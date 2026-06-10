@@ -18,11 +18,20 @@ clone_or_copy() {
     return
   fi
   echo "Cloning researchanddesire/${repo}@${branch}"
-  local clone_url="https://github.com/researchanddesire/${repo}.git"
-  if [ -n "${ASSEMBLE_GITHUB_TOKEN:-}" ]; then
-    clone_url="https://x-access-token:${ASSEMBLE_GITHUB_TOKEN}@github.com/researchanddesire/${repo}.git"
+  # Preferred: per-repo read-only deploy key (SSH). The CI workflow writes one
+  # key file per repo into ASSEMBLE_SSH_DIR. Falls back to a token, then to
+  # anonymous HTTPS (works once repos are public at cutover).
+  local key="${ASSEMBLE_SSH_DIR:-}/${repo}"
+  if [ -n "${ASSEMBLE_SSH_DIR:-}" ] && [ -f "$key" ]; then
+    GIT_SSH_COMMAND="ssh -i '$key' -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" \
+      git clone --depth 1 --branch "$branch" "git@github.com:researchanddesire/${repo}.git" "$WORK/$repo"
+  else
+    local clone_url="https://github.com/researchanddesire/${repo}.git"
+    if [ -n "${ASSEMBLE_GITHUB_TOKEN:-}" ]; then
+      clone_url="https://x-access-token:${ASSEMBLE_GITHUB_TOKEN}@github.com/researchanddesire/${repo}.git"
+    fi
+    git clone --depth 1 --branch "$branch" "$clone_url" "$WORK/$repo"
   fi
-  git clone --depth 1 --branch "$branch" "$clone_url" "$WORK/$repo"
   mkdir -p "$dest"
   if [ -d "$WORK/$repo/developer-docs/docs" ]; then
     cp -R "$WORK/$repo/developer-docs/docs/." "$dest/"

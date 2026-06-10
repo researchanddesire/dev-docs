@@ -26,10 +26,21 @@ Paths like `docs/lockbox/` (except placeholder stubs before first CI run) are **
 
 ## CI access to private forks (during prep)
 
-The OSS staging forks (`Lockbox-OSS`, `DT_Trainer-OSS`, `RADR-OSS`) are **private** until cutover. The default `GITHUB_TOKEN` cannot clone sibling private repos, so the deploy workflow reads a cross-repo token:
+The OSS staging forks (`Lockbox-OSS`, `DT_Trainer-OSS`, `RADR-OSS`) and `ossm` are **private** until cutover. The default `GITHUB_TOKEN` cannot clone sibling private repos, so CI authenticates with **per-repo read-only deploy keys** (machine credentials — no personal token):
 
-1. Mint a **fine-grained PAT** (or classic PAT with `repo` scope) with **read access** to the OSS forks + `ossm`.
-2. Add it to this repo as the **`DEV_DOCS_ASSEMBLE_TOKEN`** secret (`gh secret set DEV_DOCS_ASSEMBLE_TOKEN --repo researchanddesire/dev-docs`).
-3. Re-run the deploy workflow.
+| Repo | Deploy key secret |
+| ---- | ----------------- |
+| `Lockbox-OSS` | `ASSEMBLE_SSH_KEY_LOCKBOX` |
+| `DT_Trainer-OSS` | `ASSEMBLE_SSH_KEY_DTT` |
+| `RADR-OSS` | `ASSEMBLE_SSH_KEY_RADR` |
+| `ossm` | `ASSEMBLE_SSH_KEY_OSSM` |
 
-At cutover the forks become public canonical repos and this token is no longer required.
+To rotate a key:
+
+```bash
+ssh-keygen -t ed25519 -N "" -C "dev-docs-assemble-<repo>" -f ./key
+gh api -X POST repos/researchanddesire/<repo>/keys -f title="dev-docs-assemble (read-only)" -f key="$(cat ./key.pub)" -F read_only=true
+gh secret set ASSEMBLE_SSH_KEY_<NAME> --repo researchanddesire/dev-docs < ./key
+```
+
+The script also accepts `ASSEMBLE_GITHUB_TOKEN` (HTTPS) and `ASSEMBLE_LOCAL` (local checkout) as fallbacks. At cutover the repos become public and no credentials are required.
