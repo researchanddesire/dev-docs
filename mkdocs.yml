@@ -10,24 +10,17 @@ theme:
       primary: teal
       accent: cyan
 
-nav:
-  - Home: index.md
-  - Contributing:
-      - Getting started: contributing/getting-started.md
-      - Editing documentation: contributing/editing-docs.md
-  - Ecosystem:
-      - Overview: meta/ecosystem.md
-      - rad-json: meta/rad-json.md
-      - MQTT topology: meta/mqtt-topology.md
-      - Dashboard pairing: meta/dashboard-pairing.md
-  - Lockbox: lockbox/index.md
-  - Deep Throat Trainer: dtt/index.md
-  - RADR: radr/index.md
-  - OSSM: ossm/index.md
+plugins:
+  - search
+  - awesome-pages
 
 markdown_extensions:
   - admonition
+  - pymdownx.details
   - pymdownx.superfences
 
-# Product sections under docs/lockbox, docs/dtt, etc. are CI-assembled from each
-# product repo's developer-docs/ — do not edit those paths by hand.
+# Navigation is driven by .pages files (mkdocs-awesome-pages-plugin) so the full
+# tree assembled from each product repo's developer-docs/ shows up automatically.
+# Top-level order/titles live in docs/.pages; product order lives in each product's
+# developer-docs/docs/.pages. Product sections under docs/lockbox, docs/dtt, etc.
+# are CI-assembled — do not edit those paths by hand.
