@@ -1,0 +1,58 @@
+name: Deploy developer docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'scripts/**'
+  repository_dispatch:
+    types: [dev-docs-rebuild]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble product developer-docs
+        env:
+          LOCKBOX_BRANCH: opensource-prep
+        run: |
+          chmod +x scripts/assemble-docs.sh
+          ./scripts/assemble-docs.sh
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install MkDocs
+        run: pip install mkdocs mkdocs-material
+
+      - name: Build
+        run: mkdocs build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  publish:
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

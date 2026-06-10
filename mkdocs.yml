@@ -1,0 +1,32 @@
+site_name: Research and Desire — Developer Docs
+site_url: https://dev.researchanddesire.com/
+repo_url: https://github.com/researchanddesire/dev-docs
+repo_name: dev-docs
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      accent: cyan
+
+nav:
+  - Home: index.md
+  - Contributing:
+      - Getting started: contributing/getting-started.md
+      - Editing documentation: contributing/editing-docs.md
+  - Ecosystem:
+      - Overview: meta/ecosystem.md
+      - rad-json: meta/rad-json.md
+      - MQTT topology: meta/mqtt-topology.md
+  - Lockbox: lockbox/index.md
+  - Deep Throat Trainer: dtt/index.md
+  - RADR: radr/index.md
+  - OSSM: ossm/index.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+
+# Product sections under docs/lockbox, docs/dtt, etc. are CI-assembled from each
+# product repo's developer-docs/ — do not edit those paths by hand.
