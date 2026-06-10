@@ -22,8 +22,6 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Assemble product developer-docs
-        env:
-          LOCKBOX_BRANCH: opensource-prep
         run: |
           chmod +x scripts/assemble-docs.sh
           ./scripts/assemble-docs.sh

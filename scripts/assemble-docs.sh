@@ -27,13 +27,20 @@ clone_or_copy() {
   fi
 }
 
-LOCKBOX_BRANCH="${LOCKBOX_BRANCH:-opensource-prep}"
-DTT_BRANCH="${DTT_BRANCH:-opensource-prep}"
-RADR_BRANCH="${RADR_BRANCH:-opensource-prep}"
+LOCKBOX_REPO="${LOCKBOX_REPO:-Lockbox-OSS}"
+DTT_REPO="${DTT_REPO:-DT_Trainer-OSS}"
+RADR_REPO="${RADR_REPO:-RADR-OSS}"
+OSSM_REPO="${OSSM_REPO:-ossm}"
 
-clone_or_copy "Lockbox" "$LOCKBOX_BRANCH" "${ROOT}/docs/lockbox"
-clone_or_copy "DT_Trainer" "$DTT_BRANCH" "${ROOT}/docs/dtt"
-clone_or_copy "radr-wireless-remote" "$RADR_BRANCH" "${ROOT}/docs/radr"
-clone_or_copy "ossm" "main" "${ROOT}/docs/ossm"
+# During OSS prep, assemble from public *-OSS forks (main = opensource-prep content).
+# At cutover, set LOCKBOX_REPO=Lockbox etc. to canonical public repos.
+LOCKBOX_BRANCH="${LOCKBOX_BRANCH:-main}"
+DTT_BRANCH="${DTT_BRANCH:-main}"
+RADR_BRANCH="${RADR_BRANCH:-main}"
+
+clone_or_copy "$LOCKBOX_REPO" "$LOCKBOX_BRANCH" "${ROOT}/docs/lockbox"
+clone_or_copy "$DTT_REPO" "$DTT_BRANCH" "${ROOT}/docs/dtt"
+clone_or_copy "$RADR_REPO" "$RADR_BRANCH" "${ROOT}/docs/radr"
+clone_or_copy "$OSSM_REPO" "main" "${ROOT}/docs/ossm"
 
 echo "Assembled product docs into docs/{lockbox,dtt,radr,ossm}"
