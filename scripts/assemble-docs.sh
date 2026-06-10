@@ -18,7 +18,11 @@ clone_or_copy() {
     return
   fi
   echo "Cloning researchanddesire/${repo}@${branch}"
-  git clone --depth 1 --branch "$branch" "https://github.com/researchanddesire/${repo}.git" "$WORK/$repo"
+  local clone_url="https://github.com/researchanddesire/${repo}.git"
+  if [ -n "${ASSEMBLE_GITHUB_TOKEN:-}" ]; then
+    clone_url="https://x-access-token:${ASSEMBLE_GITHUB_TOKEN}@github.com/researchanddesire/${repo}.git"
+  fi
+  git clone --depth 1 --branch "$branch" "$clone_url" "$WORK/$repo"
   mkdir -p "$dest"
   if [ -d "$WORK/$repo/developer-docs/docs" ]; then
     cp -R "$WORK/$repo/developer-docs/docs/." "$dest/"
