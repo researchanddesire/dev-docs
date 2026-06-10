@@ -23,7 +23,10 @@ jobs:
 
       - name: Assemble product developer-docs
         env:
-          ASSEMBLE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Product OSS forks are private during prep. The default GITHUB_TOKEN
+          # cannot read sibling repos, so provide a cross-repo read token
+          # (PAT or fine-grained) as the DEV_DOCS_ASSEMBLE_TOKEN secret.
+          ASSEMBLE_GITHUB_TOKEN: ${{ secrets.DEV_DOCS_ASSEMBLE_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           chmod +x scripts/assemble-docs.sh
           ./scripts/assemble-docs.sh

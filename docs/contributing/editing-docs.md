@@ -23,3 +23,13 @@ Edit files under `docs/meta/` and `docs/contributing/` **in this repo** for ecos
 ## Do not edit assembled folders
 
 Paths like `docs/lockbox/` (except placeholder stubs before first CI run) are **overwritten** by `scripts/assemble-docs.sh`. Your PR should target the product repo's `developer-docs/` instead.
+
+## CI access to private forks (during prep)
+
+The OSS staging forks (`Lockbox-OSS`, `DT_Trainer-OSS`, `RADR-OSS`) are **private** until cutover. The default `GITHUB_TOKEN` cannot clone sibling private repos, so the deploy workflow reads a cross-repo token:
+
+1. Mint a **fine-grained PAT** (or classic PAT with `repo` scope) with **read access** to the OSS forks + `ossm`.
+2. Add it to this repo as the **`DEV_DOCS_ASSEMBLE_TOKEN`** secret (`gh secret set DEV_DOCS_ASSEMBLE_TOKEN --repo researchanddesire/dev-docs`).
+3. Re-run the deploy workflow.
+
+At cutover the forks become public canonical repos and this token is no longer required.
