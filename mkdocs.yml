@@ -19,6 +19,7 @@ nav:
       - Overview: meta/ecosystem.md
       - rad-json: meta/rad-json.md
       - MQTT topology: meta/mqtt-topology.md
+      - Dashboard pairing: meta/dashboard-pairing.md
   - Lockbox: lockbox/index.md
   - Deep Throat Trainer: dtt/index.md
   - RADR: radr/index.md

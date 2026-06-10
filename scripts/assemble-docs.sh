@@ -28,9 +28,12 @@ clone_or_copy() {
 }
 
 LOCKBOX_BRANCH="${LOCKBOX_BRANCH:-opensource-prep}"
+DTT_BRANCH="${DTT_BRANCH:-opensource-prep}"
+RADR_BRANCH="${RADR_BRANCH:-opensource-prep}"
+
 clone_or_copy "Lockbox" "$LOCKBOX_BRANCH" "${ROOT}/docs/lockbox"
-clone_or_copy "DT_Trainer" "main" "${ROOT}/docs/dtt"
-clone_or_copy "radr-wireless-remote" "main" "${ROOT}/docs/radr"
+clone_or_copy "DT_Trainer" "$DTT_BRANCH" "${ROOT}/docs/dtt"
+clone_or_copy "radr-wireless-remote" "$RADR_BRANCH" "${ROOT}/docs/radr"
 clone_or_copy "ossm" "main" "${ROOT}/docs/ossm"
 
 echo "Assembled product docs into docs/{lockbox,dtt,radr,ossm}"
