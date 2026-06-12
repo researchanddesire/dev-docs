@@ -4,4 +4,5 @@ nav:
   - rad-json.md
   - mqtt-topology.md
   - dashboard-pairing.md
+  - bom-standard.md
   - oss-staging.md
