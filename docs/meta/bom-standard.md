@@ -9,6 +9,12 @@ The single reference for Bills of Materials across all Research and Desire hardw
 - **Location:** `hardware/<product>/bom.csv`
 - **Format:** CSV, one row per line item, with the fixed header row below as the first line.
 
+## Editing a BOM
+
+Anyone — human or agent — is welcome to edit `hardware/<product>/bom.csv` directly and push or open a PR. There's no extra gatekeeping: **as long as `bom-lint` passes, the change is good.** The `bom.csv` is human-owned data, not a generated artifact.
+
+Only the schema is locked — `.github/workflows/scripts/bom.schema.json` is vendored read-only from this repo. Don't hand-edit it; changes to the standard itself happen here in `dev-docs`.
+
 ## Header row
 
 Use this exact header, in this order:
