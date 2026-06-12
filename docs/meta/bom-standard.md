@@ -58,6 +58,7 @@ The schema tracks both the canonical **field name** (machine identifier) and the
 | ADH  | Adhesive                        |
 | ASM  | Assembly                        |
 | BTP  | Belt and Pulley                 |
+| BTY  | Battery                         |
 | CAP  | Capacitor                       |
 | CBL  | Cable                           |
 | CHA  | Cable Harness Assembly          |
