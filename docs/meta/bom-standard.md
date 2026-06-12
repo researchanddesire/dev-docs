@@ -39,7 +39,7 @@ The schema tracks both the canonical **field name** (machine identifier) and the
 | `mfg_part_number`    | `MFG PN`      | string  | no       |                                                                       |
 | `vendor`             | `Vendor`      | string  | no       |                                                                       |
 | `vendor_part_number` | `Vendor PN`   | string  | no       |                                                                       |
-| `source`             | `Source`      | string  | no       | Link to the GitHub source of the part where possible (see below)      |
+| `source`             | `Source`      | string  | no       | Repo source if it exists, else a vendor/source URL, else `–` (see below) |
 | `notes`              | `Notes`       | string  | no       |                                                                       |
 
 ## Conventions
@@ -47,7 +47,7 @@ The schema tracks both the canonical **field name** (machine identifier) and the
 - **No blank cells.** An empty value is written as an en-dash `–` (U+2013), never left blank. The schema treats `–` as the "no value" marker.
 - **`qty` is a number.** Integers for discrete parts; fractions are fine for measured UOMs (e.g. `412.5` mm of belt). Lint only checks it parses as a number — it does **not** cross-check `qty` against `UOM`.
 - **`UOM` is free text.** No closed vocabulary; use sensible units. Kept loose on purpose.
-- **`source` should link to the in-repo GitHub source** that defines or produces the part (its `cad/`, `pcb/`, or `cables/` artifact) whenever one exists. Use `–` only when no source applies.
+- **`source`** prefers the in-repo GitHub source that defines or produces the part (its `cad/`, `pcb/`, or `cables/` artifact) when one exists; otherwise a vendor/product URL is acceptable; otherwise `–`.
 
 ## Part category codes
 
@@ -66,6 +66,7 @@ The schema tracks both the canonical **field name** (machine identifier) and the
 | CSM  | Machined Metal                  |
 | EXT  | Extruded Aluminum               |
 | FBO  | Fabricated, Other               |
+| FDM  | Fused Deposition Modeling Printed Parts |
 | FIL  | FDM Filament                    |
 | FST  | Fastener                        |
 | FUS  | Fuse                            |
