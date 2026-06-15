@@ -8,6 +8,7 @@
 | Change DTT firmware or its dev docs | [DT_Trainer](https://github.com/researchanddesire/DT_Trainer) |
 | Change RADR firmware or its dev docs | [radr-wireless-remote](https://github.com/researchanddesire/radr-wireless-remote) |
 | Change OSSM firmware or its dev docs | [ossm](https://github.com/researchanddesire/ossm) |
+| Start a new product repo | [rad-project-template](product-repo-template.md) |
 | Document cross-product protocols (MQTT, rad-json) | [dev-docs](https://github.com/researchanddesire/dev-docs) `docs/meta/` |
 | Change end-user guides | [simple-docs](https://github.com/researchanddesire/simple-docs) |
 
