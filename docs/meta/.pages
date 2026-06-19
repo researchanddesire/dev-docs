@@ -5,4 +5,5 @@ nav:
   - mqtt-topology.md
   - dashboard-pairing.md
   - bom-standard.md
+  - community-mods.md
   - oss-staging.md
