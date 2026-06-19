@@ -20,18 +20,29 @@ The deciding question is **what you're changing.**
 
 In short: **if it's a derivative that stands on its own, it's a mod — use `community-mods`. If you want it merged into the main product, open a PR to the product repo.**
 
+A mod can be **hosted** (files live in `community-mods`) or **external / linked**
+(it already lives in your own repo and is just *indexed* in the gallery). External
+mods keep their own upstream license — see below.
+
 Product repos stay lean — only what's needed to cut a release. Community mods
 (and their STLs/print files) live in the separate mods repo so the product
 repos don't carry that weight.
 
 ## License
 
-Mods follow the same unified RAD model as the products they modify —
+**Hosted mods** follow the same unified RAD model as the products they modify —
 **CERN-OHL-S v2** for hardware/printable design files, **MPL 2.0** for any
 software — with a DCO sign-off. There's no contributor license choice; the
-`community-mods` repo enforces it. See its `CONTRIBUTING.md` for the full
-submission rules and the safety-review policy (mods touching restraint-release,
-applied force, or electrical get a human safety pass).
+`community-mods` repo enforces it.
+
+**External / linked mods** keep their **upstream license**, declared in
+`mod.yml` — it may differ from the default (for example, the
+[OSSM M5 Remote](https://github.com/ortlof/OSSM-M5-Remote) is indexed under
+CC-BY-SA-4.0). We link to and index these rather than relicensing them.
+
+See `CONTRIBUTING.md` for the full submission rules and the safety-review policy
+(mods touching restraint-release, applied force, or electrical get a human
+safety pass).
 
 ## Standard
 
