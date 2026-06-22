@@ -5,19 +5,35 @@ repo_name: dev-docs
 
 theme:
   name: material
+  logo: assets/rad-logo.png
+  favicon: assets/favicon.png
+  font: false
   palette:
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
     - scheme: default
-      primary: teal
-      accent: cyan
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
 
 plugins:
   - search
   - awesome-pages
 
+extra_css:
+  - stylesheets/developer.css
+
 markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - md_in_html
 
 # Navigation is driven by .pages files (mkdocs-awesome-pages-plugin) so the full
 # tree assembled from each product repo's developer-docs/ shows up automatically.
