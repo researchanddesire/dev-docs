@@ -1,0 +1,10 @@
+{
+  "title": "Guides",
+  "pages": [
+    "changelog",
+    "getting-started",
+    "housekeeping",
+    "reference",
+    "user-guide"
+  ]
+}

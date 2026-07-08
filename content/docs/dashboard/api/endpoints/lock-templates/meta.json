@@ -1,0 +1,8 @@
+{
+  "title": "Lock Templates",
+  "pages": [
+    "list-lock-templates",
+    "get-active-lock-template",
+    "get-lock-template-by-id"
+  ]
+}

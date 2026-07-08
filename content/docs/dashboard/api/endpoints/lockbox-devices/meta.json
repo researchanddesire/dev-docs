@@ -1,0 +1,7 @@
+{
+  "title": "Lockbox Devices",
+  "pages": [
+    "list-lockbox-devices",
+    "get-lockbox-device-by-id"
+  ]
+}

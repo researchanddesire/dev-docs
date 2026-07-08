@@ -1,0 +1,11 @@
+{
+  "title": "Dashboard Settings",
+  "pages": [
+    "introduction",
+    "account",
+    "email",
+    "public-links",
+    "discreet-mode",
+    "integrations"
+  ]
+}

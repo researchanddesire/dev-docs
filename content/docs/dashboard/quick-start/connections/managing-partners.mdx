@@ -1,0 +1,163 @@
+---
+title: "Managing Partner Connections"
+description: "Learn how to view, manage, and create partner connections from your dashboard"
+---
+
+Partner connections let you safely share device control with trusted users. Once connected, partners can view and control only the devices and features you explicitly allow.
+
+<iframe
+  className="aspect-video w-full rounded-xl"
+  src="https://www.loom.com/embed/085e35989cf440f09f62222e4f52e18b"
+  title="Managing partner connections walkthrough"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+## Prerequisites
+
+- You have a dashboard account and are signed in
+- You know your partner’s username or their exact email address
+- Devices are registered to the correct account (see <a href="/dashboard/faqs/device-ownership-dispute-policy">device ownership guidance</a>)
+
+<Note>
+  Invitations work across mobile and desktop. The steps and screens are the same
+  on both.
+</Note>
+
+## Access partner settings
+
+Go to Settings → Partners to view existing connections, send new invitations, and manage partner permissions.
+
+## Manage existing connections
+
+From the Partners page, you can:
+
+- See all active partner connections and their status (Pending, Active, Removed)
+- View each partner’s username and what they can control
+- Open a connection’s details with Manage to edit or remove it
+
+<Warning>
+  Removing a partner immediately revokes their access to your devices. This
+  action is permanent—re-adding them requires sending a new invitation.
+</Warning>
+
+## Create a new partner invitation
+
+<Steps>
+<Step title="Open the Partners page">
+Go to Settings → Partners in your dashboard.
+</Step>
+
+<Step title="Start a new invitation">
+  Select Create invitation at the bottom of the page.
+</Step>
+
+<Step title="Choose how to invite and enter details">
+You can invite a partner in two ways:
+
+- Search by username — Enter the username of someone already on the platform
+- Invite by email — Enter the exact email address of the person you want to invite
+
+<Warning>
+Email search requires an exact match. Partial emails will not return results. If the email isn’t registered, we’ll send an invitation to join the platform.
+</Warning>
+</Step>
+
+<Step title="Send invitation and wait for acceptance">
+Send the invite. Your partner will receive an in-app notification (and an email if they’ve enabled Sharing Events in <a href="/dashboard/settings/email-preferences">Email Preferences</a>). The connection becomes Active once they accept.
+
+<Check>
+You’ll see the new entry listed with status Pending until your partner accepts.
+</Check>
+</Step>
+</Steps>
+
+## Understand partner roles
+
+The platform uses a device owner/controller model:
+
+- Device owner — Registers devices on their account and grants access to partners
+- Controller — Receives permission to view and control the owner’s devices per granted scope
+
+<Tip>
+  As a controller, you can switch to the owner’s account view at any time by
+  selecting the account name in the top-left corner of the dashboard. This lets
+  you access and control the shared devices without logging out.
+</Tip>
+
+<Info>
+  For Lockbox users: enabling Give Up Control hands full control to your
+  assigned partner and disables your own lock actions. See details in{" "}
+  <a href="/chastity-lockbox/faqs">Chastity Lockbox FAQs</a>.
+</Info>
+
+## Remove a partner
+
+- Open Settings → Partners
+- Select Manage on the connection
+- Choose Remove partner and confirm
+
+<Check>
+  Once removed, the partner no longer sees your devices or controls. If needed
+  later, send a new invitation.
+</Check>
+
+## What your partner sees
+
+- A notification to accept or decline your invitation
+- Your account available in the top-left account switcher after acceptance
+- Only the devices and controls you’ve shared with them
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="I can’t find my partner by email">
+- Use the exact email address. Partial matches won’t work.
+- If they’re new, invite them by email so they receive a sign‑up link and can accept after registration.
+</Accordion>
+
+<Accordion title="My partner accepted but can’t control the device">
+  - Confirm the device is registered to the owner’s account (see{" "}
+  <a href="/dashboard/faqs/device-ownership-dispute-policy">
+    device ownership policy
+  </a>
+  ) - Refresh the dashboard after acceptance - For Lockbox, make sure the
+  correct account has control (see Give Up Control in{" "}
+  <a href="/chastity-lockbox/faqs">Lockbox FAQs</a>)
+</Accordion>
+
+<Accordion title="I don’t see the invitation status updating">
+- Check your connection’s status on Settings → Partners
+- Ask your partner to refresh and look for the in‑app notification
+- Make sure Sharing Events notifications are enabled in <a href="/dashboard/settings/email-preferences">Email Preferences</a> if you expect email alerts
+</Accordion>
+</AccordionGroup>
+
+## Related
+
+<CardGroup cols={2}>
+<Card title="Dashboard Settings" icon="gear" href="/dashboard/settings">
+  Manage your account, devices, and preferences.
+</Card>
+
+<Card
+  title="Email Preferences"
+  icon="envelope"
+  href="/dashboard/settings/email-preferences"
+>
+  Control which notifications you receive.
+</Card>
+
+<Card
+  title="Device Ownership Policy"
+  icon="file-contract"
+  href="/dashboard/faqs/device-ownership-dispute-policy"
+>
+  Understand how device ownership works.
+</Card>
+
+<Card title="Chastity Lockbox FAQs" icon="lock" href="/chastity-lockbox/faqs">
+  Common questions about Lockbox features.
+</Card>
+</CardGroup>

@@ -1,0 +1,457 @@
+---
+title: "DTT (Deepthroat Trainer)"
+description: "List devices and training templates for the Deepthroat Trainer"
+---
+
+## List DTT Devices
+
+<div className="not-prose">`GET /api/v1/dtt`</div>
+
+Returns all Deepthroat Trainer devices you have access to.
+
+<ParamField query="limit" type="number" default="50">
+  Number of records to return (max 100).
+</ParamField>
+
+<ParamField query="offset" type="number" default="0">
+  Number of records to skip for pagination.
+</ParamField>
+
+<ResponseField name="data.data" type="object[]" required>
+  Array of DTT device objects.
+
+<ResponseField name="id" type="number">
+  Device ID.
+</ResponseField>
+
+<ResponseField name="bubbleId" type="string">
+  Unique device identifier.
+</ResponseField>
+
+<ResponseField name="ownerId" type="number">
+  ID of the device owner.
+</ResponseField>
+
+<ResponseField name="macAddress" type="string">
+  Device MAC address.
+</ResponseField>
+
+<ResponseField name="serialNumber" type="number">
+  Hardware serial number.
+</ResponseField>
+
+<ResponseField name="softwareVersion" type="string">
+  Currently installed firmware version.
+</ResponseField>
+
+<ResponseField name="lastVisited" type="string">
+  ISO 8601 timestamp of the last device connection.
+</ResponseField>
+
+  <ResponseField name="apiHits" type="number">
+    Total API requests made by this device.
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="data.pagination" type="object" required>
+  Pagination metadata.
+
+<ResponseField name="limit" type="number">
+  Number of records returned.
+</ResponseField>
+
+  <ResponseField name="offset" type="number">
+    Number of records skipped.
+  </ResponseField>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "https://dashboard.researchanddesire.com/api/v1/dtt?limit=50&offset=0"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 OK
+{
+  "ok": true,
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "bubbleId": "dtt-abc",
+        "ownerId": 42,
+        "macAddress": "AA:BB:CC:DD:EE:FF",
+        "serialNumber": 1001,
+        "softwareVersion": "2.1.0",
+        "lastVisited": "2026-02-17T12:00:00Z",
+        "apiHits": 256
+      }
+    ],
+    "pagination": {
+      "limit": 50,
+      "offset": 0
+    }
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Get DTT Device
+
+<div className="not-prose">`GET /api/v1/dtt/{id}`</div>
+
+Returns full details for a specific DTT device.
+
+<ParamField path="id" type="number" required>
+  The DTT device ID.
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  https://dashboard.researchanddesire.com/api/v1/dtt/1
+```
+</RequestExample>
+
+---
+
+## List DTT Templates
+
+<div className="not-prose">`GET /api/v1/dtt/templates`</div>
+
+Returns all training program templates you have access to, **without** segments. Use this for an overview of available programs.
+
+<ParamField query="limit" type="number" default="50">
+  Number of records to return (max 100).
+</ParamField>
+
+<ParamField query="offset" type="number" default="0">
+  Number of records to skip for pagination.
+</ParamField>
+
+<ResponseField name="data.data" type="object[]" required>
+  Array of template objects.
+
+<ResponseField name="id" type="number">
+  Template ID.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Program name.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Program description.
+</ResponseField>
+
+<ResponseField name="isPublic" type="boolean">
+  Whether the program is publicly shared.
+</ResponseField>
+
+<ResponseField name="isActive" type="boolean">
+  Whether this is the currently active program.
+</ResponseField>
+
+<ResponseField name="handsFreeMode" type="boolean">
+  Whether hands-free mode is enabled.
+</ResponseField>
+
+<ResponseField name="targetDepth" type="number">
+  Target depth setting in millimeters.
+</ResponseField>
+
+  <ResponseField name="targetWindow" type="number">
+    Tolerance window for depth detection.
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="data.pagination" type="object" required>
+  Pagination metadata.
+
+<ResponseField name="limit" type="number">
+  Number of records returned.
+</ResponseField>
+
+  <ResponseField name="offset" type="number">
+    Number of records skipped.
+  </ResponseField>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "https://dashboard.researchanddesire.com/api/v1/dtt/templates?limit=50&offset=0"
+```
+</RequestExample>
+
+---
+
+## Get DTT Template with Segments
+
+<div className="not-prose">`GET /api/v1/dtt/templates/{id}`</div>
+
+Returns a specific training program **including all segments**. Segments define the individual phases of a training session.
+
+<ParamField path="id" type="number" required>
+  The template (program) ID.
+</ParamField>
+
+<ResponseField name="data" type="object" required>
+  The template object with a nested `Segment` array.
+
+  <ResponseField name="Segment" type="object[]">
+    Array of training segments in order.
+
+    <ResponseField name="id" type="number">
+      Segment ID.
+    </ResponseField>
+
+    <ResponseField name="type" type="string">
+      Segment type.
+    </ResponseField>
+
+    <ResponseField name="duration" type="number">
+      Duration in seconds.
+    </ResponseField>
+
+    <ResponseField name="repeat" type="number">
+      Number of times to repeat this segment.
+    </ResponseField>
+
+  </ResponseField>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  https://dashboard.researchanddesire.com/api/v1/dtt/templates/5
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 OK
+{
+  "ok": true,
+  "data": {
+    "id": 5,
+    "name": "Beginner Program",
+    "isActive": true,
+    "handsFreeMode": false,
+    "targetDepth": 50,
+    "Segment": [
+      {
+        "id": 10,
+        "type": "warmup",
+        "duration": 30,
+        "repeat": 1
+      },
+      {
+        "id": 11,
+        "type": "training",
+        "duration": 60,
+        "repeat": 3
+      }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Update DTT Template
+
+<div className="not-prose">`PATCH /api/v1/dtt/templates/{id}`</div>
+
+Update one or more fields on a training program. Only include the fields you want to change — all fields are optional.
+
+If `Segment` is provided, it **replaces** the entire segment list (existing segments are deleted and recreated).
+
+<ParamField path="id" type="number" required>
+  The template (program) ID.
+</ParamField>
+
+### Request Body
+
+<ParamField body="name" type="string">
+  Program name (4–128 characters, cannot be blank).
+</ParamField>
+
+<ParamField body="targetDepth" type="number">
+  Target depth percentage.
+</ParamField>
+
+<ParamField body="targetWindow" type="number">
+  Tolerance window for depth detection.
+</ParamField>
+
+<ParamField body="toyId" type="number | null">
+  Associated toy ID. Set to `0` or `null` to unset.
+</ParamField>
+
+<ParamField body="message" type="string | null">
+  Completion message (max 50 characters). Defaults to "Good Work!" if empty.
+</ParamField>
+
+<ParamField body="handsFreeMode" type="boolean">
+  Enable hands-free mode. **Requires Ultra subscription.** Setting to `false` is always allowed.
+</ParamField>
+
+<ParamField body="tagline" type="string | null">
+  Short tagline (max 25 characters). **Requires Ultra subscription.** Setting to `null` is always allowed.
+</ParamField>
+
+<ParamField body="toyTagline" type="string | null">
+  Toy tagline (max 25 characters).
+</ParamField>
+
+<ParamField body="iconId" type="number | null">
+  Icon ID. **Requires Ultra subscription.** Setting to `null` is always allowed.
+</ParamField>
+
+<ParamField body="isPublic" type="boolean">
+  Whether the program is publicly shared.
+</ParamField>
+
+<ParamField body="description" type="string | null">
+  Program description (max 500 characters).
+</ParamField>
+
+<ParamField body="Segment" type="object[]">
+  Full replacement segment list. If provided, **all existing segments are deleted** and replaced.
+
+  Each segment object:
+
+  <ParamField body="type" type="string" required>
+    One of `repetition`, `endurance`, `freeform`, or `bounce`.
+  </ParamField>
+
+  <ParamField body="duration" type="number" required>
+    Duration (meaning varies by type).
+  </ParamField>
+
+  <ParamField body="speed" type="number" required>
+    Speed setting (1–1000).
+  </ParamField>
+
+  <ParamField body="repeat" type="number" default="1">
+    Number of times to repeat this segment.
+  </ParamField>
+
+  <ParamField body="passFailEnabled" type="boolean" default="false">
+    Whether pass/fail grading is enabled for this segment.
+  </ParamField>
+
+  <ParamField body="passGradeThreshold" type="number" default="0">
+    Minimum grade to pass (0–100).
+  </ParamField>
+
+  <ParamField body="failureText" type="string | null">
+    Message shown on failure (max 80 characters).
+  </ParamField>
+</ParamField>
+
+### Error Responses
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Invalid JSON body or empty request body |
+| `401` | Not authenticated |
+| `403` | Field requires Ultra subscription |
+| `404` | Template not found or not owned by you |
+| `422` | Validation failed — see `fieldErrors` array for details |
+
+On a `422` response, the body contains a `fieldErrors` array with per-field error messages:
+
+```json
+{
+  "ok": false,
+  "error": "Validation failed",
+  "fieldErrors": [
+    { "field": "name", "message": "String must contain at least 4 character(s)" }
+  ]
+}
+```
+
+<RequestExample>
+```bash Rename
+curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Advanced Program"}' \
+  https://dashboard.researchanddesire.com/api/v1/dtt/templates/5
+```
+
+```bash Replace Segments
+curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"Segment": [{"type": "endurance", "duration": 300, "speed": 50, "repeat": 2}]}' \
+  https://dashboard.researchanddesire.com/api/v1/dtt/templates/5
+```
+
+```bash Multiple Fields
+curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Pro Program", "targetDepth": 75, "isPublic": true}' \
+  https://dashboard.researchanddesire.com/api/v1/dtt/templates/5
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 OK
+{
+  "ok": true,
+  "data": {
+    "id": 5,
+    "bubbleId": "prog-abc",
+    "ownerId": 42,
+    "name": "Advanced Program",
+    "description": null,
+    "tagline": null,
+    "message": "Good Work!",
+    "isPublic": false,
+    "isActive": true,
+    "handsFreeMode": false,
+    "targetDepth": 50,
+    "targetWindow": 10,
+    "toyId": null,
+    "createdDate": "2025-06-01T10:00:00Z",
+    "updatedAt": "2026-02-23T10:30:00Z",
+    "Segment": [
+      {
+        "id": 20,
+        "type": "endurance",
+        "duration": 300,
+        "speed": 50,
+        "repeat": 2,
+        "order": 0,
+        "passFailEnabled": false,
+        "passGradeThreshold": 0,
+        "failureText": null
+      }
+    ]
+  }
+}
+```
+
+```json 422 Validation Error
+{
+  "ok": false,
+  "error": "Validation failed",
+  "fieldErrors": [
+    { "field": "name", "message": "String must contain at least 4 character(s)" },
+    { "field": "Segment", "message": "At least one segment is required." }
+  ]
+}
+```
+
+```json 403 Ultra Required
+{
+  "ok": false,
+  "error": "\"handsFreeMode\" requires an Ultra subscription or higher. Your current tier does not include this feature."
+}
+```
+</ResponseExample>

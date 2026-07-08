@@ -1,0 +1,14 @@
+{
+  "title": "Technical Documentation",
+  "pages": [
+    "introduction",
+    "device-states",
+    "button-controls",
+    "led-feedback",
+    "calibration",
+    "sensor-limits",
+    "offline-mode",
+    "firmware-updates",
+    "error-codes"
+  ]
+}

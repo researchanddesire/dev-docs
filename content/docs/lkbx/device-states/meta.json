@@ -1,0 +1,12 @@
+{
+  "title": "Device States",
+  "pages": [
+    "introduction",
+    "calibration",
+    "sleep-mode",
+    "take-a-break",
+    "permalock",
+    "restarting",
+    "emergency-unlock"
+  ]
+}

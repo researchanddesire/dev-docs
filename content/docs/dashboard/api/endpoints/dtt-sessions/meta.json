@@ -1,0 +1,8 @@
+{
+  "title": "DTT Sessions",
+  "pages": [
+    "list-dtt-training-sessions",
+    "get-latest-dtt-session",
+    "get-dtt-session-by-id"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "title": "Guides",
+  "pages": [
+    "changelog",
+    "community",
+    "contributing",
+    "getting-started",
+    "housekeeping",
+    "using-ossm"
+  ]
+}

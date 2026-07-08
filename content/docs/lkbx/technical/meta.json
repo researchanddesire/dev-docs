@@ -1,0 +1,12 @@
+{
+  "title": "Technical Documentation",
+  "pages": [
+    "introduction",
+    "button-controls",
+    "idle-and-power-states",
+    "menu-structure",
+    "offline-mode",
+    "sensor-system",
+    "timer-duration-limits"
+  ]
+}
