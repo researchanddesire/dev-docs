@@ -1,10 +1,4 @@
 {
-  "title": "Radr",
-  "pages": [
-    "faqs",
-    "Hardware",
-    "Software",
-    "guides",
-    "tools"
-  ]
+  "title": "RADR",
+  "pages": ["index", "software", "hardware"]
 }

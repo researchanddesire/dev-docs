@@ -1,7 +1,0 @@
-{
-  "title": "OSSM Devices",
-  "pages": [
-    "list-ossm-devices",
-    "get-ossm-device-by-id"
-  ]
-}

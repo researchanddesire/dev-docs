@@ -1,12 +1,4 @@
 {
-  "title": "Dashboard",
-  "pages": [
-    "subscription",
-    "api",
-    "changelog",
-    "faqs",
-    "leaderboards",
-    "quick-start",
-    "settings"
-  ]
+  "title": "Dashboard API",
+  "pages": ["index", "api"]
 }

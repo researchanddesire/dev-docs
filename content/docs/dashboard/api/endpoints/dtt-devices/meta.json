@@ -1,7 +1,0 @@
-{
-  "title": "DTT Devices",
-  "pages": [
-    "list-dtt-devices",
-    "get-dtt-device-by-id"
-  ]
-}

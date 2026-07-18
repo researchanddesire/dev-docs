@@ -1,13 +1,15 @@
 {
-  "title": "Introduction",
+  "title": "Developer Docs",
   "pages": [
     "index",
     "quickstart",
     "dashboard",
-    "dtt",
-    "lkbx",
+    "api-reference",
+    "integrations",
     "ossm",
     "radr",
-    "shop"
+    "dtt",
+    "lkbx",
+    "contributing"
   ]
 }

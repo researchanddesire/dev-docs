@@ -1,14 +1,11 @@
 {
-  "title": "Technical Documentation",
+  "title": "Firmware and Sensors",
   "pages": [
     "introduction",
     "device-states",
-    "button-controls",
-    "led-feedback",
     "calibration",
     "sensor-limits",
     "offline-mode",
-    "firmware-updates",
-    "error-codes"
+    "firmware-updates"
   ]
 }

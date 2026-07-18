@@ -1,10 +1,9 @@
 {
-  "title": "Technical Documentation",
+  "title": "Firmware and Sensors",
   "pages": [
     "introduction",
-    "button-controls",
+    "calibration",
     "idle-and-power-states",
-    "menu-structure",
     "offline-mode",
     "sensor-system",
     "timer-duration-limits"

@@ -1,9 +1,4 @@
 {
-  "title": "Ossm",
-  "pages": [
-    "Hardware",
-    "Software",
-    "guides",
-    "tools"
-  ]
+  "title": "OSSM",
+  "pages": ["index", "software", "hardware"]
 }

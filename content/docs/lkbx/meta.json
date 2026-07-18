@@ -1,13 +1,4 @@
 {
-  "title": "Lkbx",
-  "pages": [
-    "faqs",
-    "changelog",
-    "device-states",
-    "errors",
-    "quick-start",
-    "support",
-    "technical",
-    "using"
-  ]
+  "title": "Lockbox",
+  "pages": ["index", "technical"]
 }

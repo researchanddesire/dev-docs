@@ -1,14 +1,4 @@
 {
-  "title": "Dtt",
-  "pages": [
-    "software-2.0-preview",
-    "faqs",
-    "changelog",
-    "errors",
-    "guides",
-    "quick-start",
-    "specs",
-    "technical",
-    "training-modes"
-  ]
+  "title": "DTT",
+  "pages": ["index", "specs", "technical"]
 }

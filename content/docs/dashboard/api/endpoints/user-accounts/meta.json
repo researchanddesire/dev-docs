@@ -1,7 +1,0 @@
-{
-  "title": "Users",
-  "pages": [
-    "list-users",
-    "get-user-by-id"
-  ]
-}
