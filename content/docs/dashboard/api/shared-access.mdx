@@ -1,0 +1,39 @@
+---
+title: "Shared Access & Keyholders"
+description: "How the API scopes data to you and your linked users, and how keyholders read a lockee's sessions"
+---
+
+Every endpoint is scoped to the users you have access to: **yourself, plus anyone linked to your account via a partnership**. Your API token inherits the exact same permissions as your dashboard account, so you never see data you couldn't already see in the dashboard.
+
+This page explains how that scoping works across the API — especially for keyholders reading their lockee's data. For the request and response details of any individual endpoint, see its page in the reference (e.g. [Lock Sessions](/api-reference/lock-sessions/list-lock-sessions)).
+
+## Keyholders use the same endpoints
+
+Keyholders are always linked users. That means **there is no separate keyholder API** — as a keyholder you list and read your lockee's data with the exact same endpoints you use for your own. The results simply include the sessions and devices of any user linked to you.
+
+- [List Lock Sessions](/api-reference/lock-sessions/list-lock-sessions) returns your lockee's sessions alongside your own. Use the `ownerId` field on each record to tell whose session it is.
+- [Get Active Lock Session](/api-reference/lock-sessions/get-active-lock-session) accepts a `targetUserId` query parameter, so a keyholder can verify a lockee's lock is running without the lockee reporting it.
+
+<Info>
+  A lock session's `ownerId` is the user who wears the lock. When you keyhold for
+  someone, their sessions appear in your results with their `ownerId`, not yours.
+</Info>
+
+## Finding a linked user's ID
+
+Endpoints that act on another user (such as `targetUserId`) take a numeric user ID. To discover the users linked to you and their IDs, call [List Users](/api-reference/users/list-users) — it returns yourself plus everyone connected to you via partnerships, filtered by your account permissions.
+
+## Access outside your permissions
+
+The API never reveals data — or even the existence of data — outside your access. How a request is rejected depends on how it identifies the target:
+
+| Request style | Outside your access |
+| ------------- | ------------------- |
+| Fetch a session by ID (e.g. [Get Lock Session by ID](/api-reference/lock-sessions/get-lock-session-by-id)) | Returns `404` — the API deliberately does not distinguish "doesn't exist" from "not yours" |
+| Pass a `targetUserId` (e.g. [Get Active Lock Session](/api-reference/lock-sessions/get-active-lock-session)) | Returns `403` — the target is a user you don't have access to |
+
+<Note>
+  Because a by-ID lookup returns `404` for both a missing session and one that
+  belongs to someone else, you cannot use it to probe whether a given session ID
+  exists. This is intentional.
+</Note>
