@@ -5,12 +5,13 @@ description: Choose a supported R+D integration surface.
 
 # Supported integration surfaces
 
-| Goal | Interface |
-| --- | --- |
-| Cloud-authorized data and actions | [Dashboard API](/dashboard/api/introduction) |
-| OSSM wireless device communication | [OSSM BLE](/ossm/software/communication/ble) |
-| OSSM hardware signals | [OSSM GPIO](/ossm/software/communication/gpio) |
-| Add or update a RADR device definition | [RADR Device Registry](/radr/software/device-registry/introduction) |
-| Read a supported DTT accessory | [DTT Accessory Port](/dtt/specs/accessory-port) |
+| Goal                                           | Interface                                                           |
+| ---------------------------------------------- | ------------------------------------------------------------------- |
+| Cloud-authorized data and actions              | [Dashboard API](/dashboard/api/introduction)                        |
+| Direct BLE control of OSSM, RADR, DTT, or LKBX | [RAD BLE v1](/integrations/rad-ble)                                 |
+| OSSM wireless device communication             | [OSSM BLE](/ossm/software/communication/ble)                        |
+| OSSM hardware signals                          | [OSSM GPIO](/ossm/software/communication/gpio)                      |
+| Add or update a RADR device definition         | [RADR Device Registry](/radr/software/device-registry/introduction) |
+| Read a supported DTT accessory                 | [DTT Accessory Port](/dtt/specs/accessory-port)                     |
 
 An integration must preserve the device's stop behavior, input limits, and disconnected state. Review the target firmware and hardware revision before relying on a field or signal.
