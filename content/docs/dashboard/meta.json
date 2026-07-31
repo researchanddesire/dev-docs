@@ -1,4 +1,4 @@
 {
   "title": "Dashboard API",
-  "pages": ["index", "api"]
+  "pages": ["index", "observability", "api"]
 }

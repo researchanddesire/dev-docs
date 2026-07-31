@@ -1,0 +1,79 @@
+---
+title: PostHog observability
+description: Preserve the R+D Dashboard telemetry, identity, privacy, and release contracts.
+---
+
+# PostHog observability
+
+All repository telemetry belongs to the **RD Dashboard** PostHog project
+(`279829`, US Cloud). Build tooling rejects a different project ID. Do not
+connect development, deployment, or source-map tooling to another PostHog
+project.
+
+## Deployment configuration
+
+Web, admin, and Kinky Makers deployments require:
+
+- `NEXT_PUBLIC_POSTHOG_KEY`
+- `NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com`
+- `POSTHOG_PROJECT_ID=279829`
+- `POSTHOG_API_KEY` as a server-only personal key with only the source-map
+  upload permissions it needs
+
+Native EAS environments require `EXPO_PUBLIC_POSTHOG_KEY`,
+`EXPO_PUBLIC_POSTHOG_HOST`, and `EXPO_PUBLIC_APP_ENV`. Native source maps and
+symbols additionally require `POSTHOG_CLI_API_KEY`,
+`POSTHOG_CLI_HOST=https://us.posthog.com`, and
+`POSTHOG_CLI_PROJECT_ID=279829`.
+
+Supabase Edge Functions require `POSTHOG_PROJECT_KEY`, `POSTHOG_HOST`, and
+`DEPLOYMENT_ENVIRONMENT`. Forward failed requests to Logs. Successful device
+telemetry is summarized as product events by the web proxy.
+
+Never expose a personal API key through a `NEXT_PUBLIC_` or `EXPO_PUBLIC_`
+variable.
+
+## Identity contract
+
+- RAD web, native, admin, and server events identify a signed-in person with
+  the decimal application `User.id`, serialized as a string.
+- Kinky Makers uses `km:<Supabase auth UUID>` until it shares the RAD profile
+  model. The prefix prevents accidental identity merges.
+- Browser and native clients call `reset()` on logout and before changing
+  identified accounts.
+- Hardware is a `device` group. A MAC address is never a person ID or a group
+  key; use the hashed stable device identifier.
+
+These rules let support staff start from an application user ID and find that
+person's web, native, server, session, error, and log records without exposing
+private hardware identifiers.
+
+## Required context and privacy
+
+Every service attaches `service_name`, `platform`, `environment`, release or
+version, and deployment identifiers when available. Failed server requests also
+attach route, method, request ID, and `traceparent`.
+
+Do not send request bodies, access tokens, email addresses, intimate content,
+prompts, raw MAC addresses, or device credentials. Keep replay inputs masked.
+Kinky Makers masks all rendered text, and admin replay remains disabled.
+
+## Release verification
+
+After each staging or production deployment:
+
+1. Confirm an event contains the expected `environment`, Git SHA, deployment
+   ID, application version, service, and platform.
+2. Confirm web and native events for the same RAD account use the same numeric
+   distinct ID.
+3. Confirm logout followed by a different login creates no identity-merge
+   ingestion warning.
+4. Confirm web, admin, Kinky Makers, native, and edge-function data can be
+   separated by service and environment.
+5. Confirm a test exception resolves to source through the uploaded source map
+   or native symbols.
+6. Confirm a server failure creates an error issue and a correlated OTLP log.
+7. Confirm device events contain a `device` group and no raw MAC address.
+
+The repository runbook at `docs/posthog-observability.md` contains the
+corresponding operator checklist.
