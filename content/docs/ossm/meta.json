@@ -1,4 +1,5 @@
 {
   "title": "OSSM",
+  "root": true,
   "pages": ["index", "software", "hardware"]
 }
