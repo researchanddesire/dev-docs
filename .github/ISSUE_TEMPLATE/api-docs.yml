@@ -1,0 +1,38 @@
+name: API documentation issue
+description: Report a problem in a generated API operation page.
+title: "API docs: "
+labels:
+  - documentation
+body:
+  - type: input
+    id: operation
+    attributes:
+      label: Operation
+      description: Include the method, path, or operation ID shown on the page.
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Rendered page URL
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual documentation
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected documentation
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Public information
+      options:
+        - label: This report contains no credentials or private customer information.
+          required: true
