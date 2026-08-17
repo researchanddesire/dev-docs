@@ -1,10 +1,46 @@
 ---
 title: Contributing
-description: Review and contribute supported R+D technical documentation.
+description: Edit R+D documentation on GitHub and submit a reviewed public contribution.
 ---
 
 # Contribute technical documentation
 
-Documentation changes should name the supported product, hardware revision, firmware version, or API schema they describe. Link claims to the implementation or specification used to verify them.
+Every editable page title and section heading has a subtle pencil. Selecting it opens the corresponding Markdown or MDX file at the exact line in GitHub's web editor on `main`.
+
+## Make a quick edit
+
+1. Select the pencil beside the page title or section you want to improve.
+2. Sign in to GitHub if prompted.
+3. Edit the highlighted source. If you do not have write access, GitHub creates a fork for you automatically.
+4. Select **Propose changes**, describe the improvement, and open a pull request into `main`.
+5. Let the public content validation finish and respond to maintainer feedback.
+
+After approval, automation synchronizes the byte-identical content into the private application repository and the rendered site is deployed through the normal release track. Commits marked `[docs-sync]` are ignored by the reciprocal workflow so the two-way mirror cannot loop.
+
+## Choose the correct repository
+
+| Rendered site                                       | Public source                                                                         | Editable content |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------- | ---------------- |
+| [User Guides](https://docs.researchanddesire.com)   | [researchanddesire/simple-docs](https://github.com/researchanddesire/simple-docs)     | `content/`       |
+| [Developer Docs](https://dev.researchanddesire.com) | [researchanddesire/dev-docs](https://github.com/researchanddesire/dev-docs)           | `content/docs/`  |
+| [R+D Assembly](https://ohai.researchanddesire.com)  | [researchanddesire/assembly-docs](https://github.com/researchanddesire/assembly-docs) | `content/docs/`  |
+
+The application, Fumadocs renderer, API implementation, deployment settings, and credentials remain in the private application repository. Individual API operation pages are generated from the Dashboard OpenAPI document, so they provide a **Report an API docs issue** link instead of a misleading source-line pencil.
+
+## Write a useful contribution
+
+- Name the supported product, hardware revision, firmware version, or API schema when it matters.
+- Link technical claims to the implementation or specification used to verify them.
+- Keep images beside the page that uses them and verify every relative path.
+- Reuse the existing MDX callouts, cards, tabs, accordions, and steps.
+- Keep each pull request focused and never include credentials, private product information, or generated build output.
+
+Small corrections can be completed entirely in GitHub. For larger changes, fork and clone the public repository, edit its `content/` tree, and use the Fumadocs Preview extension for VS Code before opening the pull request.
+
+## License
+
+R+D-owned documentation prose and media in these public repositories is available under CC BY-SA 4.0 unless a file or directory says otherwise. Code samples, product source, hardware material, and third-party assets retain their stated licenses.
 
 Physical build procedures belong in [R+D Assembly](https://ohai.researchanddesire.com/ossm). Consumer instructions belong in the [User Guides](https://docs.researchanddesire.com/). Keep Developer Docs focused on APIs, firmware, protocols, official hardware interfaces, and integrations.
+
+GitHub documents the complete [editing and fork-based pull request flow](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files).
