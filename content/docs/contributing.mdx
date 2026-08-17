@@ -17,6 +17,8 @@ Every editable page title and section heading has a subtle pencil. Selecting it 
 
 After approval, automation synchronizes the byte-identical content into the private application repository and the rendered site is deployed through the normal release track. Commits marked `[docs-sync]` are ignored by the reciprocal workflow so the two-way mirror cannot loop.
 
+The synchronization jobs compare Git content-tree hashes after every transfer. This keeps the public `main` files byte-identical with the rendered source so an edit link cannot silently drift to the wrong line.
+
 ## Choose the correct repository
 
 | Rendered site                                       | Public source                                                                         | Editable content |
