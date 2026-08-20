@@ -1,0 +1,80 @@
+---
+title: "Observabilité PostHog"
+description: "Préserver les contrats de télémétrie, d'identité, de confidentialité et de publication du tableau de bord R+D."
+---
+
+# Observabilité PostHog
+
+Toutes les télémétries du référentiel appartiennent au projet **RD Dashboard** PostHog
+(`279829`, US Cloud). Les outils de génération rejettent un ID de projet différent. Ne pas
+connecter des outils de développement, de déploiement ou de mappage source à un autre PostHog
+projet.
+
+## Configuration du déploiement
+
+Les déploiements Web, administrateur et Kinky Makers utilisent :
+
+- `NEXT_PUBLIC_POSTHOG_KEY`
+- `NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com`
+- `POSTHOG_PROJECT_ID=279829`
+- `POSTHOG_API_KEY` en tant que clé personnelle facultative réservée au serveur avec uniquement le
+  autorisations de téléchargement de carte source dont il a besoin. Sans cela, le déploiement réussit
+  mais ignore le téléchargement de la carte source.
+
+Les environnements EAS natifs nécessitent `EXPO_PUBLIC_POSTHOG_KEY`,
+`EXPO_PUBLIC_POSTHOG_HOST` et `EXPO_PUBLIC_APP_ENV`. Cartes sources natives et
+les symboles nécessitent en outre `POSTHOG_CLI_API_KEY`,
+`POSTHOG_CLI_HOST=https://us.posthog.com`, et
+`POSTHOG_CLI_PROJECT_ID=279829`.
+
+Les fonctions Supabase Edge nécessitent `POSTHOG_PROJECT_KEY`, `POSTHOG_HOST` et
+`DEPLOYMENT_ENVIRONMENT`. Transférer les demandes ayant échoué vers les journaux. Appareil réussi
+la télémétrie est résumée sous forme d'événements de produit par le proxy Web.
+
+N'exposez jamais une clé API personnelle via un `NEXT_PUBLIC_` ou `EXPO_PUBLIC_`
+variable.
+
+## Contrat d'identité
+
+- Les événements RAD Web, natifs, d'administration et de serveur identifient une personne connectée avec
+  l'application décimale `User.id`, sérialisée sous forme de chaîne.
+- Kinky Makers utilise `km:<Supabase auth UUID>` jusqu'à ce qu'il partage le profil RAD
+  modèle. Le préfixe empêche les fusions d’identités accidentelles.
+- Le navigateur et les clients natifs appellent `reset()` lors de la déconnexion et avant de modifier
+  comptes identifiés.
+- Le matériel est un groupe `device`. Une adresse MAC n'est jamais un identifiant de personne ou de groupe
+  clé; utilisez l’identifiant de périphérique stable haché.
+
+Ces règles permettent au personnel d'assistance de partir d'un ID utilisateur d'application et de constater que
+les enregistrements Web, natifs, de serveur, de session, d'erreur et de journal de la personne sans les exposer
+identifiants matériels privés.
+
+## Contexte et confidentialité requis
+
+Chaque service attache `service_name`, `platform`, `environment`, version ou
+version et identifiants de déploiement lorsqu’ils sont disponibles. Les requêtes du serveur ont également échoué
+attachez l'itinéraire, la méthode, l'ID de demande et `traceparent`.
+
+N'envoyez pas de corps de requête, de jetons d'accès, d'adresses e-mail, de contenu intime,
+invites, adresses MAC brutes ou informations d’identification de l’appareil. Gardez les entrées de relecture masquées.
+Kinky Makers masque tout le texte rendu et la relecture administrateur reste désactivée.
+
+## Vérification de la version
+
+Après chaque déploiement intermédiaire ou de production :
+
+1. Confirmer qu'un événement contient le déploiement attendu de `environment`, Git SHA
+   ID, version de l'application, service et plate-forme.
+2. Confirmez que les événements Web et natifs pour le même compte RAD utilisent le même chiffre
+   ID distinct.
+3. Confirmer la déconnexion suivie d'une connexion différente ne crée aucune fusion d'identité
+   avertissement d'ingestion.
+4. Confirmez que les données Web, d'administration, Kinky Makers, natives et de fonction Edge peuvent être
+   séparés par service et environnement.
+5. Confirmer qu'une exception de test est résolue en source via la carte source téléchargée
+   ou des symboles natifs.
+6. Confirmez qu'une panne de serveur crée un problème d'erreur et un journal OTLP corrélé.
+7. Confirmez que les événements de périphérique contiennent un groupe `device` et aucune adresse MAC brute.
+
+Le runbook du référentiel sur `docs/posthog-observability.md` contient le
+liste de contrôle de l'opérateur correspondante.

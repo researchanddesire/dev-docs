@@ -1,0 +1,11 @@
+{
+  "title": "Micrologiciel et capteurs",
+  "pages": [
+    "introduction",
+    "calibration",
+    "idle-and-power-states",
+    "offline-mode",
+    "sensor-system",
+    "timer-duration-limits"
+  ]
+}

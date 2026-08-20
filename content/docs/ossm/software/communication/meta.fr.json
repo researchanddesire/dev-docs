@@ -1,0 +1,7 @@
+{
+  "title": "Communication",
+  "pages": [
+    "ble",
+    "gpio"
+  ]
+}

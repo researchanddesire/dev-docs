@@ -1,0 +1,223 @@
+---
+title: "Modèles"
+description: "Découvrez comment les modèles créent de la variété dans le mouvement StrokeEngine en générant des paramètres de mouvement trapézoïdal"
+---
+
+Les modèles sont ce qui distingue StrokeEngine des autres systèmes de mouvement. Chaque modèle est un petit programme qui génère l'ensemble suivant de paramètres de mouvement trapézoïdal : position cible, vitesse et accélération.
+
+## Modèles disponibles
+
+<Note>
+Le micrologiciel OSSM expose **7 modèles** (indices 0 à 6) : Simple Stroke, Teasing or Pounding, Robo Stroke, Half'n'Half, Deeper, Stop'n'Go et Insist. Jack Hammer et Stroke Nibbler sont disponibles dans la bibliothèque StrokeEngine mais ne sont actuellement pas implémentés dans le firmware OSSM.
+</Note>
+
+### Modèles OSSM (0-6)
+
+<AccordionGroup>
+<Accordion title="Coup simple">
+Crée un profil de course trapézoïdal avec 1/3 d'accélération, 1/3 de roue libre et 1/3 de décélération.
+
+<Note>
+Le paramètre sensation n’a aucun effet sur ce modèle.
+</Note>
+</Accordion>
+
+<Accordion title="Taquiner ou marteler">
+Ajuste le rapport de vitesse entre les mouvements d'entrée et de sortie en utilisant la valeur de sensation :
+
+- **Sensation positive (> 0)** : Rend le mouvement plus rapide (jusqu'à 5x) pour une sensation de frappe intense
+- **Sensation négative (< 0)** : Rend le mouvement de sortie plus rapide pour une sensation plus taquine
+
+Le temps de course global reste constant et dépend uniquement du paramètre de vitesse global.
+</Accordion>
+
+<Accordion title="Coup de robot">
+Contrôle l'accélération du mouvement via la valeur de sensation :
+
+- **Valeurs positives** : augmentez l'accélération jusqu'à ce que le mouvement devienne une vitesse constante (semble robotique)
+- **Neutre (0)** : Égal à une course simple (profil 1/3, 1/3, 1/3)
+- **Valeurs négatives** : Réduisez l'accélération dans un profil triangulaire
+</Accordion>
+
+<Accordion title="Moitié-moitié">
+Semblable au Teasing ou au Pounding, mais un coup sur deux n’atteint que la moitié de la profondeur.
+
+- **Sensation positive (> 0)** : Rend le mouvement plus rapide (jusqu'à 5x) pour une sensation de frappe intense
+- **Sensation négative (< 0)** : Rend le mouvement de sortie plus rapide pour une sensation plus taquine
+
+Le temps de passage reste le même pour tous les passages, y compris ceux à mi-profondeur.
+</Accordion>
+
+<Accordion title="Plus profond">
+Augmente progressivement la profondeur d'insertion à chaque course jusqu'à atteindre le maximum, puis se réinitialise et redémarre.
+
+La valeur de sensation contrôle le nombre de courses qui effectuent un cycle de rampe.
+</Accordion>
+
+<Accordion title="Stop'n'Go">
+Insère des pauses entre une série de traits. Le nombre de coups varie de 1 à 5 et inversement.
+
+La valeur de sensation contrôle la durée de pause entre les séries de mouvements.
+</Accordion>
+
+<Accordion title="Insister">
+Réduit la longueur de course effective tout en maintenant la vitesse de course constante. Cela crée des modèles vibratoires à des valeurs de sensation plus élevées.
+
+- **Sensation positive** : Les traits se déplacent vers l'avant
+- **Sensation négative** : Les traits se déplacent vers l'arrière
+</Accordion>
+</AccordionGroup>
+
+### Modèles réservés à la bibliothèque
+
+Ces modèles sont disponibles dans la bibliothèque StrokeEngine mais ne sont **pas actuellement implémentés** dans le micrologiciel OSSM. Ils sont documentés ici pour les développeurs créant un micrologiciel personnalisé ou d'autres projets basés sur StrokeEngine.
+
+<AccordionGroup>
+<Accordion title="Marteau-piqueur">
+Crée un modèle vibratoire qui vibre lors de l'entrée et se retire en douceur en un seul mouvement.
+
+La valeur de sensation définit l'amplitude de vibration de 3 mm à 25 mm.
+</Accordion>
+
+<Accordion title="Grignoteuse de coups">
+Ajoute une superposition vibratoire aux traits, vibrant à la fois à l’entrée et à la sortie.
+
+La valeur de sensation définit l'amplitude de vibration de 3 mm à 25 mm.
+</Accordion>
+</AccordionGroup>
+
+## Création de modèles personnalisés
+
+Vous pouvez créer vos propres modèles en sous-classant la classe `Pattern` dans le fichier d'en-tête uniquement [pattern.h](https://github.com/theelims/StrokeEngine/blob/main/src/pattern.h).
+
+<Steps>
+<Step title="Sous-classer la classe Pattern">
+Créez une nouvelle classe qui étend `Pattern`. Voir `SimpleStroke` pour une implémentation minimale :
+
+```cpp pattern.h
+class SimpleStroke : public Pattern {
+    public:
+        SimpleStroke(const char *str) : Pattern(str) {}
+```
+
+Le constructeur stocke la chaîne de nom d'affichage du modèle.
+</Step>
+
+<Step title="Remplacer les fonctions définies si nécessaire">
+Réimplémentez les fonctions d'ensemble lorsque vous avez besoin de calculs personnalisés :
+
+```cpp pattern.h
+void setTimeOfStroke(float speed = 0) {
+    // In & Out have same time, so divide by 2
+    _timeOfStroke = 0.5 * speed;
+}
+```
+</Step>
+
+<Step title="Implémenter la fonction nextTarget">
+Il s'agit de la fonction principale que StrokeEngine appelle après chaque trait pour obtenir les paramètres de mouvement suivants.
+
+```cpp pattern.h
+motionParameter nextTarget(unsigned int index) {
+    // Maximum speed of the trapezoidal motion
+    _nextMove.speed = int(1.5 * _stroke/_timeOfStroke);
+
+    // Acceleration to meet the profile
+    _nextMove.acceleration = int(3.0 * _nextMove.speed/_timeOfStroke);
+
+    // Odd stroke moves out
+    if (index % 2) {
+        _nextMove.stroke = _depth - _stroke;
+
+    // Even stroke moves in
+    } else {
+        _nextMove.stroke = _depth;
+    }
+
+    _index = index;
+    return _nextMove;
+}
+```
+
+<Info>
+Le paramètre `index` commence à 0 lorsque le motif est appelé pour la première fois et s'incrémente de 1 après chaque trait. Utilisez-le pour créer des modèles qui varient dans le temps.
+</Info>
+</Step>
+
+<Step title="Ajouter une sortie de débogage">
+Encapsulez les instructions `Serial.print()` avec les directives du préprocesseur afin qu'elles puissent être basculées :
+
+```cpp pattern.h
+#ifdef DEBUG_PATTERN
+    Serial.println("TimeOfInStroke: " + String(_timeOfInStroke));
+    Serial.println("TimeOfOutStroke: " + String(_timeOfOutStroke));
+#endif
+```
+</Step>
+
+<Step title="Enregistrez le modèle">
+Ajoutez une instance de votre classe de modèles au tableau `patternTable[]` au bas du fichier :
+
+```cpp pattern.h
+static Pattern *patternTable[] = {
+    new SimpleStroke("Simple Stroke"),
+    new TeasingPounding("Teasing or Pounding"),
+    new YourNewPattern("Your Pattern Name")  // Add your pattern here
+};
+```
+</Step>
+</Steps>
+
+## Exigences du modèle
+
+### Limites de profondeur et de trait
+
+<Warning>
+Les motifs doivent renvoyer les positions de trait dans l'intervalle `[0, stroke]`. StrokeEngine surveille toutes les valeurs `motionParameter` renvoyées et tronque les positions en dehors de `[depth - stroke, depth]` pour éviter les blessures.
+</Warning>
+
+Les valeurs de profondeur et de trait définies dans StrokeEngine sont des limites axiomatiques. Votre modèle définit l'enveloppe qu'il utilise dans ces limites. Les mêmes contraintes de sécurité s'appliquent à la vitesse via `timeOfStroke`.
+
+### Modifications gracieuses des paramètres
+
+Votre modèle doit gérer les changements de paramètres avec élégance. Lorsque les valeurs de profondeur ou de course changent en cours d'opération, le motif doit :
+
+- Restez dans l’intervalle `[depth, depth - stroke]` à tout moment
+- Exécuter les mouvements de transfert à la même vitesse que les mouvements normaux
+- Évitez les comportements erratiques
+
+<Tip>
+Testez minutieusement votre motif par rapport aux changements de paramètres, en particulier aux modifications de profondeur et de trait qui peuvent nécessiter des distances de trait supplémentaires.
+</Tip>
+
+### Utilisation du paramètre index
+
+Le paramètre `index` fournit des informations d'état importantes :
+
+- ** Se réinitialise à 0 ** lorsque `StrokeEngine.setPattern(int)` ou `StrokeEngine.startMotion()` est appelé
+- **Incréments** après chaque mouvement exécuté avec succès
+- **La comparaison de `index == _index`** détermine s'il s'agit d'une mise à jour du trait actuel plutôt que d'un nouveau trait.
+
+Stockez le dernier index dans `_index` avant de revenir à l'état de suivi du trait selon des modèles variables dans le temps.
+
+### Implémentation de pauses
+
+Les modèles peuvent insérer des pauses entre les traits. Lorsque la position cible est atteinte, StrokeEngine recherche de nouvelles commandes de mouvement toutes les quelques millisecondes.
+
+Pour implémenter une pause, renvoyez `_nextMove.skip = true` à partir de votre fonction `nextTarget()`. StrokeEngine interrogera à nouveau plus tard au lieu de démarrer un nouveau mouvement.
+
+La classe de base `Pattern` fournit trois fonctions d'assistance pour la gestion des pauses :
+
+| Fonction | Description |
+|----------|-------------|
+| `_startDelay()` | Démarre le temporisateur |
+| `_updateDelay(int delayInMillis)` | Définit la durée de la pause en millisecondes (peut être mise à jour à tout moment) |
+| `_isStillDelayed()` | Renvoie `true` si l'heure planifiée n'a pas été atteinte |
+
+<Note>
+Si un coup est en retard, il est exécuté immédiatement. Voir le modèle Stop'n'Go pour un exemple d'implémentation.
+</Note>
+
+## Modèles contributifs
+
+Après avoir minutieusement testé votre modèle, soumettez une pull request avec votre fichier [pattern.h](https://github.com/theelims/StrokeEngine/blob/main/src/pattern.h) mis à jour.

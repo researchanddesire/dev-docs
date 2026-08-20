@@ -1,0 +1,48 @@
+---
+title: "Mitwirken"
+description: "Bearbeiten Sie die R+D-Dokumentation auf GitHub und reichen Sie einen überprüften öffentlichen Beitrag ein."
+---
+
+# Tragen Sie zur technischen Dokumentation bei
+
+Jeder bearbeitbare Seitentitel und jede Abschnittsüberschrift ist mit einem dezenten Bleistift versehen. Wenn Sie es auswählen, wird die entsprechende Markdown- oder MDX-Datei genau in der Zeile im Webeditor von GitHub unter `main` geöffnet.
+
+## Nehmen Sie eine schnelle Bearbeitung vor
+
+1. Wählen Sie den Stift neben dem Seitentitel oder Abschnitt aus, den Sie verbessern möchten.
+2. Melden Sie sich bei GitHub an, wenn Sie dazu aufgefordert werden.
+3. Bearbeiten Sie die markierte Quelle. Wenn Sie keinen Schreibzugriff haben, erstellt GitHub automatisch einen Fork für Sie.
+4. Wählen Sie **Änderungen vorschlagen**, beschreiben Sie die Verbesserung und öffnen Sie eine Pull-Anfrage in `main`.
+5. Lassen Sie die Validierung des öffentlichen Inhalts abschließen und reagieren Sie auf das Feedback des Betreuers.
+
+Nach der Genehmigung synchronisiert die Automatisierung den byteidentischen Inhalt in das private Anwendungs-Repository und die gerenderte Site wird über den normalen Release-Track bereitgestellt. Mit `[docs-sync]` gekennzeichnete Commits werden vom reziproken Workflow ignoriert, sodass der bidirektionale Spiegel keine Schleife durchführen kann.
+
+Die Synchronisierungsjobs vergleichen Git-Content-Tree-Hashes nach jeder Übertragung. Dadurch bleibt die Byte-Identität der öffentlichen `main`-Dateien mit der gerenderten Quelle erhalten, sodass ein Bearbeitungslink nicht unbemerkt in die falsche Zeile wandern kann.
+
+## Wählen Sie das richtige Repository
+
+| Gerenderte Website                                       | Öffentliche Quelle                                                                         | Bearbeitbarer Inhalt |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------- | ---------------- |
+| [Benutzerhandbücher](https://docs.researchanddesire.com)   | [Researchanddesire/simple-docs](https://github.com/researchanddesire/simple-docs)     | `content/`       |
+| [Entwicklerdokumente](https://dev.researchanddesire.com) | [Researchanddesire/dev-docs](https://github.com/researchanddesire/dev-docs)           | `content/docs/`  |
+| [R+D-Montage](https://ohai.researchanddesire.com)  | [Researchanddesire/Assembly-Docs](https://github.com/researchanddesire/assembly-docs) | `content/docs/`  |
+
+Die Anwendung, der Fumadocs-Renderer, die API-Implementierung, die Bereitstellungseinstellungen und die Anmeldeinformationen verbleiben im privaten Anwendungs-Repository. Einzelne API-Betriebsseiten werden aus dem Dashboard-OpenAPI-Dokument generiert und bieten daher einen Link **Problem mit API-Dokumenten melden** anstelle eines irreführenden Quellzeilenstifts.
+
+## Schreiben Sie einen nützlichen Beitrag
+
+- Benennen Sie das unterstützte Produkt, die Hardware-Revision, die Firmware-Version oder das API-Schema, wenn es darauf ankommt.
+- Verknüpfen Sie technische Ansprüche mit der Implementierung oder Spezifikation, die zu ihrer Überprüfung verwendet wurde.
+- Bewahren Sie Bilder neben der Seite auf, auf der sie verwendet werden, und überprüfen Sie jeden relativen Pfad.
+- Verwenden Sie die vorhandenen MDX-Beschriftungen, Karten, Registerkarten, Akkordeons und Schritte wieder.
+- Konzentrieren Sie sich bei jeder Pull-Anfrage darauf und geben Sie niemals Anmeldeinformationen, private Produktinformationen oder generierte Build-Ausgaben an.
+
+Kleinere Korrekturen können komplett in GitHub durchgeführt werden. Für größere Änderungen forken und klonen Sie das öffentliche Repository, bearbeiten Sie seinen `content/`-Baum und verwenden Sie die Fumadocs Preview-Erweiterung für VS Code, bevor Sie den Pull-Request öffnen.
+
+## Lizenz
+
+R+D-eigene Dokumentationen und Medien in diesen öffentlichen Repositories sind unter CC BY-SA 4.0 verfügbar, sofern in einer Datei oder einem Verzeichnis nichts anderes angegeben ist. Codebeispiele, Produktquellen, Hardwarematerial und Vermögenswerte Dritter behalten ihre angegebenen Lizenzen.
+
+Physische Build-Prozeduren gehören in [R+D-Montage](https://ohai.researchanddesire.com/ossm). Verbraucheranweisungen gehören in den [Benutzerhandbücher](https://docs.researchanddesire.com/). Konzentrieren Sie sich in den Entwicklerdokumenten auf APIs, Firmware, Protokolle, offizielle Hardwareschnittstellen und Integrationen.
+
+GitHub dokumentiert den vollständigen [Bearbeitung und Fork-basierter Pull-Request-Flow](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files).

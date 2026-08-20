@@ -1,0 +1,39 @@
+---
+title: "Gemeinsamer Zugriff und Schlüsselinhaber"
+description: "Wie die API Daten an Sie und Ihre verknüpften Benutzer weiterleitet und wie Schlüsselinhaber die Sitzungen eines Lockees lesen"
+---
+
+Jeder Endpunkt ist auf die Benutzer beschränkt, auf die Sie Zugriff haben: **Sie selbst sowie alle Personen, die über eine Partnerschaft mit Ihrem Konto verknüpft sind**. Ihr API-Token erbt genau dieselben Berechtigungen wie Ihr Dashboard-Konto, sodass Sie nie Daten sehen, die Sie nicht bereits im Dashboard sehen könnten.
+
+Auf dieser Seite wird erläutert, wie diese Festlegung des Gültigkeitsbereichs in der gesamten API funktioniert – insbesondere für Schlüsselinhaber, die die Daten ihres Lockees lesen. Die Anfrage- und Antwortdetails jedes einzelnen Endpunkts finden Sie auf der entsprechenden Seite in der Referenz (z. B. [Sitzungen sperren](/api-reference/lock-sessions/list-lock-sessions)).
+
+## Schlüsselinhaber verwenden dieselben Endpunkte
+
+Schlüsselinhaber sind immer verknüpfte Benutzer. Das bedeutet **es gibt keine separate Schlüsselhalter-API** – als Schlüsselhalter listen und lesen Sie die Daten Ihres Lockees mit genau denselben Endpunkten, die Sie für Ihre eigenen verwenden. Die Ergebnisse umfassen lediglich die Sitzungen und Geräte aller mit Ihnen verknüpften Benutzer.
+
+- [Sperrsitzungen auflisten](/api-reference/lock-sessions/list-lock-sessions) gibt die Sitzungen Ihres Lockees neben Ihren eigenen zurück. Verwenden Sie das Feld `ownerId` in jedem Datensatz, um anzugeben, um welche Sitzung es sich handelt.
+- [Holen Sie sich eine aktive Sperrsitzung](/api-reference/lock-sessions/get-active-lock-session) akzeptiert einen `targetUserId`-Abfrageparameter, sodass ein Schlüsselinhaber überprüfen kann, ob die Sperre eines Lockee ausgeführt wird, ohne dass der Lockee dies meldet.
+
+<Info>
+  Der `ownerId` einer Sperrsitzung ist der Benutzer, der die Sperre trägt. Wenn Sie die Taste gedrückt halten
+  Jemand, seine Sitzungen erscheinen in Ihren Ergebnissen mit ihrem `ownerId`, nicht mit Ihren.
+</Info>
+
+## Suchen der ID eines verknüpften Benutzers
+
+Endpunkte, die auf einen anderen Benutzer reagieren (z. B. `targetUserId`), benötigen eine numerische Benutzer-ID. Rufen Sie [Benutzer auflisten](/api-reference/users/list-users) auf, um die mit Ihnen verknüpften Benutzer und deren IDs zu ermitteln. Dadurch werden Sie selbst und alle Personen angezeigt, die über Partnerschaften mit Ihnen verbunden sind, gefiltert nach Ihren Kontoberechtigungen.
+
+## Zugriff außerhalb Ihrer Berechtigungen
+
+Die API gibt niemals Daten – oder auch nur die Existenz von Daten – außerhalb Ihres Zugriffs preis. Wie eine Anfrage abgelehnt wird, hängt davon ab, wie sie das Ziel identifiziert:
+
+| Stil anfordern | Außerhalb Ihres Zugangs |
+| ------------- | ------------------- |
+| Rufen Sie eine Sitzung anhand der ID ab (z. B. [Sperrsitzung nach ID abrufen](/api-reference/lock-sessions/get-lock-session-by-id)). | Gibt `404` zurück – die API unterscheidet bewusst nicht zwischen „existiert nicht“ und „nicht von Ihnen“. |
+| Übergeben Sie einen `targetUserId` (z. B. [Holen Sie sich eine aktive Sperrsitzung](/api-reference/lock-sessions/get-active-lock-session)) | Gibt `403` zurück – das Ziel ist ein Benutzer, auf den Sie keinen Zugriff haben |
+
+<Note>
+  Weil eine Nach-ID-Suche `404` sowohl für eine fehlende als auch für eine solche Sitzung zurückgibt
+  gehört jemand anderem, Sie können damit nicht prüfen, ob eine bestimmte Sitzungs-ID vorhanden ist
+  existiert. Das ist Absicht.
+</Note>

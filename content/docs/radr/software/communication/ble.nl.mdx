@@ -1,0 +1,182 @@
+---
+title: "Bluetooth-communicatie"
+description: "BLE-protocoldetails en apparaatcommunicatie voor RADR"
+---
+
+Dit document behandelt de Bluetooth Low Energy (BLE)-communicatieprotocollen die door RADR worden gebruikt om met ondersteunde apparaten te communiceren.
+
+## BLE-overzicht
+
+RADR gebruikt Bluetooth Low Energy (BLE) voor alle apparaatcommunicatie. Als centraal BLE-apparaat scant RADR naar randapparaten zoals OSSM en Lovense-speelgoed en maakt er verbinding mee.
+
+| Parameter | Waarde |
+|-----------|-------|
+| BLE-rol | Centraal |
+| Apparaatnaam | OSSM-AFSTANDSBEDIENING |
+| Zend kracht uit | 9 dBm |
+| Stapel | Vlot |
+
+## Scanparameters
+
+| Parameter | Waarde |
+|-----------|-------|
+| Scaninterval | 100ms |
+| Scanvenster | 100ms |
+| Scantype | Actief |
+| Scanduur | 5000 ms (5 seconden) |
+
+Tijdens actief scannen verzendt RADR scanverzoekpakketten naar apparaten om de volledige advertentiegegevens op te halen, inclusief apparaatnamen.
+
+## Verbindingsparameters
+
+RADR gebruikt geoptimaliseerde verbindingsparameters voor responsieve bediening:
+
+| Parameter | Waarde | Beschrijving |
+|-----------|-------|-------------|
+| Min. interval | 12 | Minimaal verbindingsinterval van 15 ms |
+| Maximaal interval | 12 | Maximaal verbindingsinterval van 15 ms |
+| Latentie | 0 | Geen slave-latentie (onmiddellijke reacties) |
+| Time-out voor toezicht | 150 | Time-out van 1500 ms voor verloren verbindingen |
+| Time-out voor verbinding | 5000 ms | Maximale tijd om verbinding tot stand te brengen |
+
+Het verbindingsinterval van 15 ms zorgt voor een responsieve bediening met minimale latentie tussen de encoderbeurten en de reactie van het apparaat.
+
+## Apparaatdetectie
+
+RADR identificeert ondersteunde apparaten aan de hand van hun geadverteerde service-UUID's:
+
+### Onderzoeks- en wensapparaten
+
+| Apparaat | Service-UUID |
+|--------|--------------|
+| OSSM | `522B443A-4F53-534D-0001-420BADBABE69` |
+| LKBX | In afwachting van implementatie |
+| DTT | In afwachting van implementatie |
+
+### Lovense-apparaten
+
+| Apparaat | Service-UUID |
+|--------|--------------|
+| Domi 2 | `57300001-0023-4BD4-BBD5-A6920E4C5653` |
+| Ander | Via Buttplug.io-register |
+
+### Buttplug.io-apparaten
+
+Apparaten die worden ondersteund via het Buttplug.io-protocol worden geïdentificeerd met behulp van UUID's uit het dynamische register (`registry.json`). Dit register kan worden bijgewerkt via firmware-updates zonder codewijzigingen.
+
+## OSSM-protocol
+
+RADR communiceert met OSSM via een aangepast BLE-protocol:
+
+### Dienststructuur
+
+```
+Service: 522B443A-4F53-534D-0001-420BADBABE69
+├── Position Characteristic
+├── Speed Characteristic
+├── Depth Characteristic
+├── Sensation Characteristic
+├── Stroke Characteristic
+└── Pattern Characteristic
+```
+
+### Commandoformaat
+
+Commando's worden als byte-arrays naar het juiste kenmerk verzonden:
+
+| Parameter | Gegevenstype | Bereik |
+|-----------|-----------|-------|
+| Snelheid | uint8_t | 0-100 |
+| Diepte | uint8_t | 0-100 |
+| Gevoel | uint8_t | 0-100 |
+| Hartinfarct | uint8_t | 0-100 |
+| Patroon | uint8_t | Patroonindex |
+
+### Patroonselectie
+
+Patronen worden geselecteerd op index:
+
+| Index | Patroonnaam |
+|-------|--------------|
+| 0 | Simpele beroerte |
+| 1 | Plagen beukende |
+| 2 | Robo-beroerte |
+| 3 | Half en half |
+| 4 | Dieper |
+| 5 | Stop'n'Go |
+| 6 | Volharden |
+
+## Lovense-protocol
+
+Voor Lovense-apparaten met directe integratie (Domi) gebruikt RADR het Lovense BLE-protocol:
+
+### Trillingscontrole
+
+```
+Command: Vibrate:{level};
+Level: 0-16
+```
+
+### Batterijvraag
+
+```
+Command: Battery;
+Response: {percentage}
+```
+
+### Vermogenscontrole
+
+```
+Command: PowerOff;
+```
+
+## Buttplug.io-apparaten
+
+Voor apparaten die via Buttplug.io worden ondersteund, implementeert RADR een subset van het Buttplug-protocol:
+
+- **Trillen** — Trillingsniveau instellen (0-1 zwevend, toegewezen aan apparaatbereik)
+- **Lineair** — Voor duwapparaten
+- **Roteren** — Voor roterende apparaten
+
+Niet alle apparaten ondersteunen alle opdrachten. RADR vraagt ​​de apparaatmogelijkheden op tijdens de verbinding.
+
+## Verbindingsherstel
+
+Als RADR de verbinding met een apparaat verliest:
+
+1. **Detectie** — Verbindingsverlies gedetecteerd binnen supervisietime-out (1500 ms)
+2. **Opnieuw verbinden** — Automatische poging tot opnieuw verbinden binnen 2-5 seconden
+3. **Veiligheid** — Voor OSSM: geleidelijke afbouw tijdens ontkoppeling
+4. **Fout** — Na een mislukte herverbinding keert u terug naar het hoofdmenu
+
+## Beveiliging
+
+RADR maakt gebruik van open BLE-verbindingen zonder koppeling of verbinding:
+
+- Geen pincode vereist
+- Geen codering (opdrachten zijn platte tekst)
+- Eén verbinding tegelijk
+
+<Warning>
+BLE-communicatie is niet gecodeerd. Gebruik RADR in privéomgevingen waar radio-onderschepping geen probleem is.
+</Warning>
+
+## Foutopsporing
+
+Voor BLE-foutopsporing tijdens de ontwikkeling:
+
+1. Gebruik een BLE-sniffer (nRF Connect, Wireshark met BLE-adapter)
+2. Seriële loggen in firmware inschakelen (`LOG_LEVEL_DEBUG`)
+3. Bewaak verbindingsgebeurtenissen en karakteristieke schrijfbewerkingen
+
+## Verder lezen
+
+<CardGroup cols={2}>
+<Card title="NimBLE-documentatie" icon="book" href="https://mynewt.apache.org/latest/network/index.html">
+NimBLE-stackdocumentatie.
+</Card>
+
+<Card title="Buttplug.io-protocol" icon="book" href="https://buttplug-spec.docs.buttplug.io/">
+Buttplug-apparaatprotocolspecificatie.
+</Card>
+</CardGroup>

@@ -1,0 +1,8 @@
+{
+  "title": "Dashboard-API",
+  "pages": [
+    "index",
+    "observability",
+    "api"
+  ]
+}

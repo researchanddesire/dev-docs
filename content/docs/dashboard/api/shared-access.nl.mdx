@@ -1,0 +1,39 @@
+---
+title: "Gedeelde toegang en sleutelhouders"
+description: "Hoe de API gegevens naar u en uw gekoppelde gebruikers stuurt, en hoe sleutelhouders de sessies van een lockee lezen"
+---
+
+Elk eindpunt is gericht op de gebruikers waartoe u toegang heeft: **uzelf, plus iedereen die via een partnerschap aan uw account is gekoppeld**. Uw API-token neemt exact dezelfde rechten over als uw dashboardaccount, zodat u nooit gegevens ziet die u nog niet in het dashboard kon zien.
+
+Op deze pagina wordt uitgelegd hoe die scoping in de hele API werkt, vooral voor sleutelhouders die de gegevens van hun lockee lezen. Voor de aanvraag- en antwoorddetails van elk afzonderlijk eindpunt raadpleegt u de pagina in de referentie (bijvoorbeeld [Sessies vergrendelen](/api-reference/lock-sessions/list-lock-sessions)).
+
+## Sleutelhouders gebruiken dezelfde eindpunten
+
+Sleutelhouders zijn altijd gekoppelde gebruikers. Dat betekent dat **er geen aparte sleutelhouder-API is**: als sleutelhouder noteert en leest u de gegevens van uw lockee met exact dezelfde eindpunten die u voor uw eigen eindpunten gebruikt. De resultaten omvatten eenvoudigweg de sessies en apparaten van elke gebruiker die aan u is gekoppeld.
+
+- [Lijst met vergrendelingssessies](/api-reference/lock-sessions/list-lock-sessions) retourneert de sessies van uw lockee naast die van u. Gebruik het veld `ownerId` voor elke record om aan te geven wiens sessie het is.
+- [Ontvang een Active Lock-sessie](/api-reference/lock-sessions/get-active-lock-session) accepteert een `targetUserId`-queryparameter, zodat een sleutelhouder kan verifiëren dat het slot van een lockee werkt zonder dat de lockee dit meldt.
+
+<Info>
+  De `ownerId` van een slotsessie is de gebruiker die het slot draagt. Wanneer u de toets ingedrukt houdt
+  iemand, hun sessies verschijnen in uw resultaten met hun `ownerId`, niet die van u.
+</Info>
+
+## De ID van een gekoppelde gebruiker zoeken
+
+Eindpunten die op een andere gebruiker inwerken (zoals `targetUserId`) hebben een numerieke gebruikers-ID nodig. Als u de gebruikers wilt ontdekken die aan u zijn gekoppeld en hun ID's, belt u [Lijst gebruikers](/api-reference/users/list-users). U krijgt dan uzelf terug plus iedereen die via partnerschappen met u is verbonden, gefilterd op uw accountrechten.
+
+## Toegang buiten uw machtigingen
+
+De API onthult nooit gegevens (of zelfs het bestaan ​​van gegevens) buiten uw toegang. Hoe een verzoek wordt afgewezen, hangt af van hoe het doel wordt geïdentificeerd:
+
+| Stijl aanvragen | Buiten uw toegang |
+| ------------- | ------------------- |
+| Een sessie ophalen op basis van ID (bijvoorbeeld [Vergrendel sessie op basis van ID](/api-reference/lock-sessions/get-lock-session-by-id)) | Retourneert `404` - de API maakt opzettelijk geen onderscheid tussen "bestaat niet" en "niet van jou" |
+| Geef een `targetUserId` door (bijv. [Ontvang een Active Lock-sessie](/api-reference/lock-sessions/get-active-lock-session)) | Retourneert `403`: het doel is een gebruiker waartoe u geen toegang heeft |
+
+<Note>
+  Omdat een zoekopdracht op ID `404` retourneert voor zowel een ontbrekende sessie als een sessie die ontbreekt
+  van iemand anders is, kunt u deze niet gebruiken om na te gaan of een bepaalde sessie-ID aanwezig is
+  bestaat. Dit is opzettelijk.
+</Note>

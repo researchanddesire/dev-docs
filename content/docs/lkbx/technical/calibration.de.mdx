@@ -1,0 +1,90 @@
+---
+title: "Kalibrierung"
+description: "Erfahren Sie, wie sich Ihre Chastity Lockbox selbst kalibriert und was zu tun ist, wenn Sie auf den Kalibrierungsbildschirm stoßen."
+---
+
+<iframe
+  className="w-vollständiges Seitenverhältnis-Video gerundet-xl"
+  src="https://www.loom.com/embed/481662e9ed284264b539d9e5fe4ac691"
+  title="So kalibrieren Sie Ihr Lockbox"
+  FrameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  AllowFullScreen
+></iframe>
+
+<AccordionGroup>
+  <Accordion title="Videotranskript">
+    0:00 Hallo! Wenn Sie hier sind, liegt das wahrscheinlich daran, dass Sie diese Kalibrierungsmeldung auf Ihrem Keuschheitsschließfach sehen. Dies kann passieren, wenn Ihr Gerät erneut geflasht wurde oder die Kalibrierung aus irgendeinem Grund zurückgesetzt wurde.
+
+    0:11 Das ist kein Problem, Sie müssen es nur einfach sagen oder den Anweisungen auf dem Bildschirm folgen. Hier werde ich also aufgefordert, zum Kalibrieren die rechte Taste gedrückt zu halten.
+
+    0:21 Dadurch wird ermittelt, welcher Pin der richtige Knopf ist, und dann wird der Motor kalibriert.
+  </Accordion>
+</AccordionGroup>
+
+## Was ist Kalibrierung?
+
+Bei der Kalibrierung handelt es sich um einen automatischen Prozess, der Ihrer Chastity Lockbox beibringt, wie sie zusammengebaut ist und wie sie funktionieren soll. Dieser Schritt stellt sicher, dass Ihr Gerät ordnungsgemäß und sicher funktioniert.
+
+## Wann erfolgt die Kalibrierung?
+
+<Tip>
+Ihr Keuschheitsschloss wird vorkalibriert und sofort einsatzbereit geliefert.
+</Tip>
+
+Der Kalibrierungsbildschirm wird nur in den folgenden Situationen angezeigt:
+
+1. **Nach dem Flashen der Firmware** – Wenn Sie die Software Ihres Geräts aktualisiert haben, wird die Kalibrierung einmal automatisch ausgeführt
+2. **Nach einem Zurücksetzen auf die Werkseinstellungen** – Durch das Zurücksetzen des Geräts werden die gespeicherten Kalibrierungsdaten gelöscht
+
+## Was konfiguriert die Kalibrierung?
+
+Die Kalibrierung erkennt und stellt automatisch drei kritische Parameter ein:
+
+| Einstellung | Zweck |
+|---------|---------|
+| **Motorausrichtung** | Legt fest, in welche Richtung sich der Motor zum Verriegeln und Entriegeln dreht |
+| **Sperrerkennung** | Bringt dem Gerät bei, zu überprüfen, ob es sicher gesperrt ist |
+| **Motorleistungsstufe** | Stellt die optimale Leistung für eine sichere Verriegelung ein und minimiert gleichzeitig den Batterieverbrauch |
+
+## Begegnung mit dem Kalibrierungsbildschirm
+
+<Steps>
+  <Step title="Tastenkalibrierung">
+    Das Gerät zeigt „Kalibrierung“ an und fordert Sie auf, die Eingabetaste gedrückt zu halten. Dadurch wird identifiziert, welcher physische Pin welcher Taste entspricht – einige Hardwarevarianten haben unterschiedliche Konfigurationen.
+
+    Halten Sie die Eingabe-/Sperrtaste (die rechte Taste) gedrückt, bis das Gerät dies bestätigt.
+  </Step>
+  <Step title="Motorkalibrierung">
+    Das Gerät zeigt „Motor kalibrieren“ an und testet automatisch den Verriegelungsmechanismus:
+
+    1. Der Motor versucht zu blockieren
+    2. Sensoren überprüfen die Verriegelungsposition
+    3. Der Motor versucht zu entriegeln
+    4. Sensoren überprüfen die Entriegelungsposition
+
+    Dadurch wird bestimmt, ob die Motorrichtung für Ihre Hardware umgekehrt werden muss.
+
+    <Warning>
+    Schalten Sie das Gerät während der Motorkalibrierung nicht aus. Der Vorgang dauert etwa 6 Sekunden.
+    </Warning>
+  </Step>
+  <Step title="Automatischer Neustart">
+    Nach erfolgreicher Kalibrierung startet das Gerät automatisch neu und kehrt zum Normalbetrieb zurück.
+
+    <Check>
+    Der Kalibrierungsbildschirm wird erst wieder angezeigt, wenn Sie die Firmware neu flashen oder einen Werksreset durchführen.
+    </Check>
+  </Step>
+</Steps>
+
+## Kalibrierungsfehler
+
+Wenn die Kalibrierung fehlschlägt (Motor erreicht nicht die erwarteten Positionen), kann das Gerät Folgendes tun:
+- Versuchen Sie die Kalibrierung automatisch erneut
+- Zeigt einen Fehler an, der einen manuellen Eingriff erfordert
+- Muss über den Web-Flasher neu geflasht werden
+
+<Note>
+Wenn Sie Probleme mit der Kalibrierung haben oder Ihr Gerät nicht wie erwartet reagiert, wenden Sie sich an den Kundensupport unter support@researchanddesire.com.
+</Note>

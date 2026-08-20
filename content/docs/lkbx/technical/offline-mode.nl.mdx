@@ -1,0 +1,216 @@
+---
+title: "Offline-modus"
+description: "Hoe uw Chastity Lockbox werkt wanneer deze niet is verbonden met WiFi of het dashboard"
+---
+
+Uw Chastity Lockbox is ontworpen om zowel online als offline te functioneren. In deze handleiding wordt uitgelegd wat werkt zonder WiFi, wat connectiviteit vereist en hoe het apparaat omgaat met overgangen tussen online en offline statussen.
+
+## Wat offline werkt
+
+Deze functies functioneren volledig zonder internetverbinding:
+
+| Functie | Offline gedrag |
+|---------|-----------------|
+| Getimede sloten | Timer blijft lokaal aftellen |
+| Vergrendel-/ontgrendelmechanisme | Fysiek slot wordt ingeschakeld en vrijgegeven |
+| Menunavigatie | Alle menu's toegankelijk |
+| Knopbedieningen | Volledige functionaliteit |
+| Slaapmodi | Automatisch en handmatig slaapwerk |
+| Noodontgrendeling | Kan lokaal worden gebruikt (indien ingeschakeld) |
+| Volharding van de staat | De vergrendelingsstatus overleeft opnieuw opstarten |
+
+<Tip>
+Ga je ergens heen zonder wifi, dan blijft je slot werken. De timer draait op het apparaat zelf, niet op een server.
+</Tip>
+
+## Wat vereist WiFi
+
+Voor deze functies is een actieve WiFi-verbinding vereist:
+
+| Functie | Waarom WiFi nodig is |
+|---------|-------------------|
+| Koppelen | Apparaat moet zich registreren bij de dashboardserver |
+| Firmware-updates | Downloads van updateserver |
+| Dashboardsynchronisatie | Ontvangt sleutelhouderopdrachten |
+| Tijdsynchronisatie | Krijgt nauwkeurige tijd van de NTP-server |
+| Activiteitenregistratie | Verzendt gebeurtenissen naar het dashboard |
+| Publieke stemming | Ontvangt stemupdates |
+| Sleutelhouder ontgrendelen | Commando's voor ontgrendelen op afstand |
+
+## Tijdweergave wanneer offline
+
+Wanneer uw apparaat niet is verbonden met WiFi en de tijd niet heeft gesynchroniseerd, wordt op het vergrendelscherm het volgende weergegeven:
+
+> "Verbind Wi-Fi om de resterende tijd te zien"
+
+<Warning>
+Zonder tijdsynchronisatie kan het apparaat de resterende tijd niet nauwkeurig weergeven. De vergrendelingstimer zelf loopt echter nog steeds correct op basis van de geconfigureerde duur.
+</Warning>
+
+### Waarom dit gebeurt
+
+Het apparaat moet de huidige tijd weten om de 'resterende tijd' te berekenen. Zonder NTP-synchronisatie:
+- Het apparaat kent de vergrendelingsduur
+- Het apparaat weet niet hoe laat het nu is
+- Daarom kan de resterende tijd niet worden berekend
+
+Zodra WiFi verbinding maakt en de tijd synchroniseert, wordt het display bijgewerkt om de resterende tijd nauwkeurig weer te geven.
+
+## Lokale afspeelmodus
+
+Wanneer u een vergrendeling rechtstreeks op het apparaat start (niet vanaf het dashboard), werkt deze in de modus "lokaal afspelen":
+
+### Lokale speeleigenschappen
+
+- De vergrendelingsduur wordt lokaal op het apparaat opgeslagen
+- Timer werkt onafhankelijk van de server
+- Geen betrokkenheid van de sleutelhouder vereist
+- De vergrendeling eindigt wanneer de timer afloopt
+
+### Dashboardsloten
+
+Wanneer een vergrendeling wordt gestart vanaf het dashboard:
+
+- Instellingen worden via wifi met het apparaat gesynchroniseerd
+- Pauzeschema's zijn ontvangen
+- Noodontgrendeling kan op afstand worden uitgeschakeld
+- Sleutelhouder kan slot op afstand wijzigen
+
+<Info>
+Lokale vergrendelingen (gestart op het apparaat) kunnen niet worden gewijzigd vanaf het dashboard. Dashboardvergrendelingen kunnen door uw sleutelhouder worden aangepast, zelfs als u offline bent. De wijzigingen worden gesynchroniseerd wanneer u opnieuw verbinding maakt.
+</Info>
+
+## Volharding van de staat
+
+Uw apparaat behoudt zijn status over:
+
+- Opnieuw opstarten
+- Stroomcycli
+- WiFi-verbrekingen
+- Diepe slaap
+
+De volgende gegevens blijven bestaan:
+
+| Gegevens | Opslag |
+|------|---------|
+| Vergrendelingsstatus (vergrendeld/ontgrendeld) | Niet-vluchtig geheugen |
+| Eindtijd vergrendelen | Niet-vluchtig geheugen |
+| Sessie-instellingen | Niet-vluchtig geheugen |
+| WiFi-referenties | Niet-vluchtig geheugen |
+| Kalibratiegegevens | Niet-vluchtig geheugen |
+
+<Note>
+Zelfs als uw apparaat volledig stroom verliest, keert het terug naar de vergrendelde status wanneer het wordt ingeschakeld.
+</Note>
+
+## Gedrag bij opnieuw verbinden via WiFi
+
+Wanneer WiFi tijdens bedrijf wordt verbroken:
+
+1. **Onmiddellijk**: het apparaat blijft normaal werken
+2. **Elke 30 seconden**: Automatische herverbindingspoging
+3. **Bij opnieuw verbinden**: synchroniseert de status met het dashboard
+
+### Handmatige WiFi-installatie
+
+U kunt WiFi op elk gewenst moment opnieuw configureren via:
+- Hoofdmenu → Instellingen → WiFi-instellingen
+- Menu vergrendelen → WiFi-instellingen (terwijl vergrendeld)
+
+Hiermee wordt het configuratieportaal geopend zonder dat dit invloed heeft op uw vergrendelingsstatus.
+
+## Offline scenario's
+
+### Scenario 1: WiFi valt uit tijdens vergrendeling
+
+- De vergrendelingstimer loopt normaal door
+- De indicator "Verbinden" wordt weergegeven op de statusbalk
+- Automatische herverbindingspogingen elke 30 seconden
+- Het slot wordt ontgrendeld wanneer de timer afloopt (geen WiFi nodig)
+
+### Scenario 2: Startslot zonder WiFi
+
+- Navigeer naar het menu Vergrendelen
+- Duur instellen met encoder
+- Druk op Enter om te bevestigen
+- Slot blokkeert lokaal
+- Tijdweergave toont "Verbind Wi-Fi om de resterende tijd te zien"
+- Timer telt nog steeds correct af
+
+### Scenario 3: Reis naar locatie zonder WiFi
+
+- Apparaat werkt normaal
+- Dashboard kan geen opdrachten verzenden
+- Lokale noodontgrendeling nog steeds beschikbaar (indien ingeschakeld)
+- Bij terugkeer naar WiFi wordt de status automatisch gesynchroniseerd
+
+### Scenario 4: Bij diepe slaap wordt de wifi-verbinding verbroken
+
+- WiFi wordt verbroken tijdens diepe slaap (energiebesparing)
+- Vergrendelingsstatus ongewijzigd
+- Bij het ontwaken maakt WiFi automatisch opnieuw verbinding
+- Dashboardopdrachten in behandeling ontvangen
+
+## Details van dashboardsynchronisatie
+
+Wanneer u online bent, synchroniseert uw apparaat periodiek met het dashboard:
+
+### Uitgaand (apparaat → dashboard)
+
+- Statuswijzigingen vergrendelen
+- Knoppersen
+- Sensormetingen
+- Gebruik van noodontgrendeling
+- Pauzetijd
+
+### Binnenkomend (dashboard → apparaat)
+
+- Commando's vergrendelen
+- Ontgrendel opdrachten
+- Updates van het pauzeschema
+- Wijzigingen in sessie-instellingen
+- Voorkeuren voor tijdweergave
+
+<Info>
+Synchronisatie gebeurt via MQTT voor realtime reactievermogen. Commando's arriveren doorgaans binnen enkele seconden wanneer ze online zijn.
+</Info>
+
+## Offlineproblemen oplossen
+
+<AccordionGroup>
+<Accordion title="Resterende tijd wordt niet weergegeven">
+Maak verbinding met WiFi om de tijd te synchroniseren. De vergrendeling is nog steeds actief. Je kunt het aftellen pas zien nadat de tijd is gesynchroniseerd.
+</Accordion>
+
+<Accordion title="Kan geen sleutelhouderopdrachten ontvangen">
+Uw apparaat moet online zijn om dashboardopdrachten te kunnen ontvangen. Controleer de WiFi-verbindingsstatus in de statusbalk.
+</Accordion>
+
+<Accordion title="Vergrendeling beëindigd, maar het dashboard geeft nog steeds aan dat het vergrendeld is">
+Het dashboard wordt bijgewerkt wanneer uw apparaat opnieuw verbinding maakt. Maak verbinding met WiFi en de status wordt gesynchroniseerd.
+</Accordion>
+
+<Accordion title="WiFi maakt niet automatisch opnieuw verbinding">
+Ga naar Instellingen → WiFi-instellingen om handmatig opnieuw verbinding te maken. Uw vergrendelingsstatus wordt niet beïnvloed.
+</Accordion>
+</AccordionGroup>
+
+## Gerelateerde handleidingen
+
+<CardGroup cols={2}>
+<Card title="WiFi-installatie" icon="wifi" href="https://docs.researchanddesire.com/lockbox/get-started">
+Hoe u uw apparaat met WiFi kunt verbinden.
+</Card>
+
+<Card title="Slaapmodus" icon="moon" href="../device-states/sleep-mode">
+Hoe slaap de WiFi-connectiviteit beïnvloedt.
+</Card>
+
+<Card title="Statussymbolen" icon="display" href="../using/symbols">
+De WiFi-statusindicator begrijpen.
+</Card>
+
+<Card title="Onlinestatus" icon="signal" href="../support/online-status">
+Hoe u kunt verifiëren dat uw apparaat online is.
+</Card>
+</CardGroup>

@@ -1,0 +1,145 @@
+---
+title: "Offline-Modus"
+description: "Verwenden Sie Ihren Trainer ohne Internetverbindung"
+---
+
+Ihr Deep Throat Trainer kann offline mit zwischengespeicherten Sitzungsdaten arbeiten. Während für einige Funktionen eine Konnektivität erforderlich ist, können Sie trotzdem trainieren, wenn kein WLAN verfügbar ist.
+
+## Was funktioniert offline?
+
+Mit Software 2.0+ speichert der Trainer die zuletzt heruntergeladene Sitzung lokal:
+
+| Besonderheit | Offline-Support |
+|---------|-----------------|
+| **Trainingseinheiten** | Ja – verwendet zwischengespeicherte Sitzung |
+| **Positionsverfolgung** | Ja – voll funktionsfähig |
+| **LED-Feedback** | Ja – voll funktionsfähig |
+| **Bewertungen auf dem Gerät** | Ja – wird nach Segmenten angezeigt |
+| **Kalibrierung** | Ja – lokal für die Sitzung gespeichert |
+
+## Was erfordert Konnektivität?
+
+| Besonderheit | Warum |
+|---------|-----|
+| **Ergebnisse hochladen** | Noten und Statistiken müssen mit dem Dashboard synchronisiert werden |
+| **Neue Sitzungen herunterladen** | Vorlagenänderungen erfordern einen erneuten Download |
+| **Firmware-Updates** | OTA-Updates benötigen einen Internetzugang |
+| **Cloud-Kalibrierungssynchronisierung** | Fernspeicherung der Spielzeugkalibrierungsdaten |
+| **Bestenlisten-Updates** | Punkte werden erst bei der Synchronisierung aufgezeichnet |
+
+<Warning>
+Offline-Sitzungen werden in Ihrem Dashboard **nicht gespeichert**, bis Sie die Verbindung wiederherstellen. Wenn das Gerät vor der Synchronisierung ausfällt, gehen möglicherweise die Ergebnisse dieser Sitzung verloren.
+</Warning>
+
+## So funktioniert die Offline-Wiedergabe
+
+### Automatisches Caching
+Wenn Sie online Einstellungen abrufen:
+1. Die Sitzung wird vom Dashboard heruntergeladen
+2. Eine Kopie wird im lokalen Speicher (SPIFFS) gespeichert.
+3. Diese zwischengespeicherte Kopie steht für die Offline-Verwendung zur Verfügung
+
+### Starten einer Offline-Sitzung
+1. Schalten Sie den Trainer ein
+2. Wenn Sie offline sind, wird die Meldung „Sie sind offline, Ihre Noten werden möglicherweise nicht gespeichert“ angezeigt.
+3. Drücken Sie die Taste, um mit den zwischengespeicherten Einstellungen fortzufahren
+4. Trainieren Sie normal – alles funktioniert vor Ort
+
+<Note>
+Die zwischengespeicherte Sitzung ist Ihre **zuletzt heruntergeladene** Sitzung. Um eine andere Vorlage offline zu trainieren, laden Sie sie zunächst online herunter.
+</Note>
+
+## Vorbereitung auf das Offline-Training
+
+Bevor Sie offline gehen:
+
+<Steps>
+<Step title="Stellen Sie eine WLAN-Verbindung her">
+Stellen Sie sicher, dass Ihr Trainer erfolgreich eine Verbindung zum Internet herstellt.
+</Step>
+
+<Step title="Wählen Sie Ihre Vorlage aus">
+Wählen Sie im Dashboard die Vorlage aus, mit der Sie trainieren möchten.
+</Step>
+
+<Step title="Einstellungen abrufen">
+Starten Sie eine Sitzung auf dem Trainer, um die neuesten Einstellungen herunterzuladen. Nach dem Abruf können Sie den Vorgang beenden – die Daten werden jetzt zwischengespeichert.
+</Step>
+
+<Step title="Überprüfen Sie den Cache">
+Trennen Sie optional die WLAN-Verbindung und starten Sie eine Sitzung, um zu überprüfen, ob der Offline-Modus funktioniert.
+</Step>
+</Steps>
+
+## Ergebnisse werden synchronisiert, wenn wieder online
+
+Wenn Sie die WLAN-Verbindung wiederherstellen:
+1. Schalten Sie den Trainer ein
+2. Das Gerät synchronisiert ausstehende Ergebnisse automatisch
+3. Überprüfen Sie Ihr Dashboard, um zu bestätigen, dass die Sitzung stattgefunden hat
+
+<Info>
+Derzeit werden Offline-Sitzungen beim nächsten Start der Online-Sitzung synchronisiert. Zukünftige Firmware fügt möglicherweise eine Hintergrundsynchronisierung hinzu.
+</Info>
+
+## Einschränkungen
+
+### Sitzungsspeicher
+Der Trainer speichert jeweils **eine** zwischengespeicherte Sitzung. Durch das Herunterladen einer neuen Sitzung wird der vorherige Cache überschrieben.
+
+### Ergebnisse nicht gespeichert
+Ergebnisse des Offline-Trainings werden auf dem Gerät berechnet, aber nicht gespeichert. Sie werden während der Sitzung angezeigt, können jedoch verloren gehen, wenn:
+- Das Gerät verliert die Stromversorgung, bevor es wieder angeschlossen wird
+- Sie laden vor der Synchronisierung eine neue Sitzung herunter
+
+### Segmentgrenzen
+Bei der Offline-Wiedergabe gelten dieselben Segmentbeschränkungen wie im Online-Modus (bis zu 100 effektive Segmente mit Ultra).
+
+## Best Practices
+
+<Tip>
+**Planen Sie im Voraus**: Laden Sie Ihre geplante Sitzung herunter, während Sie online sind, bevor Sie reisen oder irgendwohin ohne WLAN gehen.
+</Tip>
+
+- Halten Sie den Trainer aufgeladen – bei einem Stromausfall gehen nicht gespeicherte Ergebnisse verloren
+- Aktualisieren Sie Vorlagen nicht, während Sie offline sind (Änderungen werden erst wirksam, wenn Sie sie erneut herunterladen).
+- Stellen Sie nach Möglichkeit erneut eine Verbindung her, um Ergebnisse zu synchronisieren und Aktualisierungen zu erhalten
+
+## Fehlerbehebung
+
+<AccordionGroup>
+<Accordion title="Der Offline-Modus startet nicht">
+- Stellen Sie sicher, dass Sie zuvor eine Sitzung heruntergeladen haben, während Sie online waren
+- Der Cache kann leer sein, wenn es sich um ein neues Gerät handelt oder nach einem Reset
+- Versuchen Sie zunächst, eine WLAN-Verbindung herzustellen, und trennen Sie dann die Verbindung
+</Accordion>
+
+<Accordion title="Die Ergebnisse wurden nach dem erneuten Herstellen der Verbindung nicht synchronisiert">
+- Starten Sie online eine neue Sitzung, um die Synchronisierung auszulösen
+- Überprüfen Sie Ihr Dashboard. Es kann einen Moment dauern, bis die Ergebnisse angezeigt werden
+- Wenn immer noch kein Wert vorhanden ist, wurden die Ergebnisse möglicherweise vor dem Ausschalten nicht gespeichert
+</Accordion>
+
+<Accordion title="Falsche Vorlage wird offline geladen">
+Der Offline-Cache verwendet Ihre zuletzt heruntergeladene Sitzung. So ändern Sie Vorlagen offline:
+1. Stellen Sie die WLAN-Verbindung wieder her
+2. Starten Sie eine Sitzung mit der gewünschten Vorlage
+3. Trennen Sie die Verbindung und fahren Sie offline fort
+</Accordion>
+</AccordionGroup>
+
+## Zukünftige Verbesserungen
+
+Die Offline-Sitzungssynchronisierung (Speichern mehrerer Sitzungen für einen späteren Upload) ist für eine zukünftige Firmware-Version geplant. Informationen zu kommenden Funktionen finden Sie in der <a href="/dtt/technical/introduction">Software 2.0-Vorschau</a>.
+
+## Verwandte Leitfäden
+
+<CardGroup cols={2}>
+<Card title="WLAN-Einrichtung" icon="wifi" href="https://docs.researchanddesire.com/dtt/get-started">
+Verbinden Sie Ihren Trainer mit WLAN.
+</Card>
+
+<Card title="Ergebnisse prüfen" icon="chart-line" href="https://docs.researchanddesire.com/dtt/results">
+Sehen Sie sich die Ergebnisse Ihrer synchronisierten Sitzung an.
+</Card>
+</CardGroup>

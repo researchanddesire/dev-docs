@@ -1,0 +1,219 @@
+---
+title: "Feedback en indicatoren"
+description: "LED-kleuren, zoemergeluiden en trilpatronen voor RADR"
+---
+
+RADR biedt visuele, audio- en haptische feedback om de apparaatstatus te communiceren zonder dat u naar het scherm hoeft te kijken.
+
+## LED-systeem
+
+RADR heeft drie RGB-LED's (WS2812B) rondom het apparaat:
+
+| Positie | Locatie | Primair doel |
+|----------|----------|-----------------|
+| LED 0 | Linker encoder | Snelheidsmodus-indicator |
+| LED 1 | Midden | Verbinding/afspeelstatus |
+| LED 2 | Rechter encoder | Indicator voor actieve modus |
+
+### LED-kleuren en betekenissen
+
+#### Systeemstatussen
+
+| Staat | LED | Kleur | HSV-waarde | Helderheid |
+|-------|-----|-------|-----------|------------|
+| Zoeken/scannen | Alle | Blauw | 150 | 255 (pulserend) |
+| Inactief (hoofdmenu) | Alle | Zacht Wit | 180 | 50 |
+| Apparaat aangesloten | Midden | Wit | — | 50 |
+| Gepauzeerd/gestopt | Midden | Rood | — | 255 |
+
+#### OSSM-besturingsmodi
+
+Bij het aansturen van een OSSM geven de encoder-LED's de actieve modus aan:
+
+| Modus | LED | Kleur | Beschrijving |
+|------|-----|-------|-------------|
+| Snelheid | Links | Paars | Altijd actief (snelheid wordt altijd geregeld door de linker encoder) |
+| Diepte | Rechts | Koraal/Rood | De rechter encoder past de diepte aan |
+| Gevoel | Rechts | Blauw | De rechter encoder past de sensatie aan |
+| Hartinfarct | Rechts | Groente | De rechter encoder past de slag aan |
+
+### LED-gedragspatronen
+
+| Patroon | Betekenis |
+|---------|---------|
+| Stevig | Statische status (verbonden, gepauzeerd, etc.) |
+| Pulserend | Actieve scan of zoeken |
+| Snelle flits | Feedback bij het indrukken van een knop of het wijzigen van de modus |
+
+## Zoemerpatronen
+
+RADR maakt gebruik van een piëzo-elektrische zoemer (GPIO 2) om audiofeedback te geven bij belangrijke gebeurtenissen.
+
+### Opstartgeluid
+
+**Patroon:** Oplopende reeks van 4 noten
+
+| Opmerking | Frequentie | Duur |
+|------|-----------|----------|
+| 1 | 523 Hz (C5) | 100ms |
+| 2 | 659 Hz (E5) | 100ms |
+| 3 | 784 Hz (G5) | 100ms |
+| 4 | 1047 Hz (C6) | 150 ms |
+
+Wordt afgespeeld wanneer RADR wordt ingeschakeld.
+
+### Afsluitgeluid
+
+**Patroon:** Aflopende reeks van 4 noten
+
+| Opmerking | Frequentie | Duur |
+|------|-----------|----------|
+| 1 | 1047 Hz (C6) | 100ms |
+| 2 | 784 Hz (G5) | 100ms |
+| 3 | 659 Hz (E5) | 100ms |
+| 4 | 523 Hz (C5) | 150 ms |
+
+Wordt afgespeeld wanneer u naar de slaapmodus gaat.
+
+### Apparaat aangesloten
+
+**Patroon:** Oplopende reeks van 3 noten
+
+| Opmerking | Frequentie | Duur |
+|------|-----------|----------|
+| 1 | 1047 Hz (C6) | 80 ms |
+| 2 | 1319 Hz (E6) | 80 ms |
+| 3 | 1568 Hz (G6) | 120 ms |
+
+Wordt afgespeeld wanneer er succesvol verbinding is gemaakt met een apparaat.
+
+### Apparaat losgekoppeld
+
+**Patroon:** Aflopende reeks van 3 noten
+
+| Opmerking | Frequentie | Duur |
+|------|-----------|----------|
+| 1 | 1568 Hz (G6) | 80 ms |
+| 2 | 1319 Hz (E6) | 80 ms |
+| 3 | 1047 Hz (C6) | 120 ms |
+
+Wordt afgespeeld wanneer een apparaat de verbinding verbreekt.
+
+### Gepauzeerd
+
+**Patroon:** Dubbele pieptoon
+
+| Opmerking | Frequentie | Duur |
+|------|-----------|----------|
+| 1 | 800 Hz | 150 ms |
+| Gat | — | 100ms |
+| 2 | 800 Hz | 150 ms |
+
+Wordt afgespeeld tijdens het pauzeren van het afspelen.
+
+### Afspelen/hervatten
+
+**Patroon:** Tweekleurig oplopend
+
+| Opmerking | Frequentie | Duur |
+|------|-----------|----------|
+| 1 | 1200 Hz | 100ms |
+| 2 | 1400 Hz | 100ms |
+
+Wordt afgespeeld wanneer het afspelen wordt hervat.
+
+### Mario-munt (paasei)
+
+**Patroon:** Klassiek muntgeluid
+
+| Opmerking | Frequentie | Duur |
+|------|-----------|----------|
+| 1 | 2637 Hz (E7) | 80 ms |
+| 2 | 3136 Hz (G7) | 300 ms |
+
+Speciale feedback voor bepaalde interacties.
+
+## Trillingsfeedback
+
+RADR bevat een vibratiemotor (GPIO 47) voor haptische feedback. Trillingspatronen weerspiegelen over het algemeen zoemerpatronen en bieden voelbare feedback die zonder geluid werkt.
+
+### Gebruiksscenario's voor trillingen
+
+| Evenement | Trillingen |
+|-------|-----------|
+| Knop indrukken | Korte puls |
+| Modusverandering | Snelle trilling |
+| Verbinding | Dubbele trilling |
+| Pauze/Stoppen | Sterke trillingen |
+
+### Trilpatroontimingen
+
+| Patroon | Beschrijving | Pulsduur (ms) |
+|---------|-------------|---------------------|
+| Enkele puls | Snelle tikfeedback | 50 |
+| Dubbele puls | Bevestigingsfeedback | 50, pauze 200, 50 |
+| Drievoudige puls | Sterke bevestiging | 10, pauze 50, 20, pauze 50, 30 |
+| Foutpuls | Lange foutindicatie | 500 |
+| Afsluiten | Aflopende pulsen | 150, 100, 100, 100 |
+| Apparaat aangesloten | Oplopende pulsen | 100, 100, 150 |
+| Apparaat losgekoppeld | Aflopende pulsen | 150, 100, 100 |
+| Gepauzeerd | Dubbele puls | 150, 150 |
+| Afspelen/hervatten | Snelle dubbele puls | 100, 100 |
+
+<Info>
+Trillingsfeedback helpt u RADR op gevoel te bedienen, vooral handig bij weinig licht of wanneer het apparaat niet direct zichtbaar is.
+</Info>
+
+## UI-kleurenschema
+
+Het display van RADR gebruikt een consistent kleurenschema:
+
+### Achtergrondkleuren
+
+| Element | Kleurcode | Beschrijving |
+|---------|------------|-------------|
+| Achtergrond | 0x10c5 | Donkergrijs (Grijs 900) |
+| Tekstachtergrond | Wit | Primaire tekstkleur |
+| Secundaire tekst | 0xDEFB | Lichtgrijs |
+| Gehandicapt | 0x1082 | Zeer donkergrijs |
+
+### OSSM-moduskleuren
+
+| Modus | Kleurcode | Kleur Naam |
+|------|------------|------------|
+| Snelheid | 0x5013 | Koninklijk Paars |
+| Diepte | 0xE186 | Warm koraal |
+| Gevoel | 0x3C9F | Oceaanblauw |
+| Hartinfarct | 0x4E8A | Bos Groen |
+
+### Staat kleuren
+
+| Staat | Kleur |
+|-------|-------|
+| Actief/Normaal | Wit |
+| Gepauzeerd/gestopt | Rood |
+| Gehandicapt | Donkergrijs |
+| Geselecteerd/gemarkeerd | Accentkleuren |
+
+## Feedbacktiming
+
+| Evenement | Reactietijd |
+|-------|---------------|
+| Knop indrukken | < 10 ms |
+| Encoderwijziging | < 10 ms |
+| Modusschakelaar | < 50 ms |
+| LED-kleurverandering | < 20 ms |
+
+## Tips voor het gebruik van feedback
+
+<Tip>
+Leer de zoemergeluiden om RADR te bedienen zonder te kijken. Het aangesloten geluid (oplopend) versus het niet-verbonden geluid (aflopend) geeft duidelijk de status aan.
+</Tip>
+
+<Tip>
+De linker LED (paars voor snelheid) en rechter LED (moduskleur) vertellen u in één oogopslag welke parameter elke encoder regelt.
+</Tip>
+
+<Tip>
+Rode middelste LED betekent altijd gepauzeerd of gestopt. Wit betekent actief en klaar.
+</Tip>

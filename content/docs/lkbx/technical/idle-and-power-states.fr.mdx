@@ -1,0 +1,180 @@
+---
+title: "États inactifs et alimentés"
+description: "Détails techniques sur la gestion de l'alimentation, les délais d'inactivité et la conservation de la batterie sur votre Chastity Lockbox"
+---
+
+Votre Chastity Lockbox gère automatiquement la consommation d'énergie à travers une série d'états d'inactivité. Ce guide explique les détails techniques du fonctionnement de ces états et ce qui déclenche les transitions entre eux.
+
+## Progression de l'état d'inactivité
+
+Après toute interaction de l'utilisateur, l'appareil passe par des états d'inactivité en fonction du temps d'inactivité :
+
+| État | Temps mort | Rétroéclairage | Wi-Fi | Consommation d'énergie |
+|-------|---------|-----------|------|-----------|
+| Actif | — | Complet (100%) | Connecté | Normale |
+| Inactif | 30 secondes | Estompé (10%) | Connecté | Réduit |
+| Pseudo-sommeil | 2 minutes | Désactivé | Connecté | Faible |
+| Sommeil profond | 10 minutes | Désactivé | Déconnecté | Minimal |
+
+<Info>
+Ces délais d'attente sont cumulatifs. Le sommeil profond survient 10 minutes après la dernière interaction, et non 10 minutes après le début du pseudo-sommeil.
+</Info>
+
+## État actif
+
+Lorsque vous utilisez activement votre appareil :
+
+- **Luminosité du rétroéclairage** : 100 % (valeur : 255)
+- **Tous les capteurs** : Actif et surveillance
+- **WiFi** : connecté et synchronisé
+- **Contrôleur de moteur** : Prêt pour les commandes
+
+Toute pression sur un bouton ou tout tour d'encodeur maintient l'appareil dans l'état actif et réinitialise la minuterie d'inactivité.
+
+## État inactif (30 secondes)
+
+Après 30 secondes sans interaction :
+
+- **Luminosité du rétroéclairage** : Atténuée à environ 10 % (valeur : 24)
+- **Capteurs** : Actif
+- **WiFi** : toujours connecté
+- **Contrôleur de moteur** : autorisé (pas de conduite active)
+
+<Tip>
+L'écran grisé est toujours lisible. Cet état permet d'économiser de l'énergie tout en gardant l'écran visible si vous regardez votre appareil.
+</Tip>
+
+### Se réveiller du ralenti
+
+Chacune de ces actions ramène l'appareil à l'état actif :
+- Appuyez sur n'importe quel bouton
+- Tournez l'encodeur
+- Câble USB connecté ou déconnecté
+
+## État de pseudo-sommeil (2 minutes)
+
+Après 2 minutes sans interaction :
+
+- **Luminosité du rétroéclairage** : Désactivé (valeur : 0)
+- **Écran** : toujours alimenté, juste sombre
+- **WiFi** : toujours connecté – les commandes du détenteur de clé fonctionnent
+- **Contrôleur de moteur** : Effacé
+- **Capteur de courant (INA219)** : passe en mode d'économie d'énergie
+
+<Note>
+Il s’agit de l’état de sommeil le plus profond pendant la charge. Lorsqu'il est connecté à l'alimentation USB, votre appareil n'entrera pas en veille profonde, garantissant ainsi qu'il reste connecté pour recevoir les commandes du porte-clés.
+</Note>
+
+### Se réveiller du pseudo-sommeil
+
+Mêmes déclencheurs que le réveil en état d'inactivité. La première interaction réveille l'appareil ; vous devrez peut-être appuyer à nouveau pour effectuer l'action souhaitée.
+
+## État de sommeil profond (10 minutes)
+
+Après 10 minutes sans interaction (et sans chargement) :
+
+- **Rétroéclairage** : éteint
+- **Écran** : mode veille
+- **Wi-Fi** : déconnecté
+- **Bluetooth** : désactivé
+- **La plupart des périphériques** : hors tension
+
+<Warning>
+En veille profonde, votre appareil ne peut pas recevoir de commandes du détenteur de clé jusqu'à ce qu'il se réveille. Les minuteries de verrouillage continuent de fonctionner en interne.
+</Warning>
+
+### Restrictions de sommeil profond
+
+Le sommeil profond ne s'active que lorsque **toutes** ces conditions sont vraies :
+- L'appareil est inactif depuis 10 minutes
+- L'appareil n'est **pas** connecté à l'alimentation USB
+- L'appareil n'est pas dans certains états protégés (calibrage, configuration WiFi)
+
+### Réveillez-vous d'un sommeil profond
+
+- Appuyez sur le bouton Entrée (si sur les broches ≤21) ou sur le bouton Retour
+- Réveil automatique de la minuterie si une minuterie de verrouillage est presque terminée
+
+<Info>
+Lorsqu'il reste moins de temps d'attente pour un verrou temporisé que le délai de pseudo-veille, l'appareil reste automatiquement éveillé pour gérer le déverrouillage.
+</Info>
+
+## Comportement de charge
+
+Lorsque votre appareil est connecté à l'alimentation USB :
+
+| Condition | Profondeur de sommeil maximale |
+|-----------|-------------------|
+| Chargement | Pseudo-sommeil uniquement |
+| Ne charge pas | Sommeil profond et complet |
+
+Cela garantit que votre appareil reste accessible pour les commandes du tableau de bord pendant le chargement, tout en maximisant la durée de vie de la batterie lorsqu'il est alimenté par batterie.
+
+## Réveil basé sur une minuterie
+
+Pour les verrouillages temporisés, votre appareil calcule une heure de réveil optimale :
+
+```
+sleepDuration = max(remainingTimeMs - PSEUDO_SLEEP_TIMEOUT, 0)
+```
+
+Cela signifie que l'appareil sortira d'une veille profonde avant l'expiration de votre minuterie de verrouillage, garantissant ainsi que vous ne manquerez pas le déverrouillage.
+
+## Consommation d'énergie
+
+Consommation de courant approximative dans chaque état :
+
+| État | Courant estimé |
+|-------|------------------|
+| Actif | ~80-100mA |
+| Inactif | ~40-60mA |
+| Pseudo-sommeil | ~20-30mA |
+| Sommeil profond | ~0,5-2 mA |
+
+<Tip>
+Pour une durée de vie maximale de la batterie pendant les verrouillages prolongés, gardez l'appareil hors du chargeur lorsqu'il n'est pas nécessaire. Il entrera automatiquement en veille profonde et se réveillera pour les événements importants.
+</Tip>
+
+## Suivi des interactions
+
+Chaque interaction de l'utilisateur réinitialise le minuteur d'inactivité. Les interactions suivies incluent :
+
+- Pressions sur les boutons (Entrée, Retour)
+- Rotation de l'encodeur
+- Changements d’état d’alimentation USB
+- Changements d’état du capteur (lors d’une surveillance active)
+
+## Référence technique
+
+### Constantes
+
+```
+IDLE_TIMEOUT = 30000         // 30 seconds
+PSEUDO_SLEEP_TIMEOUT = 120000  // 2 minutes
+SLEEP_TIMEOUT = 600000       // 10 minutes
+```
+
+### Valeurs PWM des LED
+
+```
+Active:       255 (100%)
+Idle:         24  (~10%)
+Pseudo-sleep: 0   (off)
+Deep sleep:   0   (off)
+```
+
+## Guides associés
+
+<CardGroup cols={2}>
+<Card title="Mode veille" icon="moon" href="../device-states/sleep-mode">
+Guide convivial des modes de veille automatique et manuel.
+</Card>
+
+<Card title="Contrôles des boutons" icon="hand-pointer" href="./button-controls">
+Comment les pressions sur les boutons réveillent l'appareil et ses fonctions.
+</Card>
+
+<Card title="Mode hors ligne" icon="wifi-slash" href="./offline-mode">
+Que se passe-t-il lorsque le sommeil profond déconnecte le WiFi ?
+</Card>
+</CardGroup>

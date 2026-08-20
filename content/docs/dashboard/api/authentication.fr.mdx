@@ -1,0 +1,112 @@
+---
+title: "Authentification"
+description: "Créez et gérez des jetons API pour authentifier vos demandes"
+---
+
+Toutes les requêtes API nécessitent un jeton API valide transmis dans l'en-tête `Authorization`. Les jetons sont des JWT signés avec l'identité de votre compte, de sorte que tout accès aux données respecte automatiquement les autorisations de votre compte.
+
+<Info>
+  La création de jetons API nécessite un abonnement **Ultra**. Si tu n'en as pas
+  pourtant, visitez [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription) pour mettre à niveau.
+</Info>
+
+## Créer un jeton
+
+<Steps>
+  <Step title="Accédez aux clés API">
+    Accédez à **Paramètres > Clés API** dans la barre latérale du tableau de bord.
+  </Step>
+
+<Step title="Cliquez sur Créer un jeton">
+  Cliquez sur le bouton **Créer un jeton** et donnez un nom descriptif à votre jeton.
+  (par exemple, « Intégration de Home Assistant » ou « Script Python »).
+</Step>
+
+  <Step title="Copiez votre jeton">
+    Votre jeton sera affiché exactement une fois. Copiez-le et conservez-le en toute sécurité.
+
+    <Warning>
+    Vous ne pourrez plus revoir ce jeton. Si vous le perdez, vous devrez en créer un nouveau.
+    </Warning>
+
+  </Step>
+</Steps>
+
+## Utiliser votre jeton
+
+Incluez le jeton en tant que jeton Bearer dans l'en-tête `Authorization` :
+
+<RequestExample>
+```bash cURL
+curl -X GET \
+  https://dashboard.researchanddesire.com/api/v1/users \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+```python Python
+import requests
+
+headers = {"Authorization": "Bearer YOUR_API_TOKEN"}
+response = requests.get(
+    "https://dashboard.researchanddesire.com/api/v1/users",
+    headers=headers,
+)
+data = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch(
+  "https://dashboard.researchanddesire.com/api/v1/users",
+  {
+    headers: { Authorization: "Bearer YOUR_API_TOKEN" },
+  },
+);
+const data = await response.json();
+```
+
+</RequestExample>
+
+## Gestion des jetons
+
+### Affichage des jetons
+
+La page des paramètres **Clés API** affiche tous vos jetons actifs avec :
+
+- **Nom** : le libellé que vous avez attribué
+- **Créé** : date à laquelle le jeton a été créé
+- **Dernière utilisation** : la dernière fois que le jeton a été utilisé pour effectuer une demande
+
+### Révocation de jetons
+
+Cliquez sur l'icône de la corbeille à côté de n'importe quel jeton pour le révoquer. La révocation est immédiate : toute demande utilisant ce jeton commencera immédiatement à recevoir des réponses `401 Unauthorized`.
+
+<Tip>Révoquez et recréez périodiquement des jetons conformément aux meilleures pratiques de sécurité.</Tip>
+
+### Limites des jetons
+
+Vous pouvez avoir jusqu'à **5 jetons actifs** à la fois. Si vous en avez besoin de plus, révoquez d'abord un jeton inutilisé.
+
+## Réponses aux erreurs
+
+| Statut | Signification                                                      |
+| ------ | ------------------------------------------------------------ |
+| `401`  | Jeton manquant, invalide, expiré ou révoqué                  |
+| `403`  | Le jeton est valide mais vous n'avez pas l'autorisation pour cette action |
+| `404`  | Ressource introuvable (ou non accessible avec vos autorisations) |
+
+<ResponseExample>
+```json 401 Unauthorized
+{
+  "ok": false,
+  "error": "Missing or invalid Authorization header"
+}
+```
+
+```json 401 Token Revoked
+{
+  "ok": false,
+  "error": "Token has been revoked"
+}
+```
+
+</ResponseExample>

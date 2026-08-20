@@ -1,0 +1,113 @@
+---
+title: "Spécifications du capteur"
+description: "Limites techniques et capacités du capteur de distance"
+---
+
+Le Deepthroat Trainer utilise un capteur de distance à ultrasons pour mesurer la position du jouet en temps réel. Comprendre les capacités et les limites du capteur vous aide à obtenir les résultats d'entraînement les plus précis.
+
+## Portée du capteur
+
+| Spécification | Valeur |
+|---------------|-------|
+| **Portée maximale** | 22,5 cm (environ 9 pouces) |
+| **Zone morte** | 1,7 cm (environ 0,67 pouces) |
+| **Plage utile efficace** | 20,8 cm (environ 8,2 pouces) |
+| **Longueur de course minimale** | 0,8 cm (environ 0,3 pouces) |
+
+<Info>
+La zone morte est la zone la plus proche du capteur où il ne peut pas détecter avec précision les changements de position. Les objets dans cette zone peuvent ne pas s'enregistrer correctement.
+</Info>
+
+## Comment fonctionne le capteur
+
+Le capteur de distance échantillonne en permanence votre position et traite les données pour fournir des lectures fluides et précises :
+
+- **Taux d'échantillonnage** : 40 échantillons sont moyennés pour réduire le bruit
+- **Calcul de la vitesse** : basé sur les changements de position au fil du temps
+- **Détection de direction** : indique si vous vous rapprochez ou vous éloignez du capteur
+
+<Note>
+Le capteur utilise un tampon circulaire de lectures récentes. Les mouvements soudains et saccadés peuvent prendre un certain temps pour être enregistrés avec précision lors de la mise à jour de la mémoire tampon.
+</Note>
+
+## Mesure de position
+
+Les positions sont mesurées en centimètres à partir du capteur :
+
+- **Position de départ** : généralement la position "repos", plus éloignée du capteur
+- **Position finale** : La profondeur cible, plus proche du capteur
+- **Fenêtre cible** : la plage acceptable autour de la position cible
+
+Pour des raisons de précision de l'entraînement, les positions sont limitées à des plages valides :
+- Position minimale détectable : 1,7 cm (limite de la zone morte)
+- Position maximale détectable : 22,5 cm
+
+## Étalonnage
+
+L'étalonnage capture deux positions clés :
+
+1. **Position minimale** : la profondeur confortable la plus proche (moyenne de 100 échantillons)
+2. **Position maximale** : la position de repos/départ (moyenne de 100 échantillons)
+
+<Tip>
+Pour de meilleurs résultats, restez stable pendant l’étalonnage. Le formateur capture 100 échantillons à chaque position pour garantir des mesures précises.
+</Tip>
+
+### Étalonnage des jouets et étalonnage des appareils
+
+- **Calibrage de l'appareil** : définit la plage globale du capteur pour votre configuration
+- **Calibrage des jouets** : stocké dans le cloud, mémorise les paramètres de jouets spécifiques
+
+Lors de l'utilisation de l'étalonnage dans le cloud (logiciel 2.0+), les données d'étalonnage sont stockées par jouet et synchronisées entre les sessions.
+
+## Limites
+
+### Zone morte
+Les objets à moins de 1,7 cm du capteur ne peuvent pas être mesurés avec précision. Les segments d'entraînement sont automatiquement ajustés pour respecter cette limite.
+
+### Portée maximale
+Le capteur ne peut pas détecter les positions au-delà de 22,5 cm. Si votre configuration nécessite des distances plus longues, envisagez de repositionner l'entraîneur.
+
+### Course minimale
+Les très petits mouvements (moins de 0,8 cm) peuvent ne pas être enregistrés comme des mouvements séparés. Cela garantit que l'entraîneur ne considère pas les micro-mouvements comme des actions intentionnelles.
+
+### Facteurs environnementaux
+
+<Warning>
+Le capteur peut être affecté par :
+- Surfaces réfléchissantes à proximité de la zone de détection
+- Matériaux très doux ou insonorisants
+- Températures extrêmes
+</Warning>
+
+## Dépannage
+
+<AccordionGroup>
+<Accordion title="Les lectures du capteur semblent inexactes">
+- Recalibrer l'appareil
+- Assurez-vous que le jouet est correctement positionné sur le chemin du capteur
+- Vérifiez que rien n'obstrue la zone de détection
+</Accordion>
+
+<Accordion title="La position saute ou bégaie">
+- Cela peut se produire près de la limite de la zone morte
+- Essayez d'ajuster les paramètres de votre segment pour éviter les plages extrêmes
+- Assurez-vous que le jouet bouge en douceur sans vaciller
+</Accordion>
+
+<Accordion title="Les petits mouvements ne sont pas détectés">
+Les mouvements inférieurs à 0,8 cm peuvent ne pas être enregistrés. Ceci est prévu pour éviter les fausses lectures dues aux vibrations ou aux ajustements mineurs.
+</Accordion>
+</AccordionGroup>
+
+## Guides associés
+
+<CardGroup cols={2}>
+<Card title="Commentaires des LED" icon="lightbulb" href="https://docs.researchanddesire.com/dtt/troubleshooting">
+Comment les couleurs des LED indiquent l'état de votre position.
+</Card>
+
+<Card title="Calibrage" icon="sliders" href="/dtt/technical/calibration">
+Guide étape par étape pour calibrer votre home trainer.
+</Card>
+</CardGroup>

@@ -1,0 +1,7 @@
+{
+  "title": "Architecture",
+  "pages": [
+    "folder-structure",
+    "state-machine"
+  ]
+}

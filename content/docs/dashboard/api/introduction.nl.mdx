@@ -1,0 +1,128 @@
+---
+title: "API-overzicht"
+description: "Programmatisch toegang krijgen tot uw Research- en Desire-gegevens met de REST API"
+---
+
+Met de Research and Desire API heeft u toegang tot uw dashboardgegevens vanuit externe applicaties, scripts en integraties. Bij elk API-verzoek worden de rechten van uw account gerespecteerd: u heeft alleen toegang tot gegevens die u mag zien.
+
+<Info>
+  API-toegang is een **Ultra**-functie. Je hebt een actief Ultra-abonnement nodig
+  maak API-tokens. [Meer informatie over Ultra](https://dashboard.researchanddesire.com/app/settings/subscription).
+</Info>
+
+## Basis-URL
+
+Alle API-eindpunten zijn beschikbaar op:
+
+```
+https://dashboard.researchanddesire.com/api/v1
+```
+
+## Sleutelconcepten
+
+<CardGroup cols={2}>
+  <Card title="Authenticatie" icon="key" href="./authentication">
+    Maak API-tokens en leer hoe u verzoeken kunt verifiëren.
+  </Card>
+
+  <Card title="Eindpuntreferentie" icon="code" href="./endpoints/users">
+    Blader door alle beschikbare eindpunten voor Gebruikers, DTT, LKBX en OSSM.
+  </Card>
+</CardGroup>
+
+## Hoe het werkt
+
+<Steps>
+  <Step title="Maak een API-token">
+    Ga naar **Instellingen > API-sleutels** in het dashboard en maak een nieuw token. Kopieer het onmiddellijk; het wordt slechts één keer weergegeven.
+  </Step>
+
+  <Step title="Verzoeken doen">
+    Neem uw token op in de `Authorization`-header van elk verzoek.
+
+    ```bash
+    curl -H "Authorization: Bearer YOUR_TOKEN" \
+      https://dashboard.researchanddesire.com/api/v1/users
+    ```
+
+  </Step>
+
+  <Step title="Parseer het antwoord">
+    Alle antwoorden volgen een consistent JSON-envelopformaat.
+  </Step>
+</Steps>
+
+## Antwoordformaat
+
+Bij elk antwoord wordt dezelfde envelop gebruikt:
+
+**Succes:**
+
+```json
+{
+  "ok": true,
+  "data": { ... }
+}
+```
+
+**Fout:**
+
+```json
+{
+  "ok": false,
+  "error": "Human-readable error message"
+}
+```
+
+## Paginering
+
+Lijsteindpunten ondersteunen paginering via queryparameters:
+
+| Parameter | Standaard | Max | Beschrijving                 |
+| --------- | ------- | --- | --------------------------- |
+| `limit`   | 50      | 100 | Aantal records dat moet worden geretourneerd |
+| `offset`  | 0       | -   | Aantal records dat moet worden overgeslagen   |
+
+Gepagineerde antwoorden omwikkelen de data-array met pagineringsmetagegevens:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "data": [ ... ],
+    "pagination": {
+      "limit": 50,
+      "offset": 0
+    }
+  }
+}
+```
+
+Voorbeeld: haal de tweede pagina van 25 gebruikers op:
+
+```bash
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "https://dashboard.researchanddesire.com/api/v1/users?limit=25&offset=25"
+```
+
+## Tariefbeperking
+
+<Note>
+  De API hanteert momenteel geen strikte tarieflimieten, maar houd er rekening mee
+  respectvol met uw verzoekvolume. Overmatig gebruik kan leiden tot throttling
+  in toekomstige releases.
+</Note>
+
+## Machtigingen en RLS
+
+Uw API-token neemt exact dezelfde machtigingen over als uw dashboardaccount. Dit betekent:
+
+- Je kunt alleen **je eigen apparaten** en **apparaten die met je zijn gedeeld** via partnerschappen zien
+- Bij het vergrendelen van sessieacties worden de machtigingen van de sleutelhouder gerespecteerd
+- Gebruikersquery's retourneren alleen gebruikers waarmee u een verbinding heeft
+
+<Warning>
+  Behandel uw API-token als een wachtwoord. Iedereen met uw token heeft toegang tot uw
+  gegevens. Als een token is aangetast, trekt u deze onmiddellijk in via **Instellingen > API
+  Sleutels**.
+</Warning>

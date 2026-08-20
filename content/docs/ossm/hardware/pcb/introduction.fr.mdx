@@ -1,0 +1,214 @@
+---
+title: "Vue d'ensemble des PCB"
+description: "Introduction aux conceptions de cartes de circuits imprimés OSSM et aux options de câblage"
+---
+
+Cette section explique comment le PCB OSSM connecte votre contrôleur basé sur ESP32 au pilote de moteur. Vous pouvez utiliser le PCB OSSM officiel ou créer une configuration de câblage DIY.
+
+<Card title="Acheter le PCB OSSM" icon="cart-shopping" href="https://www.researchanddesire.com/products/ossm-reference-board">
+Disponible pré-flashé chez Research and Desire avec le dernier firmware, prêt à être utilisé avec votre OSSM.
+</Card>
+
+## Options disponibles
+
+<CardGroup cols={2}>
+  <Card title="PCB officiel OSSM" icon="microchip" href="#official-ossm-wiring">
+    Carte de référence avec sorties pas à pas/dir 5 V, protection intégrée et connecteurs standardisés pour un fonctionnement fiable.
+  </Card>
+  <Card title="Câblage DIY" icon="plug" href="#alternative-wiring-configurations">
+    Planche à pain ou faisceaux personnalisés pour le prototypage ou l'utilisation de pilotes de moteur alternatifs.
+  </Card>
+</CardGroup>
+
+## Choisir votre approche
+
+<Tabs>
+  <Tab title="PCB officiel">
+    Le PCB officiel OSSM fournit :
+    - GPIO pré-mappé vers step/dir/enable
+    - Conversion du signal de 3,3 V à 5 V pour un contrôle à grande vitesse et résistant au bruit
+    - Connecteurs JST‑PH pour une gestion ordonnée des câbles
+    - Alimentation intégrée et protection contre-EMF
+    - Un design validé pour la configuration officielle OSSM
+
+    <Tip>
+    Pour la plupart des constructeurs, le PCB officiel constitue le chemin le plus rapide et le plus fiable vers le succès.
+    </Tip>
+  </Tab>
+  <Tab title="Câblage DIY">
+    Choisissez le câblage DIY si vous :
+    - Vous souhaitez réaliser un prototype avant de vous engager dans un PCB
+    - Nécessité d'interfacer avec un pilote non standard
+    - Vous avez déjà des pièces compatibles sous la main
+    - Préfère apprendre le système au niveau du signal
+
+    <Warning>
+    Un ESP32 utilise une logique de 3,3 V. De nombreux pilotes de moteur s'attendent à des signaux pas à pas/dir de 5 V. Incluez toujours un levier de niveau lors du câblage directement d'un ESP32 à un pilote 5V.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Considérations clés
+
+Avant de vous décider, gardez ces facteurs à l’esprit :
+
+<AccordionGroup>
+  <Accordion title="Compatibilité du niveau de tension">
+    Les cartes ESP32 fonctionnent avec une logique de 3,3 V tandis que de nombreux pilotes utilisent des entrées de 5 V. Sans changement de niveau approprié, vous pouvez voir :
+    - Pas manqués à des vitesses plus élevées
+    - Changements de direction peu fiables
+    - Risque d'endommagement des composants
+
+    Vérifiez les exigences de tension d'entrée pour votre pilote spécifique avant le câblage.
+  </Accordion>
+  <Accordion title="Intégrité du signal">
+    Les signaux pas à pas à grande vitesse (jusqu'à 200 kHz) exigent un câblage propre :
+    - Gardez les avances de pas et de direction courtes
+    - Acheminer les signaux loin des câbles d'alimentation du moteur
+    - Utilisez des paires torsadées ou un câble blindé pour des longueurs supérieures à 30 cm
+  </Accordion>
+  <Accordion title="Exigences d'alimentation">
+    Dimensionnez l'alimentation du pilote pour votre moteur :
+    - Les servomoteurs utilisent généralement du 24 à 48 V CC
+    - Les pilotes pas à pas varient selon le modèle (12 à 48 V typiques)
+    - Alimentez l'ESP32 à partir d'un port USB ou d'un rail régulé de 5 V, indépendamment de la puissance du moteur.
+  </Accordion>
+</AccordionGroup>
+
+## Câblage officiel OSSM
+
+Utilisez cette section si vous câblez le PCB OSSM au moteur OSSM Gold (série 57AIM) ou à un pilote pas à pas/dir compatible.
+
+<Steps>
+<Step title="Rassembler les pièces">
+  - PCB OSSM
+  - Alimentation 24 V (certifiée UL recommandée)
+  - Câble de signal PH‑4 et connecteur d'alimentation moteur vert (inclus avec les kits moteur OSSM)
+  - Moteur et pilote appropriés
+
+  <Note>
+  Pour l'assemblage physique et le câblage, utilisez l'étape de câblage officielle <a href="https://ohai.researchanddesire.com/ossm/build/wiring"></a>.
+  </Note>
+</Step>
+
+<Step title="Connecter l'alimentation du moteur">
+  - Dénudez les fils d'alimentation rouge/noir.
+  - Insérez le rouge (+) et le noir (–) dans la borne d'alimentation du moteur à deux positions sur le PCB.
+  - Serrez fermement pour éviter les connexions intermittentes.
+
+  <Check>
+  Tirez doucement sur chaque fil. S'il bouge, resserrez le terminal.
+  </Check>
+</Step>
+
+<Step title="Connectez les signaux pas à pas/dir">
+  - Branchez le câble de signal PH‑4 à clé dans le connecteur à 4 broches du PCB.
+  - Acheminez l'autre extrémité vers l'entrée de commande du moteur/pilote comme indiqué.
+
+  <Tip>
+  Le PCB produit des signaux pas/dir actifs bas de 5 V sur l'embase PH-4, ce qui améliore l'immunité au bruit avec de nombreux pilotes.
+  </Tip>
+</Step>
+
+<Step title="Mettre sous tension et vérifier">
+  - Connectez l'alimentation 24 V à la prise cylindrique de 2,1 mm x 5,5 mm du PCB.
+  - Allumez. Le moteur/pilote doit indiquer la puissance et être prêt.
+
+```bash
+# Quick preflight
+1) Power on the PCB
+2) Confirm motor/driver status LED indicates power
+3) Connect your controller and home the axis when mechanically assembled
+```
+
+  <Check>
+  Si la télécommande est connectée pendant les tests au banc, la prise d'origine peut ne pas se terminer tant que l'actionneur n'est pas entièrement assemblé sur un rail.
+  </Check>
+</Step>
+</Steps>
+
+## Configurations de câblage alternatives
+
+Si vous interagissez avec un autre pilote step/dir ou si vous effectuez un prototypage sur une maquette :
+
+<Steps>
+<Step title="Ajouter un levier de niveau (obligatoire pour les pilotes 5V)">
+  Utilisez un sélecteur de niveau unidirectionnel 3,3 V → 5 V pour STEP, DIR et ENABLE. Attachez la masse entre l'ESP32, le levier de niveau et le conducteur.
+
+  ```text
+  ESP32 (3.3V) → Level Shifter → Driver (5V)
+       STEP  ────────────────→  STEP
+       DIR   ────────────────→  DIR
+       EN    ────────────────→  EN (if used)
+       GND   ─────────────────  GND (common)
+  ```
+
+  <Warning>
+  Ne pilotez pas une entrée 5 V directement à partir d’une broche ESP32.
+  </Warning>
+</Step>
+
+<Step title="Câbler correctement l'alimentation">
+  - Gardez la puissance du moteur séparée des rails logiques 5 V.
+  - Dimensionner le câblage d'alimentation en courant. Utilisez 16-24 AWG sur les bornes de sortie du moteur PCB.
+</Step>
+
+<Step title="Valider les signaux">
+  - Commencez à un rythme lent et augmentez progressivement.
+  - Confirmez clairement les changements de direction et qu’aucune étape n’est manquée.
+</Step>
+</Steps>
+
+## Caractéristiques
+
+Ces spécifications résument les capacités du PCB OSSM.
+
+### Entrée d'alimentation
+
+| Paramètre | Valeur |
+|-----------|-------|
+| Tension | 24 V CC |
+| Courant maximum | 5A |
+| Connecteur | Prise cylindrique de 2,1 mm × 5,5 mm |
+
+<Warning>
+Utilisez une alimentation électrique de haute qualité certifiée UL. Les alimentations de mauvaise qualité ne parviennent souvent pas à fournir la puissance nominale et peuvent endommager le moteur ou la carte.
+</Warning>
+
+### Sorties de signaux
+
+| Paramètre | Spécification |
+|-----------|---------------|
+| Type de signal | Étape‑Dir |
+| Niveau logique | 5 V actif faible |
+| Connecteur | JST‑PH‑4 |
+
+### Puissance de sortie du moteur
+
+| Paramètre | Spécification |
+|-----------|---------------|
+| Tension | 24V |
+| Courant maximum | 6A |
+| Terminaux | 2× bornes à vis |
+| Calibre de fil | 16 à 24 AWG |
+
+### Protection contre les champs électromagnétiques
+
+Le PCB comprend une protection intégrée contre les pointes de tension régénératives :
+
+- Diode en ligne pour protéger l'alimentation du courant inverse
+- Condensateur de 1 500 µF pour gérer l'énergie régénérative
+
+## Guides associés
+
+<CardGroup cols={2}>
+  <Card title="Référence PCB OSSM" icon="file" href="/ossm/hardware/pcb/board-design">
+    Spécifications électriques détaillées et brochage des connecteurs.
+  </Card>
+  <Card title="Étape de câblage officiel" icon="bolt" href="https://ohai.researchanddesire.com/ossm/build/wiring">
+    Câblage étape par étape pour le moteur OSSM Gold (série 57AIM).
+  </Card>
+  <Card title="Micrologiciel et mises à jour" icon="cpu" href="/ossm/software/getting-started/wifi-and-updates">
+    Utilisez le flasher Web pour charger le firmware sur votre carte.
+  </Card>
+</CardGroup>

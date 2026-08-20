@@ -1,0 +1,240 @@
+---
+title: "Zubehöranschluss"
+description: "Technische Spezifikationen für den 3,5-mm-Zubehöranschluss und benutzerdefinierte Integrationsrichtlinien"
+---
+
+Der Deep Throat Trainer verfügt über einen 3,5-mm-Zubehöranschluss, der kompatibles Vibrationszubehör für eine leistungsbasierte Verstärkung in Echtzeit antreibt.
+
+## Offizielles Zubehör
+
+Wir bieten Vibrationsstecker und -stäbe an, die direkt an den Zubehöranschluss angeschlossen werden können. Dieses Zubehör reagiert automatisch auf die Trainingsausgabe – es ist keine zusätzliche Einrichtung erforderlich.
+
+<Info>
+Der Zubehöranschluss gibt ein moduliertes Signal aus, das sich an die Trainingsleistung anpasst. Eine höhere Leistung führt zu einer stärkeren Zubehöraktivierung.
+</Info>
+
+### Verwendung mehrerer Zubehörteile
+
+Wenn Sie einen Vibe und einen Wand zusammen kaufen, legen wir ein Splitterkabel bei, damit Sie beide Zubehörteile während des Trainings gleichzeitig verwenden können. Schließen Sie den Splitter an den Zubehöranschluss des Trainers an und stecken Sie dann jedes Zubehör in den Splitter ein.
+
+<Tip>
+Der Stab ist für die äußerliche Anwendung konzipiert – halten Sie ihn manuell fest, stecken Sie ihn in die Unterwäsche oder positionieren Sie ihn so, wie es für Sie am besten ist.
+</Tip>
+
+<Warning>
+Die Verwendung mehrerer Zubehörteile erhöht den Batterieverbrauch. Wenn beide Zubehörteile angeschlossen sind, können Sie mit einer Akkulaufzeit von ca. 2–3 Stunden statt der üblichen 4 Stunden rechnen. Überwachen Sie Ihren Akkustand bei längeren Sitzungen.
+</Warning>
+
+## Port-Spezifikationen
+
+Der Zubehöranschluss verwendet eine 4-Leiter-TRRS-Buchse (3,5 mm) mit den folgenden Eigenschaften.
+
+| Parameter | Spezifikation |
+|-----------|---------------|
+| Steckertyp | 3,5 mm TRRS (4-Leiter) |
+| Signalausgang | Erster Klingelton (R1) |
+| Signaltyp | 3,3 V PWM (Pulsweitenmodulation) |
+| Maximaler Strom | Insgesamt 200 mA am Zubehörausgang |
+| Verhalten | Der Arbeitszyklus variiert dynamisch je nach Trainingsleistung |
+
+<Note>
+PWM (Pulsweitenmodulation) schaltet den Ausgang schnell ein und aus. Die effektive Intensität wird durch das Tastverhältnis (Prozentsatz der Zeit, in der das Signal innerhalb jedes Zyklus eingeschaltet ist) gesteuert.
+</Note>
+
+<Warning>
+Befolgen Sie beim Anschließen externer Geräte an den Trainer die folgenden Sicherheitsrichtlinien:
+
+- Schließen Sie Hochspannungs- oder Netzgeräte niemals direkt an den Zubehöranschluss an.
+- Beachten Sie die grundlegende elektrische Sicherheit und halten Sie alle örtlichen Normen und Vorschriften ein.
+- Versuchen Sie benutzerdefinierte Integrationen nur, wenn Sie Erfahrung im Umgang mit Elektronik haben und die damit verbundenen Risiken akzeptieren.
+- Wir unterstützen offiziell nur R+D-Zubehör. Die Verwendung von benutzerdefinierten Schnittstellen oder Schnittstellen von Drittanbietern erfolgt auf eigenes Risiko.
+</Warning>
+
+## Pinbelegungsdiagramm
+
+Die Leiterpositionen und den Erdungsbezug finden Sie im Diagramm. Das PWM-Signal liegt am ersten Ring (R1) an.
+
+<Frame caption="TRRS-Pinbelegungsdiagramm für den Zubehöranschluss">
+  <img src="./_images/image (5).webp" alt="TRRS-Pinbelegungsdiagramm des Zubehöranschlusses mit Darstellung der 4-Leiter-Konfiguration" />
+</Frame>
+
+<Tip>
+Übernehmen Sie keine bestimmte CTIA/OMTP-Leiterreihenfolge von anderen Audiogeräten. Überprüfen Sie vor der Verkabelung stets die bereitgestellte Pinbelegung.
+</Tip>
+
+## Benutzerdefinierte Integrationen
+
+Verwenden Sie die folgenden Schritte und Referenzdesigns, um den Zubehörausgang sicher in Ihre eigenen Projekte zu integrieren.
+
+<Steps>
+<Step title="Planen Sie Ihre Auslastung und Ihr Budget aktuell">
+  Bestimmen Sie das Zubehör oder den Stromkreis, den Sie ansteuern möchten, und stellen Sie sicher, dass nicht mehr als 200 mA vom Anschluss benötigt werden. Wenn mehr Strom oder eine andere Spannung benötigt wird, verwenden Sie eine Treiberstufe (Beispiel siehe unten).
+
+<Check>
+  Sie haben den erwarteten Dauerstrom und etwaige Anlauf-/Einschaltströme für Ihre Last ermittelt.
+</Check>
+</Step>
+
+<Step title="Messen Sie das Signalverhalten auf Ihrem Gerät">
+  Messen Sie bei aktivem Trainer das PWM-Tastverhältnis und die Frequenz mit einem Multimeter mit Tastverhältnismodus oder einem Oszilloskop. Die Häufigkeit kann sich je nach Firmware-Version ändern. Design für einen angemessenen Bereich und nicht für einen festen Wert.
+
+<Check>
+  Sie haben typische Arbeitszykluswerte bei niedriger, mittlerer und hoher Leistung aufgezeichnet und bestätigt, dass die Signalamplitude 3,3 V beträgt.
+</Check>
+</Step>
+
+<Step title="Prototyp mit sicherer Testlast">
+  Bevor Sie einen Motor oder Zubehör anschließen, beginnen Sie mit einer Widerstandslast innerhalb der 200-mA-Grenze (z. B. ≥22 Ω bei 3,3 V). Stellen Sie sicher, dass der Anschluss die Temperaturgrenzen nicht überschreitet und dass sich der Arbeitszyklus wie erwartet verhält.
+
+<Warning>
+  Schließen Sie den Ausgang nicht kurz. Verwenden Sie für zusätzlichen Schutz beim Testen ein strombegrenztes Tischnetzteil oder eine Inline-Sicherung.
+</Warning>
+</Step>
+
+<Step title="Fügen Sie eine Treiberstufe für Lasten mit höherer Leistung hinzu">
+  Wenn Ihr Zubehör mehr Strom oder eine höhere Spannung benötigt, als der Anschluss liefert, verwenden Sie einen N-Kanal-MOSFET mit Logikpegel oder einen speziellen Low-Side-Treiber. Behalten Sie den Zubehörausgang des Trainers ausschließlich als Steuersignal bei.
+
+<Check>
+  Sie können Ihr Zubehör vollständig nutzen, ohne die Grenzen des Anschlusses zu überschreiten, und der Trainer bleibt während des Betriebs kühl und stabil.
+</Check>
+</Step>
+
+<Step title="Überprüfen und finalisieren Sie die Verkabelung">
+  Bestätigen Sie die Leiterzuordnung anhand des Pinbelegungsdiagramms. Verlegen Sie die Erdungen entsprechend Ihrem Design, fügen Sie einen Flyback-Schutz für induktive Lasten hinzu und entlasten Sie den TRRS-Stecker zugentlastet.
+
+<Check>
+  Wenn das Zubehör angeschlossen ist, passt sich die Ausgangsintensität der Leistung reibungslos an, ohne dass es zu Resets, Stromausfällen oder hörbaren Artefakten kommt.
+</Check>
+</Step>
+</Steps>
+
+### Referenzschaltungen
+
+Nutzen Sie diese Beispiele als Ausgangspunkt. Passen Sie die Komponentenwerte an die Spezifikationen Ihres Zubehörs an.
+
+#### A. Direktantrieb (≤200 mA bei 3,3 V)
+
+- Schließen Sie das Zubehör wie im Pinbelegungsdiagramm angegeben zwischen dem PWM-Ausgang (R1) des Zubehöranschlusses und Masse an.
+- Optional: Fügen Sie einen kleinen Vorwiderstand (1–4,7 Ω) ein, um den Einschaltstrom bei kleinen Gleichstrommotoren zu reduzieren.
+- Stellen Sie sicher, dass die Gesamtstromaufnahme niemals 200 mA überschreitet.
+
+<Warning>
+Wenn Ihr Zubehör sich der 200-mA-Grenze nähert, messen Sie den Blockierstrom. Viele kleine Motoren überschreiten beim Start den Dauerstrom.
+</Warning>
+
+#### B. Externe Stromversorgung mit MOSFET-Low-Side-Treiber (>200 mA oder >3,3 V)
+
+- Versorgen Sie das Zubehör über eine externe Stromversorgung, die für seine Spannung/Stromstärke ausgelegt ist.
+- Verwenden Sie die PWM (R1) des Zubehöranschlusses als MOSFET-Gate-Antrieb.
+- Gemeinsame Designelemente:
+  - N-MOSFET mit Logikpegel (z. B. niedriger Rds(on) bei 3,3 V Gate)
+  - Gate-Widerstand: 47–220 Ω
+  - Gate-zu-Source-Pulldown: 100 kΩ
+  - Flyback-Diode über induktiven Lasten (Motor/Magnet): Schnelle Diode, ausgelegt für Laststrom
+  - Gemeinsame Basis zwischen externer Versorgung und dem Trainer, falls Ihre Mess- und Isolationsstrategie dies erfordert
+
+<Info>
+Verwenden Sie zur galvanischen Trennung einen Optokoppler oder einen Gate-Treiber mit Isolierung und versorgen Sie die isolierte Seite entsprechend mit Strom. Stellen Sie sicher, dass Signalpolarität und Timing mit PWM kompatibel bleiben.
+</Info>
+
+### Auslesen des PWM-Signals mit einem Mikrocontroller
+
+Wenn Sie möchten, dass Ihr Projekt auf die Leistung des Trainers reagiert, anstatt eine Last anzutreiben, lesen Sie den PWM-Arbeitszyklus mit einem Mikrocontroller aus. Die folgenden Beispiele messen den Arbeitszyklus und ordnen ihn einem Intensitätswert von 0–100 % zu.
+
+<CodeGroup>
+```cpp Arduino
+// Reads a 3.3 V PWM signal and computes duty cycle on Arduino (3.3 V boards recommended)
+// Wire the accessory port PWM (R1) to a digital input pin that supports pulseIn measurements.
+
+const int pwmPin = 2; // PWM signal from accessory port (R1)
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(pwmPin, INPUT);
+}
+
+void loop() {
+  // Measure high and low durations (microseconds)
+  unsigned long highT = pulseIn(pwmPin, HIGH, 50000); // 50 ms timeout
+  unsigned long lowT  = pulseIn(pwmPin, LOW,  50000);
+  if (highT > 0 && lowT > 0) {
+    float duty = 100.0f * (float)highT / (highT + lowT);
+    Serial.print("Duty: ");
+    Serial.print(duty, 1);
+    Serial.println(" %");
+  }
+}
+```
+
+```python Python
+# Reads a 3.3 V PWM signal and computes duty cycle on Raspberry Pi using pigpio
+# Requires: sudo apt install pigpio && sudo systemctl start pigpiod
+
+import time
+import pigpio
+
+PWM_PIN = 18  # BCM numbering; connect accessory port PWM (R1) here
+pi = pigpio.pi()
+pi.set_mode(PWM_PIN, pigpio.INPUT)
+
+def measure_duty(pin, interval=0.05):
+    # Sample high/low states over a short window and estimate duty
+    start = time.time()
+    high_time = 0.0
+    last_t = start
+    last_state = pi.read(pin)
+    while time.time() - start < interval:
+        state = pi.read(pin)
+        now = time.time()
+        if last_state == 1:
+            high_time += now - last_t
+        last_t = now
+        last_state = state
+    duty = 100.0 * high_time / interval
+    return max(0.0, min(100.0, duty))
+
+try:
+    while True:
+        d = measure_duty(PWM_PIN)
+        print(f"Duty: {d:4.1f} %")
+        time.sleep(0.1)
+finally:
+    pi.stop()
+```
+</CodeGroup>
+
+<Note>
+Wenn Ihr Mikrocontroller mit einer 5-V-Logik arbeitet, stellen Sie sicher, dass der Eingangspin 3,3 V-tolerant ist, oder fügen Sie einen Pegelumsetzer/Puffer hinzu. Führen Sie keine 5 V zurück in den Zubehöranschluss.
+</Note>
+
+## Designrichtlinien und Best Practices
+
+- Schützen Sie sich vor induktivem Rückschlag mit einer Diode zwischen Motoren und Magnetspulen.
+- Halten Sie die Kabelwege kurz, um PWM-Kantenschwingungen und elektromagnetische Störungen zu minimieren. Fügen Sie bei Bedarf einen kleinen RC-Snubber am Zubehör hinzu.
+- Verwenden Sie eine Zugentlastung am TRRS-Stecker, um unterbrochene Verbindungen zu vermeiden.
+- Führen Sie die Validierung mit einer Dummy-Last durch, bevor Sie ein tragbares Gerät oder ein Zubehörteil mit Benutzerkontakt anbringen.
+- Dokumentieren Sie Ihre Verkabelung und Einstellungen, damit Sie die Ergebnisse sitzungsübergreifend reproduzieren können.
+
+<AccordionGroup>
+<Accordion title="Das Zubehör reagiert nicht">
+- Stellen Sie sicher, dass Sie an den richtigen Leiter (R1) für PWM angeschlossen sind.
+- Stellen Sie sicher, dass die Massereferenz mit dem Pinbelegungsdiagramm übereinstimmt.
+- Testen Sie mit einer Widerstandslast, um Zubehörfehler auszuschließen.
+</Accordion>
+
+<Accordion title="Die Ausgabe scheint schwach oder inkonsistent zu sein">
+- Messen Sie den tatsächlichen Arbeitszyklus und stellen Sie sicher, dass sich Ihre Treiberstufe nicht in einem linearen Bereich befindet.
+- Überprüfen Sie die Versorgungsspannungen und stellen Sie sicher, dass beim Einschalten der Last kein Spannungsabfall auftritt.
+- Reduzieren Sie die Kabellänge oder fügen Sie eine Entkopplung in der Nähe der Last hinzu.
+</Accordion>
+
+<Accordion title="Elektrisches Rauschen oder hörbares Jammern">
+- Erhöhen Sie ggf. die PWM-Filterung auf der Lastseite (RC oder LC).
+- Fügen Sie einen Gate-Widerstand (47–220 Ω) hinzu und minimieren Sie die Schleifenfläche auf Pfaden mit hohem di/dt.
+- Montieren Sie die Flyback-Diode in der Nähe der Lastklemmen.
+</Accordion>
+</AccordionGroup>
+
+<Check>
+Sie haben die Stromgrenzwerte überprüft, die korrekte Verwendung der Pinbelegung bestätigt und einen stabilen Betrieb sowohl mit einer Testlast als auch mit Ihrem endgültigen Zubehör nachgewiesen.
+</Check>

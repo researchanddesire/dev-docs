@@ -1,0 +1,175 @@
+---
+title: "Introductie"
+description: "Documentatie voor introductie."
+---
+
+# Firmware-overzicht
+
+De Open Source Sex Machine (OSSM)-firmware is een op ESP32 gebaseerd besturingssysteem dat beweging, gebruikersinvoer en communicatie voor uw apparaat beheert. Deze gids leidt u door de projectarchitectuur en helpt u bij het opzetten van uw ontwikkelomgeving.
+
+## Kerntechnologieën
+
+De OSSM-firmware is gebaseerd op vier belangrijke technologieën die samenwerken om responsieve, betrouwbare bewegingsbesturing te leveren.
+
+<AccordionGroup>
+<Accordion title="State Machine - Vergroot SML" icon="diagram-project">
+[Boost SML](https://boost-ext.github.io/sml/) (State Machine Language) is een C++-bibliotheek met alleen headers die een domeinspecifieke taal biedt voor het definiëren van statusmachines.
+
+**Waarom we het gebruiken:**
+- Machineverificatie tijdens het compileren spoort fouten op vóór runtime
+- Geen runtime-overhead vergeleken met handmatige switch/case-implementaties
+- Schone, declaratieve syntaxis maakt complexe statusovergangen leesbaar
+- Verwerkt overgangen tussen toestanden zoals inactief, actief, fout en homing
+
+De toestandsmachine regelt de operationele modi van het apparaat en zorgt voor veilige overgangen en voorspelbaar gedrag. Zie de documentatie bij [State Machine Architecture](/ossm/software/architecture/state-machine) voor meer informatie.
+</Accordion>
+
+<Accordion title="Weergave - U8G2-bibliotheek" icon="display">
+[U8G2](https://github.com/olikraus/u8g2) is een monochrome grafische bibliotheek die is geoptimaliseerd voor embedded systemen en OLED-schermen.
+
+**Waarom we het gebruiken:**
+- Ondersteunt een breed scala aan displaycontrollers, waaronder SSD1306 en SH1106
+- Minimale geheugenvoetafdruk, geschikt voor het beperkte RAM-geheugen van ESP32
+- Ingebouwde lettertypeweergave met meerdere formaten en stijlen
+- Hardwareversneld tekenen voor soepele UI-updates
+
+U8G2 geeft de interface op het apparaat weer, inclusief snelheid, diepte, patroonselectie en systeemstatus.
+</Accordion>
+
+<Accordion title="Taakbeheer - FreeRTOS" icon="layer-group">
+[FreeRTOS](https://www.freertos.org/) is een real-time besturingssysteemkernel die multitasking op ingebedde apparaten mogelijk maakt.
+
+**Waarom we het gebruiken:**
+- Voert meerdere gelijktijdige taken uit (bewegingsbesturing, display-updates, invoerverwerking)
+- Op prioriteiten gebaseerde planning zorgt ervoor dat tijdkritische bewegingstaken betrouwbaar worden uitgevoerd
+- Communicatie tussen taken via wachtrijen en semaforen
+- Standaard geïntegreerd in het ESP32 Arduino-framework
+
+Met FreeRTOS kan de firmware tegelijkertijd gebruikersinvoer verwerken, het display bijwerken en een nauwkeurige motortiming behouden.
+</Accordion>
+
+<Accordion title="Bewegingsbediening - StrokeEngine" icon="wave-pulse">
+[StrokeEngine](https://github.com/theelims/StrokeEngine) is een bewegingspatroonbibliotheek gemaakt door theelims, aangepast voor OSSM-specifieke vereisten.
+
+**Waarom we het gebruiken:**
+- Genereert vloeiende, aanpasbare bewegingspatronen met configureerbare snelheid en diepte
+- Ondersteunt meerdere patroontypen (constant, willekeurig, oscillerend en meer)
+- Verwerkt acceleratie-ramping voor motorbescherming
+- Biedt real-time parameteraanpassing zonder bewegingsonderbreking
+
+StrokeEngine vertaalt gebruikersinstellingen in nauwkeurige motorcommando's, waardoor de verscheidenheid aan bewegingspatronen mogelijk wordt die beschikbaar zijn in OSSM.
+</Accordion>
+</AccordionGroup>
+
+## Aan de slag
+
+Stel uw ontwikkelomgeving in door deze stappen te volgen.
+
+### Vereisten
+
+Zorg ervoor dat u, voordat u begint, over het volgende beschikt:
+- Een computer met Windows, macOS of Linux
+- Git is op uw systeem geïnstalleerd
+- Een internetverbinding om afhankelijkheden te downloaden
+
+<Steps>
+<Step title="Installeer VS Code en PlatformIO">
+Download en installeer [Visual Studio Code](https://code.visualstudio.com/)  en voeg vervolgens de PlatformIO-extensie toe.
+
+1. Open VS-code
+2. Navigeer naar het paneel Extensies (Ctrl+Shift+X / Cmd+Shift+X)
+3. Zoeken naar "PlatformIO IDE"
+4. Klik op **Installeren** en wacht tot de installatie is voltooid
+5. Start VS Code opnieuw wanneer daarom wordt gevraagd
+
+<Tip>
+Voor gedetailleerde PlatformIO-installatie-instructies, zie onze [PlatformIO-installatiegids](/ossm/software/getting-started/platformio).
+</Tip>
+</Step>
+
+<Step title="Kloon de repository">
+Open een terminal en kloon de OSSM-repository naar uw lokale machine.
+
+<Tabs>
+<Tab title="HTTPS">
+```bash
+git clone https://github.com/KinkyMakers/OSSM-hardware.git
+cd OSSM-hardware/Software
+```
+</Tab>
+
+<Tab title="SSH">
+```bash
+git clone git@github.com:KinkyMakers/OSSM-hardware.git
+cd OSSM-hardware/Software
+```
+</Tab>
+
+<Tab title="GitHub-CLI">
+```bash
+gh repo clone KinkyMakers/OSSM-hardware
+cd OSSM-hardware/Software
+```
+</Tab>
+</Tabs>
+
+<Note>
+Als u van plan bent wijzigingen bij te dragen, fork dan eerst de repository en kloon vervolgens uw fork.
+</Note>
+</Step>
+
+<Step title="Open het project in VS Code">
+Start het project met PlatformIO.
+
+1. Open VS-code
+2. Selecteer **Bestand > Map openen**
+3. Navigeer naar de map `OSSM-hardware/Software` die u zojuist hebt gekloond
+4. Klik op **Map selecteren** (of **Open** op macOS)
+
+PlatformIO detecteert automatisch het `platformio.ini`-bestand en configureert het project.
+
+<Check>
+Je zou de PlatformIO-werkbalk onderaan VS Code moeten zien verschijnen met knoppen voor bouwen, uploaden en monitoren.
+</Check>
+</Step>
+
+<Step title="Bouw en upload de firmware">
+Compileer het project en flash het naar uw ESP32.
+
+1. Sluit uw ESP32-bord aan via USB
+2. Klik op de knop **PlatformIO: Build** (vinkje) om te compileren
+3. Zodra de build is gelukt, klikt u op **PlatformIO: Upload** (pijlpictogram) om de firmware te flashen
+
+<Warning>
+Zorg ervoor dat u de juiste COM-poort selecteert als u meerdere seriële apparaten hebt aangesloten. U kunt dit configureren in `platformio.ini` of via de PlatformIO-apparaatmonitor.
+</Warning>
+</Step>
+</Steps>
+
+## Volgende stappen
+
+<CardGroup cols={2}>
+<Card title="Bedrijfsmodi" icon="play" href="/ossm/software/getting-started/operating-modes">
+  Meer informatie over de modi Simple Penetration, Stroke Engine en Streaming.
+</Card>
+
+<Card title="Veiligheidsvoorzieningen" icon="shield" href="/ossm/software/getting-started/safety-features">
+  Begrijp preflight-controles, ontkoppel de veiligheid en noodstop.
+</Card>
+
+<Card title="Configuratie" icon="sliders" href="/ossm/software/getting-started/configuration">
+  Pas bewegingsparameters, pinnen en gebruikersvoorkeuren aan.
+</Card>
+
+<Card title="WiFi en updates" icon="wifi" href="/ossm/software/getting-started/wifi-and-updates">
+  Configureer WiFi en installeer draadloze firmware-updates.
+</Card>
+
+<Card title="Mappenstructuur" icon="folder-tree" href="/ossm/software/architecture/folder-structure">
+  Begrijp de broncode-organisatie en modulaire architectuur.
+</Card>
+
+<Card title="PlatformIO-installatie" icon="wrench" href="/ossm/software/getting-started/platformio">
+  Stel uw ontwikkelomgeving in voor firmwarewijzigingen.
+</Card>
+</CardGroup>

@@ -1,0 +1,80 @@
+---
+title: "Waarneembaarheid van PostHog"
+description: "Behoud de R+D Dashboard-telemetrie-, identiteits-, privacy- en releasecontracten."
+---
+
+# Waarneembaarheid van PostHog
+
+Alle repository-telemetrie behoort tot het **RD Dashboard** PostHog-project
+(`279829`, US Cloud). Build-tooling wijst een ander project-ID af. Niet doen
+Verbind ontwikkelings-, implementatie- of bronkaarttools met een andere PostHog
+project.
+
+## Implementatieconfiguratie
+
+Web-, admin- en Kinky Makers-implementaties gebruiken:
+
+- `NEXT_PUBLIC_POSTHOG_KEY`
+- `NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com`
+- `POSTHOG_PROJECT_ID=279829`
+- `POSTHOG_API_KEY` als een optionele persoonlijke sleutel voor de server met alleen de
+  uploadrechten voor de bronkaart die nodig zijn. Zonder dit slaagt de implementatie
+  maar slaat het uploaden van de bronkaart over.
+
+Native EAS-omgevingen vereisen `EXPO_PUBLIC_POSTHOG_KEY`,
+`EXPO_PUBLIC_POSTHOG_HOST` en `EXPO_PUBLIC_APP_ENV`. Native bronkaarten en
+symbolen vereisen bovendien `POSTHOG_CLI_API_KEY`,
+`POSTHOG_CLI_HOST=https://us.posthog.com`, en
+`POSTHOG_CLI_PROJECT_ID=279829`.
+
+Supabase Edge-functies vereisen `POSTHOG_PROJECT_KEY`, `POSTHOG_HOST` en
+`DEPLOYMENT_ENVIRONMENT`. Stuur mislukte verzoeken door naar Logboeken. Succesvol apparaat
+telemetrie wordt door de webproxy samengevat als productgebeurtenissen.
+
+Stel nooit een persoonlijke API-sleutel bloot via een `NEXT_PUBLIC_` of `EXPO_PUBLIC_`
+variabel.
+
+## Identiteitscontract
+
+- RAD web-, native-, admin- en servergebeurtenissen identificeren een aangemelde persoon met
+  de decimale toepassing `User.id`, geserialiseerd als een tekenreeks.
+- Kinky Makers gebruikt `km:<Supabase auth UUID>` totdat het het RAD-profiel deelt
+  model. Het voorvoegsel voorkomt onbedoelde samenvoeging van identiteiten.
+- Browser- en native clients bellen `reset()` bij het uitloggen en voordat ze wijzigen
+  geïdentificeerde rekeningen.
+- Hardware is een `device`-groep. Een MAC-adres is nooit een persoons-ID of een groep
+  sleutel; gebruik de gehashte stabiele apparaat-ID.
+
+Dankzij deze regels kunnen ondersteunend personeel uitgaan van een gebruikers-ID van een applicatie en die vinden
+iemands web-, native-, server-, sessie-, fout- en logrecords zonder deze bloot te leggen
+privé hardware-ID's.
+
+## Vereiste context en privacy
+
+Bij elke service zijn `service_name`, `platform`, `environment`, release of
+versie en implementatie-ID's, indien beschikbaar. Mislukte serververzoeken ook
+voeg route, methode, verzoek-ID en `traceparent` toe.
+
+Stuur geen verzoekteksten, toegangstokens, e-mailadressen, intieme inhoud,
+prompts, onbewerkte MAC-adressen of apparaatreferenties. Houd replay-invoer gemaskeerd.
+Kinky Makers maskeert alle weergegeven tekst en het opnieuw afspelen door de beheerder blijft uitgeschakeld.
+
+## Verificatie vrijgeven
+
+Na elke staging- of productie-implementatie:
+
+1. Bevestig dat een gebeurtenis de verwachte `environment`, Git SHA, implementatie bevat
+   ID, applicatieversie, service en platform.
+2. Bevestig dat web- en native gebeurtenissen voor hetzelfde RAD-account hetzelfde numerieke getal gebruiken
+   aparte identiteitskaart.
+3. Bevestig het uitloggen gevolgd door een andere login, waardoor er geen identiteitssamenvoeging ontstaat
+   waarschuwing voor inname.
+4. Bevestig dat web-, admin-, Kinky Makers-, native- en edge-functiegegevens kunnen worden gebruikt
+   gescheiden door service en omgeving.
+5. Bevestig dat een testuitzondering wordt opgelost via de geüploade bronkaart
+   of inheemse symbolen.
+6. Bevestig dat een serverfout een foutprobleem veroorzaakt en een bijbehorend OTLP-logboek.
+7. Controleer of apparaatgebeurtenissen een `device`-groep bevatten en geen onbewerkt MAC-adres.
+
+Het repository-runbook op `docs/posthog-observability.md` bevat de
+bijbehorende operatorchecklist.

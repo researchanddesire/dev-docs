@@ -1,0 +1,241 @@
+---
+title: "Contrôle GPIO"
+description: "Contrôlez les broches de sortie GPIO sur votre OSSM via Bluetooth Low Energy pour les accessoires et les intégrations"
+---
+
+L'OSSM expose quatre broches GPIO qui peuvent être contrôlées via Bluetooth Low Energy (BLE). Utilisez ces broches pour déclencher des accessoires externes, des indicateurs, des relais ou d'autres intégrations matérielles.
+
+<Info>
+Le contrôle GPIO est une fonctionnalité de développeur/créateur. Il nécessite une application client BLE pour envoyer des commandes : il n'y a pas d'interface sur l'appareil pour le contrôle GPIO.
+</Info>
+
+## Aperçu
+
+La caractéristique GPIO permet de :
+
+- Réglez l'une des 4 broches sur HIGH ou LOW
+- Lire les capacités actuelles
+- Intégrez du matériel externe à votre OSSM
+
+### Cas d'utilisation
+
+- **Indicateurs LED** — Signaler l'état de l'appareil à l'éclairage externe
+- **Contrôle de relais** – Déclencher l'activation/la désactivation des appareils externes
+- **Synchronisation des accessoires** – Coordonnez-vous avec d'autres matériels
+- **Intégrations personnalisées** — Créez vos propres systèmes de contrôle
+
+## Caractéristique BLE
+
+| Propriété | Valeur |
+|----------|-------|
+| UUID | `522b443a-4f53-534d-4000-420badbabe69` |
+| Propriétés | LIRE, ÉCRIRE |
+| Espace de noms | 0x4 (GPIO) |
+
+<Note>
+La caractéristique GPIO fait partie du service principal OSSM BLE (`522b443a-4f53-534d-0001-420badbabe69`). Connectez-vous d'abord au service, puis accédez à cette caractéristique.
+</Note>
+
+## Cartographie des broches
+
+Le firmware expose 4 broches logiques qui correspondent aux numéros GPIO ESP32 :
+
+| Épingle logique | ESP32GPIO | Emplacement du tableau |
+|-------------|------------|----------------|
+| 1 | GPIO2 | Disponible sur l'en-tête |
+| 2 | GPIO15 | Disponible sur l'en-tête |
+| 3 | GPIO22 | Disponible sur l'en-tête |
+| 4 | GPIO33 | Disponible sur l'en-tête |
+
+<Warning>
+Ces broches GPIO sont directement connectées à l'ESP32. Ils produisent des niveaux logiques de 3,3 V avec une capacité de courant limitée (~ 12 mA par broche). Utilisez des pilotes appropriés pour les charges à courant élevé.
+</Warning>
+
+## Format de commande
+
+### Écriture (définition de l'état des broches)
+
+Envoyez une chaîne au format :
+
+```
+<pin_number>:<state>
+```
+
+**Numéro de broche :** `1`, `2`, `3` ou `4`
+
+**Valeurs d'état :**
+- `high` ou `1` — Définir la broche HIGH (3,3 V)
+- `low` ou `0` — Régler la broche BAS (0 V)
+
+**Exemples :**
+
+| Commande | Effet |
+|---------|--------|
+| `1:high` | Réglez la broche 1 (GPIO 2) HIGH |
+| `2:low` | Régler la broche 2 (GPIO 15) LOW |
+| `3:1` | Réglez la broche 3 (GPIO 22) HIGH |
+| `4:0` | Régler la broche 4 (GPIO 33) LOW |
+
+### Écrire des réponses
+
+| Réponse | Signification |
+|----------|---------|
+| `ok:1:high` | La broche 1 a été définie avec succès sur HIGH |
+| `ok:2:low` | La broche 2 a été réglée avec succès sur FAIBLE |
+| `error:invalid_format` | Format de commande non reconnu |
+| `error:pin_out_of_range` | Numéro de broche non 1-4 |
+
+### Lecture (capacités)
+
+La lecture de la caractéristique renvoie un indice de capacités :
+
+```
+pins:[1,2,3,4]
+```
+
+Cela indique quelles broches logiques sont disponibles pour le contrôle.
+
+## Exemple de code
+
+<CodeGroup>
+```javascript Web Bluetooth (JavaScript)
+// Connect to OSSM (assumes already connected to service)
+const gpioChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-4000-420badbabe69"
+);
+
+// Set pin 1 HIGH
+await gpioChar.writeValue(new TextEncoder().encode("1:high"));
+
+// Read the response
+const response = await gpioChar.readValue();
+console.log(new TextDecoder().decode(response));
+// Output: "ok:1:high"
+
+// Set pin 2 LOW
+await gpioChar.writeValue(new TextEncoder().encode("2:low"));
+
+// Read capabilities
+const caps = await gpioChar.readValue();
+console.log(new TextDecoder().decode(caps));
+// Output: "pins:[1,2,3,4]"
+```
+
+```python Python (bleak)
+import asyncio
+from bleak import BleakClient
+
+GPIO_UUID = "522b443a-4f53-534d-4000-420badbabe69"
+
+async def control_gpio():
+    async with BleakClient("OSSM") as client:
+        # Set pin 1 HIGH
+        await client.write_gatt_char(GPIO_UUID, b"1:high")
+
+        # Read response
+        response = await client.read_gatt_char(GPIO_UUID)
+        print(response.decode())  # "ok:1:high"
+
+        # Set pin 2 LOW
+        await client.write_gatt_char(GPIO_UUID, b"2:low")
+
+        # Set multiple pins
+        await client.write_gatt_char(GPIO_UUID, b"3:high")
+        await client.write_gatt_char(GPIO_UUID, b"4:low")
+
+asyncio.run(control_gpio())
+```
+</CodeGroup>
+
+## Intégration matérielle
+
+### Indicateur LED de base
+
+Connectez une LED avec une résistance de limitation de courant :
+
+```
+GPIO Pin → 220Ω Resistor → LED Anode (+)
+                           LED Cathode (-) → GND
+```
+
+<Tip>
+Utilisez une résistance de 220 Ω à 470 Ω pour les LED standard. La sortie 3,3 V de l'ESP32 fournit une tension suffisante pour la plupart des LED.
+</Tip>
+
+### Contrôle des relais
+
+Pour les charges à courant plus élevé, utilisez un module relais opto-isolé :
+
+```
+GPIO Pin → Relay Module Signal
+3.3V     → Relay Module VCC
+GND      → Relay Module GND
+```
+
+La plupart des modules de relais avec opto-isolation fonctionnent avec une logique 3,3 V. Vérifiez les spécifications de votre module.
+
+<Warning>
+Ne connectez jamais la tension secteur (120 V/240 V) directement à l'OSSM. Utilisez toujours des modules de relais correctement évalués avec les précautions de sécurité appropriées.
+</Warning>
+
+### Conversion de niveau logique
+
+Si vous avez besoin d'une sortie logique 5 V :
+
+```
+GPIO Pin → Level Shifter 3.3V Side
+5V       → Level Shifter 5V Side
+GND      → Level Shifter GND
+           Level Shifter 5V Output → Your 5V Device
+```
+
+## Limites
+
+- **Pas de prise en charge PWM** — Les broches sont uniquement numériques HIGH/LOW
+- **Aucune lecture d'entrée** — GPIO est uniquement en sortie via cette interface
+- **Pas de persistance** — Les états des broches sont réinitialisés à FAIBLE au redémarrage de l'appareil
+- **Aucune interruption** – Impossible de déclencher en fonction de signaux externes
+- **Limites de courant** — ESP32 GPIO maximum ~ 12 mA par broche, 40 mA au total
+
+## Dépannage
+
+<AccordionGroup>
+<Accordion title="Le code PIN ne répond pas">
+- Vérifiez que la connexion BLE est active
+- Vérifiez que le format de commande correspond exactement à `<pin>:<state>`
+- Assurez-vous que le code PIN est compris entre 1 et 4.
+- Vérifiez avec un multimètre que la tension change
+</Accordion>
+
+<Accordion title="erreur : réponse au format_invalide">
+Le format de la commande n'a pas été reconnu. Formats valides :
+- `1:high`, `1:low`, `1:1`, `1:0`
+- `2:high`, `2:low`, `2:1`, `2:0`
+- etc.
+
+La casse n'a pas d'importance (`HIGH` et `high` fonctionnent tous les deux).
+</Accordion>
+
+<Accordion title="erreur : réponse pin_out_of_range">
+Le numéro PIN doit être 1, 2, 3 ou 4. Vérifiez votre commande.
+</Accordion>
+
+<Accordion title="L'appareil connecté ne fonctionne pas">
+- Vérifiez la tension avec un multimètre (doit être 0 V ou ~ 3,3 V)
+- Vérifiez les exigences actuelles : GPIO ESP32 limité à ~ 12 mA
+- Assurez un terrain d’entente entre OSSM et votre appareil
+- Envisagez d'utiliser un transistor ou un relais pour les charges de courant plus élevées
+</Accordion>
+</AccordionGroup>
+
+## Pages connexes
+
+<CardGroup cols={2}>
+<Card title="Protocole BLE" icon="bluetooth" href="/ossm/software/communication/ble">
+  Référence complète du protocole BLE pour le contrôle OSSM.
+</Card>
+
+<Card title="Référence de configuration" icon="sliders" href="/ossm/software/getting-started/configuration">
+  Définitions des broches et configuration matérielle.
+</Card>
+</CardGroup>

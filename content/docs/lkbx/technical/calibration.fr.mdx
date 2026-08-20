@@ -1,0 +1,90 @@
+---
+title: "Calibrage"
+description: "Découvrez comment votre Chastity Lockbox se calibre automatiquement et que faire si vous rencontrez l'écran de calibrage"
+---
+
+<iframe
+  className="w-full aspect-video arrondi-xl"
+  src="https://www.loom.com/embed/481662e9ed284264b539d9e5fe4ac691"
+  title="Comment calibrer votre lockbox"
+  cadreBord="0"
+  Allow="accéléromètre ; lecture automatique ; écriture dans le presse-papiers ; support crypté ; gyroscope ; image dans l'image"
+  autoriserFullScreen
+></iframe>
+
+<AccordionGroup>
+  <Accordion title="Transcription vidéo">
+    0:00 Salut ! Si vous êtes ici, c'est probablement parce que vous voyez ce message d'étalonnage sur votre coffre-fort de chasteté. Cela peut se produire si votre appareil a été reflashé ou si l'étalonnage, pour une raison quelconque, a été réinitialisé.
+
+    0:11 Ce n'est pas un problème, tout ce que vous avez à faire est simplement de le dire ou de suivre les instructions à l'écran. Donc ici, il me demande de maintenir le bouton droit enfoncé pour calibrer.
+
+    0:21 Cela identifie quelle broche est le bon bouton, puis cela calibrera le moteur.
+  </Accordion>
+</AccordionGroup>
+
+## Qu’est-ce que l’étalonnage ?
+
+L'étalonnage est un processus automatique qui apprend à votre Chastity Lockbox comment il est assemblé et comment il doit fonctionner. Cette étape garantit que votre appareil fonctionne correctement et en toute sécurité.
+
+## Quand l’étalonnage a-t-il lieu ?
+
+<Tip>
+Votre Chastity Lockbox arrive pré-calibrée et prête à l’emploi.
+</Tip>
+
+Vous ne rencontrerez l’écran d’étalonnage que dans ces situations :
+
+1. **Après le flashage du micrologiciel** — Si vous avez mis à jour le logiciel de votre appareil, l'étalonnage s'exécute automatiquement une fois.
+2. **Après une réinitialisation d'usine** — La réinitialisation de l'appareil efface les données d'étalonnage stockées
+
+## Que configure l’étalonnage ?
+
+L'étalonnage détecte et définit automatiquement trois paramètres critiques :
+
+| Paramètre | But |
+|---------|---------|
+| **Orientation du moteur** | Détermine dans quelle direction le moteur tourne pour verrouiller et déverrouiller |
+| **Détection de verrouillage** | Apprend à l'appareil comment vérifier s'il est bien verrouillé |
+| **Niveau de puissance du moteur** | Définit une puissance optimale pour un verrouillage sécurisé tout en minimisant l'épuisement de la batterie |
+
+## Rencontre avec l'écran d'étalonnage
+
+<Steps>
+  <Step title="Calibrage des boutons">
+    L'appareil affiche « Calibration » et vous demande de maintenir le bouton Entrée enfoncé. Cela identifie quelle broche physique correspond à quel bouton : certaines variantes matérielles ont des configurations différentes.
+
+    Appuyez et maintenez enfoncé le bouton Entrée/Verrouillage (le bouton droit) jusqu'à ce que l'appareil le reconnaisse.
+  </Step>
+  <Step title="Calibrage du moteur">
+    L'appareil affiche « Calibration du moteur » et teste automatiquement le mécanisme de verrouillage :
+
+    1. Le moteur tente de se verrouiller
+    2. Les capteurs vérifient la position de verrouillage
+    3. Le moteur tente de se déverrouiller
+    4. Les capteurs vérifient la position de déverrouillage
+
+    Cela détermine si le sens du moteur doit être inversé pour votre matériel.
+
+    <Warning>
+    N'éteignez pas l'appareil pendant l'étalonnage du moteur. Le processus prend environ 6 secondes.
+    </Warning>
+  </Step>
+  <Step title="Redémarrage automatique">
+    Une fois l'étalonnage terminé avec succès, l'appareil redémarre automatiquement et revient à un fonctionnement normal.
+
+    <Check>
+    Vous ne verrez plus l'écran d'étalonnage à moins que vous ne reflasherez le micrologiciel ou que vous effectuiez une réinitialisation d'usine.
+    </Check>
+  </Step>
+</Steps>
+
+## Échecs d'étalonnage
+
+Si l'étalonnage échoue (le moteur n'atteint pas les positions attendues), l'appareil peut :
+- Réessayer automatiquement l'étalonnage
+- Afficher une erreur nécessitant une intervention manuelle
+- Doit être reflashé via le web flasher
+
+<Note>
+Si vous rencontrez des problèmes avec l'étalonnage ou si votre appareil ne répond pas comme prévu, contactez le support client à support@researchanddesire.com.
+</Note>

@@ -1,0 +1,230 @@
+---
+title: "Bordontwerp en bedrading"
+description: "Bedradingsschema's en GPIO-pinouts voor de officiële OSSM-PCB en alternatieve configuraties"
+---
+
+Deze handleiding laat zien hoe u de officiële OSSM-PCB aansluit en hoe u alternatieve configuraties kunt aansluiten met behulp van een ESP32, niveauverschuiving en gewone motordrivers.
+
+## Vereisten
+
+Zorg ervoor dat u, voordat u begint, beschikt over:
+
+- Een ESP32-ontwikkelbord (ESP32-DevKitC of compatibel)
+- Een motordriver die stap-/richtinginvoer accepteert
+- Een voeding op maat voor uw motor en bestuurder
+- Basisgereedschap: draadstripper, kleine schroevendraaierset, multimeter
+
+<Note>
+De meeste ESP32-kaarten gebruiken 3,3V-logica. Bij hogere snelheden kan dit leiden tot gemiste stappen bij 5V-logic-drivers. Gebruik een niveauverschuiver om stap/richting/inschakeling om te zetten naar 5V voor een betrouwbare werking.
+</Note>
+
+### Prototyping van componenten (voor aangepaste bedrading)
+
+Als u bedrading maakt zonder de officiële PCB, heeft u doorgaans het volgende nodig:
+
+- Logische niveauverschuiver (3,3V → 5V, 4+ kanalen)
+- Soldeerloze breadboard of protoboard
+- Dupont-jumpers (mannelijk↔mannelijk en mannelijk↔vrouwelijk)
+- 5V-rail voor de hoge kant van de niveauverschuiver (vaak verkrijgbaar bij uw chauffeur of een aparte regelaar)
+
+<Tip>
+Houd de signaalbedrading kort en netjes. Leid de stap/richting/vrijgave weg van de motor en voedingskabels om ruis te minimaliseren.
+</Tip>
+
+## Officiële OSSM-bedrading
+
+De referentie-OSSM-PCB bevat niveauverschuiving en gestandaardiseerde headers. Dit is de aanbevolen aanpak voor de meeste builds.
+
+### Referentiebordindeling
+
+<Frame caption="OSSM referentiebord (versie 1) - vooraanzicht met plaatsing van componenten">
+  <img src="./_images/150361448-80e9fdaf-4a8c-4054-a920-6eab9aa68678.webp" alt="OSSM versie 1 referentiebord met ESP32-socket, niveauverschuivers en JST-connectoren" />
+</Frame>
+
+### PCB-aansluitschema
+
+<Frame caption="Aansluitschema met de aansluitingen van de motordriver en randapparatuur">
+  <img src="./_images/150355658-2ab2c53f-8da0-41ce-ad61-cfe9965b9ab2.webp" alt="OSSM PCB-aansluitschema met gelabelde motordriveruitgang, encoderingang en stroomaansluitingen" />
+</Frame>
+
+### ESP32 GPIO-pinout (standaard)
+
+Dit zijn de standaardfirmware-toewijzingen voor de OSSM-PCB:
+
+| Signaal      | GPIO-pin | Functie                                      |
+|-------------|----------|-----------------------------------------------|
+| Stap        | GPIO14  | Stappulsuitgang naar motorbestuurder             |
+| Richting   | GPIO27  | Richtingsignaal naar motorbestuurder              |
+| Inschakelen      | GPIO26  | Motorbesturing in-/uitschakelen                   |
+| Encoder A   | GPIO36  | Kwadratuur-encoderkanaal A (alleen ingang)     |
+| Encoder B   | GPIO39  | Kwadratuur-encoder kanaal B (alleen ingang)     |
+
+<Frame caption="ESP32 GPIO-pinout die de routering van het stuursignaal toont">
+  <img src="./_images/152600401-80b986ea-6f5b-480d-ba74-5b5001079c1b.webp" alt="OSSM GPIO-pinoutdiagram met stap-, richting- en inschakelpinnen op ESP32" />
+</Frame>
+
+<Frame caption="JST-headerlocaties met pinlabels voor gemakkelijke identificatie">
+  <img src="./_images/226189433-db28dfc6-22ac-4fdb-8b45-afe0c3fa9a7b.webp" alt="Locaties van de JST-connectorkop op de OSSM PCB met weergave van motoruitgang, encoderingang en hulpaansluitingen" />
+</Frame>
+
+<Info>
+Firmware kan indien nodig pinnen opnieuw toewijzen. Als u de bedrading wijzigt, update dan uw firmwareconfiguratie zodat deze overeenkomt.
+</Info>
+
+## Alternatieve bedradingsconfiguraties
+
+<Info>
+De volgende instellingen zijn gevalideerde integratiepatronen. Voor hardwarerevisies kunnen verschillende pintoewijzingen nodig zijn. Controleer dus de toepasselijke kaart-, driver- en motorspecificaties.
+</Info>
+
+### TB6600 stappenmotor driver
+
+Gebruik dit bij het aandrijven van een stappenmotor met een externe driver in TB6600-stijl.
+
+<Steps>
+  <Step title="Sluit het motorvermogen en de fasen aan">
+    Sluit de motorvoeding (doorgaans 24 V) aan op de TB6600 DC+ en DC‑. Sluit de motorfasen aan op A+, A‑, B+, B‑ volgens het bedradingsschema van de motor.
+
+    <Warning>
+    Gebruik nooit hot-pluggable stappenmotoren. Schakel de stroom uit voordat u de motorbedrading wijzigt.
+    </Warning>
+  </Step>
+  <Step title="Draadbesturingssignalen (via niveauverschuiver)">
+    Sluit ESP32-signalen via de 3,3V → 5V-niveaushifter aan op de driveringangen:
+
+    - Stap (GPIO 14) → PUL+
+    - Richting (GPIO 27) → DIR+
+    - Inschakelen (GPIO 26, indien gebruikt) → ENA+
+    - GND (ESP32/niveauverschuiver) → PUL‑, DIR‑, ENA‑
+
+    <Check>
+    Alle aardingen zijn gemeenschappelijk tussen ESP32, niveauschakelaar en bestuurder.
+    </Check>
+  </Step>
+  <Step title="DIP-schakelaars instellen">
+    Configureer de stroomlimiet zodat deze bij uw motor past en kies een microstep-instelling die geschikt is voor uw mechanica. Begin conservatief en verfijn vervolgens tijdens het testen.
+  </Step>
+</Steps>
+
+<Frame caption="Bedradingsschema voor TB6600 stappenmotor met OSSM-controller">
+  <img src="./_images/159145946-a9960bba-c9bc-4717-b3b4-5b5c34b4a3d2.webp" alt="Aansluitschema met OSSM PCB-signaaluitgangen aangesloten via niveauverschuiver naar TB6600 stappenmotordriveringangen" />
+</Frame>
+
+### Servomotor met geïntegreerde driver (iHSV57, 42AIM30, enz.)
+
+Veel geïntegreerde servo's accepteren stap/richting/inschakeling, net als een stappenmotor.
+
+<Frame caption="Configuratie servomotorbedrading met stap/richting-interface">
+  <img src="./_images/783876cf-f5bf-4708-9b4f-bd89723713f9.webp" alt="Bedradingsschema voor servomotoraansluiting met gesloten lus op OSSM-controller via stap/richting-interface" />
+</Frame>
+
+<Tip>
+Sommige geïntegreerde servo's accepteren rechtstreeks 3,3V-logica; anderen vereisen 5V. Controleer de documentatie van uw servo. Mogelijk kunt u de niveauverschuiver weglaten.
+</Tip>
+
+### Extra stappenmotor-driveropties
+
+Voor meer ontwerpen en gearchiveerde schema's, zie het hardware-archief van de repository:
+
+```
+/ossm/hardware/PCB Files/Archive/
+```
+
+## Best practices voor kracht en aarding
+
+- Gebruik een éénpuntsmassa (ster) tussen ESP32, niveauschakelaar en bestuurder
+- Houd stap/richting/enable-leads kort; vermijd ze parallel aan het motorvermogen te laten lopen
+- Draai elk motorfasepaar (A+/A‑ en B+/B‑) om EMI te verminderen
+- Zorg voor trekontlasting voor alle connectoren om intermitterende fouten te voorkomen
+- Als de kabellengte lang is, overweeg dan een afgeschermde kabel voor stuursignalen en sluit de afscherming slechts aan één uiteinde aan op het chassis/aarde
+
+## Uw bedrading verifiëren
+
+Voer deze controles uit voordat u de motoraansturing van stroom voorziet.
+
+<Steps>
+  <Step title="Continuïteit en pinmapping">
+    Gebruik een multimeter om te controleren of elk signaal van de juiste ESP32-pin naar de driveringang loopt.
+
+    <Check>
+    Stap, stuur en schakel elke showcontinuïteit in vanaf ESP32 → level shifter → driver.
+    </Check>
+  </Step>
+  <Step title="Isolatie tussen signalen en stroom">
+    Zorg ervoor dat er geen kortsluiting bestaat tussen aangrenzende signaallijnen of tussen signaal- en stroomrails.
+
+    <Check>
+    Geen continuïteit tussen aangrenzende pinnen of tussen signalen en DC+/DC‑.
+    </Check>
+  </Step>
+  <Step title="Stroompolariteit en spanning">
+    Controleer de voedingspolariteit en spanning op de driverterminals voordat u de motor aansluit.
+
+    <Warning>
+    Omgekeerde polariteit kan de bestuurder onmiddellijk beschadigen. Controleer de DC+- en DC-oriëntatie nogmaals.
+    </Warning>
+  </Step>
+</Steps>
+
+## Eerste opstartchecklist
+
+- Terwijl de motor is losgekoppeld, schakelt u de driver in en controleert u of de status-LED's er normaal uitzien
+- Sluit de motor aan en geef opdracht tot een beweging met zeer lage snelheid
+- Controleer richtingsveranderingen wanneer dit wordt opgedragen
+- Als u een encoder gebruikt, controleer dan of de tellingen soepel in één richting veranderen en omgekeerd als de richting verandert
+
+<Check>
+U kunt bewegingen op lage snelheid besturen zonder gemiste stappen, trillingen of fouten van de bestuurder.
+</Check>
+
+## Problemen oplossen
+
+<AccordionGroup>
+  <Accordion title="Motor mist stappen bij hoge snelheid">
+    Dit duidt doorgaans op een mismatch op logisch niveau of een slechte signaalintegriteit.
+
+    - De levelshifter wordt aan beide zijden gevoed (3,3V en 5V)
+    - Er zijn gemeenschappelijke gronden tussen ESP32, niveauverschuiver en bestuurder
+    - Signaaldraden zijn kort en weggeleid van de motorvoeding
+
+    <Tip>
+    Als je geen level shifter gebruikt, voeg er dan één toe. Als dit het geval is, controleer dan de 5V-voeding op de pinnen aan de hoge kant.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Motor reageert niet op commando's">
+    Mogelijk ontvangt de bestuurder geen geldige stuursignalen.
+
+    - Controleer de ingangspolariteit; veel stuurprogramma's gebruiken active-low enable
+    - Controleer of de stap-/richtingspinnen overeenkomen met uw firmwareconfiguratie
+    - Zorg ervoor dat de driver voldoende stroom heeft (controleer de status-LED's)
+
+    <Info>
+    Gebruik een logische analysator of oscilloscoop om stappulsen bij de driveringang te bevestigen.
+    </Info>
+  </Accordion>
+
+  <Accordion title="Onregelmatige of zenuwachtige bewegingen">
+    Elektrische ruis of instabiliteit van de voeding kunnen het regelpad beïnvloeden.
+
+    - Houd signaaldraden gescheiden van motorvoedingskabels
+    - Controleer of de voeding van de driver onder belasting binnen de specificaties blijft
+    - Voeg lokale ontkoppeling toe nabij de driveringangen
+
+    <Tip>
+    Voeg keramische condensatoren van 0,1 µF toe dichtbij de stuuringangen van de driver (naar aarde). Gebruik afgeschermde kabel voor lange signaaltrajecten.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Motor draait de verkeerde kant op">
+    Het richtingssignaal is omgekeerd ten opzichte van uw bedrading.
+
+    <Info>
+    Verwissel de polariteit van de richting op de connector, of keer de richting om in de firmware door de `INVERT_DIRECTION`-instelling te wijzigen.
+    </Info>
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+Schakel altijd de stroom uit en wacht tot de condensatoren zijn ontladen voordat u de bedrading opnieuw aansluit. Het omkeren van de polariteit of het kortsluiten van uitgangen kan uw hardware permanent beschadigen.
+</Warning>

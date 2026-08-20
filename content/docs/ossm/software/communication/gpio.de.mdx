@@ -1,0 +1,241 @@
+---
+title: "GPIO-Steuerung"
+description: "Steuern Sie die GPIO-Ausgangspins Ihres OSSM über Bluetooth Low Energy für Zubehör und Integrationen."
+---
+
+Das OSSM stellt vier GPIO-Pins zur Verfügung, die über Bluetooth Low Energy (BLE) gesteuert werden können. Verwenden Sie diese Pins, um externes Zubehör, Anzeigen, Relais oder andere Hardware-Integrationen auszulösen.
+
+<Info>
+Die GPIO-Steuerung ist eine Entwickler-/Herstellerfunktion. Zum Senden von Befehlen ist eine BLE-Clientanwendung erforderlich – es gibt keine Schnittstelle auf dem Gerät für die GPIO-Steuerung.
+</Info>
+
+## Überblick
+
+Die GPIO-Eigenschaft ermöglicht Ihnen:
+
+- Stellen Sie einen der 4 Pins auf HIGH oder LOW
+- Lesen Sie aktuelle Funktionen
+- Integrieren Sie externe Hardware in Ihr OSSM
+
+### Anwendungsfälle
+
+- **LED-Anzeigen** – Signalisieren Sie den Gerätestatus an die externe Beleuchtung
+- **Relaissteuerung** – Externe Geräte ein-/ausschalten
+- **Zubehörsynchronisierung** – Koordinierung mit anderer Hardware
+- **Benutzerdefinierte Integrationen** – Erstellen Sie Ihre eigenen Steuerungssysteme
+
+## BLE-Charakteristik
+
+| Eigentum | Wert |
+|----------|-------|
+| UUID | `522b443a-4f53-534d-4000-420badbabe69` |
+| Eigenschaften | LESEN, SCHREIBEN |
+| Namensraum | 0x4 (GPIO) |
+
+<Note>
+Die GPIO-Eigenschaft ist Teil des Haupt-OSSM-BLE-Dienstes (`522b443a-4f53-534d-0001-420badbabe69`). Stellen Sie zunächst eine Verbindung zum Dienst her und greifen Sie dann auf dieses Merkmal zu.
+</Note>
+
+## Pin-Zuordnung
+
+Die Firmware stellt 4 logische Pins bereit, die ESP32-GPIO-Nummern zugeordnet sind:
+
+| Logischer Pin | ESP32 GPIO | Board-Standort |
+|-------------|------------|----------------|
+| 1 | GPIO 2 | Verfügbar im Header |
+| 2 | GPIO 15 | Verfügbar im Header |
+| 3 | GPIO 22 | Verfügbar im Header |
+| 4 | GPIO 33 | Verfügbar im Header |
+
+<Warning>
+Diese GPIO-Pins sind direkt mit dem ESP32 verbunden. Sie geben 3,3-V-Logikpegel mit begrenzter Stromkapazität aus (~12 mA pro Pin). Verwenden Sie für Hochstromlasten geeignete Treiber.
+</Warning>
+
+## Befehlsformat
+
+### Schreiben (Pin-Status festlegen)
+
+Senden Sie eine Zeichenfolge im Format:
+
+```
+<pin_number>:<state>
+```
+
+**Pin-Nummer:** `1`, `2`, `3` oder `4`
+
+**Statuswerte:**
+- `high` oder `1` – Pin auf HIGH (3,3 V) setzen
+- `low` oder `0` – Pin auf LOW (0 V) setzen
+
+**Beispiele:**
+
+| Befehl | Wirkung |
+|---------|--------|
+| `1:high` | Setzen Sie Pin 1 (GPIO 2) auf HIGH |
+| `2:low` | Setzen Sie Pin 2 (GPIO 15) auf LOW |
+| `3:1` | Setzen Sie Pin 3 (GPIO 22) auf HIGH |
+| `4:0` | Setzen Sie Pin 4 (GPIO 33) auf LOW |
+
+### Schreiben Sie Antworten
+
+| Antwort | Bedeutung |
+|----------|---------|
+| `ok:1:high` | Pin 1 erfolgreich auf HIGH gesetzt |
+| `ok:2:low` | Pin 2 erfolgreich auf LOW gesetzt |
+| `error:invalid_format` | Befehlsformat nicht erkannt |
+| `error:pin_out_of_range` | Pin-Nummer nicht 1-4 |
+
+### Lesen (Fähigkeiten)
+
+Das Lesen des Merkmals gibt einen Hinweis auf die Fähigkeiten zurück:
+
+```
+pins:[1,2,3,4]
+```
+
+Dies zeigt an, welche logischen Pins zur Steuerung verfügbar sind.
+
+## Beispielcode
+
+<CodeGroup>
+```javascript Web Bluetooth (JavaScript)
+// Connect to OSSM (assumes already connected to service)
+const gpioChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-4000-420badbabe69"
+);
+
+// Set pin 1 HIGH
+await gpioChar.writeValue(new TextEncoder().encode("1:high"));
+
+// Read the response
+const response = await gpioChar.readValue();
+console.log(new TextDecoder().decode(response));
+// Output: "ok:1:high"
+
+// Set pin 2 LOW
+await gpioChar.writeValue(new TextEncoder().encode("2:low"));
+
+// Read capabilities
+const caps = await gpioChar.readValue();
+console.log(new TextDecoder().decode(caps));
+// Output: "pins:[1,2,3,4]"
+```
+
+```python Python (bleak)
+import asyncio
+from bleak import BleakClient
+
+GPIO_UUID = "522b443a-4f53-534d-4000-420badbabe69"
+
+async def control_gpio():
+    async with BleakClient("OSSM") as client:
+        # Set pin 1 HIGH
+        await client.write_gatt_char(GPIO_UUID, b"1:high")
+
+        # Read response
+        response = await client.read_gatt_char(GPIO_UUID)
+        print(response.decode())  # "ok:1:high"
+
+        # Set pin 2 LOW
+        await client.write_gatt_char(GPIO_UUID, b"2:low")
+
+        # Set multiple pins
+        await client.write_gatt_char(GPIO_UUID, b"3:high")
+        await client.write_gatt_char(GPIO_UUID, b"4:low")
+
+asyncio.run(control_gpio())
+```
+</CodeGroup>
+
+## Hardware-Integration
+
+### Einfache LED-Anzeige
+
+Schließen Sie eine LED mit Strombegrenzungswiderstand an:
+
+```
+GPIO Pin → 220Ω Resistor → LED Anode (+)
+                           LED Cathode (-) → GND
+```
+
+<Tip>
+Verwenden Sie für Standard-LEDs einen Widerstand von 220 Ω bis 470 Ω. Der 3,3-V-Ausgang des ESP32 liefert ausreichend Spannung für die meisten LEDs.
+</Tip>
+
+### Relaissteuerung
+
+Für Lasten mit höherem Strom verwenden Sie ein optoisoliertes Relaismodul:
+
+```
+GPIO Pin → Relay Module Signal
+3.3V     → Relay Module VCC
+GND      → Relay Module GND
+```
+
+Die meisten Relaismodule mit Optoisolation arbeiten mit 3,3-V-Logik. Überprüfen Sie die Spezifikationen Ihres Moduls.
+
+<Warning>
+Schließen Sie niemals Netzspannung (120 V/240 V) direkt an das OSSM an. Verwenden Sie immer ordnungsgemäß ausgelegte Relaismodule mit entsprechenden Sicherheitsvorkehrungen.
+</Warning>
+
+### Konvertierung der Logikebene
+
+Wenn Sie einen 5-V-Logikausgang benötigen:
+
+```
+GPIO Pin → Level Shifter 3.3V Side
+5V       → Level Shifter 5V Side
+GND      → Level Shifter GND
+           Level Shifter 5V Output → Your 5V Device
+```
+
+## Einschränkungen
+
+- **Keine PWM-Unterstützung** – Pins sind nur digital HIGH/LOW
+- **Kein Eingabelesen** – GPIO erfolgt nur über diese Schnittstelle
+- **Keine Persistenz** – Pin-Zustände werden beim Neustart des Geräts auf LOW zurückgesetzt
+- **Keine Unterbrechungen** – Kann nicht basierend auf externen Signalen ausgelöst werden
+- **Stromgrenzen** – ESP32 GPIO maximal ~12 mA pro Pin, 40 mA insgesamt
+
+## Fehlerbehebung
+
+<AccordionGroup>
+<Accordion title="Pin reagiert nicht">
+- Stellen Sie sicher, dass die BLE-Verbindung aktiv ist
+- Überprüfen Sie, ob das Befehlsformat genau mit `<pin>:<state>` übereinstimmt
+- Stellen Sie sicher, dass die Pin-Nummer 1-4 ist
+- Überprüfen Sie mit einem Multimeter, ob sich die Spannung ändert
+</Accordion>
+
+<Accordion title="Fehler:invalid_format-Antwort">
+Das Befehlsformat wurde nicht erkannt. Gültige Formate:
+- `1:high`, `1:low`, `1:1`, `1:0`
+- `2:high`, `2:low`, `2:1`, `2:0`
+- usw.
+
+Die Groß-/Kleinschreibung spielt keine Rolle (`HIGH` und `high` funktionieren beide).
+</Accordion>
+
+<Accordion title="Fehler: pin_out_of_range-Antwort">
+Die Pin-Nummer muss 1, 2, 3 oder 4 sein. Überprüfen Sie Ihren Befehl.
+</Accordion>
+
+<Accordion title="Angeschlossenes Gerät funktioniert nicht">
+- Überprüfen Sie die Spannung mit einem Multimeter (sollte 0 V oder ~3,3 V betragen).
+- Überprüfen Sie die aktuellen Anforderungen – ESP32 GPIO ist auf ~12 mA begrenzt
+- Sorgen Sie für eine gemeinsame Basis zwischen OSSM und Ihrem Gerät
+- Erwägen Sie die Verwendung eines Transistors oder Relais für höhere Stromlasten
+</Accordion>
+</AccordionGroup>
+
+## Verwandte Seiten
+
+<CardGroup cols={2}>
+<Card title="BLE-Protokoll" icon="bluetooth" href="/ossm/software/communication/ble">
+  Vollständige BLE-Protokollreferenz für die OSSM-Steuerung.
+</Card>
+
+<Card title="Konfigurationsreferenz" icon="sliders" href="/ossm/software/getting-started/configuration">
+  Pin-Definitionen und Hardware-Konfiguration.
+</Card>
+</CardGroup>

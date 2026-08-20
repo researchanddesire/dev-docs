@@ -1,0 +1,214 @@
+---
+title: "PCB-overzicht"
+description: "Inleiding tot de OSSM-printplaatontwerpen en bedradingsopties"
+---
+
+In dit gedeelte wordt uitgelegd hoe de OSSM-PCB uw ESP32-gebaseerde controller verbindt met de motordriver. U kunt de officiële OSSM-printplaat gebruiken of een doe-het-zelf-bedradingsinstallatie maken.
+
+<Card title="Koop OSSM-printplaat" icon="cart-shopping" href="https://www.researchanddesire.com/products/ossm-reference-board">
+Beschikbaar voorgeflasht door Research and Desire met de nieuwste firmware, klaar voor gebruik met uw OSSM.
+</Card>
+
+## Beschikbare opties
+
+<CardGroup cols={2}>
+  <Card title="Officiële OSSM-printplaat" icon="microchip" href="#official-ossm-wiring">
+    Referentiebord met 5V step/dir-uitgangen, geïntegreerde bescherming en gestandaardiseerde connectoren voor betrouwbare werking.
+  </Card>
+  <Card title="DIY-bedrading" icon="plug" href="#alternative-wiring-configurations">
+    Breadboard of aangepaste harnassen voor prototyping of het gebruik van alternatieve motordrivers.
+  </Card>
+</CardGroup>
+
+## Uw aanpak kiezen
+
+<Tabs>
+  <Tab title="Officiële printplaat">
+    De officiële OSSM-PCB biedt:
+    - Vooraf toegewezen GPIO naar step/dir/enable
+    - Signaalconversie van 3,3 V naar 5 V voor snelle, geluidsbestendige bediening
+    - JST-PH-connectoren voor netjes kabelbeheer
+    - Ingebouwde voeding en tegen-EMF-bescherming
+    - Een ontwerp gevalideerd voor de officiële OSSM-configuratie
+
+    <Tip>
+    Voor de meeste bouwers is de officiële PCB de snelste en meest betrouwbare weg naar succes.
+    </Tip>
+  </Tab>
+  <Tab title="DIY-bedrading">
+    Kies voor doe-het-zelfbedrading als u:
+    - Wilt u een prototype maken voordat u zich aan een PCB wijdt
+    - Er is een interface nodig met een niet-standaard stuurprogramma
+    - Heb al compatibele onderdelen bij de hand
+    - Leer het systeem bij voorkeur op signaalniveau kennen
+
+    <Warning>
+    Een ESP32 gebruikt 3,3V-logica. Veel motorrijders verwachten 5V step/dir-signalen. Zorg altijd voor een niveauverschuiver als u rechtstreeks van een ESP32 naar een 5V-driver bekabelt.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Belangrijke overwegingen
+
+Houd rekening met deze factoren voordat u een beslissing neemt:
+
+<AccordionGroup>
+  <Accordion title="Compatibiliteit met spanningsniveaus">
+    ESP32-kaarten werken op 3,3V-logica, terwijl veel stuurprogramma's 5V-ingangen gebruiken. Zonder de juiste niveauverschuiving ziet u mogelijk het volgende:
+    - Gemiste stappen bij hogere snelheden
+    - Onbetrouwbare richtingsveranderingen
+    - Risico op beschadiging van componenten
+
+    Controleer de ingangsspanningsvereisten voor uw specifieke driver voordat u de bedrading aansluit.
+  </Accordion>
+  <Accordion title="Signaalintegriteit">
+    Hogesnelheidsstapsignalen (tot 200 kHz) vereisen schone bedrading:
+    - Houd stap- en richtingslijnen kort
+    - Leid signalen weg van motorstroomkabels
+    - Gebruik getwiste aderparen of afgeschermde kabel voor kabels langer dan 30 cm
+  </Accordion>
+  <Accordion title="Vereisten voor stroomvoorziening">
+    Grootte van het stuurprogramma voor uw motor:
+    - Servomotoren gebruiken gewoonlijk 24–48 V DC
+    - Stappendrivers variëren per model (typisch 12-48V)
+    - Voed de ESP32 vanaf USB of een gereguleerde 5V-rail, onafhankelijk van het motorvermogen
+  </Accordion>
+</AccordionGroup>
+
+## Officiële OSSM-bedrading
+
+Gebruik dit gedeelte als u de OSSM-PCB aansluit op de OSSM Gold Motor (57AIM-serie) of een compatibele step/dir-driver.
+
+<Steps>
+<Step title="Verzamel onderdelen">
+  - OSSM-printplaat
+  - 24V-voeding (UL-gecertificeerd aanbevolen)
+  - PH‑4 signaalkabel en groene motorvoedingsconnector (meegeleverd met OSSM-motorsets)
+  - Passende motor en bestuurder
+
+  <Note>
+  Gebruik voor fysieke montage en bedrading de <a href="https://ohai.researchanddesire.com/ossm/build/wiring">officiële bedradingsfase</a>.
+  </Note>
+</Step>
+
+<Step title="Motorvermogen aansluiten">
+  - Strip de rood/zwarte voedingskabels.
+  - Steek rood (+) en zwart (–) in de motorvoedingsterminal met twee posities op de printplaat.
+  - Draai stevig vast om onderbroken verbindingen te voorkomen.
+
+  <Check>
+  Trek voorzichtig aan elke draad. Als deze beweegt, draait u de terminal opnieuw vast.
+  </Check>
+</Step>
+
+<Step title="Sluit stap/richtingsignalen aan">
+  - Sluit de gecodeerde PH-4-signaalkabel aan op de 4-pins header van de printplaat.
+  - Leid het andere uiteinde naar de besturingsingang van de motor/aandrijving, zoals aangegeven.
+
+  <Tip>
+  De PCB voert 5V actieve-lage stap/dir-signalen uit op de PH-4-header, waardoor de ruisimmuniteit bij veel drivers wordt verbeterd.
+  </Tip>
+</Step>
+
+<Step title="Schakel stroom in en controleer">
+  - Sluit de 24V-voeding aan op de 2,1 mm x 5,5 mm cilinderaansluiting van de printplaat.
+  - Schakel in. De motor/bestuurder moet stroom aangeven en gereed zijn.
+
+```bash
+# Quick preflight
+1) Power on the PCB
+2) Confirm motor/driver status LED indicates power
+3) Connect your controller and home the axis when mechanically assembled
+```
+
+  <Check>
+  Als de afstandsbediening tijdens het testen op de bank wordt aangesloten, is de homing mogelijk pas voltooid als de actuator volledig op een rail is gemonteerd.
+  </Check>
+</Step>
+</Steps>
+
+## Alternatieve bedradingsconfiguraties
+
+Als u een ander stap-/dir-stuurprogramma gebruikt of prototypes maakt op een breadboard:
+
+<Steps>
+<Step title="Voeg een level shifter toe (vereist voor 5V-drivers)">
+  Gebruik een unidirectionele 3,3V → 5V niveauverschuiver voor STEP, DIR en ENABLE. Verbind de grond tussen de ESP32, niveauschakelaar en bestuurder.
+
+  ```text
+  ESP32 (3.3V) → Level Shifter → Driver (5V)
+       STEP  ────────────────→  STEP
+       DIR   ────────────────→  DIR
+       EN    ────────────────→  EN (if used)
+       GND   ─────────────────  GND (common)
+  ```
+
+  <Warning>
+  Stuur een 5V-ingang niet rechtstreeks vanaf een ESP32-pin.
+  </Warning>
+</Step>
+
+<Step title="Sluit de stroom correct aan">
+  - Houd de motorvoeding gescheiden van 5V logische rails.
+  - Afmeting voedingsbedrading voor stroom. Gebruik 16–24 AWG op de uitgangsklemmen van de PCB-motor.
+</Step>
+
+<Step title="Valideer signalen">
+  - Begin met een lage stapsnelheid en verhoog deze geleidelijk.
+  - Bevestig dat de richtingswijzigingen netjes worden gewijzigd en dat er geen stappen worden gemist.
+</Step>
+</Steps>
+
+## Specificaties
+
+Deze specificaties vatten de mogelijkheden van OSSM PCB samen.
+
+### Stroominvoer
+
+| Parameter | Waarde |
+|-----------|-------|
+| Spanning | 24 V gelijkstroom |
+| Maximale stroom | 5A |
+| Connector | 2,1 mm x 5,5 mm cilinderkrik |
+
+<Warning>
+Gebruik een hoogwaardige, UL-gecertificeerde voeding. Voedingen van lage kwaliteit leveren vaak geen nominaal vermogen en kunnen de motor of het bord beschadigen.
+</Warning>
+
+### Signaaluitgangen
+
+| Parameter | Specificatie |
+|-----------|---------------|
+| Signaaltype | Stap-Dir |
+| Logisch niveau | 5V actief laag |
+| Connector | JST-PH-4 |
+
+### Motorvermogen
+
+| Parameter | Specificatie |
+|-----------|---------------|
+| Spanning | 24V |
+| Maximale stroom | 6A |
+| Terminals | 2× schroefklemmen |
+| Draadmeter | 16–24 AWG |
+
+### Terug-EMF-bescherming
+
+De printplaat bevat ingebouwde bescherming tegen regeneratieve spanningspieken:
+
+- Inline-diode om de voeding te beschermen tegen tegenstroom
+- 1500 µF condensator voor het verwerken van regeneratieve energie
+
+## Gerelateerde handleidingen
+
+<CardGroup cols={2}>
+  <Card title="OSSM PCB-referentie" icon="file" href="/ossm/hardware/pcb/board-design">
+    Gedetailleerde elektrische specificaties en connector-pinouts.
+  </Card>
+  <Card title="Officiële bedradingsfase" icon="bolt" href="https://ohai.researchanddesire.com/ossm/build/wiring">
+    Stap-voor-stap bedrading voor de OSSM Gold Motor (57AIM-serie).
+  </Card>
+  <Card title="Firmware en updates" icon="cpu" href="/ossm/software/getting-started/wifi-and-updates">
+    Gebruik de webflasher om firmware op uw bord te laden.
+  </Card>
+</CardGroup>

@@ -1,0 +1,161 @@
+---
+title: "Limites de durée de la minuterie"
+description: "Référence complète pour les durées des minuteries de verrouillage, de 30 secondes à 1 000 ans"
+---
+
+Lorsque vous définissez un verrouillage temporisé sur votre Chastity Lockbox, vous pouvez choisir des durées allant de 30 secondes à plus de 1 000 ans. Ce guide explique le fonctionnement du système de minuterie et les plages de durée disponibles.
+
+## Aperçu de la plage de durée
+
+| Minimum | Maximum |
+|---------|---------|
+| 30 secondes | 1000 ans |
+
+<Info>
+La minuterie utilise une précision à la milliseconde en interne, prenant en charge une synchronisation extrêmement précise pour toute durée comprise dans cette plage.
+</Info>
+
+## Régler la durée
+
+Lorsque vous sélectionnez **Verrouiller** dans le menu principal, l'écran de configuration de la minuterie apparaît :
+
+1. **Faites pivoter l'encodeur** pour régler la durée
+2. Un indicateur d'arc visuel indique votre position dans la plage actuelle de l'unité.
+3. La durée s'affiche dans un format lisible par l'homme (par exemple, « 10 minutes », « 3 jours »)
+4. **Appuyez sur Entrée** pour confirmer et démarrer le verrouillage
+
+### Valeur de départ par défaut
+
+La minuterie démarre à **10 minutes** par défaut, positionnée dans la plage des minutes pour un réglage rapide.
+
+## Unités et incréments de durée
+
+L'encodeur correspond à différentes unités de temps en fonction de la valeur actuelle. Au fur et à mesure que vous augmentez la durée, l'unité change automatiquement :
+
+### Secondes (30 à 120 secondes)
+
+| Gamme | Incrément | Exemples de valeurs |
+|-------|-----------|----------------|
+| 30 à 120 secondes | 1 seconde | 30, 31, 32... 120 |
+
+### Minutes (1 à 120 minutes)
+
+| Gamme | Incrément | Exemples de valeurs |
+|-------|-----------|----------------|
+| 1 à 120 minutes | 1 minute | 1 minute, 2 minutes... 120 minutes |
+
+### Heures (2 à 24 heures)
+
+| Gamme | Incrément | Exemples de valeurs |
+|-------|-----------|----------------|
+| 2 à 24 heures | 1 heure | 2h, 3h, 4h... 24h |
+
+### Jours (1 à 30 jours)
+
+| Gamme | Incrément | Exemples de valeurs |
+|-------|-----------|----------------|
+| 1 à 30 jours | 1 jour | 1 jour, 2 jours... 30 jours |
+
+### Semaines (4 à 8 semaines)
+
+| Gamme | Incrément | Exemples de valeurs |
+|-------|-----------|----------------|
+| 4 à 8 semaines | 1 semaine | 4 semaines, 5 semaines... 8 semaines |
+
+### Mois (2 à 12 mois)
+
+| Gamme | Incrément | Exemples de valeurs |
+|-------|-----------|----------------|
+| 2 à 12 mois | 1 mois | 2 mois, 3 mois... 12 mois |
+
+### Années (1 à 1 000 ans)
+
+| Gamme | Incrément | Exemples de valeurs |
+|-------|-----------|----------------|
+| 1 à 1000 ans | 1 an | 1 an, 2 ans... 1000 ans |
+
+<Warning>
+Les durées extrêmement longues sont techniquement prises en charge mais ne sont pas recommandées. Pensez à utiliser le mode **Lock Forever** avec contrôle par titulaire de clé pour les verrous indéfinis au lieu de définir des minuteries sur plusieurs années.
+</Warning>
+
+## Indicateur visuel d'arc
+
+L'écran du minuteur affiche un arc semi-circulaire qui indique votre position dans la plage d'unités actuelle :
+
+- **Arc vide** : Au minimum de l'unité actuelle
+- **Arc complet** : Au maximum de l'unité actuelle
+- **Remplissage partiel** : affiche la position relative
+
+L'arc se réinitialise lorsque vous passez à une nouvelle plage d'unités (par exemple, de minutes à heures).
+
+## Accélération du codeur
+
+L'encodeur a l'accélération activée pour la configuration de la minuterie :
+
+- **Tours lents** : changements précis à un seul incrément
+- **Tours rapides** : sauts plus grands pour atteindre rapidement votre cible
+
+<Tip>
+Pour de très longues durées, tournez rapidement l'encodeur pour parcourir les plages plus rapidement, puis ralentissez pour affiner le réglage.
+</Tip>
+
+## Calculs de temps
+
+En interne, les durées sont stockées en millisecondes à l'aide de ces conversions :
+
+| Unité | Millisecondes |
+|------|--------------|
+| 1 seconde | 1,000 |
+| 1 minute | 60,000 |
+| 1 heure | 3,600,000 |
+| 1 jour | 86,400,000 |
+| 1 semaine | 604,800,000 |
+| 1 mois | 2 629 746 000 (~30,44 jours) |
+| 1 an | 31 556 952 000 (~365,24 jours) |
+
+<Note>
+Les calculs de mois et d'année utilisent des durées moyennes pour tenir compte des différentes durées de mois et des années bissextiles.
+</Note>
+
+## Format d'affichage
+
+L'affichage du minuteur s'adapte en fonction de la durée :
+
+| Durée | Format d'affichage |
+|----------|---------------|
+| Moins d'1 heure | MM:SS (par exemple, "05:30") |
+| 1 à 24 heures | Xh MM:SS (par exemple, "2h 30:00") |
+| 1 à 30 jours | Xd Xh MM:SS (par exemple, "3j 5h 30:00") |
+| Plus de 30 jours | Simplifié (par exemple, « 2 mois ») |
+
+## Minuteries du tableau de bord et des appareils
+
+Lorsque vous utilisez le tableau de bord pour créer des verrous :
+
+- **Tableau de bord** : peut proposer différents préréglages et options de durée
+- **Appareil** : utilise le système basé sur un encodeur décrit ici
+- Les deux se synchronisent lorsqu'ils sont connectés au WiFi
+
+<Info>
+Les verrous créés à partir du tableau de bord sont reçus par votre appareil et affichent le temps restant en utilisant le même format.
+</Info>
+
+## Guides associés
+
+<CardGroup cols={2}>
+<Card title="Démarrage rapide" icon="rocket" href="https://docs.researchanddesire.com/lockbox/get-started">
+Découvrez comment démarrer votre premier verrouillage.
+</Card>
+
+<Card title="Mode verrouillage permanent" icon="infinity" href="../device-states/permalock">
+Verrous indéfinis sans limite de temps.
+</Card>
+
+<Card title="Contrôles des boutons" icon="hand-pointer" href="./button-controls">
+Comment utiliser l'encodeur pour la sélection de la minuterie.
+</Card>
+
+<Card title="Temps de masquage" icon="eye-slash" href="../using/hiding-time">
+Cachez le temps restant pour plus de mystère.
+</Card>
+</CardGroup>

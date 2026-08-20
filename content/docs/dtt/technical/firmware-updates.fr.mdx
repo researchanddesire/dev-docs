@@ -1,0 +1,194 @@
+---
+title: "Mises à jour du micrologiciel"
+description: "Comment votre formateur reçoit et installe les mises à jour logicielles"
+---
+
+Votre Deepthroat Trainer reçoit des mises à jour du micrologiciel par liaison radio (OTA) lorsqu'il est connecté au Wi-Fi. Les mises à jour apportent de nouvelles fonctionnalités, des améliorations et des corrections de bugs.
+
+## Comment fonctionnent les mises à jour
+
+### Vérification automatique
+Chaque fois que vous allumez et vous connectez au Wi-Fi, le formateur vérifie les mises à jour disponibles pendant la phase de contrôle en amont.
+
+### Processus de mise à jour
+Lorsqu'une mise à jour est disponible :
+1. L'écran affiche "Mise à jour" avec des informations de progression
+2. Le nouveau firmware se télécharge automatiquement
+3. L'appareil redémarre avec la nouvelle version
+
+<Warning>
+N'éteignez pas l'appareil pendant une mise à jour. Attendez qu'il soit terminé et redémarrez automatiquement. Interrompre une mise à jour peut entraîner des problèmes.
+</Warning>
+
+## Flux de micrologiciels
+
+Votre home trainer peut recevoir des mises à jour de différents flux de micrologiciels :
+
+| Flux | Description |
+|--------|-------------|
+| **Production** | Versions stables pour un usage général |
+| **Bêta** | Versions préliminaires avec de nouvelles fonctionnalités (peut contenir des bugs) |
+| **Alpha** | Premières versions de tests (usage interne/limité) |
+
+<Info>
+La plupart des utilisateurs reçoivent automatiquement les mises à jour de production. L'inscription à la version bêta est généralement gérée via votre compte de tableau de bord ou votre niveau d'abonnement.
+</Info>
+
+### Statut bêta actuel
+Les abonnés actifs sont souvent inscrits au flux bêta lors des déploiements. Une bascule de tableau de bord permettant de basculer entre les flux Production, Bêta et Derniers est prévue.
+
+Consultez l'aperçu <a href="/dtt/technical/introduction">Software 2.0</a> pour plus de détails sur les fonctionnalités bêta actuelles.
+
+## Quelles mises à jour incluent
+
+Les mises à jour du micrologiciel peuvent inclure :
+
+- **Nouvelles fonctionnalités** — Modes d'entraînement, améliorations de l'interface utilisateur, personnalisation
+- **Corrections de bugs** – Problèmes résolus des versions précédentes
+- **Performance** — Réponse plus rapide, meilleure stabilité
+- **Sécurité** — Améliorations de la protection
+
+## Informations sur les versions
+
+La version actuelle de votre micrologiciel s'affiche lors du démarrage de l'appareil. Notez ces informations lorsque vous contactez le support.
+
+## Vérification manuelle des mises à jour
+
+Pour forcer une vérification de mise à jour :
+1. Assurez-vous que le Wi-Fi est connecté
+2. Redémarrez l'appareil
+3. Les vérifications préliminaires rechercheront automatiquement les mises à jour
+
+Il n'y a pas de bouton manuel "vérifier les mises à jour" - la vérification s'effectue automatiquement à chaque démarrage en ligne.
+
+## Clignotement USB manuel
+
+Si votre Trainer ne peut pas recevoir les mises à jour OTA (en raison de problèmes de connectivité ou de restrictions réseau), vous pouvez flasher manuellement le micrologiciel à l'aide d'un câble USB et du Web Flasher.
+
+<Info>
+Utilisez le flash USB manuel lors du dépannage des problèmes de connectivité ou lorsque l’assistance vous le demande. La plupart des utilisateurs n'en auront pas besoin : les mises à jour OTA gèrent tout automatiquement.
+</Info>
+
+### Conditions préalables
+
+- Un câble USB prenant en charge le **transfert de données** (pas seulement le chargement)
+- Un ordinateur avec un port USB disponible
+- Google Chrome, Edge ou un autre navigateur basé sur Chromium
+
+<Warning>
+**Compatibilité matérielle :** Les home trainers achetés avant le 1er juillet 2025 ne disposent pas de l'interface USB requise pour le flashage manuel. Si vous voyez un message indiquant que votre appareil n'est pas flashable, ou si le webflasher ne peut pas détecter votre appareil, contactez [support@researchanddesire.com](mailto:support@researchanddesire.com) pour obtenir de l'aide.
+</Warning>
+
+### Instructions clignotantes
+
+<Steps>
+<Step title="Connectez votre entraîneur">
+  Branchez le câble USB sur votre Deepthroat Trainer et connectez l'autre extrémité à votre ordinateur.
+</Step>
+
+<Step title="Ouvrez le Flasher Web">
+  Accédez à [dashboard.researchanddesire.com/app/tools/web-flasher](https://dashboard.researchanddesire.com/app/tools/web-flasher) dans votre navigateur.
+</Step>
+
+<Step title="Sélectionnez les options du micrologiciel">
+  Dans le Flasher Web :
+  1. Sélectionnez **Deepthroat Trainer** dans la liste déroulante des appareils.
+  2. Sélectionnez **Production** dans la liste déroulante du flux du micrologiciel.
+</Step>
+
+<Step title="Connectez-vous à votre appareil">
+  Cliquez sur **Connecter** et sélectionnez votre appareil dans la liste. Recherchez un appareil étiqueté :
+  - **Pont UART**
+  - **USB JTAG** (ou similaire)
+
+  <Warning>
+  Si aucun périphérique n'apparaît, vérifiez que votre câble prend en charge le transfert de données et essayez un autre port USB.
+  </Warning>
+</Step>
+
+<Step title="Flasher le firmware">
+  Cliquez sur **Flash** pour installer le micrologiciel. Attendez la fin du processus.
+
+  <Warning>
+  N'activez **pas** « Effacer l'appareil », sauf indication contraire de l'assistance. L'effacement efface votre identifiant de formateur et nécessite un réapprovisionnement.
+  </Warning>
+</Step>
+</Steps>
+
+### Après avoir flashé
+
+Une fois le flash terminé, votre Trainer redémarre avec le nouveau firmware. Connectez-vous au Wi-Fi pour vérifier la connectivité.
+
+Si vous voyez **E-DTT-1** (« Pas d'Internet. Vérifiez le pare-feu et le routeur. ») après la connexion, cela confirme qu'une restriction réseau bloque votre appareil. Suivez le guide de dépannage <a href="https://docs.researchanddesire.com/dtt/troubleshooting">E-DTT-1</a> pour résoudre le problème.
+
+## Exigences de mise à jour
+
+| Exigence | Détails |
+|-------------|---------|
+| **Internet** | Connexion Wi-Fi requise |
+| **Batterie** | Charge suffisante recommandée |
+| **Temps** | Les mises à jour prennent généralement 1 à 3 minutes |
+
+## Dépannage
+
+<AccordionGroup>
+<Accordion title="La mise à jour ne démarre pas">
+- Vérifiez que le Wi-Fi est connecté et fonctionne
+- Vérifiez que l'appareil peut accéder à Internet (aucun blocage de pare-feu)
+- Essayez de redémarrer et de vous reconnecter
+</Accordion>
+
+<Accordion title="La mise à jour échoue ou redémarre à plusieurs reprises">
+- Assurer une alimentation stable (brancher le chargeur si la batterie est faible)
+- Vérifiez la puissance du signal Wi-Fi
+- En cas d'échecs répétés, contactez le support
+</Accordion>
+
+<Accordion title="L'ID du formateur affiche des caractères confus ou aléatoires après la mise à jour">
+Si votre identifiant de formateur affiche des caractères corrompus (tels que « .t », « U]t » ou d'autres symboles aléatoires) et change à chaque redémarrage, les données d'approvisionnement de l'appareil ont été effacées lors de la mise à jour du micrologiciel.
+
+**Cause:**
+Cela se produit généralement lors de l'utilisation du Web Flasher avec l'option "Effacer le périphérique" activée. L'option d'effacement efface toutes les données stockées, y compris l'ID de formateur unique attribué lors de la fabrication.
+
+**Solution:**
+Contactez l'assistance à [support@researchanddesire.com](mailto:support@researchanddesire.com). Inclure:
+- Votre numéro de commande
+- Une description de ce que vous voyez à l'écran
+- Les étapes que vous avez suivies avant l'apparition du problème
+
+L'assistance peut réapprovisionner votre appareil avec un nouvel identifiant de formateur.
+
+<Warning>
+Lorsque vous utilisez le flasher Web, activez « Effacer le périphérique » uniquement si l'assistance vous le demande spécifiquement. Les mises à jour normales du micrologiciel ne nécessitent pas d'effacer l'appareil.
+</Warning>
+</Accordion>
+
+<Accordion title="Les fonctionnalités ne correspondent pas à la documentation">
+- Vous êtes peut-être sur un flux de micrologiciel différent de celui documenté
+- Certaines fonctionnalités sont uniquement en version bêta/aperçu
+- Vérifiez votre version actuelle par rapport aux notes de version
+</Accordion>
+
+<Accordion title="Puis-je rétrograder le firmware ?">
+La rétrogradation n’est pas prise en charge dans le cadre d’un fonctionnement normal. Si vous rencontrez des problèmes avec une nouvelle version, contactez l'assistance.
+</Accordion>
+</AccordionGroup>
+
+## Libérer la communication
+
+Les mises à jour et les modifications sont communiquées via :
+- Annonces du tableau de bord
+- Mises à jour de la documentation
+- La page <a href="/dtt/technical/introduction">Software 2.0 Preview</a>
+
+## Guides associés
+
+<CardGroup cols={2}>
+<Card title="Aperçu du logiciel 2.0" icon="sparkles" href="/dtt/technical/introduction">
+Fonctionnalités bêta actuelles et feuille de route.
+</Card>
+
+<Card title="Configuration Wi-Fi" icon="wifi" href="https://docs.researchanddesire.com/dtt/get-started">
+Connectez votre entraîneur pour les mises à jour.
+</Card>
+</CardGroup>

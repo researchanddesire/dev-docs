@@ -1,0 +1,112 @@
+---
+title: "Authentifizierung"
+description: "Erstellen und verwalten Sie API-Tokens zur Authentifizierung Ihrer Anfragen"
+---
+
+Für alle API-Anfragen ist ein gültiges API-Token erforderlich, das im `Authorization`-Header übergeben wird. Token sind JWTs, die mit der Identität Ihres Kontos signiert sind, sodass jeder Datenzugriff automatisch Ihre Kontoberechtigungen respektiert.
+
+<Info>
+  Für die Erstellung von API-Tokens ist ein **Ultra**-Abonnement erforderlich. Falls Sie keins haben
+  Besuchen Sie jedoch [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription), um ein Upgrade durchzuführen.
+</Info>
+
+## Erstellen eines Tokens
+
+<Steps>
+  <Step title="Navigieren Sie zu API-Schlüssel">
+    Gehen Sie in der Dashboard-Seitenleiste zu **Einstellungen > API-Schlüssel**.
+  </Step>
+
+<Step title="Klicken Sie auf Token erstellen">
+  Klicken Sie auf die Schaltfläche **Token erstellen** und geben Sie Ihrem Token einen aussagekräftigen Namen
+  (z. B. „Home Assistant Integration“ oder „Python Script“).
+</Step>
+
+  <Step title="Kopieren Sie Ihren Token">
+    Ihr Token wird genau einmal angezeigt. Kopieren Sie es und bewahren Sie es sicher auf.
+
+    <Warning>
+    Sie können dieses Token nicht mehr sehen. Wenn Sie es verlieren, müssen Sie ein neues erstellen.
+    </Warning>
+
+  </Step>
+</Steps>
+
+## Verwendung Ihres Tokens
+
+Fügen Sie das Token als Bearer-Token in den `Authorization`-Header ein:
+
+<RequestExample>
+```bash cURL
+curl -X GET \
+  https://dashboard.researchanddesire.com/api/v1/users \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+```python Python
+import requests
+
+headers = {"Authorization": "Bearer YOUR_API_TOKEN"}
+response = requests.get(
+    "https://dashboard.researchanddesire.com/api/v1/users",
+    headers=headers,
+)
+data = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch(
+  "https://dashboard.researchanddesire.com/api/v1/users",
+  {
+    headers: { Authorization: "Bearer YOUR_API_TOKEN" },
+  },
+);
+const data = await response.json();
+```
+
+</RequestExample>
+
+## Verwalten von Tokens
+
+### Token anzeigen
+
+Auf der Einstellungsseite **API-Schlüssel** werden alle Ihre aktiven Token angezeigt mit:
+
+- **Name** – die von Ihnen zugewiesene Bezeichnung
+- **Erstellt** – wann das Token erstellt wurde
+- **Zuletzt verwendet** – das letzte Mal, dass das Token für eine Anfrage verwendet wurde
+
+### Token widerrufen
+
+Klicken Sie auf das Papierkorbsymbol neben einem beliebigen Token, um es zu widerrufen. Der Widerruf erfolgt sofort – alle Anfragen, die dieses Token verwenden, erhalten sofort `401 Unauthorized`-Antworten.
+
+<Tip>Revokieren und erstellen Sie Token regelmäßig als bewährte Sicherheitsmethode.</Tip>
+
+### Token-Limits
+
+Sie können bis zu **5 aktive Token** gleichzeitig haben. Wenn Sie mehr benötigen, widerrufen Sie zunächst einen nicht verwendeten Token.
+
+## Fehlerantworten
+
+| Status | Bedeutung                                                      |
+| ------ | ------------------------------------------------------------ |
+| `401`  | Fehlendes, ungültiges, abgelaufenes oder widerrufenes Token                  |
+| `403`  | Das Token ist gültig, aber Sie haben keine Berechtigung für diese Aktion |
+| `404`  | Ressource nicht gefunden (oder mit Ihren Berechtigungen nicht zugänglich) |
+
+<ResponseExample>
+```json 401 Unauthorized
+{
+  "ok": false,
+  "error": "Missing or invalid Authorization header"
+}
+```
+
+```json 401 Token Revoked
+{
+  "ok": false,
+  "error": "Token has been revoked"
+}
+```
+
+</ResponseExample>

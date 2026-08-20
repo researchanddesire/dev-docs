@@ -1,0 +1,11 @@
+{
+  "title": "Firmware und Sensoren",
+  "pages": [
+    "introduction",
+    "device-states",
+    "calibration",
+    "sensor-limits",
+    "offline-mode",
+    "firmware-updates"
+  ]
+}

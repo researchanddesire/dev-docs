@@ -1,0 +1,234 @@
+---
+title: "OTA Update Systeem"
+description: "Technische documentatie voor de RADR over-the-air update-architectuur"
+---
+
+Dit document beschrijft het over-the-air (OTA) updatesysteem dat wordt gebruikt door de Research And Desire wireless Remote (RADR), inclusief de updateketen, de statusmachinestroom en welke componenten worden bijgewerkt.
+
+## Overzicht
+
+RADR maakt gebruik van een tweedelig OTA-updatesysteem:
+
+| Onderdeel | Beschrijving | Binair |
+|-----------|-------------|--------|
+| **Firmware** | ESP32 applicatie binair | `firmware.bin` |
+| **Bestandssysteem** | LittleFS-partitie met apparaatregister en protocolspecificaties | `littlefs.bin` |
+
+De bestandssysteemupdate is vooral belangrijk voor apparaatondersteuning: deze bevat het Buttplug.io-register dat UUID's van Bluetooth-services toewijst aan apparaatconfiguraties. Hierdoor kan ondersteuning voor nieuwe apparaten worden toegevoegd zonder dat er firmwarewijzigingen nodig zijn.
+
+## Architectuur bijwerken
+
+```mermaid
+flowchart TB
+    subgraph OTA[OTA Update System]
+        direction LR
+        subgraph FW[Firmware Update]
+            FWBin[firmware.bin]
+            FWBin --> AppCode[Application Code]
+        end
+        subgraph FS[Filesystem Update]
+            FSBin[littlefs.bin]
+            FSBin --> Registry[/registry.json]
+            FSBin --> Protocols[/protocols/*.json]
+            Protocols --> ButtplugSpecs[Buttplug.io Device Specs]
+        end
+    end
+    Server[Supabase Storage] --> OTA
+```
+
+### Server bijwerken
+
+Updates worden geleverd vanuit Supabase Storage. De server-URL wordt gedefinieerd in `platformio.ini`:
+
+```ini
+UPDATE_SERVER_URL="https://acjajruwevyyatztbkdf.supabase.co/storage/v1/object/public/radr-firmware"
+```
+
+Binaire URL's volgen het patroon:
+- Firmware: `{UPDATE_SERVER_URL}/master/firmware.bin`
+- Bestandssysteem: `{UPDATE_SERVER_URL}/master/littlefs.bin`
+
+## Staatsmachinestroom
+
+Updates worden beheerd door de RADR-statusmachine. De updatestroom wordt geactiveerd vanuit het menu Instellingen.
+
+```mermaid
+flowchart TD
+    SettingsMenu[settings_menu] -->|"User selects Update Device"| UpdateCheck{WiFi Connected?}
+    UpdateCheck -->|No| UpdateWifi[update.wifi]
+    UpdateWifi -->|"WiFi connects"| Update
+    UpdateCheck -->|Yes| Update[update]
+
+    Update -->|hasFilesystemUpdate| UpdateFS[update.filesystem]
+    Update -->|hasSoftwareUpdate| UpdateSW[update.software]
+    Update -->|"No updates"| UpdateDone[update.done]
+
+    UpdateFS -->|"Has software update"| UpdateSW
+    UpdateFS -->|"No software update"| Restart[restart]
+
+    UpdateSW --> Restart
+    UpdateDone --> Restart
+```
+
+### Staatsovergangen
+
+| Van | Naar | Voorwaarde |
+|------|-----|-----------|
+| `settings_menu` | `update` | Gebruiker selecteert "Apparaat bijwerken" + WiFi verbonden |
+| `settings_menu` | `update.wifi` | Gebruiker selecteert "Apparaat bijwerken" + WiFi niet verbonden |
+| `update.wifi` | `update` | WiFi-verbinding tot stand gebracht |
+| `update` | `update.filesystem` | `hasFilesystemUpdate`-bewaker keert terug naar waar |
+| `update` | `update.software` | `hasSoftwareUpdate`-guard retourneert True (geen update van het bestandssysteem) |
+| `update` | `update.done` | Geen updates beschikbaar |
+| `update.filesystem` | `update.software` | Bestandssysteemupdate voltooid + software-update beschikbaar |
+| `update.filesystem` | `restart` | Bestandssysteemupdate voltooid, geen software-update |
+| `update.software` | `restart` | Software-update voltooid (start altijd opnieuw) |
+| `update.done` | `restart` | Gebruiker erkent |
+
+## Wat wordt bijgewerkt
+
+### Firmware-update
+
+De firmware-update vervangt de binaire applicatie ESP32. Dit omvat:
+
+- Kernapplicatielogica
+- UI en weergavecode
+- Bluetooth-stack en apparaatcommunicatie
+- Staatsmachine en navigatie
+- Invoerverwerking (encoders, knoppen, bumpers)
+
+**Implementatie:** `updateSoftwareTask()` in `src/tasks/update.cpp`
+
+```cpp
+void updateSoftwareTask(void *pvParameters) {
+    // Uses ESP32 HTTPUpdate library
+    httpUpdate.setRebootOnUpdate(true);  // Auto-reboot on success
+
+    String url = String(UPDATE_SERVER_URL) + "/master/firmware.bin";
+    httpUpdate.update(client, url);
+}
+```
+
+De firmware-update start het apparaat automatisch opnieuw op als het succesvol is.
+
+### Update van het bestandssysteem
+
+De bestandssysteemupdate vervangt de LittleFS-partitie, die het volgende bevat:
+
+| Bestand | Doel |
+|------|---------|
+| `/registry.json` | Wijst BLE-service-UUID's toe aan protocolspecificatiebestanden |
+| `/protocols/*.json` | Buttplug.io v4 apparaatconfiguratiebestanden |
+
+**Implementatie:** `updateFilesystemTask()` in `src/tasks/update.cpp`
+
+```cpp
+void updateFilesystemTask(void *pvParameters) {
+    LittleFS.end();  // Unmount before update
+
+    httpUpdate.setRebootOnUpdate(false);  // Don't reboot yet
+
+    String url = String(UPDATE_SERVER_URL) + "/master/littlefs.bin";
+    httpUpdate.updateSpiffs(client, url);
+
+    LittleFS.begin();  // Remount after update
+}
+```
+
+<Info>
+De update van het bestandssysteem veroorzaakt geen automatische herstart. Hierdoor kunnen zowel het bestandssysteem als de firmware achtereenvolgens worden bijgewerkt voordat opnieuw wordt opgestart.
+</Info>
+
+### Registerupdateketen
+
+Wanneer het bestandssysteem wordt bijgewerkt, wordt het Buttplug.io-apparaatregister vernieuwd:
+
+```mermaid
+flowchart LR
+    OTA[OTA downloads littlefs.bin] --> LittleFS[LittleFS partition updated]
+    LittleFS --> Init["initRegistry() loads on boot"]
+    Init --> NewDevices[New devices supported]
+```
+
+Het register wordt tijdens het opstarten geladen door `initRegistry()` in `src/devices/registry.cpp`:
+
+1. Hardgecodeerde apparaten worden eerst geregistreerd (bijvoorbeeld OSSM)
+2. `/registry.json` wordt gelezen vanuit LittleFS
+3. Elke service-UUID wordt toegewezen aan een `ButtplugIODeviceFactory`
+4. Protocolspecificaties worden op aanvraag geladen wanneer apparaten worden ontdekt
+
+## Beschikbaarheid bijwerken
+
+Beschikbaarheid van updates wordt bepaald door bewakingsfuncties in `src/state/guards.hpp`:
+
+```cpp
+bool hasFilesystemUpdate(const State &state, const Event &event) {
+    return isFilesystemUpdateAvailable;
+}
+
+bool hasSoftwareUpdate(const State &state, const Event &event) {
+    return isSoftwareUpdateAvailable;
+}
+```
+
+Deze vlaggen worden gecontroleerd door:
+
+| Vlag | Stel in wanneer |
+|------|----------|
+| `isSoftwareUpdateAvailable` | `FORCE_UPDATE` compileervlag, of server geeft update aan |
+| `isFilesystemUpdateAvailable` | `FORCE_UPDATE` compileervlag, of server geeft update aan |
+
+<Warning>
+De huidige implementatie heeft een TODO voor automatische updatecontrole. Momenteel worden updates handmatig geactiveerd en moet de beschikbaarheid worden ingesteld via compileervlaggen of externe mechanismen.
+</Warning>
+
+## Belangrijke bronbestanden
+
+| Bestand | Doel |
+|------|---------|
+| `src/tasks/update.cpp` | Implementaties van taakupdates (`updateSoftwareTask`, `updateFilesystemTask`) |
+| `src/tasks/update.h` | Update taakdeclaraties en beschikbaarheidsvlaggen |
+| `src/state/machine.h` | Toestandsmachinedefinitie met updatestatussen |
+| `src/state/guards.hpp` | Bewakingsfuncties voor beschikbaarheid van updates |
+| `src/devices/registry.cpp` | Registerinitialisatie van LittleFS |
+| `data/registry.json` | Service-UUID naar protocolspecificatie-toewijzingen |
+| `data/protocols/*.json` | Buttplug.io v4 apparaatspecificaties |
+
+## Ontwikkelingsnotities
+
+### Updates forceren
+
+Gebruik voor ontwikkeling en testen de compileervlag `FORCE_UPDATE`:
+
+```ini
+build_flags =
+    -D FORCE_UPDATE
+```
+
+Hierdoor worden zowel `isSoftwareUpdateAvailable` als `isFilesystemUpdateAvailable` ingesteld op `true`.
+
+### Lokale bestandssysteemupdates
+
+Wanneer u lokaal ontwikkelt, gebruikt u de functie "Upload Filesystem" van PlatformIO:
+
+```bash
+pio run --target uploadfs
+```
+
+Hiermee wordt de inhoud van de map `data/` geüpload naar de LittleFS-partitie.
+
+<Warning>
+"Upload Filesystem" wist de bestaande LittleFS-partitie vóór het schrijven. Eventuele runtime-wijzigingen gaan verloren.
+</Warning>
+
+## Gerelateerde documentatie
+
+<CardGroup cols={2}>
+<Card title="Apparaatregister" icon="database" href="/radr/software/device-registry/introduction">
+Hoe RADR apparaatinstanties ontdekt en maakt op basis van BLE-service-UUID's.
+</Card>
+
+<Card title="Webflitser" icon="bolt" href="/radr/software/ota-updates/introduction">
+Handmatige firmware flashen via browser.
+</Card>
+</CardGroup>

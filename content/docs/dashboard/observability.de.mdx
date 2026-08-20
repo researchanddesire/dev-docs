@@ -1,0 +1,80 @@
+---
+title: "PostHog-Beobachtbarkeit"
+description: "Behalten Sie die Telemetrie-, Identitäts-, Datenschutz- und Freigabeverträge des R+D-Dashboards bei."
+---
+
+# PostHog-Beobachtbarkeit
+
+Die gesamte Repository-Telemetrie gehört zum **RD Dashboard** PostHog-Projekt
+(`279829`, US Cloud). Build Tooling lehnt eine andere Projekt-ID ab. Nicht
+Verbinden Sie Entwicklungs-, Bereitstellungs- oder Quellzuordnungstools mit einem anderen PostHog
+Projekt.
+
+## Bereitstellungskonfiguration
+
+Web-, Admin- und Kinky Makers-Bereitstellungen verwenden Folgendes:
+
+- `NEXT_PUBLIC_POSTHOG_KEY`
+- `NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com`
+- `POSTHOG_PROJECT_ID=279829`
+- `POSTHOG_API_KEY` als optionaler persönlicher Schlüssel nur für den Server mit nur dem
+  benötigte Quellkarten-Upload-Berechtigungen. Ohne sie ist die Bereitstellung erfolgreich
+  aber überspringt das Hochladen der Quellkarte.
+
+Native EAS-Umgebungen erfordern `EXPO_PUBLIC_POSTHOG_KEY`,
+`EXPO_PUBLIC_POSTHOG_HOST` und `EXPO_PUBLIC_APP_ENV`. Native Quellkarten und
+Symbole erfordern zusätzlich `POSTHOG_CLI_API_KEY`,
+`POSTHOG_CLI_HOST=https://us.posthog.com` und
+`POSTHOG_CLI_PROJECT_ID=279829`.
+
+Supabase Edge-Funktionen erfordern `POSTHOG_PROJECT_KEY`, `POSTHOG_HOST` und
+`DEPLOYMENT_ENVIRONMENT`. Leiten Sie fehlgeschlagene Anfragen an Protokolle weiter. Erfolgreiches Gerät
+Telemetriedaten werden vom Web-Proxy als Produktereignisse zusammengefasst.
+
+Geben Sie niemals einen persönlichen API-Schlüssel über `NEXT_PUBLIC_` oder `EXPO_PUBLIC_` preis
+Variable.
+
+## Identitätsvertrag
+
+- RAD-Web-, Native-, Admin- und Server-Ereignisse identifizieren eine angemeldete Person mit
+  die Dezimalanwendung `User.id`, serialisiert als String.
+- Kinky Makers verwendet `km:<Supabase auth UUID>`, bis es das RAD-Profil teilt
+  Modell. Das Präfix verhindert versehentliche Identitätszusammenführungen.
+- Browser- und native Clients rufen `reset()` beim Abmelden und vor Änderungen auf
+  identifizierte Konten.
+- Hardware ist eine `device`-Gruppe. Eine MAC-Adresse ist niemals eine Personen-ID oder eine Gruppe
+  Schlüssel; Verwenden Sie die gehashte stabile Gerätekennung.
+
+Diese Regeln ermöglichen es Supportmitarbeitern, von einer Anwendungsbenutzer-ID auszugehen und diese zu finden
+Web-, Native-, Server-, Sitzungs-, Fehler- und Protokolldatensätze einer Person ohne Offenlegung
+private Hardware-IDs.
+
+## Erforderlicher Kontext und Privatsphäre
+
+Jeder Dienst fügt `service_name`, `platform`, `environment`, Release oder hinzu
+Version und Bereitstellungskennungen, sofern verfügbar. Auch fehlgeschlagene Serveranfragen
+Route, Methode, Anforderungs-ID und `traceparent` anhängen.
+
+Senden Sie keine Anfragetexte, Zugriffstoken, E-Mail-Adressen, vertrauliche Inhalte usw.
+Eingabeaufforderungen, rohe MAC-Adressen oder Geräteanmeldeinformationen. Halten Sie Wiedergabeeingaben maskiert.
+Kinky Makers maskiert den gesamten gerenderten Text und die Admin-Wiedergabe bleibt deaktiviert.
+
+## Freigabeverifizierung
+
+Nach jeder Staging- oder Produktionsbereitstellung:
+
+1. Bestätigen Sie, dass ein Ereignis die erwartete `environment`-, Git-SHA-Bereitstellung enthält
+   ID, Anwendungsversion, Dienst und Plattform.
+2. Bestätigen Sie, dass Web- und native Ereignisse für dasselbe RAD-Konto dieselben Zahlen verwenden
+   eindeutige ID.
+3. Bestätigen Sie die Abmeldung, gefolgt von einer anderen Anmeldung, wodurch keine Identitätszusammenführung erfolgt
+   Verschluckungswarnung.
+4. Bestätigen Sie, dass Web-, Admin-, Kinky Makers-, native und Edge-Funktionsdaten verfügbar sind
+   getrennt nach Service und Umgebung.
+5. Bestätigen Sie, dass eine Testausnahme über die hochgeladene Quellzuordnung zur Quelle aufgelöst wird
+   oder native Symbole.
+6. Bestätigen Sie, dass ein Serverausfall ein Fehlerproblem und ein entsprechendes OTLP-Protokoll verursacht.
+7. Bestätigen Sie, dass Geräteereignisse eine `device`-Gruppe und keine rohe MAC-Adresse enthalten.
+
+Das Repository-Runbook unter `docs/posthog-observability.md` enthält die
+entsprechende Betreiber-Checkliste.

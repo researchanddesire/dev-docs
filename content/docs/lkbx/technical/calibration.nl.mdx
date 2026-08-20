@@ -1,0 +1,90 @@
+---
+title: "Kalibratie"
+description: "Leer hoe uw Chastity Lockbox zichzelf kalibreert en wat u moet doen als u het kalibratiescherm tegenkomt"
+---
+
+<iframe
+  className="w-volledig aspect-video afgerond-xl"
+  src="https://www.loom.com/embed/481662e9ed284264b539d9e5fe4ac691"
+  title="Hoe u uw lockbox kunt kalibreren"
+  frameBorder = "0"
+  allow="accelerometer; autoplay; klembord-schrijven; gecodeerde media; gyroscoop; beeld-in-beeld"
+  toestaanVolledig scherm
+></iframe>
+
+<AccordionGroup>
+  <Accordion title="Videotranscriptie">
+    0:00 Hallo daar! Als u hier bent, komt dat waarschijnlijk omdat u dit kalibratiebericht op uw kuisheidsslotbox ziet. Dit kan gebeuren als uw apparaat opnieuw is geflashed of als de kalibratie om een ​​of andere reden is gereset.
+
+    0:11 Dit is geen probleem, u hoeft het alleen maar te vertellen of de instructies op het scherm te volgen. Dus hier vraagt ​​hij me om de rechterknop ingedrukt te houden om te kalibreren.
+
+    0:21 Dat identificeert welke pin de juiste knop is, en dan wordt de motor gekalibreerd.
+  </Accordion>
+</AccordionGroup>
+
+## Wat is kalibratie?
+
+Kalibratie is een automatisch proces dat uw Chastity Lockbox leert hoe deze in elkaar zit en hoe deze zou moeten functioneren. Deze stap zorgt ervoor dat uw apparaat correct en veilig werkt.
+
+## Wanneer vindt kalibratie plaats?
+
+<Tip>
+Uw Chastity Lockbox wordt vooraf gekalibreerd en klaar voor gebruik uit de doos geleverd.
+</Tip>
+
+Alleen in deze situaties kom je het kalibratiescherm tegen:
+
+1. **Na het flashen van de firmware** — Als u de software van uw apparaat hebt bijgewerkt, wordt de kalibratie eenmalig automatisch uitgevoerd
+2. **Na een fabrieksreset**: als u het apparaat opnieuw instelt, worden de opgeslagen kalibratiegegevens gewist
+
+## Wat configureert kalibratie?
+
+Kalibratie detecteert en stelt automatisch drie kritische parameters in:
+
+| Instelling | Doel |
+|---------|---------|
+| **Motororiëntatie** | Bepaalt in welke richting de motor draait om te vergrendelen en ontgrendelen |
+| **Vergrendelingsdetectie** | Leert het apparaat hoe het kan verifiëren of het veilig is vergrendeld |
+| **Motorvermogensniveau** | Stelt optimaal vermogen in voor veilige vergrendeling en minimaliseert het leeglopen van de batterij |
+
+## Het kalibratiescherm tegenkomen
+
+<Steps>
+  <Step title="Knopkalibratie">
+    Het apparaat geeft "Kalibreren" weer en vraagt ​​u de Enter-knop ingedrukt te houden. Hiermee wordt geïdentificeerd welke fysieke pin overeenkomt met welke knop. Sommige hardwarevarianten hebben verschillende configuraties.
+
+    Houd de Enter/Lock-knop (de rechterknop) ingedrukt totdat het apparaat dit bevestigt.
+  </Step>
+  <Step title="Motorkalibratie">
+    Het apparaat geeft "Motor kalibreren" weer en test automatisch het vergrendelingsmechanisme:
+
+    1. De motor probeert te vergrendelen
+    2. Sensoren verifiëren de slotpositie
+    3. De motor probeert te ontgrendelen
+    4. Sensoren verifiëren de ontgrendelingspositie
+
+    Dit bepaalt of de motorrichting moet worden omgekeerd voor uw hardware.
+
+    <Warning>
+    Schakel het apparaat niet uit tijdens de motorkalibratie. Het proces duurt ongeveer 6 seconden.
+    </Warning>
+  </Step>
+  <Step title="Automatische herstart">
+    Nadat de kalibratie met succes is voltooid, wordt het apparaat automatisch opnieuw opgestart en keert het terug naar de normale werking.
+
+    <Check>
+    U zult het kalibratiescherm niet meer zien tenzij u de firmware opnieuw flasht of een fabrieksreset uitvoert.
+    </Check>
+  </Step>
+</Steps>
+
+## Kalibratiefouten
+
+Als de kalibratie mislukt (de motor bereikt de verwachte posities niet), kan het apparaat:
+- Probeer de kalibratie automatisch opnieuw
+- Geef een fout weer die handmatige tussenkomst vereist
+- Moet opnieuw worden geflashed via de webflitser
+
+<Note>
+Als u problemen ondervindt met de kalibratie of als uw apparaat niet reageert zoals verwacht, neem dan contact op met de klantenondersteuning via support@researchanddesire.com.
+</Note>

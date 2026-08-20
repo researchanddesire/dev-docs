@@ -1,0 +1,113 @@
+---
+title: "Sensorspezifikationen"
+description: "Technische Grenzen und Möglichkeiten des Abstandssensors"
+---
+
+Der Deepthroat Trainer nutzt einen Ultraschall-Abstandssensor, um die Position des Spielzeugs in Echtzeit zu messen. Wenn Sie die Fähigkeiten und Grenzen des Sensors kennen, können Sie die genauesten Trainingsergebnisse erzielen.
+
+## Sensorreichweite
+
+| Spezifikation | Wert |
+|---------------|-------|
+| **Maximale Reichweite** | 22,5 cm (ca. 9 Zoll) |
+| **Tote Zone** | 1,7 cm (ca. 0,67 Zoll) |
+| **Effektiver Nutzbereich** | 20,8 cm (ca. 8,2 Zoll) |
+| **Mindesthublänge** | 0,8 cm (ca. 0,3 Zoll) |
+
+<Info>
+Die Totzone ist der Bereich, der dem Sensor am nächsten liegt und Positionsänderungen nicht genau erkennen kann. Objekte innerhalb dieser Zone werden möglicherweise nicht richtig registriert.
+</Info>
+
+## Wie der Sensor funktioniert
+
+Der Abstandssensor erfasst kontinuierlich Ihre Position und verarbeitet die Daten, um reibungslose und genaue Messwerte zu liefern:
+
+- **Abtastrate**: 40 Abtastwerte werden gemittelt, um das Rauschen zu reduzieren
+- **Geschwindigkeitsberechnung**: Basierend auf Positionsänderungen im Laufe der Zeit
+- **Richtungserkennung**: Verfolgt, ob Sie sich auf den Sensor zu oder von ihm weg bewegen
+
+<Note>
+Der Sensor verwendet einen Ringpuffer der letzten Messwerte. Bei plötzlichen, ruckartigen Bewegungen kann es einen Moment dauern, bis der Puffer aktualisiert wird.
+</Note>
+
+## Positionsmessung
+
+Positionen werden in Zentimetern vom Sensor gemessen:
+
+- **Startposition**: Normalerweise die „Ruheposition“, weiter vom Sensor entfernt
+- **Endposition**: Die Zieltiefe, näher am Sensor
+- **Zielfenster**: Der akzeptable Bereich um die Zielposition
+
+Für die Trainingsgenauigkeit werden die Positionen auf gültige Bereiche beschränkt:
+- Minimale erkennbare Position: 1,7 cm (Totzonengrenze)
+- Maximal erkennbare Position: 22,5 cm
+
+## Kalibrierung
+
+Die Kalibrierung erfasst zwei Schlüsselpositionen:
+
+1. **Minimale Position**: Die nächstgelegene angenehme Tiefe (gemittelt aus 100 Proben)
+2. **Maximale Position**: Die Ruhe-/Startposition (100 Proben gemittelt)
+
+<Tip>
+Um optimale Ergebnisse zu erzielen, halten Sie das Gerät während der Kalibrierung ruhig. Der Trainer erfasst an jeder Position 100 Proben, um genaue Messungen sicherzustellen.
+</Tip>
+
+### Spielzeugkalibrierung vs. Gerätekalibrierung
+
+- **Gerätekalibrierung**: Legt den gesamten Sensorbereich für Ihr Setup fest
+- **Spielzeugkalibrierung**: In der Cloud gespeichert, speichert die Einstellungen für bestimmte Spielzeuge
+
+Bei Verwendung der Cloud-Kalibrierung (Software 2.0+) werden die Kalibrierungsdaten pro Spielzeug gespeichert und sitzungsübergreifend synchronisiert.
+
+## Einschränkungen
+
+### Tote Zone
+Objekte im Umkreis von 1,7 cm um den Sensor können nicht genau gemessen werden. Trainingssegmente werden automatisch angepasst, um diese Grenze einzuhalten.
+
+### Maximale Reichweite
+Der Sensor kann keine Positionen über 22,5 cm erkennen. Wenn Ihr Setup längere Distanzen erfordert, sollten Sie eine Neupositionierung des Trainers in Betracht ziehen.
+
+### Minimaler Hub
+Sehr kleine Bewegungen (weniger als 0,8 cm) werden möglicherweise nicht als separate Striche registriert. Dadurch wird sichergestellt, dass der Trainer Mikrobewegungen nicht als absichtliche Handlungen zählt.
+
+### Umweltfaktoren
+
+<Warning>
+Der Sensor kann beeinträchtigt sein durch:
+- Reflektierende Oberflächen in der Nähe des Erfassungsbereichs
+- Sehr weiche oder schallabsorbierende Materialien
+- Extreme Temperaturen
+</Warning>
+
+## Fehlerbehebung
+
+<AccordionGroup>
+<Accordion title="Die Sensorwerte scheinen ungenau zu sein">
+- Kalibrieren Sie das Gerät neu
+- Stellen Sie sicher, dass das Spielzeug richtig im Weg des Sensors positioniert ist
+- Stellen Sie sicher, dass der Erfassungsbereich durch nichts behindert wird
+</Accordion>
+
+<Accordion title="Positionssprünge oder Stottern">
+- Dies kann in der Nähe der Totzonengrenze auftreten
+- Versuchen Sie, Ihre Segmentparameter anzupassen, um extreme Bereiche zu vermeiden
+- Stellen Sie sicher, dass sich das Spielzeug reibungslos bewegt, ohne zu wackeln
+</Accordion>
+
+<Accordion title="Kleine Bewegungen werden nicht erkannt">
+Bewegungen kleiner als 0,8 cm werden möglicherweise nicht registriert. Dies ist beabsichtigt, um falsche Messwerte durch Vibrationen oder geringfügige Anpassungen zu verhindern.
+</Accordion>
+</AccordionGroup>
+
+## Verwandte Leitfäden
+
+<CardGroup cols={2}>
+<Card title="LED-Feedback" icon="lightbulb" href="https://docs.researchanddesire.com/dtt/troubleshooting">
+Wie LED-Farben Ihren Positionsstatus anzeigen.
+</Card>
+
+<Card title="Kalibrierung" icon="sliders" href="/dtt/technical/calibration">
+Schritt-für-Schritt-Anleitung zur Kalibrierung Ihres Trainers.
+</Card>
+</CardGroup>

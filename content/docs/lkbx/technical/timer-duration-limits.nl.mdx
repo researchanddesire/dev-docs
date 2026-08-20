@@ -1,0 +1,161 @@
+---
+title: "Timerduurlimieten"
+description: "Volledige referentie voor slottimerduur, van 30 seconden tot 1000 jaar"
+---
+
+Wanneer u een tijdslot op uw Chastity Lockbox instelt, kunt u een tijdsduur kiezen van 30 seconden tot meer dan 1000 jaar. In deze handleiding wordt uitgelegd hoe het timersysteem werkt en welke tijdsduur beschikbaar is.
+
+## Overzicht duurbereik
+
+| Minimum | Maximaal |
+|---------|---------|
+| 30 seconden | 1000 jaar |
+
+<Info>
+De timer maakt intern gebruik van millisecondenprecisie en ondersteunt een extreem nauwkeurige timing voor elke duur binnen dit bereik.
+</Info>
+
+## De duur instellen
+
+Wanneer u **Vergrendelen** selecteert in het hoofdmenu, verschijnt het timerconfiguratiescherm:
+
+1. **Draai aan de encoder** om de duur aan te passen
+2. Een visuele boogindicator toont uw positie binnen het huidige eenheidsbereik
+3. De duur wordt weergegeven in een voor mensen leesbaar formaat (bijvoorbeeld '10 minuten', '3 dagen')
+4. **Druk op Enter** om te bevestigen en de vergrendeling te starten
+
+### Standaard startwaarde
+
+De timer start standaard op **10 minuten** en is in het minutenbereik geplaatst voor snelle aanpassing.
+
+## Duureenheden en stappen
+
+De encoder wijst verschillende tijdseenheden toe, afhankelijk van de huidige waarde. Naarmate u de duur verlengt, verandert de eenheid automatisch:
+
+### Seconden (30-120 seconden)
+
+| Bereik | Verhogen | Voorbeeldwaarden |
+|-------|-----------|----------------|
+| 30–120 seconden | 1 seconde | Jaren 30, 31, 32... 120 |
+
+### Minuten (1–120 minuten)
+
+| Bereik | Verhogen | Voorbeeldwaarden |
+|-------|-----------|----------------|
+| 1–120 minuten | 1 minuut | 1 min, 2 min... 120 min |
+
+### Uren (2–24 uur)
+
+| Bereik | Verhogen | Voorbeeldwaarden |
+|-------|-----------|----------------|
+| 2–24 uur | 1 uur | 2 uur, 3 uur, 4 uur... 24 uur |
+
+### Dagen (1–30 dagen)
+
+| Bereik | Verhogen | Voorbeeldwaarden |
+|-------|-----------|----------------|
+| 1–30 dagen | 1 dag | 1 dag, 2 dagen... 30 dagen |
+
+### Weken (4–8 weken)
+
+| Bereik | Verhogen | Voorbeeldwaarden |
+|-------|-----------|----------------|
+| 4–8 weken | 1 week | 4 weken, 5 weken... 8 weken |
+
+### Maanden (2–12 maanden)
+
+| Bereik | Verhogen | Voorbeeldwaarden |
+|-------|-----------|----------------|
+| 2–12 maanden | 1 maand | 2 maanden, 3 maanden... 12 maanden |
+
+### Jaar (1-1000 jaar)
+
+| Bereik | Verhogen | Voorbeeldwaarden |
+|-------|-----------|----------------|
+| 1–1000 jaar | 1 jaar | 1 jaar, 2 jaar... 1000 jaar |
+
+<Warning>
+Extreem lange duur wordt technisch ondersteund, maar wordt niet aanbevolen. Overweeg het gebruik van de **Lock Forever**-modus met sleutelhoudercontrole voor sloten voor onbepaalde tijd in plaats van het instellen van timers voor meerdere jaren.
+</Warning>
+
+## Visuele boogindicator
+
+Op het timerscherm wordt een halfronde boog weergegeven die uw positie binnen het huidige eenheidsbereik aangeeft:
+
+- **Lege boog**: Op het minimum van de huidige eenheid
+- **Volle boog**: Op het maximum van de huidige eenheid
+- **Gedeeltelijke vulling**: toont relatieve positie
+
+De boog wordt gereset wanneer u een nieuw eenheidsbereik binnengaat (bijvoorbeeld van minuten naar uren).
+
+## Encoderversnelling
+
+De encoder heeft versnelling ingeschakeld voor timerconfiguratie:
+
+- **Langzame bochten**: nauwkeurige wijzigingen in één stap
+- **Snelle bochten**: grotere sprongen om snel je doel te bereiken
+
+<Tip>
+Voor zeer lange speelduur draait u snel aan de encoder om sneller door de bereiken te gaan, en vertraagt ​​u vervolgens om nauwkeurig af te stemmen.
+</Tip>
+
+## Tijd berekeningen
+
+Intern worden de duur opgeslagen in milliseconden met behulp van deze conversies:
+
+| Eenheid | Milliseconden |
+|------|--------------|
+| 1 seconde | 1,000 |
+| 1 minuut | 60,000 |
+| 1 uur | 3,600,000 |
+| 1 dag | 86,400,000 |
+| 1 week | 604,800,000 |
+| 1 maand | 2.629.746.000 (~30,44 dagen) |
+| 1 jaar | 31.556.952.000 (~365,24 dagen) |
+
+<Note>
+Maand- en jaarberekeningen maken gebruik van gemiddelde lengtes om rekening te houden met variërende maandlengtes en schrikkeljaren.
+</Note>
+
+## Weergaveformaat
+
+Het timerdisplay past zich aan op basis van de duur:
+
+| Duur | Weergaveformaat |
+|----------|---------------|
+| Minder dan 1 uur | MM:SS (bijvoorbeeld "05:30") |
+| 1–24 uur | Xh MM:SS (bijvoorbeeld "2h 30:00") |
+| 1–30 dagen | Xd Xh MM:SS (bijvoorbeeld "3d 5h 30:00") |
+| Meer dan 30 dagen | Vereenvoudigd (bijvoorbeeld '2 maanden') |
+
+## Dashboard versus apparaattimers
+
+Wanneer u het dashboard gebruikt om sloten te maken:
+
+- **Dashboard**: Kan verschillende voorinstellingen en opties voor de duur bieden
+- **Apparaat**: gebruikt het hier beschreven encodergebaseerde systeem
+- Beide synchroniseren wanneer verbonden met WiFi
+
+<Info>
+Vergrendelingen die via het dashboard zijn aangemaakt, worden door uw apparaat ontvangen en geven de resterende tijd weer in hetzelfde formaat.
+</Info>
+
+## Gerelateerde handleidingen
+
+<CardGroup cols={2}>
+<Card title="Snel beginnen" icon="rocket" href="https://docs.researchanddesire.com/lockbox/get-started">
+Leer hoe u uw eerste slot kunt starten.
+</Card>
+
+<Card title="Permalock-modus" icon="infinity" href="../device-states/permalock">
+Onbepaalde sloten zonder tijdslimiet.
+</Card>
+
+<Card title="Knopbediening" icon="hand-pointer" href="./button-controls">
+Hoe de encoder te gebruiken voor timerselectie.
+</Card>
+
+<Card title="Tijd verbergen" icon="eye-slash" href="../using/hiding-time">
+Verberg de resterende tijd voor extra mysterie.
+</Card>
+</CardGroup>

@@ -1,0 +1,229 @@
+---
+title: "Système de capteurs"
+description: "Documentation technique pour la détection de verrouillage et les capteurs de plaque arrière de votre Chastity Lockbox"
+---
+
+Votre Chastity Lockbox utilise plusieurs capteurs pour détecter l’état du verrouillage et la position de la plaque arrière. Ce guide explique comment fonctionne le système de capteurs et ce que l'appareil surveille.
+
+## Présentation du capteur
+
+Votre appareil dispose de deux types de capteurs :
+
+| Type de capteur | Quantité | But |
+|-------------|----------|---------|
+| Capteurs RTM | 3 | Détecter la position de la palette de verrouillage |
+| Capteurs à effet Hall | 2 | Détecter la présence de la plaque arrière |
+
+## Capteurs TMR (détection de palette)
+
+Trois capteurs TMR (Tunnel Magnetoresistance) détectent si la palette de verrouillage est en position verrouillée ou déverrouillée.
+
+### Comment ils fonctionnent
+
+- Les capteurs détectent le champ magnétique de la pagaie
+- Lorsque la palette est en position verrouillée, les capteurs indiquent FAIBLE
+- Lorsque la palette est déverrouillée, les capteurs indiquent HIGH
+
+### Logique de détection
+
+L'appareil considère la palette **verrouillée** lorsque :
+
+```
+(TMR1 AND TMR2 AND TMR3) OR
+(TMR1 AND TMR2) OR
+(TMR1 AND TMR3) OR
+(TMR2 AND TMR3)
+```
+
+<Info>
+Deux des trois capteurs détectant la position verrouillée sont suffisants. Cela fournit une redondance : si un capteur tombe en panne, la détection du verrouillage fonctionne toujours.
+</Info>
+
+### Pourquoi trois capteurs ?
+
+- **Redondance** : le vote deux sur trois garantit une détection fiable
+- **Tolérance aux pannes** : la défaillance d'un seul capteur n'interrompt pas la détection du verrouillage
+- **Précision** : plusieurs capteurs réduisent les fausses lectures
+
+## Capteurs à effet Hall (détection de plaque arrière)
+
+Deux capteurs à effet Hall détectent si la plaque arrière est correctement fixée.
+
+### Comment ils fonctionnent
+
+- Les capteurs détectent les aimants intégrés dans la plaque arrière
+- Lorsque la plaque arrière est fixée, au moins un capteur indique FAIBLE
+- Lorsque la plaque arrière est retirée, les deux capteurs indiquent HIGH
+
+### Logique de détection
+
+L'appareil considère la plaque arrière comme **fermée** lorsque :
+
+```
+Hall1 OR Hall2
+```
+
+L’un ou l’autre capteur détectant l’aimant de la plaque arrière est suffisant.
+
+<Warning>
+L'appareil ne permettra pas le verrouillage si la plaque arrière n'est pas détectée. Il s'agit d'un dispositif de sécurité destiné à empêcher le verrouillage sans fermeture appropriée.
+</Warning>
+
+## Vérification des capteurs pendant les opérations
+
+### Opération de verrouillage
+
+Lorsque vous lancez un verrouillage :
+
+1. Le moteur entraîne la palette en position de verrouillage
+2. L'appareil attend jusqu'à 2 secondes pour que la palette atteigne la position
+3. Les capteurs TMR vérifient que la palette est verrouillée
+4. Les capteurs à effet Hall vérifient que la plaque arrière est fermée
+5. Si tous les contrôles sont réussis → Verrouillage confirmé
+6. Si les vérifications échouent → Erreur affichée
+
+### Opération de déverrouillage
+
+Lorsque l'appareil se déverrouille :
+
+1. Le moteur entraîne la palette pour déverrouiller la position
+2. L'appareil attend jusqu'à 2 secondes pour que la palette bouge
+3. Les capteurs TMR vérifient que la palette est déverrouillée
+4. Si le contrôle réussit → Déverrouillage confirmé
+5. Si la vérification échoue → Erreur E-LOCK-2 affichée
+
+## Conditions d'erreur
+
+| Erreur | Condition | Capteurs impliqués |
+|-------|-----------|-----------------|
+| E-LOCK-1 | Impossible de verrouiller | Les capteurs TMR ne détectent pas la position verrouillée |
+| E-LOCK-2 | Impossible de déverrouiller | Les capteurs TMR détectent toujours la position verrouillée |
+| E-LOCK-3 | Pas de plaque arrière | Les capteurs à effet Hall ne détectent pas la plaque arrière |
+
+<Tip>
+La plupart des erreurs de capteur sont causées par une obstruction physique. Vérifiez que rien ne bloque le mouvement de la palette et que la plaque arrière est correctement installée.
+</Tip>
+
+## Journalisation des activités
+
+Lorsqu'il est connecté au WiFi, votre appareil signale périodiquement les états des capteurs au tableau de bord :
+
+### Données déclarées
+
+| Champ | Description |
+|-------|-------------|
+| tmr1, tmr2, tmr3 | États individuels des capteurs TMR |
+| salle1, salle2 | États individuels des capteurs Hall |
+| estPaddleLocked | État de verrouillage des palettes calculé |
+| isBackplateClosed | État calculé de la plaque arrière |
+| État actuel | Position de la machine à états de l'appareil |
+| Pourcentage de batterie | Niveau actuel de la batterie |
+| est en charge | Alimentation USB connectée |
+
+### Quand les journaux sont envoyés
+
+- Sur les changements d'état (événements de verrouillage/déverrouillage)
+- Sur les changements d'état du capteur
+- Périodiquement pendant les séances actives
+
+<Info>
+Cette télémétrie aide votre détenteur de clé à surveiller l'état de l'appareil et permet à l'assistance de diagnostiquer les problèmes à distance.
+</Info>
+
+## Surveillance actuelle
+
+Un capteur de courant INA219 surveille le courant du moteur pendant les opérations de verrouillage/déverrouillage :
+
+### But
+
+- Détecter quand le moteur a terminé son mouvement
+- Empêcher les dommages au moteur de caler
+- Vérifier le bon fonctionnement
+
+### Limites actuelles
+
+Si le courant moyen dépasse 50 mA pendant une période prolongée pendant le fonctionnement du moteur, celui-ci s'arrête automatiquement pour éviter tout dommage.
+
+## État du capteur dans l'interface utilisateur
+
+L'icône de verrouillage dans la barre d'état reflète l'état du capteur :
+
+| Icône de verrouillage | État de la pagaie | Point indicateur | État de la plaque arrière |
+|-----------|--------------|---------------|-----------------|
+| Fermé | Palette en position verrouillée | Vert | Plaque arrière détectée |
+| Fermé | Palette en position verrouillée | Jaune | Plaque arrière non détectée |
+| Débloqué | Palette en position déverrouillée | Vert | Plaque arrière détectée |
+| Débloqué | Palette en position déverrouillée | Jaune | Plaque arrière non détectée |
+
+Voir [Symboles d'état](../using/symbols) pour des descriptions détaillées des icônes.
+
+## Dépannage des problèmes de capteur
+
+<AccordionGroup>
+<Accordion title="E-LOCK-1 : Impossible de verrouiller">
+Les capteurs TMR ne détectent pas la palette en position verrouillée. Vérifier:
+- Rien ne bloque la pagaie
+- La plaque arrière est correctement installée
+- Essayez de recalibrer si le problème persiste
+</Accordion>
+
+<Accordion title="E-LOCK-2 : Impossible de déverrouiller">
+Les capteurs TMR détectent toujours la palette comme verrouillée. Vérifier:
+- Rien n'empêche le mouvement de la pagaie
+- L'appareil dispose d'une batterie suffisante
+- Contactez l'assistance si le moteur sonne mais que la palette ne bouge pas
+</Accordion>
+
+<Accordion title="E-LOCK-3 : pas de plaque arrière">
+Les capteurs Hall ne détectent pas la plaque arrière. Vérifier:
+- La plaque arrière est entièrement en place et s'enclenche
+- Nettoyer la zone de contact entre l'appareil et la plaque arrière
+- Éloignez-vous des sources magnétiques puissantes
+</Accordion>
+
+<Accordion title="Indicateur de plaque arrière jaune">
+L'indicateur de la plaque arrière s'affiche en jaune lorsque les capteurs Hall ne détectent pas la plaque arrière. Assurez-vous que la plaque arrière est entièrement fixée avant de la verrouiller.
+</Accordion>
+</AccordionGroup>
+
+## Spécifications techniques
+
+### Capteurs RTM
+
+| Paramètre | Valeur |
+|-----------|-------|
+| Épingles | 17, 18, 21 |
+| État actif | FAIBLE lorsque la palette est détectée |
+| Vote | 2 sur 3 requis |
+
+### Capteurs à effet Hall
+
+| Paramètre | Valeur |
+|-----------|-------|
+| Épingles | 6, 15 |
+| État actif | FAIBLE lorsque l'aimant est détecté |
+| Vote | 1 sur 2 requis |
+
+### Capteur de courant (INA219)
+
+| Paramètre | Valeur |
+|-----------|-------|
+| Broches I2C | SDA : 9, SCL : 10 |
+| Limite actuelle | 50 mA en moyenne |
+| Période de surveillance | Pendant les opérations du moteur |
+
+## Guides associés
+
+<CardGroup cols={2}>
+<Card title="Erreurs de périphérique" icon="triangle-exclamation" href="../errors/introduction">
+Dépannage des codes d'erreur.
+</Card>
+
+<Card title="Symboles d'état" icon="display" href="../using/symbols">
+Comprendre les indicateurs de verrouillage et de plaque arrière.
+</Card>
+
+<Card title="Calibrage" icon="sliders" href="../device-states/calibration">
+Comment l’étalonnage configure les capteurs.
+</Card>
+</CardGroup>

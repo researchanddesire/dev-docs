@@ -1,0 +1,244 @@
+---
+title: „PCB-Übersicht“
+description: „Technische Dokumentation für die RADR-Hauptplatine (OSSM Wireless v0.4)“
+---
+
+In diesem Abschnitt wird das Haupt-PCB-Design von RADR behandelt, einschließlich Schaltplänen, Komponentenspezifikationen und Fertigungsdateien.
+
+## Board-Übersicht
+
+| Spezifikation | Wert |
+|---------------|-------|
+| Vorstandsname | OSSM Wireless |
+| Version | v0.4 |
+| Mikrocontroller | ESP32-S3 mit PSRAM |
+| Design-Software | Altium-Designer |
+| Anzahl der Ebenen | 2 (geschätzt) |
+
+Die RADR-Leiterplatte integriert die gesamte Elektronik, die für eine eigenständige drahtlose Fernbedienung erforderlich ist, einschließlich Mikrocontroller, Anzeigeschnittstelle, Energieverwaltung, Benutzereingaben und Feedbacksystemen.
+
+<Frame>
+<img src="/radr/hardware/PCB/RADR-PCB-render.webp" alt="RADR PCB-Render" />
+</Frame>
+
+## Kernkomponenten
+
+### Mikrocontroller
+
+| Parameter | Wert |
+|-----------|-------|
+| MCU | ESP32-S3 |
+| Erinnerung | Enthält PSRAM |
+| Kabellos | WLAN + Bluetooth LE |
+| Betriebsspannung | 3,3 V |
+
+Der ESP32-S3 bietet:
+- Dual-Core-Xtensa-LX7-Prozessor
+- Integriertes Bluetooth Low Energy für die Gerätekommunikation
+- Ausreichend GPIO für alle Ein-, Ausgänge und Peripheriegeräte
+- Energiesparende Schlafmodi zur Batterieschonung
+
+### Energieverwaltung
+
+| Komponente | Funktion |
+|-----------|----------|
+| USB-C-Anschluss | 5V Ladeeingang |
+| Lade-IC | Laden des LiPo-Akkus |
+| MAX17048 | Tankanzeige (Batterieüberwachung) |
+| LDO/Regler | 3,3V Systemstrom |
+
+Das Stromversorgungssystem unterstützt:
+- USB-C-Aufladung (5V-Eingang)
+- LED-Anzeige für Hardware-Ladevorgang
+- Präziser Batterieprozentsatz über I²C-Tankanzeige
+- Tiefschlafstrom < 100μA
+
+### Anzeigeschnittstelle
+
+| Parameter | Wert |
+|-----------|-------|
+| Anzeigetyp | TFT-LCD |
+| Auflösung | 320 x 240 Pixel |
+| Farbtiefe | 16-Bit (RGB565) |
+| Schnittstelle | SPI |
+| Hintergrundbeleuchtung | PWM-gesteuert |
+
+### Benutzereingaben
+
+| Eingang | Typ | GPIO |
+|-------|------|------|
+| Linker Encoder | Drehen + Drücken | GPIO 10, 11 |
+| Rechter Encoder | Drehen + Drücken | GPIO 42, 41 |
+| Linke Schulter | Momentaner Schalter | GPIO 48 |
+| Rechte Schulter | Momentaner Schalter | GPIO 1 |
+| Unter dem Bildschirm links | Momentaner Schalter | GPIO 38 |
+| Unter-Bildschirm-Mitte | Momentaner Schalter | GPIO 39 |
+| Unter dem Bildschirm rechts | Momentaner Schalter | GPIO 40 |
+
+<Note>
+Die angezeigten GPIO-Zuweisungen gelten für v0.4-Boards mit PSRAM. Frühere v1.x-Boards verwenden unterschiedliche Pins für den linken Encoder (GPIO 35, 36) und LEDs (GPIO 37).
+</Note>
+
+### Feedback-Ausgänge
+
+| Komponente | Typ | GPIO |
+|-----------|------|------|
+| Status-LEDs | WS2812B RGB (x3) | GPIO 12 |
+| Summer | Piezoelektrisch | GPIO 2 |
+| Vibrationsmotor | ERM-Motor | GPIO 47 |
+
+### Erweiterung
+
+| Stecker | Schnittstelle | Zweck |
+|-----------|-----------|---------|
+| QWIIC | I²C | Externe Sensoren/Peripheriegeräte |
+| USB-C | USB 2.0 | Programmieren und Laden |
+
+## Schematische Abschnitte
+
+Der Schaltplan ist in Funktionsblöcke unterteilt:
+
+| Abschnitt | Beschreibung |
+|---------|-------------|
+| Leistung | USB-C-Eingang, Ladeschaltung, Spannungsregelung |
+| MCU | ESP32-S3, Quarz, Reset, Boot-Auswahl |
+| Anzeige | TFT-LCD-Anschluss, Hintergrundbeleuchtungstreiber |
+| Eingaben | Drehgeber, Tasten, Pull-Up/Pull-Down-Widerstände |
+| Rückmeldung | LED-Datenleitung, Summertreiber, Motortreiber |
+| Batterie | MAX17048 Tankanzeige, Batterieanschluss |
+| Erweiterung | QWIIC-Anschluss, Programmier-Header |
+
+## Überlegungen zum PCB-Layout
+
+### Komponentenplatzierung
+
+- **MCU** zentral positioniert für ausgewogenes Trace-Routing
+- **USB-C**-Anschluss an der Platinenkante für Zugänglichkeit
+- **Display-Anschluss** für die Flachbandkabelführung zum Gehäuse ausgerichtet
+- **Batterieanschluss** für die interne Batterieplatzierung positioniert
+- **QWIIC-Anschluss** zugänglich für Erweiterungsmodule
+
+### Überlegungen zur Antenne
+
+Der ESP32-S3 verwendet eine integrierte PCB-Antenne oder eine externe Antenne (versionsabhängig). Der Antennenbereich sollte freigehalten werden von:
+- Masseebenen direkt darunter
+- Nähe zum Metallgehäuse
+- Hochfrequente Schaltsignale
+
+<Warning>
+Platzieren Sie keine Komponenten und verlegen Sie keine Leiterbahnen in der Sperrzone der Antenne. Dadurch wird die WLAN-Leistung erheblich beeinträchtigt.
+</Warning>
+
+## Designdateien
+
+Alle Designdateien sind im GitHub-Repository verfügbar:
+
+| Datei | Format | Beschreibung |
+|------|--------|-------------|
+| PCB – OSSM Wireless v0.4.pcbdoc | Altium-Designer | PCB-Layout mit Kupfer, Siebdruck, Bohrdateien |
+| Schaltplan – OSSM Wireless V0.4.schdoc | Altium-Designer | Vollständige schematische Erfassung |
+| RADR-Schema – OSSM Wireless V0.4.pdf | PDF | Druckbare schematische Referenz |
+| RADR BOM – OSSM Wireless – v0.4 – S3.xlsx | Excel | Stückliste mit Teilenummern |
+| RADR PCB render.png | PNG | 3D-Rendering der zusammengebauten Platine |
+
+<Card title="Designdateien herunterladen" icon="download" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Hardware/Electronics">
+Greifen Sie auf Altium-Projektdateien, Gerbers und Stücklisten auf GitHub zu.
+</Card>
+
+## Herstellung
+
+### PCB-Herstellung
+
+Empfohlene Spezifikationen für die Bestellung:
+
+| Parameter | Wert |
+|-----------|-------|
+| Schichten | 2 |
+| Dicke | 1,6 mm |
+| Oberflächenbeschaffenheit | HASL oder ENIG |
+| Kupfergewicht | 1 Unze |
+| Lötmaske | Jede Farbe |
+| Siebdruck | Weiß |
+
+### Montageoptionen
+
+| Verfahren | Empfohlen für |
+|--------|-----------------|
+| Handmontage | Prototypen, Einzelstücke |
+| PCBA-Service | Produktionsmengen |
+
+<Tip>
+Dienste wie JLCPCB und PCBWay bieten kombinierte Leiterplattenfertigung und -montage. Laden Sie die Gerbers und die Stückliste hoch, um eine schlüsselfertige Lösung zu erhalten.
+</Tip>
+
+### Kritische Komponenten
+
+Diese Komponenten erfordern beim Zusammenbau besondere Aufmerksamkeit:
+
+| Komponente | Notizen |
+|-----------|-------|
+| ESP32-S3-Modul | Überprüfen Sie die Ausrichtung und stellen Sie sicher, dass alle Pads verlötet sind |
+| USB-C-Anschluss | Erfordert eine präzise Ausrichtung, auf Kurzschlüsse prüfen |
+| MAX17048 | Kleines QFN-Gehäuse, benötigt einen ordnungsgemäßen Reflow |
+| WS2812B-LEDs | Hitzeempfindlich, Reflow-Profil beachten |
+
+## Versionsgeschichte
+
+| Version | Änderungen |
+|---------|---------|
+| v0.4 | Aktuelle Version mit ESP32-S3 |
+
+<Note>
+Version v0.4 verwendet die ESP32-S3-Variante. Das Suffix „S3“ im BOM-Dateinamen weist auf diese Variante hin.
+</Note>
+
+## Fehlerbehebung
+
+<AccordionGroup>
+<Accordion title="Das Board lässt sich nicht einschalten">
+- Überprüfen Sie die USB-C-Verbindung und das Kabel
+- Überprüfen Sie den 3,3-V-Reglerausgang
+- Überprüfen Sie die Stromschienen auf Kurzschlüsse
+- Stellen Sie sicher, dass der Akku angeschlossen und geladen ist
+</Accordion>
+
+<Accordion title="Anzeige funktioniert nicht">
+- Überprüfen Sie die Verbindung des Flachbandkabels
+- SPI-Signale mit Oszilloskop prüfen
+- Bestätigen Sie das PWM-Signal der Hintergrundbeleuchtung
+- Testen Sie die Stromschienen des Displays
+</Accordion>
+
+<Accordion title="Bluetooth verbindet sich nicht">
+- Überprüfen Sie den Antennenbereich auf Kurzschlüsse oder Brücken
+- Stellen Sie sicher, dass ESP32-S3 richtig programmiert ist
+- Stellen Sie sicher, dass sich kein Metall in der Nähe der Antennenzone befindet
+- Test mit entfernter HF-Abschirmung (falls zutreffend)
+</Accordion>
+
+<Accordion title="Akku wird nicht geladen">
+- Überprüfen Sie, ob USB-C-CC-Widerstände vorhanden sind
+- Überprüfen Sie die Lade-IC-Anschlüsse
+- Batteriespannung am Stecker messen
+- Bestätigen Sie den Lade-LED-Schaltkreis
+</Accordion>
+
+<Accordion title="Tasten reagieren nicht">
+- Pull-Up-/Pull-Down-Widerstände prüfen
+- Überprüfen Sie die GPIO-Zuweisungen in der Firmware
+- Testen Sie den Durchgang von der Taste zur MCU
+- Auf kalte Lötstellen prüfen
+</Accordion>
+</AccordionGroup>
+
+## Verwandte Dokumentation
+
+<CardGroup cols={2}>
+<Card title="Batterie und Strom" icon="battery-full" href="/radr/hardware/specifications/battery-and-power">
+Detaillierte Energieverwaltungs- und Ladedokumentation.
+</Card>
+
+<Card title="Feedback-Systeme" icon="lightbulb" href="/radr/hardware/specifications/feedback-and-indicators">
+Details zu LED, Summer und Vibrationsmotor.
+</Card>
+</CardGroup>

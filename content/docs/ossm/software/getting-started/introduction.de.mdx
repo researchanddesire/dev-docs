@@ -1,0 +1,175 @@
+---
+title: "Einführung"
+description: "Dokumentation zur Einführung."
+---
+
+# Firmware-Übersicht
+
+Die Open Source Sex Machine (OSSM)-Firmware ist ein ESP32-basiertes Steuerungssystem, das Bewegungen, Benutzereingaben und Kommunikation für Ihr Gerät verwaltet. Dieser Leitfaden führt Sie durch die Projektarchitektur und hilft Ihnen beim Einrichten Ihrer Entwicklungsumgebung.
+
+## Kerntechnologien
+
+Die OSSM-Firmware basiert auf vier Schlüsseltechnologien, die zusammenarbeiten, um eine reaktionsschnelle und zuverlässige Bewegungssteuerung zu ermöglichen.
+
+<AccordionGroup>
+<Accordion title="Zustandsmaschine – Boost SML" icon="diagram-project">
+[SML steigern](https://boost-ext.github.io/sml/) (State Machine Language) ist eine reine Header-C++-Bibliothek, die eine domänenspezifische Sprache zum Definieren von Zustandsmaschinen bereitstellt.
+
+**Warum wir es verwenden:**
+- Die Überprüfung der Zustandsmaschine zur Kompilierungszeit erkennt Fehler vor der Laufzeit
+- Kein Laufzeitaufwand im Vergleich zu manuellen Switch-/Case-Implementierungen
+- Eine saubere, deklarative Syntax macht komplexe Zustandsübergänge lesbar
+- Behandelt Übergänge zwischen Zuständen wie Leerlauf, Betrieb, Fehler und Referenzfahrt
+
+Die Zustandsmaschine regelt die Betriebsmodi des Geräts und sorgt so für sichere Übergänge und vorhersehbares Verhalten. Einzelheiten finden Sie in der Dokumentation [Zustandsmaschinenarchitektur](/ossm/software/architecture/state-machine).
+</Accordion>
+
+<Accordion title="Anzeige – U8G2-Bibliothek" icon="display">
+[U8G2](https://github.com/olikraus/u8g2) ist eine monochrome Grafikbibliothek, die für eingebettete Systeme und OLED-Displays optimiert ist.
+
+**Warum wir es verwenden:**
+- Unterstützt eine breite Palette von Display-Controllern, einschließlich SSD1306 und SH1106
+- Minimaler Speicherbedarf, geeignet für den begrenzten RAM des ESP32
+- Integrierte Schriftartenwiedergabe mit mehreren Größen und Stilen
+- Hardwarebeschleunigtes Zeichnen für reibungslose UI-Updates
+
+U8G2 rendert die Schnittstelle auf dem Gerät, einschließlich Geschwindigkeit, Tiefe, Musterauswahl und Systemstatus.
+</Accordion>
+
+<Accordion title="Aufgabenverwaltung – FreeRTOS" icon="layer-group">
+[FreeRTOS](https://www.freertos.org/) ist ein Echtzeit-Betriebssystemkernel, der Multitasking auf eingebetteten Geräten ermöglicht.
+
+**Warum wir es verwenden:**
+- Führt mehrere gleichzeitige Aufgaben aus (Bewegungssteuerung, Anzeigeaktualisierungen, Eingabeverarbeitung)
+- Die prioritätsbasierte Planung stellt sicher, dass zeitkritische Bewegungsaufgaben zuverlässig ausgeführt werden
+- Kommunikation zwischen Aufgaben über Warteschlangen und Semaphoren
+- Standardmäßig in das ESP32-Arduino-Framework integriert
+
+Mit FreeRTOS kann die Firmware gleichzeitig Benutzereingaben verarbeiten, die Anzeige aktualisieren und ein präzises Motor-Timing beibehalten.
+</Accordion>
+
+<Accordion title="Bewegungssteuerung – StrokeEngine" icon="wave-pulse">
+[StrokeEngine](https://github.com/theelims/StrokeEngine) ist eine von theelims erstellte Bewegungsmusterbibliothek, die für OSSM-spezifische Anforderungen modifiziert wurde.
+
+**Warum wir es verwenden:**
+- Erzeugt sanfte, anpassbare Bewegungsmuster mit konfigurierbarer Geschwindigkeit und Tiefe
+- Unterstützt mehrere Mustertypen (konstant, zufällig, oszillierend und mehr)
+- Behandelt Beschleunigungsrampen zum Schutz des Motors
+- Bietet Parameteranpassung in Echtzeit ohne Bewegungsunterbrechung
+
+StrokeEngine übersetzt Benutzereinstellungen in präzise Motorbefehle und ermöglicht so die Vielfalt der in OSSM verfügbaren Bewegungsmuster.
+</Accordion>
+</AccordionGroup>
+
+## Erste Schritte
+
+Richten Sie Ihre Entwicklungsumgebung ein, indem Sie die folgenden Schritte ausführen.
+
+### Voraussetzungen
+
+Bevor Sie beginnen, stellen Sie sicher, dass Sie Folgendes haben:
+- Ein Computer mit Windows, macOS oder Linux
+- Git ist auf Ihrem System installiert
+- Eine Internetverbindung zum Herunterladen von Abhängigkeiten
+
+<Steps>
+<Step title="Installieren Sie VS Code und PlatformIO">
+Laden Sie [Visual Studio-Code](https://code.visualstudio.com/) herunter, installieren Sie es und fügen Sie dann die PlatformIO-Erweiterung hinzu.
+
+1. Öffnen Sie VS-Code
+2. Navigieren Sie zum Bedienfeld „Erweiterungen“ (Strg+Umschalt+X / Befehl+Umschalt+X).
+3. Suche nach „PlatformIO IDE“
+4. Klicken Sie auf **Installieren** und warten Sie, bis die Installation abgeschlossen ist
+5. Starten Sie VS Code neu, wenn Sie dazu aufgefordert werden
+
+<Tip>
+Ausführliche Anweisungen zur PlatformIO-Einrichtung finden Sie in unserem [PlatformIO-Setup-Anleitung](/ossm/software/getting-started/platformio).
+</Tip>
+</Step>
+
+<Step title="Klonen Sie das Repository">
+Öffnen Sie ein Terminal und klonen Sie das OSSM-Repository auf Ihren lokalen Computer.
+
+<Tabs>
+<Tab title="HTTPS">
+```bash
+git clone https://github.com/KinkyMakers/OSSM-hardware.git
+cd OSSM-hardware/Software
+```
+</Tab>
+
+<Tab title="SSH">
+```bash
+git clone git@github.com:KinkyMakers/OSSM-hardware.git
+cd OSSM-hardware/Software
+```
+</Tab>
+
+<Tab title="GitHub-CLI">
+```bash
+gh repo clone KinkyMakers/OSSM-hardware
+cd OSSM-hardware/Software
+```
+</Tab>
+</Tabs>
+
+<Note>
+Wenn Sie vorhaben, Änderungen beizutragen, forken Sie zuerst das Repository und klonen Sie dann stattdessen Ihren Fork.
+</Note>
+</Step>
+
+<Step title="Öffnen Sie das Projekt in VS Code">
+Starten Sie das Projekt mit PlatformIO.
+
+1. Öffnen Sie VS-Code
+2. Wählen Sie **Datei > Ordner öffnen**
+3. Navigieren Sie zum Verzeichnis `OSSM-hardware/Software`, das Sie gerade geklont haben
+4. Klicken Sie auf **Ordner auswählen** (oder **Öffnen** unter macOS).
+
+PlatformIO erkennt die `platformio.ini`-Datei automatisch und konfiguriert das Projekt.
+
+<Check>
+Unten in VS Code sollte die PlatformIO-Symbolleiste mit den Schaltflächen „Erstellen“, „Hochladen“ und „Überwachen“ angezeigt werden.
+</Check>
+</Step>
+
+<Step title="Erstellen Sie die Firmware und laden Sie sie hoch">
+Kompilieren Sie das Projekt und flashen Sie es auf Ihren ESP32.
+
+1. Verbinden Sie Ihr ESP32-Board über USB
+2. Klicken Sie zum Kompilieren auf die Schaltfläche **PlatformIO: Build** (Häkchensymbol).
+3. Sobald der Build erfolgreich war, klicken Sie auf **PlatformIO: Upload** (Pfeilsymbol), um die Firmware zu flashen
+
+<Warning>
+Stellen Sie sicher, dass Sie den richtigen COM-Port auswählen, wenn Sie mehrere serielle Geräte angeschlossen haben. Sie können dies in `platformio.ini` oder über den PlatformIO-Gerätemonitor konfigurieren.
+</Warning>
+</Step>
+</Steps>
+
+## Nächste Schritte
+
+<CardGroup cols={2}>
+<Card title="Betriebsmodi" icon="play" href="/ossm/software/getting-started/operating-modes">
+  Erfahren Sie mehr über die Modi „Simple Penetration“, „Stroke Engine“ und „Streaming“.
+</Card>
+
+<Card title="Sicherheitsfunktionen" icon="shield" href="/ossm/software/getting-started/safety-features">
+  Verstehen Sie die Kontrollen vor dem Flug, die Sicherheitsabschaltung und den Notstopp.
+</Card>
+
+<Card title="Konfiguration" icon="sliders" href="/ossm/software/getting-started/configuration">
+  Passen Sie Bewegungsparameter, Pins und Benutzereinstellungen an.
+</Card>
+
+<Card title="WLAN und Updates" icon="wifi" href="/ossm/software/getting-started/wifi-and-updates">
+  Konfigurieren Sie WLAN und installieren Sie Over-the-Air-Firmware-Updates.
+</Card>
+
+<Card title="Ordnerstruktur" icon="folder-tree" href="/ossm/software/architecture/folder-structure">
+  Verstehen Sie die Organisation des Quellcodes und die modulare Architektur.
+</Card>
+
+<Card title="PlatformIO-Setup" icon="wrench" href="/ossm/software/getting-started/platformio">
+  Richten Sie Ihre Entwicklungsumgebung für Firmware-Änderungen ein.
+</Card>
+</CardGroup>

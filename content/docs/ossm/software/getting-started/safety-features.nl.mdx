@@ -1,0 +1,212 @@
+---
+title: "Veiligheidsvoorzieningen"
+description: "Begrijp de veiligheidsmechanismen die zijn ingebouwd in de OSSM-firmware om u en uw hardware te beschermen"
+---
+
+De OSSM-firmware bevat verschillende veiligheidsfuncties die zijn ontworpen om ongelukken te voorkomen, hardware te beschermen en een voorspelbare werking te garanderen. In deze handleiding wordt elk veiligheidsmechanisme uitgelegd en hoe het werkt.
+
+<Warning>
+Veiligheidsvoorzieningen vormen een aanvulling op (geen vervanging van) veilige gebruikspraktijken. Volg altijd de [veiligheidsrichtlijnen](https://docs.researchanddesire.com/ossm/safety) bij het bedienen van uw OSSM.
+</Warning>
+
+## Veiligheidscontrole vóór de vlucht
+
+Voordat de OSSM een bedieningsmodus activeert, voert hij een preflight-controle uit om onbedoelde start op hoge snelheid te voorkomen.
+
+### Hoe het werkt
+
+Wanneer u Simple Penetration of Stroke Engine in het menu selecteert:
+
+1. De firmware leest de snelheidspotentiometer
+2. Als de snelheid hoger is dan 1% (`commandDeadZonePercentage`), verschijnt er een waarschuwingsscherm
+3. De waarschuwing geeft de huidige snelheid weer en geeft u de instructie deze te verlagen
+4. Zodra de snelheid onder de 1% daalt, start de modus automatisch
+
+### Wat je zult zien
+
+```
+Simple Penetration
+Speed: 45%
+Decrease the speed to begin playing.
+```
+
+### Preflight omzeilen
+
+U kunt de preflightcontrole niet omzeilen. De modus start pas als de snelheidsknop bijna nul is. Hierdoor begin je altijd op een veilig tempo en voer je dit bewust op.
+
+<Tip>
+Als het preflight-scherm verschijnt, draait u eenvoudigweg uw snelheidsknop volledig tegen de klok in. De modus start binnen een seconde zodra de meting onder de drempel daalt.
+</Tip>
+
+### Preflight verlaten
+
+**Druk lang op de encoder** om terug te keren naar het hoofdmenu zonder de modus te starten.
+
+## BLE-ontkoppelingsveiligheid
+
+Wanneer u uw OSSM via Bluetooth bedient, kan een onverwachte ontkoppeling ertoe leiden dat het apparaat op hoge snelheid draait. De firmware bevat een automatische uitloop om dit te voorkomen.
+
+### Hoe het werkt
+
+Wanneer een BLE-verbinding verloren gaat:
+
+1. De firmware legt de huidige snelheid vast bij het verbreken van de verbinding
+2. Na een vertraging van **1 seconde** begint het uitlopen
+3. Gedurende **2 seconden** neemt de snelheid af naar nul met behulp van een 'easy-in-out-sinus'-curve
+4. Het apparaat blijft op nulsnelheid draaien totdat het opnieuw wordt aangesloten of handmatig wordt gestopt
+
+### Waarom de vertraging?
+
+De vertraging van 1 seconde voorkomt valse triggers door tijdelijke signaaluitval. Korte interferentie zal tijdens normaal gebruik geen onnodige vertragingen veroorzaken.
+
+### Helling curve
+
+De 'easy-in-out-sinus'-curve zorgt voor een soepele vertraging:
+
+- Start langzaam (zachte initiële vertraging)
+- Versnelt door het midden van de oprit
+- Eindigt langzaam (zachte eindstop)
+
+Dit voelt natuurlijker aan dan lineaire vertraging en vermindert mechanische belasting.
+
+<Note>
+Als de snelheid al nul was toen de verbinding werd verbroken, vindt er geen ramp plaats; het apparaat gaat gewoon door in rust.
+</Note>
+
+### Handmatige overschrijving
+
+Lokale bedieningselementen (potentiometer en encoder) blijven actief tijdens en na het ontkoppelen. U kunt:
+
+- Stop het apparaat handmatig met de snelheidsknop
+- Houd de encoder lang ingedrukt voor een noodstop
+- Maak opnieuw verbinding via BLE om de controle te hervatten
+
+## Veilig thuiskomen
+
+De homing-reeks omvat verschillende veiligheidscontroles om mechanische problemen op te sporen voordat de werking begint.
+
+### Time-outbescherming
+
+De homing moet binnen **40 seconden** voltooid zijn. Als de aandrijving binnen deze tijd niet beide eindbewegingen heeft gevonden:
+
+1. De motor stopt
+2. Er verschijnt een foutscherm: "Homing duurde te lang. Controleer uw bedrading en probeer het opnieuw."
+3. Er verschijnt een QR-code die linkt naar bronnen voor probleemoplossing
+4. Druk op de encoder om opnieuw te starten
+
+**Veelvoorkomende oorzaken van time-out:**
+- Onvoldoende stroomvoorziening
+- Motorbedrading losgekoppeld
+- Mechanische obstructie
+- Riem te los of kapot
+
+### Huidige detectie
+
+De OSSM maakt gebruik van sensorloze homing: het detecteert het einde van de beweging door de motorstroom te monitoren. Wanneer de stroom `sensorlessCurrentLimit` overschrijdt (standaard: 1,5%), weet de firmware dat de actuator een fysieke stop heeft bereikt.
+
+<Info>
+Sensorloze homing elimineert de noodzaak van eindschakelaars, terwijl mechanische grenzen nog steeds betrouwbaar worden gedetecteerd.
+</Info>
+
+### Minimale slagvalidatie
+
+Na homing valideert de firmware dat de gemeten slaglengte groter is dan `minStrokeLengthMm` (standaard: 50 mm). Als de slag te kort is:
+
+1. Er verschijnt een foutscherm: "Slag te kort. Controleer uw aandrijfriem."
+2. Het apparaat gaat naar de foutstatus
+3. Druk op de encoder om hulp te bekijken en druk vervolgens opnieuw om opnieuw op te starten
+
+**Veelvoorkomende oorzaken van een korte beroerte:**
+- De riem slipt op de poelies
+- Riemspanning te los
+- Mechanische binding of obstructie
+- Onjuiste motorconfiguratie
+
+### Offsetbuffer
+
+Nadat elk bewegingseinde is gedetecteerd, trekt de actuator zich terug met `strokeZeroOffsetMm` (standaard: 6 mm). Deze buffer:
+
+- Voorkomt dat de actuator herhaaldelijk de fysieke eindstop raakt
+- Biedt een veiligheidsmarge voor positiefouten
+- Vermindert slijtage aan mechanische componenten
+
+## Noodstop
+
+Tijdens de werking kunt u op elk moment een onmiddellijke stop activeren.
+
+### Hoe te activeren
+
+**Houd de encoder ongeveer 3 seconden lang ingedrukt** vanuit elke bedrijfsmodus.
+
+### Wat gebeurt er
+
+1. `forceStop()` wordt aangeroepen op de stappenmotor
+2. Motoruitgangen worden onmiddellijk uitgeschakeld
+3. Het apparaat is gemarkeerd als 'niet thuis'
+4. U keert terug naar het hoofdmenu
+
+<Warning>
+Een noodstop zorgt ervoor dat de OSSM zijn positiereferentie verliest. U moet opnieuw opstarten en terugkeren voordat u weer kunt gaan werken.
+</Warning>
+
+### Wanneer te gebruiken
+
+Gebruik een noodstop wanneer:
+
+- Er voelt iets mis tijdens de werking
+- U moet om welke reden dan ook onmiddellijk stoppen
+- Het apparaat gedraagt ​​zich onverwacht
+- Je hoort ongebruikelijke geluiden uit het mechanische systeem
+
+<Note>
+Aarzel niet om de noodstop te gebruiken; deze is er voor uw veiligheid. Het opnieuw thuisbrengen duurt slechts enkele seconden.
+</Note>
+
+## Foutstatussen
+
+Wanneer de firmware een probleem detecteert, gaat deze naar een foutstatus met nuttige informatie.
+
+### Foutscherm
+
+Het foutscherm wordt weergegeven:
+
+1. Koptekst 'Fout'
+2. Een beschrijving van het probleem
+3. Instructies voor de volgende stappen
+
+### Help-scherm
+
+Druk op de encoder op het foutscherm om het helpscherm te bekijken, dat het volgende weergeeft:
+
+- Koptekst 'Hulp vragen'
+- Instructies om Discord of GitHub te bezoeken
+- Een QR-code die linkt naar [unbox.ossm.tech](https://unbox.ossm.tech)
+
+Druk nogmaals op de encoder om het apparaat opnieuw op te starten.
+
+## Configuratie veiligheidswaarden
+
+Verschillende configuratieparameters beïnvloeden het veiligheidsgedrag:
+
+| Parameter | Standaard | Effect |
+|-----------|---------|--------|
+| `commandDeadZonePercentage` | 1.0% | Preflightdrempel voor snelheidsknop |
+| `sensorlessCurrentLimit` | 1.5% | Huidige drempel voor thuisdetectie |
+| `minStrokeLengthMm` | 50 mm | Minimaal geldige slag na homing |
+| `strokeZeroOffsetMm` | 6 mm | Veiligheidsbuffer van fysieke eindstops |
+
+<Warning>
+Het wijzigen van deze waarden kan de veiligheidsmarges verkleinen. Wijzig ze alleen als u de implicaties begrijpt en grondig hebt getest.
+</Warning>
+
+## Gerelateerde pagina's
+
+<CardGroup cols={2}>
+<Card title="Problemen oplossen" icon="wrench" href="https://docs.researchanddesire.com/ossm/troubleshooting">
+  Diagnose en oplossing van veelvoorkomende problemen met uw OSSM.
+</Card>
+
+<Card title="Configuratiereferentie" icon="sliders" href="/ossm/software/getting-started/configuration">
+  Begrijp alle configureerbare parameters en hun standaardwaarden.
+</Card>
+</CardGroup>

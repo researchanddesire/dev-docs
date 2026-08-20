@@ -1,0 +1,194 @@
+---
+title: "Firmware-updates"
+description: "Hoe jouw trainer software-updates ontvangt en installeert"
+---
+
+Uw Deepthroat Trainer ontvangt firmware-updates over-the-air (OTA) wanneer deze is verbonden met Wi-Fi. Updates brengen nieuwe functies, verbeteringen en bugfixes met zich mee.
+
+## Hoe updates werken
+
+### Automatische controle
+Elke keer dat u het apparaat inschakelt en verbinding maakt met Wi-Fi, controleert de trainer tijdens de preflightfase of er updates beschikbaar zijn.
+
+### Updateproces
+Wanneer er een update beschikbaar is:
+1. Het scherm toont "Updating" met voortgangsinformatie
+2. Nieuwe firmware wordt automatisch gedownload
+3. Het apparaat start opnieuw op met de nieuwe versie
+
+<Warning>
+Schakel het apparaat niet uit tijdens een update. Wacht tot het is voltooid en start automatisch opnieuw. Het onderbreken van een update kan problemen veroorzaken.
+</Warning>
+
+## Firmware-streams
+
+Uw trainer kan updates ontvangen van verschillende firmwarestreams:
+
+| Stroom | Beschrijving |
+|--------|-------------|
+| **Productie** | Stabiele releases voor algemeen gebruik |
+| **Bèta** | Preview-releases met nieuwe functies (kunnen bugs bevatten) |
+| **Alfa** | Vroege testversies (intern/beperkt gebruik) |
+
+<Info>
+De meeste gebruikers ontvangen automatisch productie-updates. Bèta-inschrijving wordt doorgaans beheerd via uw dashboardaccount of abonnementsniveau.
+</Info>
+
+### Huidige bètastatus
+Actieve abonnees worden tijdens de implementatie vaak ingeschreven voor de bètastream. Er is een dashboardschakelaar gepland om te schakelen tussen productie-, bèta- en nieuwste streams.
+
+Zie de <a href="/dtt/technical/introduction">Software 2.0 Preview</a> voor details over de huidige bètafuncties.
+
+## Welke updates omvatten
+
+Firmware-updates kunnen het volgende omvatten:
+
+- **Nieuwe functies** — Trainingsmodi, UI-verbeteringen, maatwerk
+- **Bugfixes** — Problemen uit eerdere versies opgelost
+- **Prestaties** — Snellere respons, betere stabiliteit
+- **Beveiliging** — Verbeteringen in de bescherming
+
+## Versie-informatie
+
+Uw huidige firmwareversie wordt weergegeven tijdens het opstarten van het apparaat. Noteer deze informatie wanneer u contact opneemt met de ondersteuning.
+
+## Handmatige updatecontrole
+
+Een updatecontrole forceren:
+1. Zorg ervoor dat Wi-Fi is verbonden
+2. Schakel het apparaat uit en weer in
+3. De preflightcontroles zoeken automatisch naar updates
+
+Er is geen handmatige knop 'controleren op updates'; de controle gebeurt automatisch bij elke start wanneer u online bent.
+
+## Handmatig USB-flashen
+
+Als uw Trainer geen OTA-updates kan ontvangen (vanwege connectiviteitsproblemen of netwerkbeperkingen), kunt u de firmware handmatig flashen met behulp van een USB-kabel en de Web Flasher.
+
+<Info>
+Gebruik handmatig USB-flashen bij het oplossen van verbindingsproblemen of wanneer u instructies krijgt van de ondersteuning. De meeste gebruikers hebben dit niet nodig: OTA-updates handelen alles automatisch af.
+</Info>
+
+### Vereisten
+
+- Een USB-kabel die **gegevensoverdracht** ondersteunt (niet alleen opladen)
+- Een computer met een beschikbare USB-poort
+- Google Chrome, Edge of een andere Chromium-gebaseerde browser
+
+<Warning>
+**Hardwarecompatibiliteit:** Trainers die vóór 1 juli 2025 zijn gekocht, beschikken niet over de vereiste USB-interface voor handmatig flitsen. Als u een bericht ziet dat uw apparaat niet kan flitsen, of als de webflasher uw apparaat niet kan detecteren, neemt u contact op met [support@researchanddesire.com](mailto:support@researchanddesire.com) voor hulp.
+</Warning>
+
+### Knipperende instructies
+
+<Steps>
+<Step title="Sluit uw trainer aan">
+  Sluit de USB-kabel aan op uw Deepthroat Trainer en sluit het andere uiteinde aan op uw computer.
+</Step>
+
+<Step title="Open de webflitser">
+  Navigeer naar [dashboard.researchanddesire.com/app/tools/web-flasher](https://dashboard.researchanddesire.com/app/tools/web-flasher) in uw browser.
+</Step>
+
+<Step title="Selecteer firmware-opties">
+  In de webflitser:
+  1. Selecteer **Deepthroat Trainer** in de vervolgkeuzelijst met apparaten
+  2. Selecteer **Productie** in de vervolgkeuzelijst voor firmwarestreams
+</Step>
+
+<Step title="Maak verbinding met uw apparaat">
+  Klik op **Verbinden** en selecteer uw apparaat in de lijst. Zoek naar een apparaat met het label:
+  - **UART-brug**
+  - **USB JTAG** (of vergelijkbaar)
+
+  <Warning>
+  Als er geen apparaat verschijnt, controleer dan of uw kabel gegevensoverdracht ondersteunt en probeer een andere USB-poort.
+  </Warning>
+</Step>
+
+<Step title="Flash de firmware">
+  Klik op **Flash** om de firmware te installeren. Wacht tot het proces is voltooid.
+
+  <Warning>
+  Schakel 'Apparaat wissen' **niet** in, tenzij specifiek aangegeven door de ondersteuning. Door te wissen wordt uw Trainer-ID gewist en moet opnieuw worden geregistreerd.
+  </Warning>
+</Step>
+</Steps>
+
+### Na het knipperen
+
+Zodra het flitsen is voltooid, wordt uw Trainer opnieuw opgestart met de nieuwe firmware. Maak verbinding met Wi-Fi om de connectiviteit te verifiëren.
+
+Als je **E-DTT-1** ("Geen internet. Controleer firewall en router.") ziet nadat je verbinding hebt gemaakt, bevestigt dit dat een netwerkbeperking je apparaat blokkeert. Volg de <a href="https://docs.researchanddesire.com/dtt/troubleshooting">E-DTT-1 probleemoplossingsgids</a> om het probleem op te lossen.
+
+## Vereisten bijwerken
+
+| Vereiste | Details |
+|-------------|---------|
+| **Internet** | Wi-Fi-verbinding vereist |
+| **Batterij** | Voldoende opladen aanbevolen |
+| **Tijd** | Updates duren doorgaans 1-3 minuten |
+
+## Problemen oplossen
+
+<AccordionGroup>
+<Accordion title="Update start niet">
+- Controleer of Wi-Fi is verbonden en werkt
+- Controleer of het apparaat internet kan bereiken (geen firewallblokkeringen)
+- Probeer uit en weer aan te sluiten
+</Accordion>
+
+<Accordion title="Update mislukt of wordt herhaaldelijk opnieuw opgestart">
+- Zorg voor een stabiele stroomvoorziening (sluit de oplader aan als de batterij bijna leeg is)
+- Controleer op een sterk wifi-signaal
+- Neem bij herhaalde storingen contact op met de ondersteuning
+</Accordion>
+
+<Accordion title="Trainer-ID toont na de update door elkaar gegooide of willekeurige tekens">
+Als uw Trainer-ID beschadigde tekens weergeeft (zoals ".t", "U]t" of andere willekeurige symbolen) en bij elke herstart verandert, zijn de inrichtingsgegevens van het apparaat tijdens de firmware-update gewist.
+
+**Oorzaak:**
+Dit gebeurt meestal wanneer u de webflasher gebruikt terwijl de optie 'Apparaat wissen' is ingeschakeld. Met de wisoptie worden alle opgeslagen gegevens gewist, inclusief de unieke Trainer-ID die tijdens de productie is toegewezen.
+
+**Oplossing:**
+Neem contact op met de ondersteuning op [support@researchanddesire.com](mailto:support@researchanddesire.com). Erbij betrekken:
+- Uw bestelnummer
+- Een beschrijving van wat u op het scherm ziet
+- De stappen die u heeft uitgevoerd voordat het probleem zich voordeed
+
+Ondersteuning kan uw apparaat opnieuw voorzien van een nieuwe Trainer-ID.
+
+<Warning>
+Wanneer u de webflasher gebruikt, schakelt u 'Apparaat wissen' alleen in als dit specifiek wordt aangegeven door de ondersteuning. Voor normale firmware-updates is het niet nodig om het apparaat te wissen.
+</Warning>
+</Accordion>
+
+<Accordion title="Functies komen niet overeen met de documentatie">
+- Mogelijk gebruikt u een andere firmwarestream dan gedocumenteerd
+- Sommige functies zijn alleen bèta/preview
+- Controleer uw huidige versie aan de hand van de release-opmerkingen
+</Accordion>
+
+<Accordion title="Kan ik firmware downgraden?">
+Downgraden wordt niet ondersteund tijdens normaal gebruik. Als u problemen ondervindt met een nieuwe versie, neemt u contact op met de ondersteuning.
+</Accordion>
+</AccordionGroup>
+
+## Communicatie vrijgeven
+
+Updates en wijzigingen worden gecommuniceerd via:
+- Dashboardaankondigingen
+- Documentatie-updates
+- De <a href="/dtt/technical/introduction">Software 2.0 Preview</a>-pagina
+
+## Gerelateerde handleidingen
+
+<CardGroup cols={2}>
+<Card title="Software 2.0 voorbeeld" icon="sparkles" href="/dtt/technical/introduction">
+Huidige bètafuncties en routekaart.
+</Card>
+
+<Card title="Wi-Fi-installatie" icon="wifi" href="https://docs.researchanddesire.com/dtt/get-started">
+Verbind je trainer voor updates.
+</Card>
+</CardGroup>
