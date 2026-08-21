@@ -7,7 +7,7 @@ De Deepthroat Trainer bevat een accessoirepoort van 3,5 mm die compatibele vibre
 
 ## Officiële accessoires
 
-Wij bieden vibrerende pluggen en staafjes die rechtstreeks op de accessoirepoort worden aangesloten. Deze accessoires reageren automatisch op trainingsresultaten, er is geen extra installatie vereist.
+Wij bieden vibrerende pluggen en staafjes die rechtstreeks op de accessoirepoort worden aangesloten. Deze accessoires reageren automatisch op trainingsresultaten – er is geen extra installatie vereist.
 
 <Info>
 De accessoirepoort voert een gemoduleerd signaal uit dat meegroeit met de trainingsprestaties. Hogere prestaties zorgen voor een sterkere activering van accessoires.
@@ -15,34 +15,34 @@ De accessoirepoort voert een gemoduleerd signaal uit dat meegroeit met de traini
 
 ### Meerdere accessoires gebruiken
 
-Wanneer je een Vibe en Wand samen aanschaft, leveren wij een splitterkabel mee, zodat je beide accessoires tegelijkertijd kunt gebruiken tijdens de training. Sluit de splitter aan op de accessoirepoort van de Trainer en sluit vervolgens elk accessoire aan op de splitter.
+Wanneer u een Vibe en Wand samen aanschaft, leveren wij een splitterkabel mee, zodat u beide accessoires tegelijkertijd kunt gebruiken tijdens de training. Sluit de splitter aan op de accessoirepoort van de Deepthroat Trainer en sluit vervolgens elk accessoire aan op de splitter.
 
 <Tip>
-Het staafje is ontworpen voor extern gebruik: houd hem handmatig op zijn plaats, stop hem in ondergoed of positioneer hem op de manier die voor jou het beste werkt.
+Het staafje is ontworpen voor extern gebruik: houd hem handmatig op zijn plaats, stop hem in ondergoed of positioneer hem op de manier die voor u het beste werkt.
 </Tip>
 
 <Warning>
 Het gebruik van meerdere accessoires verhoogt het batterijverbruik. Als beide accessoires zijn aangesloten, kunt u rekenen op een batterijduur van ongeveer 2 à 3 uur in plaats van de standaard 4 uur. Houd uw batterijniveau in de gaten tijdens langere sessies.
 </Warning>
 
-## Poortspecificaties
+## Specificaties van de poort
 
 De accessoirepoort maakt gebruik van een 4-draads TRRS-aansluiting (3,5 mm) met de onderstaande kenmerken.
 
 | Parameter | Specificatie |
 |-----------|---------------|
 | Connectortype | 3,5 mm TRRS (4 geleiders) |
-| Signaaluitgang | Eerste belsignaal (R1) |
+| Signaaluitgang | Eerste ring (R1) |
 | Signaaltype | 3,3 V PWM (pulsbreedtemodulatie) |
 | Maximale stroom | 200 mA totaal op de accessoire-uitgang |
-| Gedrag | De inschakelduur varieert dynamisch, afhankelijk van de trainingsprestaties |
+| Gedrag | De werkcyclus varieert dynamisch, afhankelijk van de trainingsprestaties |
 
 <Note>
-PWM (pulsbreedtemodulatie) schakelt de uitgang snel aan en uit. De effectieve intensiteit wordt bepaald door de duty-cycle (het percentage van de tijd dat het signaal binnen elke cyclus aanstaat).
+PWM (pulsbreedtemodulatie) schakelt de uitgang snel aan en uit. De effectieve intensiteit wordt bepaald door de werkcyclus (het percentage van de tijd dat het signaal binnen elke cyclus aanstaat).
 </Note>
 
 <Warning>
-Volg deze veiligheidsrichtlijnen wanneer u externe apparaten op de trainer aansluit:
+Volg deze veiligheidsrichtlijnen wanneer u externe apparaten op de Deepthroat Trainer aansluit:
 
 - Sluit nooit hoogspannings- of netvoedingsapparatuur rechtstreeks aan op de accessoirepoort.
 - Neem de fundamentele elektrische veiligheid in acht en voldoe aan alle lokale normen en voorschriften.
@@ -52,14 +52,14 @@ Volg deze veiligheidsrichtlijnen wanneer u externe apparaten op de trainer aansl
 
 ## Pin-outdiagram
 
-Raadpleeg het diagram voor de posities van de geleiders en de aardreferentie. Het PWM-signaal is aanwezig op de eerste ring (R1).
+Raadpleeg het diagram voor de posities van de geleiders en de massareferentie. Het PWM-signaal is aanwezig op de eerste ring (R1).
 
 <Frame caption="TRRS-pinoutdiagram voor de accessoirepoort">
   <img src="./_images/image (5).webp" alt="Accessoirepoort TRRS pinoutdiagram met de configuratie met 4 geleiders" />
 </Frame>
 
 <Tip>
-Ga niet uit van een bepaalde CTIA/OMTP-geleidervolgorde van andere audioapparaten. Controleer altijd aan de hand van de meegeleverde pin-out voordat u de bedrading bedient.
+Ga niet uit van een bepaalde CTIA/OMTP-geleidervolgorde van andere audioapparaten. Controleer altijd aan de hand van de meegeleverde pin-out voordat u de bedrading aansluit.
 </Tip>
 
 ## Aangepaste integraties
@@ -67,24 +67,24 @@ Ga niet uit van een bepaalde CTIA/OMTP-geleidervolgorde van andere audioapparate
 Gebruik de onderstaande stappen en referentieontwerpen om de accessoire-uitgang veilig te integreren in uw eigen projecten.
 
 <Steps>
-<Step title="Plan uw lading en budget actueel">
+<Step title="Plan uw belasting en stroombudget">
   Bepaal welk accessoire of circuit u wilt aansturen en controleer of er niet meer dan 200 mA van de poort nodig is. Als er meer stroom of een andere spanning nodig is, gebruik dan een drivertrap (voorbeeld hieronder).
 
 <Check>
-  U hebt de verwachte stabiele stroom en eventuele opstart-/inschakelstroom voor uw belasting geïdentificeerd.
+  U hebt de verwachte continue stroom en eventuele opstart-/inschakelstroom voor uw belasting geïdentificeerd.
 </Check>
 </Step>
 
 <Step title="Meet het signaalgedrag op uw apparaat">
-  Terwijl de trainer actief is, meet u de PWM-werkcyclus en -frequentie met behulp van een multimeter met werkcyclusmodus of een oscilloscoop. De frequentie kan variëren tussen firmwareversies; ontwerp voor een redelijk bereik in plaats van een vaste waarde.
+  Terwijl de Deepthroat Trainer actief is, meet u de PWM-werkcyclus en -frequentie met behulp van een multimeter met werkcyclusmodus of een oscilloscoop. De frequentie kan variëren tussen firmwareversies; ontwerp voor een redelijk bereik in plaats van een vaste waarde.
 
 <Check>
-  U hebt typische duty-cycle-waarden geregistreerd bij lage, gemiddelde en hoge prestaties, en u heeft bevestigd dat de signaalamplitude 3,3 V is.
+  U hebt typische werkcycluswaarden geregistreerd bij lage, gemiddelde en hoge prestaties en bevestigd dat de signaalamplitude 3,3 V is.
 </Check>
 </Step>
 
 <Step title="Prototype met een veilige testbelasting">
-  Voordat u een motor of accessoire aansluit, moet u beginnen met een weerstandsbelasting binnen de limiet van 200 mA (bijvoorbeeld ≥22 Ω bij 3,3 V). Controleer of de poort de temperatuurlimieten niet overschrijdt en of de werkcyclus zich gedraagt ​​zoals verwacht.
+  Voordat u een motor of accessoire aansluit, moet u beginnen met een weerstandsbelasting binnen de limiet van 200 mA (bijvoorbeeld ≥22 Ω bij 3,3 V). Controleer of de poort de temperatuurlimieten niet overschrijdt en of de werkcyclus zich gedraagt zoals verwacht.
 
 <Warning>
   Sluit de uitgang niet kort. Gebruik een stroombeperkte voeding of een inline-zekering voor extra bescherming tijdens het testen.
@@ -92,18 +92,18 @@ Gebruik de onderstaande stappen en referentieontwerpen om de accessoire-uitgang 
 </Step>
 
 <Step title="Voeg een drivertrap toe voor belastingen met een hoger vermogen">
-  Als uw accessoire meer stroom of een hogere spanning nodig heeft dan de poort levert, gebruik dan een N-kanaals MOSFET op logisch niveau of een speciale low-side driver. Houd de accessoire-uitvoer van de trainer uitsluitend als stuursignaal.
+  Als uw accessoire meer stroom of een hogere spanning nodig heeft dan de poort levert, gebruik dan een N-kanaals MOSFET op logisch niveau of een speciale low-side driver. Houd de accessoire-uitgang van de Deepthroat Trainer uitsluitend als stuursignaal.
 
 <Check>
-  U kunt uw accessoire volledig besturen zonder de limieten van de poort te overschrijden, en de trainer blijft koel en stabiel tijdens gebruik.
+  U kunt uw accessoire volledig aansturen zonder de limieten van de poort te overschrijden, en de Deepthroat Trainer blijft koel en stabiel tijdens gebruik.
 </Check>
 </Step>
 
 <Step title="Controleer en voltooi de bedrading">
-  Bevestig de adertoewijzingen aan de hand van het pinschema. Leid aardingen aan zoals vereist door uw ontwerp, voeg terugslagbescherming toe voor inductieve belastingen en ontlast de TRRS-connector.
+  Bevestig de adertoewijzingen aan de hand van het pinschema. Sluit de massa aan zoals vereist door uw ontwerp, voeg terugslagbescherming toe voor inductieve belastingen en zorg voor trekontlasting van de TRRS-connector.
 
 <Check>
-  Als het accessoire is aangesloten, volgt de uitvoerintensiteit de prestaties soepel zonder resets, brownouts of hoorbare artefacten.
+  Als het accessoire is aangesloten, volgt de uitgangsintensiteit de prestaties soepel zonder resets, spanningsdalingen of hoorbare artefacten.
 </Check>
 </Step>
 </Steps>
@@ -114,32 +114,32 @@ Gebruik deze voorbeelden als uitgangspunt. Pas de componentwaarden aan de specif
 
 #### A. Directe aandrijving (≤200 mA bij 3,3 V)
 
-- Sluit het accessoire aan tussen de PWM-uitgang (R1) van de accessoirepoort en aarde, zoals aangegeven in het pin-outdiagram.
+- Sluit het accessoire aan tussen de PWM-uitgang (R1) van de accessoirepoort en massa, zoals aangegeven in het pin-outdiagram.
 - Optioneel: plaats een kleine serieweerstand (1–4,7 Ω) om de inschakelstroom bij kleine DC-motoren te verminderen.
 - Zorg ervoor dat de totale stroomopname nooit groter is dan 200 mA.
 
 <Warning>
-Als uw accessoire de limiet van 200 mA nadert, meet dan de blokkeerstroom. Veel kleine motoren overschrijden bij het opstarten de stabiele stroom.
+Als uw accessoire de limiet van 200 mA nadert, meet dan de blokkeerstroom. Veel kleine motoren overschrijden bij het opstarten de continue stroom.
 </Warning>
 
 #### B. Externe voeding met MOSFET low-side driver (>200 mA of >3,3 V)
 
-- Voed het accessoire via een externe voeding die geschikt is voor de spanning/stroom.
+- Voed het accessoire via een externe voeding die geschikt is voor de spanning en stroom.
 - Gebruik de PWM (R1) van de accessoirepoort als de MOSFET-gatedrive.
 - Gemeenschappelijke ontwerpelementen:
-  - N-MOSFET op logisch niveau (bijvoorbeeld lage Rds(aan) bij 3,3 V-poort)
-  - Poortweerstand: 47–220 Ω
-  - Gate-to-source pulldown: 100 kΩ
+  - N-MOSFET op logisch niveau (bijvoorbeeld lage Rds(on) bij een 3,3 V-gate)
+  - Gateweerstand: 47–220 Ω
+  - Gate-source-pulldownweerstand: 100 kΩ
   - Terugslagdiode over inductieve belastingen (motor/solenoïde): snelle diode geschikt voor belastingsstroom
-  - Gemeenschappelijke basis tussen extern aanbod en de trainer, indien vereist door uw meet- en isolatiestrategie
+  - Gemeenschappelijke massa tussen de externe voeding en de Deepthroat Trainer, indien vereist door uw meet- en isolatiestrategie
 
 <Info>
-Gebruik voor galvanische isolatie een optocoupler of een poortdriver met isolatie en voed de geïsoleerde zijde op de juiste manier. Zorg ervoor dat de signaalpolariteit en timing compatibel blijven met PWM.
+Gebruik voor galvanische isolatie een optocoupler of een gatedriver met isolatie en voed de geïsoleerde zijde op de juiste manier. Zorg ervoor dat de signaalpolariteit en timing compatibel blijven met PWM.
 </Info>
 
 ### Het PWM-signaal uitlezen met een microcontroller
 
-Als u wilt dat uw project reageert op de prestaties van de trainer in plaats van een belasting te veroorzaken, lees dan de PWM-dutycycle met een microcontroller. In de onderstaande voorbeelden wordt de werkcyclus gemeten en toegewezen aan een intensiteitswaarde van 0–100%.
+Als u wilt dat uw project reageert op de prestaties van de Deepthroat Trainer in plaats van een belasting aan te sturen, lees dan de PWM-werkcyclus met een microcontroller. In de onderstaande voorbeelden wordt de werkcyclus gemeten en toegewezen aan een intensiteitswaarde van 0–100%.
 
 <CodeGroup>
 ```cpp Arduino
@@ -207,34 +207,34 @@ finally:
 Als uw microcontroller op 5 V-logica werkt, zorg er dan voor dat de ingangspin 3,3 V-tolerant is of voeg een niveauverschuiver/buffer toe. Voer geen 5 V terug in de accessoirepoort.
 </Note>
 
-## Ontwerprichtlijnen en best practices
+## Ontwerprichtlijnen en goede werkwijzen
 
-- Bescherm tegen inductieve terugslag met een diode over motoren en elektromagneten.
-- Houd de kabel kort om PWM-randringing en EMI te minimaliseren. Voeg indien nodig een kleine RC-demper toe aan het accessoire.
+- Bescherm tegen inductieve terugslag door een diode parallel over motoren en solenoïden te plaatsen.
+- Houd kabels kort om ringing aan PWM-flanken en EMI te minimaliseren. Voeg indien nodig een kleine RC-demper toe aan het accessoire.
 - Gebruik trekontlasting op de TRRS-connector om intermitterende verbindingen te voorkomen.
-- Valideer met een dummyload voordat u een draagbaar of gebruikerscontactaccessoire bevestigt.
+- Valideer met een dummyload voordat u een op het lichaam gedragen accessoire of een accessoire dat met de gebruiker in contact komt aansluit.
 - Documenteer uw bedrading en instellingen, zodat u resultaten voor verschillende sessies kunt reproduceren.
 
 <AccordionGroup>
 <Accordion title="Het accessoire reageert niet">
 - Controleer of u bent aangesloten op de juiste geleider (R1) voor PWM.
-- Controleer of de aardreferentie overeenkomt met het pinschema.
+- Controleer of de massareferentie overeenkomt met het pinschema.
 - Test met een weerstandsbelasting om accessoirefouten uit te sluiten.
 </Accordion>
 
-<Accordion title="De output lijkt zwak of inconsistent">
-- Meet de werkelijke inschakelduur en bevestig dat uw bestuurdersfase zich niet in een lineair gebied bevindt.
+<Accordion title="De uitgang lijkt zwak of inconsistent">
+- Meet de werkelijke werkcyclus en bevestig dat uw drivertrap zich niet in een lineair gebied bevindt.
 - Controleer de voedingsspanningen en zorg ervoor dat er geen onderspanning ontstaat wanneer de belasting wordt ingeschakeld.
 - Verklein de kabellengte of voeg ontkoppeling toe dicht bij de belasting.
 </Accordion>
 
-<Accordion title="Elektrisch geluid of hoorbaar gezeur">
+<Accordion title="Elektrische ruis of hoorbaar gezoem">
 - Verhoog indien nodig de PWM-filtering aan de belastingzijde (RC of LC).
-- Voeg een poortweerstand (47–220 Ω) toe en minimaliseer het lusgebied op hoge di/dt-paden.
+- Voeg een gateresistor (47–220 Ω) toe en minimaliseer het lusgebied op paden met hoge di/dt.
 - Monteer de terugslagdiode dichtbij de belastingsklemmen.
 </Accordion>
 </AccordionGroup>
 
 <Check>
-U heeft de huidige limieten geverifieerd, het juiste pinout-gebruik bevestigd en een stabiele werking aangetoond met zowel een testbelasting als uw laatste accessoire.
+U hebt de stroomlimieten geverifieerd, het juiste gebruik van de pinout bevestigd en een stabiele werking aangetoond met zowel een testbelasting als uw uiteindelijke accessoire.
 </Check>

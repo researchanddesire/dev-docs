@@ -15,44 +15,44 @@ Le port accessoire émet un signal modulé qui évolue en fonction des performan
 
 ### Utiliser plusieurs accessoires
 
-Lorsque vous achetez un Vibe et un Wand ensemble, nous incluons un câble répartiteur afin que vous puissiez utiliser les deux accessoires simultanément pendant l'entraînement. Connectez le répartiteur au port accessoire du Trainer, puis branchez chaque accessoire dans le répartiteur.
+Lorsque vous achetez un Vibe et un Wand ensemble, nous incluons un câble répartiteur afin que vous puissiez utiliser les deux accessoires simultanément pendant l'entraînement. Connectez le répartiteur au port accessoire du Deepthroat Trainer, puis branchez chaque accessoire dans le répartiteur.
 
 <Tip>
 La baguette est conçue pour un usage externe : maintenez-la en place manuellement, rentrez-la dans un sous-vêtement ou positionnez-la comme vous le souhaitez.
 </Tip>
 
 <Warning>
-L’utilisation de plusieurs accessoires augmente la décharge de la batterie. Avec les deux accessoires connectés, attendez-vous à environ 2 à 3 heures d’autonomie au lieu des 4 heures standard. Surveillez le niveau de votre batterie pendant les sessions plus longues.
+L’utilisation de plusieurs accessoires augmente la consommation de la batterie. Avec les deux accessoires connectés, attendez-vous à environ 2 à 3 heures d’autonomie au lieu des 4 heures standard. Surveillez le niveau de votre batterie pendant les sessions plus longues.
 </Warning>
 
-## Spécifications des ports
+## Spécifications du port
 
 Le port accessoire utilise une prise TRRS (3,5 mm) à 4 conducteurs présentant les caractéristiques ci-dessous.
 
 | Paramètre | Spécification |
 |-----------|---------------|
 | Type de connecteur | TRRS 3,5 mm (4 conducteurs) |
-| Sortie de signal | Première sonnerie (R1) |
+| Sortie de signal | Premier anneau (R1) |
 | Type de signal | PWM 3,3 V (modulation de largeur d'impulsion) |
 | Courant maximal | 200 mA au total sur la sortie accessoire |
-| Comportement | Le cycle de service varie de manière dynamique en fonction des performances d'entraînement |
+| Comportement | Le rapport cyclique varie de manière dynamique en fonction des performances d'entraînement |
 
 <Note>
 PWM (modulation de largeur d'impulsion) active et désactive rapidement la sortie. L'intensité effective est contrôlée par le rapport cyclique (pourcentage de temps pendant lequel le signal est activé au cours de chaque cycle).
 </Note>
 
 <Warning>
-Lorsque vous connectez des appareils externes au home trainer, suivez ces consignes de sécurité :
+Lorsque vous connectez des appareils externes au Deepthroat Trainer, suivez ces consignes de sécurité :
 
 - Ne connectez jamais d’équipement haute tension ou alimenté par le secteur directement au port accessoire.
-- Respectez la sécurité électrique de base et respectez toutes les normes et réglementations locales.
+- Respectez les règles élémentaires de sécurité électrique et conformez-vous à toutes les normes et réglementations locales.
 - Essayez des intégrations personnalisées uniquement si vous êtes expérimenté en électronique et acceptez les risques associés.
 - Nous prenons officiellement en charge uniquement les accessoires R+D. Les interfaces personnalisées ou tierces sont utilisées à vos propres risques.
 </Warning>
 
 ## Schéma de brochage
 
-Reportez-vous au schéma pour connaître les positions des conducteurs et la référence à la terre. Le signal PWM est présent sur le premier anneau (R1).
+Reportez-vous au schéma pour connaître les positions des conducteurs et la référence de masse. Le signal PWM est présent sur le premier anneau (R1).
 
 <Frame caption="Schéma de brochage TRRS pour le port accessoire">
   <img src="./_images/image (5).webp" alt="Schéma de brochage TRRS du port accessoire montrant la configuration à 4 conducteurs" />
@@ -64,19 +64,19 @@ Ne présumez pas d’un ordre de conducteur CTIA/OMTP particulier provenant d’
 
 ## Intégrations personnalisées
 
-Utilisez les étapes et les conceptions de référence ci-dessous pour intégrer en toute sécurité la sortie des accessoires dans vos propres projets.
+Utilisez les étapes et les conceptions de référence ci-dessous pour intégrer en toute sécurité la sortie accessoire dans vos propres projets.
 
 <Steps>
-<Step title="Planifiez votre charge et votre budget actuel">
+<Step title="Planifiez votre charge et votre budget de courant">
   Déterminez l'accessoire ou le circuit que vous souhaitez piloter et confirmez qu'il ne nécessite pas plus de 200 mA du port. S'il a besoin de plus de courant ou d'une tension différente, utilisez un étage pilote (exemple fourni ci-dessous).
 
 <Check>
-  Vous avez identifié le courant permanent attendu et tout courant de démarrage/appel pour votre charge.
+  Vous avez identifié le courant en régime permanent attendu et tout courant de démarrage/appel pour votre charge.
 </Check>
 </Step>
 
 <Step title="Mesurez le comportement du signal sur votre appareil">
-  Avec l'entraîneur actif, mesurez le rapport cyclique et la fréquence PWM à l'aide d'un multimètre avec mode rapport cyclique ou d'un oscilloscope. La fréquence peut changer selon les versions du micrologiciel ; conception pour une plage raisonnable plutôt que pour une valeur fixe.
+  Avec le Deepthroat Trainer actif, mesurez le rapport cyclique et la fréquence PWM à l'aide d'un multimètre avec mode rapport cyclique ou d'un oscilloscope. La fréquence peut changer selon les versions du micrologiciel ; prévoyez une plage raisonnable plutôt qu'une valeur fixe.
 
 <Check>
   Vous avez enregistré des valeurs de rapport cyclique typiques à des performances faibles, moyennes et élevées, et confirmé que l'amplitude du signal est de 3,3 V.
@@ -84,23 +84,23 @@ Utilisez les étapes et les conceptions de référence ci-dessous pour intégrer
 </Step>
 
 <Step title="Prototype avec une charge de test sûre">
-  Avant de connecter un moteur ou un accessoire, commencez avec une charge de résistance dans la limite de 200 mA (par exemple, ≥22 Ω à 3,3 V). Vérifiez que le port ne dépasse pas les limites de température et que le cycle de service se comporte comme prévu.
+  Avant de connecter un moteur ou un accessoire, commencez avec une charge résistive dans la limite de 200 mA (par exemple, ≥22 Ω à 3,3 V). Vérifiez que le port ne dépasse pas les limites de température et que le rapport cyclique se comporte comme prévu.
 
 <Warning>
   Ne court-circuitez pas la sortie. Utilisez une alimentation de banc à courant limité ou un fusible en ligne pour une protection supplémentaire lors des tests.
 </Warning>
 </Step>
 
-<Step title="Ajoutez un étage de pilote pour les charges de puissance plus élevée">
-  Si votre accessoire nécessite plus de courant ou une tension plus élevée que celle fournie par le port, utilisez un MOSFET canal N de niveau logique ou un pilote low-side dédié. Conservez la sortie des accessoires du home trainer strictement comme signal de contrôle.
+<Step title="Ajoutez un étage pilote pour les charges de puissance plus élevée">
+  Si votre accessoire nécessite plus de courant ou une tension plus élevée que celle fournie par le port, utilisez un MOSFET canal N de niveau logique ou un pilote low-side dédié. Conservez la sortie accessoire du Deepthroat Trainer strictement comme signal de contrôle.
 
 <Check>
-  Vous pouvez conduire pleinement votre accessoire sans dépasser les limites du port, et le home trainer reste froid et stable pendant le fonctionnement.
+  Vous pouvez piloter complètement votre accessoire sans dépasser les limites du port, et le Deepthroat Trainer reste froid et stable pendant le fonctionnement.
 </Check>
 </Step>
 
-<Step title="Vérifier et finaliser le câblage">
-  Confirmez les affectations des conducteurs par rapport au schéma de brochage. Acheminez les mises à la terre selon les besoins de votre conception, ajoutez une protection anti-retour pour les charges inductives et soulagez le connecteur TRRS.
+<Step title="Vérifiez et finalisez le câblage">
+  Confirmez les affectations des conducteurs par rapport au schéma de brochage. Acheminez les connexions de masse selon les besoins de votre conception, ajoutez une protection contre les surtensions inductives avec une diode de roue libre et assurez une décharge de traction du connecteur TRRS.
 
 <Check>
   Avec l'accessoire connecté, l'intensité de sortie suit en douceur les performances sans réinitialisations, baisses de tension ou artefacts sonores.
@@ -112,26 +112,26 @@ Utilisez les étapes et les conceptions de référence ci-dessous pour intégrer
 
 Utilisez ces exemples comme points de départ. Adaptez les valeurs des composants aux spécifications de votre accessoire.
 
-#### A. Entraînement direct (≤200 mA à 3,3 V)
+#### A. Commande directe (≤200 mA à 3,3 V)
 
 - Connectez l'accessoire entre la sortie PWM du port accessoire (R1) et la masse comme indiqué par le schéma de brochage.
-- Facultatif : insérez une petite résistance série (1 à 4,7 Ω) pour réduire les appels pour les petits moteurs à courant continu.
+- Facultatif : insérez une petite résistance série (1 à 4,7 Ω) pour réduire le courant d'appel des petits moteurs à courant continu.
 - Assurez-vous que la consommation totale ne dépasse jamais 200 mA.
 
 <Warning>
-Si votre accessoire s'approche de la limite de 200 mA, mesurez le courant de décrochage. De nombreux petits moteurs dépassent le courant en régime permanent au démarrage.
+Si votre accessoire s'approche de la limite de 200 mA, mesurez le courant de blocage. De nombreux petits moteurs dépassent le courant en régime permanent au démarrage.
 </Warning>
 
 #### B. Alimentation externe avec pilote MOSFET low‑side (>200 mA ou >3,3 V)
 
-- Alimentez l’accessoire à partir d’une alimentation externe dimensionnée pour sa tension/courant.
-- Utilisez le PWM (R1) du port accessoire comme pilote de grille MOSFET.
+- Alimentez l’accessoire à partir d’une alimentation externe adaptée à sa tension et à son courant.
+- Utilisez le PWM (R1) du port accessoire comme signal de commande de grille du MOSFET.
 - Éléments de conception courants :
-  - N-MOSFET de niveau logique (par exemple, Rds(on) faible à une porte de 3,3 V)
-  - Résistance de grille : 47-220 Ω
-  - Pulldown porte-à-source : 100 kΩ
+  - N-MOSFET de niveau logique (par exemple, Rds(on) faible avec une grille à 3,3 V)
+  - Résistance de grille : 47–220 Ω
+  - Résistance pull-down grille-source : 100 kΩ
   - Diode flyback sur charges inductives (moteur/solénoïde) : diode rapide conçue pour le courant de charge
-  - Terrain d'entente entre l'alimentation externe et le formateur, si votre stratégie de mesure et d'isolement l'exige
+  - Masse commune entre l'alimentation externe et le Deepthroat Trainer, si votre stratégie de mesure et d'isolement l'exige
 
 <Info>
 Pour l'isolation galvanique, utilisez un optocoupleur ou un pilote de grille avec isolation et alimentez le côté isolé de manière appropriée. Assurez-vous que la polarité et la synchronisation du signal restent compatibles avec PWM.
@@ -139,7 +139,7 @@ Pour l'isolation galvanique, utilisez un optocoupleur ou un pilote de grille ave
 
 ### Lecture du signal PWM avec un microcontrôleur
 
-Si vous souhaitez que votre projet réagisse aux performances du formateur plutôt que de piloter une charge, lisez le cycle de service PWM avec un microcontrôleur. Les exemples ci-dessous mesurent le cycle de service et le mappent à une valeur d'intensité de 0 à 100 %.
+Si vous souhaitez que votre projet réagisse aux performances du Deepthroat Trainer plutôt que de piloter une charge, lisez le rapport cyclique PWM avec un microcontrôleur. Les exemples ci-dessous mesurent le rapport cyclique et l'associent à une valeur d'intensité de 0 à 100 %.
 
 <CodeGroup>
 ```cpp Arduino
@@ -204,33 +204,33 @@ finally:
 </CodeGroup>
 
 <Note>
-Si votre microcontrôleur fonctionne avec une logique de 5 V, assurez-vous que la broche d'entrée est tolérante à 3,3 V ou ajoutez un décalage/tampon de niveau. Ne réinjectez pas de 5 V dans le port accessoire.
+Si votre microcontrôleur fonctionne avec une logique de 5 V, assurez-vous que la broche d'entrée est tolérante à 3,3 V ou ajoutez un convertisseur/tampon de niveau. Ne réinjectez pas de 5 V dans le port accessoire.
 </Note>
 
 ## Directives de conception et bonnes pratiques
 
-- Protégez-vous contre le rebond inductif avec une diode entre les moteurs et les solénoïdes.
-- Gardez les câbles courts pour minimiser les sonneries de bord PWM et les EMI. Ajoutez un petit amortisseur RC au niveau de l'accessoire si nécessaire.
-- Utilisez un serre-câble sur le connecteur TRRS pour éviter les connexions intermittentes.
-- Validez avec une charge factice avant de fixer un accessoire portable ou en contact avec l'utilisateur.
+- Protégez le circuit contre les surtensions inductives en plaçant une diode de roue libre en parallèle sur les moteurs et les solénoïdes.
+- Gardez les câbles courts pour minimiser les oscillations sur les fronts PWM et les interférences électromagnétiques. Ajoutez un petit amortisseur RC au niveau de l'accessoire si nécessaire.
+- Utilisez un dispositif de décharge de traction sur le connecteur TRRS pour éviter les connexions intermittentes.
+- Validez avec une charge factice avant de connecter un accessoire porté sur le corps ou en contact avec l'utilisateur.
 - Documentez votre câblage et vos paramètres afin de pouvoir reproduire les résultats au fil des sessions.
 
 <AccordionGroup>
 <Accordion title="L'accessoire ne répond pas">
 - Confirmez que vous êtes connecté au bon conducteur (R1) pour PWM.
-- Vérifiez que la référence au sol correspond au schéma de brochage.
-- Testez avec une charge de résistance pour exclure les défauts d’accessoires.
+- Vérifiez que la référence de masse correspond au schéma de brochage.
+- Testez avec une charge résistive pour exclure les défauts d’accessoires.
 </Accordion>
 
-<Accordion title="Le résultat semble faible ou incohérent">
-- Mesurez le cycle de service réel et confirmez que l'étape de votre pilote ne se trouve pas dans une région linéaire.
+<Accordion title="La sortie semble faible ou incohérente">
+- Mesurez le rapport cyclique réel et confirmez que votre étage de commande ne se trouve pas dans une région linéaire.
 - Vérifiez les tensions d'alimentation et assurez-vous qu'il n'y a pas de baisse de tension lorsque la charge s'enclenche.
 - Réduisez la longueur du câble ou ajoutez un découplage à proximité de la charge.
 </Accordion>
 
-<Accordion title="Bruit électrique ou gémissement audible">
+<Accordion title="Bruit électrique ou sifflement audible">
 - Augmentez le filtrage PWM côté charge (RC ou LC), le cas échéant.
-- Ajoutez une résistance de grille (47-220 Ω) et minimisez la zone de boucle sur les chemins à di/dt élevé.
+- Ajoutez une résistance de grille (47–220 Ω) et minimisez la zone de boucle sur les chemins à di/dt élevé.
 - Montez la diode flyback à proximité des bornes de charge.
 </Accordion>
 </AccordionGroup>

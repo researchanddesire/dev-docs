@@ -7,9 +7,9 @@ Uw Chastity Lockbox beheert automatisch het energieverbruik via een reeks inacti
 
 ## Voortgang van de inactieve toestand
 
-Na elke gebruikersinteractie gaat het apparaat door een inactieve toestand op basis van de inactiviteitstijd:
+Na elke gebruikersinteractie gaat het apparaat door inactieve toestanden op basis van de inactiviteitstijd:
 
-| Staat | Time-out | Achtergrondverlichting | WiFi | Stroomverbruik |
+| Toestand | Time-out | Achtergrondverlichting | WiFi | Stroomverbruik |
 |-------|---------|-----------|------|-----------|
 | Actief | — | Volledig (100%) | Aangesloten | Normaal |
 | Inactief | 30 seconden | Gedimd (10%) | Aangesloten | Verminderd |
@@ -20,33 +20,33 @@ Na elke gebruikersinteractie gaat het apparaat door een inactieve toestand op ba
 Deze time-outs zijn cumulatief. Diepe slaap vindt plaats 10 minuten na de laatste interactie, niet 10 minuten nadat de pseudo-slaap begint.
 </Info>
 
-## Actieve staat
+## Actieve toestand
 
 Wanneer u uw apparaat actief gebruikt:
 
 - **Helderheid achtergrondverlichting**: 100% (waarde: 255)
-- **Alle sensoren**: Actief en bewakend
+- **Alle sensoren**: Actief en monitoren de toestand
 - **WiFi**: verbonden en gesynchroniseerd
 - **Motorcontroller**: Klaar voor commando's
 
-Elke druk op de knop of het draaien aan de encoder houdt het apparaat in de actieve status en reset de inactieve timer.
+Elke druk op de knop of het draaien aan de encoder houdt het apparaat in de actieve toestand en reset de inactieve timer.
 
-## Inactieve status (30 seconden)
+## Inactieve toestand (30 seconden)
 
 Na 30 seconden zonder interactie:
 
 - **Helderheid achtergrondverlichting**: gedimd tot ongeveer 10% (waarde: 24)
 - **Sensoren**: Actief
 - **WiFi**: Nog steeds verbonden
-- **Motorcontroller**: gewist (niet actief rijdend)
+- **Motorcontroller**: teruggezet (stuurt de motor niet actief aan)
 
 <Tip>
-Het gedimde scherm is nog steeds leesbaar. Deze status bespaart energie terwijl het display zichtbaar blijft als u naar uw apparaat kijkt.
+Het gedimde scherm is nog steeds leesbaar. Deze toestand bespaart energie terwijl het display zichtbaar blijft als u naar uw apparaat kijkt.
 </Tip>
 
 ### Wakker worden uit inactiviteit
 
-Elk van deze acties brengt het apparaat terug naar de actieve status:
+Elk van deze acties brengt het apparaat terug naar de actieve toestand:
 - Druk op een willekeurige knop
 - Draai aan de encoder
 - USB-kabel aangesloten of losgekoppeld
@@ -58,16 +58,16 @@ Na 2 minuten zonder interactie:
 - **Helderheid achtergrondverlichting**: Uit (waarde: 0)
 - **Scherm**: Nog steeds ingeschakeld, alleen donker
 - **WiFi**: Nog steeds verbonden: sleutelhouderopdrachten werken
-- **Motorcontroller**: gewist
+- **Motorcontroller**: teruggezet
 - **Stroomsensor (INA219)**: Gaat naar de energiebesparende modus
 
 <Note>
 Dit is de diepste slaapstand tijdens het opladen. Wanneer uw apparaat is aangesloten op USB-voeding, gaat het niet in de diepe slaapstand, waardoor het verbonden blijft om sleutelhouderopdrachten te ontvangen.
 </Note>
 
-### Ontwaak uit een pseudo-slaap
+### Wakker worden uit de pseudo-slaap
 
-Dezelfde triggers als waken bij inactieve toestand. De eerste interactie maakt het apparaat wakker; Mogelijk moet u nogmaals op drukken om de beoogde actie uit te voeren.
+Dezelfde triggers als bij het wakker worden uit de inactieve toestand. De eerste interactie maakt het apparaat wakker; mogelijk moet u nogmaals drukken om de beoogde actie uit te voeren.
 
 ## Diepe slaaptoestand (10 minuten)
 
@@ -75,7 +75,7 @@ Na 10 minuten geen interactie (en niet opladen):
 
 - **Achtergrondverlichting**: Uit
 - **Scherm**: Slaapmodus
-- **WiFi**: verbinding verbroken
+- **WiFi**: Verbinding verbroken
 - **Bluetooth**: Uit
 - **De meeste randapparatuur**: uitgeschakeld
 
@@ -85,18 +85,18 @@ In de diepe slaap kan uw apparaat geen sleutelhouderopdrachten ontvangen totdat 
 
 ### Beperkingen op het gebied van diepe slaap
 
-Diepe slaap wordt alleen geactiveerd als **al** deze voorwaarden waar zijn:
+Diepe slaap wordt alleen geactiveerd als aan **al** deze voorwaarden wordt voldaan:
 - Apparaat is 10 minuten inactief geweest
 - Apparaat is **niet** aangesloten op USB-voeding
 - Apparaat bevindt zich niet in bepaalde beveiligde statussen (kalibratie, WiFi-installatie)
 
-### Ontwaak uit een diepe slaap
+### Wakker worden uit een diepe slaap
 
 - Druk op de Enter-knop (indien op pinnen ≤21) of de Terug-knop
 - Automatische timer-activering als een vergrendelingstimer bijna voltooid is
 
 <Info>
-Wanneer voor een getimede vergrendeling minder dan de resterende pseudo-slaaptime-out overblijft, blijft het apparaat automatisch wakker om de ontgrendeling af te handelen.
+Wanneer er voor een getimede vergrendeling minder tijd resteert dan de pseudo-slaap-time-out, blijft het apparaat automatisch wakker om de ontgrendeling af te handelen.
 </Info>
 
 ## Laadgedrag
@@ -108,7 +108,7 @@ Wanneer uw apparaat is aangesloten op USB-voeding:
 | Opladen | Alleen pseudo-slaap |
 | Niet opladen | Volledige diepe slaap |
 
-Dit zorgt ervoor dat uw apparaat tijdens het opladen bereikbaar blijft voor dashboardopdrachten, terwijl de levensduur van de batterij wordt gemaximaliseerd wanneer deze op batterijvoeding werkt.
+Dit zorgt ervoor dat uw apparaat tijdens het opladen bereikbaar blijft voor dashboardopdrachten, terwijl de levensduur van de batterij wordt gemaximaliseerd wanneer het op batterijvoeding werkt.
 
 ## Op timer gebaseerd ontwaken
 
@@ -122,9 +122,9 @@ Dit betekent dat het apparaat uit de diepe slaap ontwaakt voordat uw vergrendeli
 
 ## Stroomverbruik
 
-Geschatte stroomopname in elke staat:
+Geschatte stroomopname in elke toestand:
 
-| Staat | Geschatte stroom |
+| Toestand | Geschatte stroom |
 |-------|------------------|
 | Actief | ~80-100mA |
 | Inactief | ~40-60mA |
@@ -141,7 +141,7 @@ Bij elke gebruikersinteractie wordt de inactieve timer opnieuw ingesteld. Bijgeh
 
 - Indrukken van knoppen (Enter, Terug)
 - Encoderrotatie
-- USB-voedingsstatus verandert
+- Veranderingen in de USB-voedingsstatus
 - Veranderingen in de sensorstatus (tijdens actieve bewaking)
 
 ## Technische referentie
@@ -171,10 +171,10 @@ Gebruiksvriendelijke gids voor automatische en handmatige slaapmodi.
 </Card>
 
 <Card title="Knopbediening" icon="hand-pointer" href="./button-controls">
-Hoe het indrukken van knoppen het apparaat en hun functies activeert.
+Hoe knopdrukken het apparaat wekken en welke functies ze activeren.
 </Card>
 
 <Card title="Offline-modus" icon="wifi-slash" href="./offline-mode">
-Wat gebeurt er als de diepe slaap de wifi-verbinding verbreekt?
+Wat gebeurt er als de diepe slaap de WiFi-verbinding verbreekt?
 </Card>
 </CardGroup>

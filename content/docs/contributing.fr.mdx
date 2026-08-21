@@ -1,48 +1,76 @@
 ---
 title: "Contribuer"
-description: "Modifiez la documentation R+D sur GitHub et soumettez une contribution publique révisée."
+description: "Modifiez la documentation R+D sur GitHub et soumettez une contribution publique pour examen."
 ---
 
 # Contribuer à la documentation technique
 
-Chaque titre de page et en-tête de section modifiable est doté d'un crayon subtil. Le sélectionner ouvre le fichier Markdown ou MDX correspondant sur la ligne exacte dans l'éditeur Web de GitHub sur `main`.
+Chaque titre de page et en-tête de section modifiable comporte un crayon discret.
+En le sélectionnant, vous ouvrez le fichier Markdown ou MDX correspondant à la
+ligne exacte dans l'éditeur web de GitHub sur `main`.
 
 ## Effectuer une modification rapide
 
 1. Sélectionnez le crayon à côté du titre de la page ou de la section que vous souhaitez améliorer.
 2. Connectez-vous à GitHub si vous y êtes invité.
 3. Modifiez la source en surbrillance. Si vous n'avez pas d'accès en écriture, GitHub crée automatiquement un fork pour vous.
-4. Sélectionnez **Proposer des modifications**, décrivez l'amélioration et ouvrez une demande d'extraction dans `main`.
-5. Laissez la validation du contenu public se terminer et répondez aux commentaires du responsable.
+4. Sélectionnez **Proposer des modifications**, décrivez l'amélioration et
+   ouvrez une pull request vers `main`.
+5. Laissez la validation du contenu public se terminer et répondez aux
+   commentaires des mainteneurs.
 
-Après approbation, l'automatisation synchronise le contenu identique en octets dans le référentiel d'application privé et le site rendu est déployé via la piste de publication normale. Les validations marquées `[docs-sync]` sont ignorées par le flux de travail réciproque, de sorte que le miroir bidirectionnel ne peut pas effectuer de boucle.
+Après approbation, l'automatisation synchronise le contenu identique octet par
+octet dans le dépôt privé de l'application et le site rendu est déployé via le
+circuit de publication habituel. Les commits marqués `[docs-sync]` sont ignorés
+par le flux de synchronisation en sens inverse, de sorte que le miroir
+bidirectionnel ne peut pas entrer dans une boucle.
 
-Les tâches de synchronisation comparent les hachages de l'arborescence de contenu Git après chaque transfert. Cela maintient les fichiers publics `main` identiques en octets à la source rendue afin qu'un lien d'édition ne puisse pas dériver silencieusement vers la mauvaise ligne.
+Les tâches de synchronisation comparent après chaque transfert les hachages de
+l'arborescence de contenu Git. Les fichiers publics sur `main` restent ainsi
+identiques octet par octet à la source rendue, et un lien d'édition ne peut pas
+dériver silencieusement vers la mauvaise ligne.
 
 ## Choisissez le bon référentiel
 
 | Site rendu                                       | Source publique                                                                         | Contenu modifiable |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------- | ---------------- |
-| [Guides de l'utilisateur](https://docs.researchanddesire.com)   | [rechercheetdésir/simple-docs](https://github.com/researchanddesire/simple-docs)     | `content/`       |
-| [Documents du développeur](https://dev.researchanddesire.com) | [recherche et désir/dev-docs](https://github.com/researchanddesire/dev-docs)            | `content/docs/`  |
-| [Assemblage R+D](https://ohai.researchanddesire.com)  | [rechercheetdésir/assemblage-docs](https://github.com/researchanddesire/assembly-docs) | `content/docs/`  |
+| [Guides de l'utilisateur](https://docs.researchanddesire.com) | [researchanddesire/simple-docs](https://github.com/researchanddesire/simple-docs) | `content/` |
+| [Documents du développeur](https://dev.researchanddesire.com) | [researchanddesire/dev-docs](https://github.com/researchanddesire/dev-docs) | `content/docs/` |
+| [R+D Assembly](https://ohai.researchanddesire.com) | [researchanddesire/assembly-docs](https://github.com/researchanddesire/assembly-docs) | `content/docs/` |
 
-L'application, le moteur de rendu Fumadocs, l'implémentation de l'API, les paramètres de déploiement et les informations d'identification restent dans le référentiel d'application privé. Les pages d'opération d'API individuelles sont générées à partir du document Dashboard OpenAPI, elles fournissent donc un lien **Signaler un problème de documentation d'API** au lieu d'un crayon de ligne source trompeur.
+L'application, le moteur de rendu Fumadocs, l'implémentation de l'API, les
+paramètres de déploiement et les identifiants restent dans le dépôt privé de
+l'application. Les pages individuelles d'opérations API sont générées à partir
+du document Dashboard OpenAPI et fournissent donc un lien **Signaler un problème
+de documentation API** au lieu d'un crayon de ligne source trompeur.
 
 ## Écrivez une contribution utile
 
-- Nommez le produit pris en charge, la révision matérielle, la version du micrologiciel ou le schéma API lorsque cela est important.
-- Liez les réclamations techniques à la mise en œuvre ou à la spécification utilisée pour les vérifier.
+- Mentionnez le produit pris en charge, la révision matérielle, la version du
+  micrologiciel ou le schéma API lorsque cela est important.
+- Reliez les affirmations techniques à l'implémentation ou à la spécification
+  utilisée pour les vérifier.
 - Conservez les images à côté de la page qui les utilise et vérifiez chaque chemin relatif.
-- Réutilisez les légendes, cartes, onglets, accordéons et étapes MDX existants.
-- Gardez chaque demande d'extraction ciblée et n'incluez jamais d'informations d'identification, d'informations privées sur le produit ou de sortie de build générée.
+- Réutilisez les encarts MDX, cartes, onglets, accordéons et étapes existants.
+- Gardez chaque pull request ciblée et n'incluez jamais d'identifiants,
+  d'informations privées sur le produit ou de sortie de build générée.
 
-Les petites corrections peuvent être effectuées entièrement dans GitHub. Pour des modifications plus importantes, dupliquez et clonez le référentiel public, modifiez son arborescence `content/` et utilisez l'extension Fumadocs Preview pour VS Code avant d'ouvrir la demande d'extraction.
+Les petites corrections peuvent être effectuées entièrement dans GitHub. Pour des
+modifications plus importantes, créez un fork et clonez le dépôt public, modifiez
+son arborescence `content/` et utilisez l'extension Fumadocs Preview pour VS Code
+avant d'ouvrir la pull request.
 
 ## Licence
 
-La documentation et les médias appartenant à R+D dans ces référentiels publics sont disponibles sous CC BY-SA 4.0, sauf indication contraire dans un fichier ou un répertoire. Les échantillons de code, la source du produit, le matériel matériel et les actifs tiers conservent leurs licences indiquées.
+La documentation et les médias appartenant à R+D dans ces dépôts publics sont
+disponibles sous CC BY-SA 4.0, sauf indication contraire dans un fichier ou un
+répertoire. Les exemples de code, le code source des produits, le matériel et
+les ressources tierces conservent leurs licences indiquées.
 
-Les procédures de construction physique appartiennent à [Assemblage R+D](https://ohai.researchanddesire.com/ossm) . Les instructions destinées au consommateur figurent dans les [Guides de l'utilisateur](https://docs.researchanddesire.com/) . Gardez les documents de développeur concentrés sur les API, les micrologiciels, les protocoles, les interfaces matérielles officielles et les intégrations.
+Les procédures de montage physique appartiennent à [R+D Assembly](https://ohai.researchanddesire.com/ossm).
+Les instructions destinées aux consommateurs figurent dans les [Guides de l'utilisateur](https://docs.researchanddesire.com/).
+Gardez la documentation destinée aux développeurs centrée sur les API, les
+micrologiciels, les protocoles, les interfaces matérielles officielles et les
+intégrations.
 
-GitHub documente le [flux complet de requêtes d'édition et de pull basé sur un fork](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files) .
+GitHub documente le [flux complet de modification et de pull request basé sur un fork](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files).

@@ -3,7 +3,7 @@ title: "Zubehöranschluss"
 description: "Technische Spezifikationen für den 3,5-mm-Zubehöranschluss und benutzerdefinierte Integrationsrichtlinien"
 ---
 
-Der Deep Throat Trainer verfügt über einen 3,5-mm-Zubehöranschluss, der kompatibles Vibrationszubehör für eine leistungsbasierte Verstärkung in Echtzeit antreibt.
+Der Deepthroat Trainer verfügt über einen 3,5-mm-Zubehöranschluss, der kompatibles Vibrationszubehör für eine leistungsbasierte Verstärkung in Echtzeit antreibt.
 
 ## Offizielles Zubehör
 
@@ -15,7 +15,7 @@ Der Zubehöranschluss gibt ein moduliertes Signal aus, das sich an die Trainings
 
 ### Verwendung mehrerer Zubehörteile
 
-Wenn Sie einen Vibe und einen Wand zusammen kaufen, legen wir ein Splitterkabel bei, damit Sie beide Zubehörteile während des Trainings gleichzeitig verwenden können. Schließen Sie den Splitter an den Zubehöranschluss des Trainers an und stecken Sie dann jedes Zubehör in den Splitter ein.
+Wenn Sie einen Vibe und einen Wand zusammen kaufen, legen wir ein Splitterkabel bei, damit Sie beide Zubehörteile während des Trainings gleichzeitig verwenden können. Schließen Sie den Splitter an den Zubehöranschluss des Deepthroat Trainers an und stecken Sie dann jedes Zubehör in den Splitter ein.
 
 <Tip>
 Der Stab ist für die äußerliche Anwendung konzipiert – halten Sie ihn manuell fest, stecken Sie ihn in die Unterwäsche oder positionieren Sie ihn so, wie es für Sie am besten ist.
@@ -25,24 +25,24 @@ Der Stab ist für die äußerliche Anwendung konzipiert – halten Sie ihn manue
 Die Verwendung mehrerer Zubehörteile erhöht den Batterieverbrauch. Wenn beide Zubehörteile angeschlossen sind, können Sie mit einer Akkulaufzeit von ca. 2–3 Stunden statt der üblichen 4 Stunden rechnen. Überwachen Sie Ihren Akkustand bei längeren Sitzungen.
 </Warning>
 
-## Port-Spezifikationen
+## Spezifikationen des Anschlusses
 
 Der Zubehöranschluss verwendet eine 4-Leiter-TRRS-Buchse (3,5 mm) mit den folgenden Eigenschaften.
 
 | Parameter | Spezifikation |
 |-----------|---------------|
 | Steckertyp | 3,5 mm TRRS (4-Leiter) |
-| Signalausgang | Erster Klingelton (R1) |
+| Signalausgang | Erster Ring (R1) |
 | Signaltyp | 3,3 V PWM (Pulsweitenmodulation) |
 | Maximaler Strom | Insgesamt 200 mA am Zubehörausgang |
-| Verhalten | Der Arbeitszyklus variiert dynamisch je nach Trainingsleistung |
+| Verhalten | Das Tastverhältnis variiert dynamisch je nach Trainingsleistung |
 
 <Note>
 PWM (Pulsweitenmodulation) schaltet den Ausgang schnell ein und aus. Die effektive Intensität wird durch das Tastverhältnis (Prozentsatz der Zeit, in der das Signal innerhalb jedes Zyklus eingeschaltet ist) gesteuert.
 </Note>
 
 <Warning>
-Befolgen Sie beim Anschließen externer Geräte an den Trainer die folgenden Sicherheitsrichtlinien:
+Befolgen Sie beim Anschließen externer Geräte an den Deepthroat Trainer die folgenden Sicherheitsrichtlinien:
 
 - Schließen Sie Hochspannungs- oder Netzgeräte niemals direkt an den Zubehöranschluss an.
 - Beachten Sie die grundlegende elektrische Sicherheit und halten Sie alle örtlichen Normen und Vorschriften ein.
@@ -52,7 +52,7 @@ Befolgen Sie beim Anschließen externer Geräte an den Trainer die folgenden Sic
 
 ## Pinbelegungsdiagramm
 
-Die Leiterpositionen und den Erdungsbezug finden Sie im Diagramm. Das PWM-Signal liegt am ersten Ring (R1) an.
+Die Positionen der Leiter und den Bezug zur Masse finden Sie im Diagramm. Das PWM-Signal liegt am ersten Ring (R1) an.
 
 <Frame caption="TRRS-Pinbelegungsdiagramm für den Zubehöranschluss">
   <img src="./_images/image (5).webp" alt="TRRS-Pinbelegungsdiagramm des Zubehöranschlusses mit Darstellung der 4-Leiter-Konfiguration" />
@@ -67,7 +67,7 @@ Die Leiterpositionen und den Erdungsbezug finden Sie im Diagramm. Das PWM-Signal
 Verwenden Sie die folgenden Schritte und Referenzdesigns, um den Zubehörausgang sicher in Ihre eigenen Projekte zu integrieren.
 
 <Steps>
-<Step title="Planen Sie Ihre Auslastung und Ihr Budget aktuell">
+<Step title="Planen Sie Ihre Last und das Strombudget">
   Bestimmen Sie das Zubehör oder den Stromkreis, den Sie ansteuern möchten, und stellen Sie sicher, dass nicht mehr als 200 mA vom Anschluss benötigt werden. Wenn mehr Strom oder eine andere Spannung benötigt wird, verwenden Sie eine Treiberstufe (Beispiel siehe unten).
 
 <Check>
@@ -76,15 +76,15 @@ Verwenden Sie die folgenden Schritte und Referenzdesigns, um den Zubehörausgang
 </Step>
 
 <Step title="Messen Sie das Signalverhalten auf Ihrem Gerät">
-  Messen Sie bei aktivem Trainer das PWM-Tastverhältnis und die Frequenz mit einem Multimeter mit Tastverhältnismodus oder einem Oszilloskop. Die Häufigkeit kann sich je nach Firmware-Version ändern. Design für einen angemessenen Bereich und nicht für einen festen Wert.
+  Messen Sie bei aktivem Deepthroat Trainer das PWM-Tastverhältnis und die Frequenz mit einem Multimeter mit Tastverhältnismodus oder einem Oszilloskop. Die Frequenz kann sich je nach Firmware-Version ändern; planen Sie für einen angemessenen Bereich statt für einen festen Wert.
 
 <Check>
-  Sie haben typische Arbeitszykluswerte bei niedriger, mittlerer und hoher Leistung aufgezeichnet und bestätigt, dass die Signalamplitude 3,3 V beträgt.
+  Sie haben typische Tastverhältniswerte bei niedriger, mittlerer und hoher Leistung aufgezeichnet und bestätigt, dass die Signalamplitude 3,3 V beträgt.
 </Check>
 </Step>
 
 <Step title="Prototyp mit sicherer Testlast">
-  Bevor Sie einen Motor oder Zubehör anschließen, beginnen Sie mit einer Widerstandslast innerhalb der 200-mA-Grenze (z. B. ≥22 Ω bei 3,3 V). Stellen Sie sicher, dass der Anschluss die Temperaturgrenzen nicht überschreitet und dass sich der Arbeitszyklus wie erwartet verhält.
+  Bevor Sie einen Motor oder ein Zubehörteil anschließen, beginnen Sie mit einer Widerstandslast innerhalb der 200-mA-Grenze (z. B. ≥22 Ω bei 3,3 V). Stellen Sie sicher, dass der Anschluss die Temperaturgrenzen nicht überschreitet und dass sich das Tastverhältnis wie erwartet verhält.
 
 <Warning>
   Schließen Sie den Ausgang nicht kurz. Verwenden Sie für zusätzlichen Schutz beim Testen ein strombegrenztes Tischnetzteil oder eine Inline-Sicherung.
@@ -92,18 +92,18 @@ Verwenden Sie die folgenden Schritte und Referenzdesigns, um den Zubehörausgang
 </Step>
 
 <Step title="Fügen Sie eine Treiberstufe für Lasten mit höherer Leistung hinzu">
-  Wenn Ihr Zubehör mehr Strom oder eine höhere Spannung benötigt, als der Anschluss liefert, verwenden Sie einen N-Kanal-MOSFET mit Logikpegel oder einen speziellen Low-Side-Treiber. Behalten Sie den Zubehörausgang des Trainers ausschließlich als Steuersignal bei.
+  Wenn Ihr Zubehör mehr Strom oder eine höhere Spannung benötigt, als der Anschluss liefert, verwenden Sie einen N-Kanal-MOSFET mit Logikpegel oder einen speziellen Low-Side-Treiber. Verwenden Sie den Zubehörausgang des Deepthroat Trainers ausschließlich als Steuersignal.
 
 <Check>
-  Sie können Ihr Zubehör vollständig nutzen, ohne die Grenzen des Anschlusses zu überschreiten, und der Trainer bleibt während des Betriebs kühl und stabil.
+  Sie können Ihr Zubehör vollständig ansteuern, ohne die Grenzen des Anschlusses zu überschreiten, und der Deepthroat Trainer bleibt während des Betriebs kühl und stabil.
 </Check>
 </Step>
 
 <Step title="Überprüfen und finalisieren Sie die Verkabelung">
-  Bestätigen Sie die Leiterzuordnung anhand des Pinbelegungsdiagramms. Verlegen Sie die Erdungen entsprechend Ihrem Design, fügen Sie einen Flyback-Schutz für induktive Lasten hinzu und entlasten Sie den TRRS-Stecker zugentlastet.
+  Bestätigen Sie die Leiterzuordnung anhand des Pinbelegungsdiagramms. Verlegen Sie die Masseverbindungen entsprechend Ihrem Design, fügen Sie einen Flyback-Schutz für induktive Lasten hinzu und sorgen Sie für eine Zugentlastung des TRRS-Steckers.
 
 <Check>
-  Wenn das Zubehör angeschlossen ist, passt sich die Ausgangsintensität der Leistung reibungslos an, ohne dass es zu Resets, Stromausfällen oder hörbaren Artefakten kommt.
+  Wenn das Zubehör angeschlossen ist, passt sich die Ausgangsintensität der Leistung reibungslos an, ohne dass es zu Resets, Spannungseinbrüchen oder hörbaren Artefakten kommt.
 </Check>
 </Step>
 </Steps>
@@ -124,14 +124,14 @@ Wenn Ihr Zubehör sich der 200-mA-Grenze nähert, messen Sie den Blockierstrom. 
 
 #### B. Externe Stromversorgung mit MOSFET-Low-Side-Treiber (>200 mA oder >3,3 V)
 
-- Versorgen Sie das Zubehör über eine externe Stromversorgung, die für seine Spannung/Stromstärke ausgelegt ist.
+- Versorgen Sie das Zubehör über eine externe Stromversorgung, die für seine Spannung und Stromstärke ausgelegt ist.
 - Verwenden Sie die PWM (R1) des Zubehöranschlusses als MOSFET-Gate-Antrieb.
 - Gemeinsame Designelemente:
-  - N-MOSFET mit Logikpegel (z. B. niedriger Rds(on) bei 3,3 V Gate)
+  - N-MOSFET mit Logikpegel (z. B. niedriger Rds(on) bei einem 3,3-V-Gate)
   - Gate-Widerstand: 47–220 Ω
   - Gate-zu-Source-Pulldown: 100 kΩ
-  - Flyback-Diode über induktiven Lasten (Motor/Magnet): Schnelle Diode, ausgelegt für Laststrom
-  - Gemeinsame Basis zwischen externer Versorgung und dem Trainer, falls Ihre Mess- und Isolationsstrategie dies erfordert
+  - Flyback-Diode parallel zu induktiven Lasten (Motor/Solenoid): schnelle Diode, ausgelegt für den Laststrom
+  - Gemeinsame Masse zwischen externer Versorgung und dem Deepthroat Trainer, falls Ihre Mess- und Isolationsstrategie dies erfordert
 
 <Info>
 Verwenden Sie zur galvanischen Trennung einen Optokoppler oder einen Gate-Treiber mit Isolierung und versorgen Sie die isolierte Seite entsprechend mit Strom. Stellen Sie sicher, dass Signalpolarität und Timing mit PWM kompatibel bleiben.
@@ -139,7 +139,7 @@ Verwenden Sie zur galvanischen Trennung einen Optokoppler oder einen Gate-Treibe
 
 ### Auslesen des PWM-Signals mit einem Mikrocontroller
 
-Wenn Sie möchten, dass Ihr Projekt auf die Leistung des Trainers reagiert, anstatt eine Last anzutreiben, lesen Sie den PWM-Arbeitszyklus mit einem Mikrocontroller aus. Die folgenden Beispiele messen den Arbeitszyklus und ordnen ihn einem Intensitätswert von 0–100 % zu.
+Wenn Sie möchten, dass Ihr Projekt auf die Leistung des Deepthroat Trainers reagiert, anstatt eine Last anzutreiben, lesen Sie das PWM-Tastverhältnis mit einem Mikrocontroller aus. Die folgenden Beispiele messen das Tastverhältnis und ordnen es einem Intensitätswert von 0–100 % zu.
 
 <CodeGroup>
 ```cpp Arduino
@@ -207,12 +207,12 @@ finally:
 Wenn Ihr Mikrocontroller mit einer 5-V-Logik arbeitet, stellen Sie sicher, dass der Eingangspin 3,3 V-tolerant ist, oder fügen Sie einen Pegelumsetzer/Puffer hinzu. Führen Sie keine 5 V zurück in den Zubehöranschluss.
 </Note>
 
-## Designrichtlinien und Best Practices
+## Designrichtlinien und bewährte Verfahren
 
-- Schützen Sie sich vor induktivem Rückschlag mit einer Diode zwischen Motoren und Magnetspulen.
-- Halten Sie die Kabelwege kurz, um PWM-Kantenschwingungen und elektromagnetische Störungen zu minimieren. Fügen Sie bei Bedarf einen kleinen RC-Snubber am Zubehör hinzu.
-- Verwenden Sie eine Zugentlastung am TRRS-Stecker, um unterbrochene Verbindungen zu vermeiden.
-- Führen Sie die Validierung mit einer Dummy-Last durch, bevor Sie ein tragbares Gerät oder ein Zubehörteil mit Benutzerkontakt anbringen.
+- Schützen Sie die Schaltung vor induktiven Spannungsspitzen, indem Sie eine Diode parallel zu Motoren und Solenoiden schalten.
+- Halten Sie die Kabelwege kurz, um Schwingungen an den PWM-Flanken und elektromagnetische Störungen zu minimieren. Fügen Sie bei Bedarf einen kleinen RC-Snubber am Zubehör hinzu.
+- Verwenden Sie eine Zugentlastung am TRRS-Stecker, um sporadische Verbindungsabbrüche zu vermeiden.
+- Führen Sie die Validierung mit einer Dummy-Last durch, bevor Sie am Körper getragenes Zubehör oder ein Zubehörteil mit Benutzerkontakt anbringen.
 - Dokumentieren Sie Ihre Verkabelung und Einstellungen, damit Sie die Ergebnisse sitzungsübergreifend reproduzieren können.
 
 <AccordionGroup>
@@ -223,12 +223,12 @@ Wenn Ihr Mikrocontroller mit einer 5-V-Logik arbeitet, stellen Sie sicher, dass 
 </Accordion>
 
 <Accordion title="Die Ausgabe scheint schwach oder inkonsistent zu sein">
-- Messen Sie den tatsächlichen Arbeitszyklus und stellen Sie sicher, dass sich Ihre Treiberstufe nicht in einem linearen Bereich befindet.
+- Messen Sie das tatsächliche Tastverhältnis und stellen Sie sicher, dass sich Ihre Treiberstufe nicht in einem linearen Bereich befindet.
 - Überprüfen Sie die Versorgungsspannungen und stellen Sie sicher, dass beim Einschalten der Last kein Spannungsabfall auftritt.
 - Reduzieren Sie die Kabellänge oder fügen Sie eine Entkopplung in der Nähe der Last hinzu.
 </Accordion>
 
-<Accordion title="Elektrisches Rauschen oder hörbares Jammern">
+<Accordion title="Elektrisches Rauschen oder hörbares Pfeifen">
 - Erhöhen Sie ggf. die PWM-Filterung auf der Lastseite (RC oder LC).
 - Fügen Sie einen Gate-Widerstand (47–220 Ω) hinzu und minimieren Sie die Schleifenfläche auf Pfaden mit hohem di/dt.
 - Montieren Sie die Flyback-Diode in der Nähe der Lastklemmen.

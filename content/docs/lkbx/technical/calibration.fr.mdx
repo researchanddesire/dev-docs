@@ -1,67 +1,67 @@
 ---
-title: "Calibrage"
-description: "Découvrez comment votre Chastity Lockbox se calibre automatiquement et que faire si vous rencontrez l'écran de calibrage"
+title: "Étalonnage"
+description: "Découvrez comment votre Chastity Lockbox se calibre automatiquement et que faire si l’écran d’étalonnage s’affiche"
 ---
 
 <iframe
-  className="w-full aspect-video arrondi-xl"
+  className="w-full aspect-video rounded-xl"
   src="https://www.loom.com/embed/481662e9ed284264b539d9e5fe4ac691"
-  title="Comment calibrer votre lockbox"
-  cadreBord="0"
-  Allow="accéléromètre ; lecture automatique ; écriture dans le presse-papiers ; support crypté ; gyroscope ; image dans l'image"
-  autoriserFullScreen
+  title="Comment étalonner votre Chastity Lockbox"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
 ></iframe>
 
 <AccordionGroup>
   <Accordion title="Transcription vidéo">
-    0:00 Salut ! Si vous êtes ici, c'est probablement parce que vous voyez ce message d'étalonnage sur votre coffre-fort de chasteté. Cela peut se produire si votre appareil a été reflashé ou si l'étalonnage, pour une raison quelconque, a été réinitialisé.
+    0:00 Bonjour ! Si vous êtes ici, c'est probablement parce que vous voyez ce message d'étalonnage sur votre Chastity Lockbox. Cela peut se produire si le micrologiciel de votre appareil a été reflashé ou si l'étalonnage a été réinitialisé pour une raison quelconque.
 
-    0:11 Ce n'est pas un problème, tout ce que vous avez à faire est simplement de le dire ou de suivre les instructions à l'écran. Donc ici, il me demande de maintenir le bouton droit enfoncé pour calibrer.
+    0:11 Ce n'est pas un problème. Il vous suffit de suivre l'invite ou les instructions à l'écran. Ici, l'appareil me demande de maintenir le bouton droit enfoncé pour procéder à l'étalonnage.
 
-    0:21 Cela identifie quelle broche est le bon bouton, puis cela calibrera le moteur.
+    0:21 Cela permet d'identifier quel pin correspond au bouton droit ; le moteur est ensuite étalonné.
   </Accordion>
 </AccordionGroup>
 
-## Qu’est-ce que l’étalonnage ?
+## Qu'est-ce que l'étalonnage ?
 
-L'étalonnage est un processus automatique qui apprend à votre Chastity Lockbox comment il est assemblé et comment il doit fonctionner. Cette étape garantit que votre appareil fonctionne correctement et en toute sécurité.
+L'étalonnage est un processus automatique qui apprend à votre Chastity Lockbox comment elle est assemblée et comment elle doit fonctionner. Cette étape garantit que votre appareil fonctionne correctement et en toute sécurité.
 
-## Quand l’étalonnage a-t-il lieu ?
+## Quand l'étalonnage a-t-il lieu ?
 
 <Tip>
-Votre Chastity Lockbox arrive pré-calibrée et prête à l’emploi.
+Votre Chastity Lockbox est pré-étalonnée et prête à l'emploi dès sa sortie de boîte.
 </Tip>
 
-Vous ne rencontrerez l’écran d’étalonnage que dans ces situations :
+Vous ne verrez l'écran d'étalonnage que dans les situations suivantes :
 
-1. **Après le flashage du micrologiciel** — Si vous avez mis à jour le logiciel de votre appareil, l'étalonnage s'exécute automatiquement une fois.
+1. **Après le flashage du micrologiciel** — Si vous avez mis à jour le logiciel de votre appareil, l'étalonnage s'exécute automatiquement une fois
 2. **Après une réinitialisation d'usine** — La réinitialisation de l'appareil efface les données d'étalonnage stockées
 
-## Que configure l’étalonnage ?
+## Que configure l'étalonnage ?
 
-L'étalonnage détecte et définit automatiquement trois paramètres critiques :
+L'étalonnage détecte et définit automatiquement trois paramètres importants :
 
-| Paramètre | But |
+| Paramètre | Objectif |
 |---------|---------|
 | **Orientation du moteur** | Détermine dans quelle direction le moteur tourne pour verrouiller et déverrouiller |
-| **Détection de verrouillage** | Apprend à l'appareil comment vérifier s'il est bien verrouillé |
-| **Niveau de puissance du moteur** | Définit une puissance optimale pour un verrouillage sécurisé tout en minimisant l'épuisement de la batterie |
+| **Détection du verrouillage** | Apprend à l'appareil à vérifier qu'il est correctement verrouillé |
+| **Niveau de puissance du moteur** | Définit une puissance optimale pour verrouiller en toute sécurité tout en minimisant la consommation de la batterie |
 
-## Rencontre avec l'écran d'étalonnage
+## Écran d'étalonnage
 
 <Steps>
-  <Step title="Calibrage des boutons">
-    L'appareil affiche « Calibration » et vous demande de maintenir le bouton Entrée enfoncé. Cela identifie quelle broche physique correspond à quel bouton : certaines variantes matérielles ont des configurations différentes.
+  <Step title="Étalonnage des boutons">
+    L'appareil affiche "Calibrating" et vous demande de maintenir le bouton Enter enfoncé. Cela permet d'identifier quel pin physique correspond à quel bouton ; certaines variantes matérielles ont des configurations différentes.
 
-    Appuyez et maintenez enfoncé le bouton Entrée/Verrouillage (le bouton droit) jusqu'à ce que l'appareil le reconnaisse.
+    Maintenez le bouton Enter/Lock (le bouton droit) enfoncé jusqu'à ce que l'appareil le reconnaisse.
   </Step>
-  <Step title="Calibrage du moteur">
-    L'appareil affiche « Calibration du moteur » et teste automatiquement le mécanisme de verrouillage :
+  <Step title="Étalonnage du moteur">
+    L'appareil affiche "Calibrating Motor" et teste automatiquement le mécanisme de verrouillage :
 
     1. Le moteur tente de se verrouiller
-    2. Les capteurs vérifient la position de verrouillage
+    2. Les capteurs vérifient la position verrouillée
     3. Le moteur tente de se déverrouiller
-    4. Les capteurs vérifient la position de déverrouillage
+    4. Les capteurs vérifient la position déverrouillée
 
     Cela détermine si le sens du moteur doit être inversé pour votre matériel.
 
@@ -70,20 +70,20 @@ L'étalonnage détecte et définit automatiquement trois paramètres critiques 
     </Warning>
   </Step>
   <Step title="Redémarrage automatique">
-    Une fois l'étalonnage terminé avec succès, l'appareil redémarre automatiquement et revient à un fonctionnement normal.
+    Une fois l’étalonnage terminé avec succès, l’appareil redémarre automatiquement et revient à un fonctionnement normal.
 
     <Check>
-    Vous ne verrez plus l'écran d'étalonnage à moins que vous ne reflasherez le micrologiciel ou que vous effectuiez une réinitialisation d'usine.
+    Vous ne verrez plus l'écran d'étalonnage à moins que vous ne reflasiez le micrologiciel ou n'effectuiez une réinitialisation d'usine.
     </Check>
   </Step>
 </Steps>
 
 ## Échecs d'étalonnage
 
-Si l'étalonnage échoue (le moteur n'atteint pas les positions attendues), l'appareil peut :
-- Réessayer automatiquement l'étalonnage
-- Afficher une erreur nécessitant une intervention manuelle
-- Doit être reflashé via le web flasher
+Si l'étalonnage échoue (le moteur n'atteint pas les positions attendues), l'appareil peut :
+- réessayer automatiquement l'étalonnage
+- afficher une erreur nécessitant une intervention manuelle
+- devoir être reflashé via le Web Flasher
 
 <Note>
 Si vous rencontrez des problèmes avec l'étalonnage ou si votre appareil ne répond pas comme prévu, contactez le support client à support@researchanddesire.com.

@@ -3,46 +3,74 @@ title: "Bijdragen"
 description: "Bewerk R+D-documentatie op GitHub en dien een beoordeelde publieke bijdrage in."
 ---
 
-# Technische documentatie bijdragen
+# Draag bij aan technische documentatie
 
-Elke bewerkbare paginatitel en sectiekop heeft een subtiel potlood. Als u dit selecteert, wordt het overeenkomstige Markdown- of MDX-bestand geopend op de exacte regel in de webeditor van GitHub op `main`.
+Elke bewerkbare paginatitel en sectiekop heeft een subtiel potlood. Als u het
+selecteert, wordt het overeenkomstige Markdown- of MDX-bestand op de exacte
+regel geopend in de webeditor van GitHub op `main`.
 
 ## Voer een snelle bewerking uit
 
 1. Selecteer het potlood naast de paginatitel of sectie die u wilt verbeteren.
 2. Meld u aan bij GitHub als daarom wordt gevraagd.
-3. Bewerk de gemarkeerde bron. Als je geen schrijftoegang hebt, maakt GitHub automatisch een fork voor je.
-4. Selecteer **Wijzigingen voorstellen**, beschrijf de verbetering en open een pull-aanvraag in `main`.
-5. Laat de validatie van de openbare inhoud voltooien en reageer op feedback van de onderhouder.
+3. Bewerk de gemarkeerde bron. Als u geen schrijftoegang hebt, maakt GitHub
+   automatisch een fork voor u.
+4. Selecteer **Wijzigingen voorstellen**, beschrijf de verbetering en open een
+   pull request naar `main`.
+5. Wacht tot de validatie van de openbare inhoud is voltooid en reageer op feedback van de maintainers.
 
-Na goedkeuring synchroniseert automatisering de byte-identieke inhoud naar de privéapplicatierepository en wordt de gerenderde site geïmplementeerd via het normale releasetraject. Vastleggingen gemarkeerd met `[docs-sync]` worden genegeerd door de wederkerige workflow, zodat de tweerichtingsspiegel geen lus kan maken.
+Na goedkeuring synchroniseert automatisering de byte-identieke inhoud naar de
+private applicatierepository en wordt de gerenderde site via het normale
+releasetraject uitgerold. Commits met `[docs-sync]` worden genegeerd door de
+workflow in de andere richting, zodat de tweerichtingsspiegel niet in een lus
+kan raken.
 
-De synchronisatietaken vergelijken de hashes van de Git-inhoudsboom na elke overdracht. Hierdoor blijven de openbare `main`-bestanden byte-identiek met de weergegeven broncode, zodat een bewerkingslink niet stilletjes naar de verkeerde regel kan afdrijven.
+De synchronisatietaken vergelijken na elke overdracht de hashes van de
+Git-inhoudsboom. Zo blijven de openbare bestanden op `main` byte-identiek aan de
+gerenderde bron en kan een bewerkingslink niet ongemerkt naar de verkeerde regel
+verschuiven.
 
 ## Kies de juiste opslagplaats
 
-| Gesmolten site                                       | Openbare bron                                                                         | Bewerkbare inhoud |
+| Gerenderde site                                      | Openbare bron                                                                         | Bewerkbare inhoud |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------- | ---------------- |
-| [Gebruikershandleidingen](https://docs.researchanddesire.com)   | [researchanddesire/simple-docs](https://github.com/researchanddesire/simple-docs)     | `content/`       |
-| [Documenten voor ontwikkelaars](https://dev.researchanddesire.com) | [researchanddesire/dev-docs](https://github.com/researchanddesire/dev-docs)           | `content/docs/`  |
-| [R+D-assemblage](https://ohai.researchanddesire.com)  | [researchanddesire/assemblage-docs](https://github.com/researchanddesire/assembly-docs) | `content/docs/`  |
+| [Gebruikershandleidingen](https://docs.researchanddesire.com) | [researchanddesire/simple-docs](https://github.com/researchanddesire/simple-docs) | `content/` |
+| [Documenten voor ontwikkelaars](https://dev.researchanddesire.com) | [researchanddesire/dev-docs](https://github.com/researchanddesire/dev-docs) | `content/docs/` |
+| [R+D Assembly](https://ohai.researchanddesire.com) | [researchanddesire/assembly-docs](https://github.com/researchanddesire/assembly-docs) | `content/docs/` |
 
-De applicatie, de Fumadocs-renderer, de API-implementatie, de implementatie-instellingen en de inloggegevens blijven in de privé-applicatierepository. Individuele API-bewerkingspagina's worden gegenereerd op basis van het Dashboard OpenAPI-document, dus ze bieden een link **Rapporteer een probleem met API-documenten** in plaats van een misleidend bronregelpotlood.
+De applicatie, de Fumadocs-renderer, de API-implementatie, de uitrolinstellingen
+en de inloggegevens blijven in de private applicatierepository. Afzonderlijke
+API-operatiepagina's worden gegenereerd uit het Dashboard OpenAPI-document en
+bieden daarom een link **Meld een probleem met API-documentatie** in plaats van
+een misleidend potlood naar de bronregel.
 
 ## Schrijf een nuttige bijdrage
 
-- Geef het ondersteunde product, de hardwarerevisie, de firmwareversie of het API-schema een naam als het er toe doet.
-- Koppel technische claims aan de implementatie of specificatie die wordt gebruikt om ze te verifiëren.
+- Vermeld het ondersteunde product, de hardwarerevisie, de firmwareversie of het
+  API-schema wanneer dat relevant is.
+- Koppel technische beweringen aan de implementatie of specificatie waarmee u ze
+  hebt geverifieerd.
 - Bewaar afbeeldingen naast de pagina die ze gebruikt en verifieer elk relatief pad.
-- Hergebruik de bestaande MDX-bijschriften, kaarten, tabbladen, accordeons en stappen.
-- Zorg ervoor dat elk pull-verzoek gefocust is en voeg nooit inloggegevens, privéproductinformatie of gegenereerde build-uitvoer toe.
+- Hergebruik de bestaande MDX-callouts, kaarten, tabbladen, accordeons en
+  stappen.
+- Houd elke pull request gericht en neem nooit inloggegevens,
+  privéproductinformatie of gegenereerde build-uitvoer op.
 
-Kleine correcties kunnen geheel in GitHub worden uitgevoerd. Voor grotere wijzigingen kunt u de openbare repository splitsen en klonen, de `content/`-structuur bewerken en de Fumadocs Preview-extensie voor VS Code gebruiken voordat u de pull-aanvraag opent.
+Kleine correcties kunnen volledig in GitHub worden uitgevoerd. Voor grotere
+wijzigingen kunt u de openbare repository forken en klonen, de `content/`-structuur
+bewerken en de Fumadocs Preview-extensie voor VS Code gebruiken voordat u de pull
+request opent.
 
 ## Licentie
 
-Documentatie, proza ​​en media die eigendom zijn van R+D, in deze openbare opslagplaatsen is beschikbaar onder CC BY-SA 4.0, tenzij een bestand of map anders aangeeft. Codevoorbeelden, productbron, hardwaremateriaal en activa van derden behouden hun vermelde licenties.
+Documentatietekst en media die eigendom zijn van R+D in deze openbare repositories
+zijn beschikbaar onder CC BY-SA 4.0, tenzij een bestand of map anders aangeeft.
+Codevoorbeelden, productbroncode, hardwaremateriaal en assets van derden behouden
+hun vermelde licenties.
 
-Fysieke bouwprocedures horen thuis in [R+D-assemblage](https://ohai.researchanddesire.com/ossm). Consumenteninstructies horen thuis in de [Gebruikershandleidingen](https://docs.researchanddesire.com/). Houd ontwikkelaarsdocumentatie gericht op API's, firmware, protocollen, officiële hardware-interfaces en integraties.
+Fysieke montageprocedures horen in [R+D Assembly](https://ohai.researchanddesire.com/ossm).
+Consumenteninstructies horen in de [Gebruikershandleidingen](https://docs.researchanddesire.com/).
+Houd de Developer Docs gericht op API's, firmware, protocollen, officiële
+hardware-interfaces en integraties.
 
-GitHub documenteert de volledige [bewerking en op fork gebaseerde pull-aanvraagstroom](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files).
+GitHub documenteert de volledige [flow voor bewerken en op forks gebaseerde pull requests](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files).

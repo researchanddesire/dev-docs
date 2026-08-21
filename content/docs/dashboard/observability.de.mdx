@@ -1,25 +1,28 @@
 ---
-title: "PostHog-Beobachtbarkeit"
-description: "Behalten Sie die Telemetrie-, Identitäts-, Datenschutz- und Freigabeverträge des R+D-Dashboards bei."
+title: "PostHog-Observability"
+description: "Bewahren Sie die Telemetrie-, Identitäts-, Datenschutz- und Release-Verträge für das R+D Dashboard."
 ---
 
-# PostHog-Beobachtbarkeit
+# PostHog-Observability
 
-Die gesamte Repository-Telemetrie gehört zum **RD Dashboard** PostHog-Projekt
-(`279829`, US Cloud). Build Tooling lehnt eine andere Projekt-ID ab. Nicht
-Verbinden Sie Entwicklungs-, Bereitstellungs- oder Quellzuordnungstools mit einem anderen PostHog
-Projekt.
+Die gesamte Telemetrie des Repositorys gehört zum **RD Dashboard**-PostHog-Projekt
+(`279829`, US Cloud). Die Build-Tools lehnen eine andere Projekt-ID ab. Verbinden Sie
+Entwicklungs-, Bereitstellungs- oder Quellkarten-Tools niemals mit einem anderen PostHog-Projekt.
 
 ## Bereitstellungskonfiguration
 
-Web-, Admin- und Kinky Makers-Bereitstellungen verwenden Folgendes:
+Web-, Admin-, sämtliche Dokumentations- und Kinky Makers-Bereitstellungen verwenden Folgendes:
 
 - `NEXT_PUBLIC_POSTHOG_KEY`
 - `NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com`
 - `POSTHOG_PROJECT_ID=279829`
-- `POSTHOG_API_KEY` als optionaler persönlicher Schlüssel nur für den Server mit nur dem
-  benötigte Quellkarten-Upload-Berechtigungen. Ohne sie ist die Bereitstellung erfolgreich
-  aber überspringt das Hochladen der Quellkarte.
+- `POSTHOG_API_KEY` als optionaler persönlicher, nur serverseitig verwendeter Schlüssel mit
+  ausschließlich den für den Quellkarten-Upload erforderlichen Berechtigungen. Ohne ihn ist die
+  Bereitstellung erfolgreich, überspringt jedoch den Quellkarten-Upload.
+
+Dokumentationsbereitstellungen erfordern außerdem `NEXT_PUBLIC_SUPABASE_URL` und
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` des Release-Tracks, damit die gemeinsame
+Dashboard-Sitzung die numerische `User.id` auflösen kann.
 
 Native EAS-Umgebungen erfordern `EXPO_PUBLIC_POSTHOG_KEY`,
 `EXPO_PUBLIC_POSTHOG_HOST` und `EXPO_PUBLIC_APP_ENV`. Native Quellkarten und
@@ -27,53 +30,58 @@ Symbole erfordern zusätzlich `POSTHOG_CLI_API_KEY`,
 `POSTHOG_CLI_HOST=https://us.posthog.com` und
 `POSTHOG_CLI_PROJECT_ID=279829`.
 
-Supabase Edge-Funktionen erfordern `POSTHOG_PROJECT_KEY`, `POSTHOG_HOST` und
-`DEPLOYMENT_ENVIRONMENT`. Leiten Sie fehlgeschlagene Anfragen an Protokolle weiter. Erfolgreiches Gerät
-Telemetriedaten werden vom Web-Proxy als Produktereignisse zusammengefasst.
+Supabase-Edge-Funktionen erfordern `POSTHOG_PROJECT_KEY`, `POSTHOG_HOST` und
+`DEPLOYMENT_ENVIRONMENT`. Leiten Sie fehlgeschlagene Anfragen an Logs weiter. Erfolgreiche
+Geräte-Telemetrie wird vom Web-Proxy als Produktereignisse zusammengefasst.
 
-Geben Sie niemals einen persönlichen API-Schlüssel über `NEXT_PUBLIC_` oder `EXPO_PUBLIC_` preis
-Variable.
+Geben Sie niemals einen persönlichen API-Schlüssel über eine Variable mit dem Präfix
+`NEXT_PUBLIC_` oder `EXPO_PUBLIC_` preis.
 
 ## Identitätsvertrag
 
-- RAD-Web-, Native-, Admin- und Server-Ereignisse identifizieren eine angemeldete Person mit
-  die Dezimalanwendung `User.id`, serialisiert als String.
-- Kinky Makers verwendet `km:<Supabase auth UUID>`, bis es das RAD-Profil teilt
-  Modell. Das Präfix verhindert versehentliche Identitätszusammenführungen.
-- Browser- und native Clients rufen `reset()` beim Abmelden und vor Änderungen auf
-  identifizierte Konten.
-- Hardware ist eine `device`-Gruppe. Eine MAC-Adresse ist niemals eine Personen-ID oder eine Gruppe
-  Schlüssel; Verwenden Sie die gehashte stabile Gerätekennung.
+- RAD-Web-, Dokumentations-, native, Admin- und Serverereignisse identifizieren eine angemeldete Person anhand der
+  dezimalen Anwendungs-ID `User.id`, die als Zeichenfolge serialisiert wird.
+- Kinky Makers verwendet `km:<Supabase auth UUID>`, bis es das RAD-Profilmodell teilt. Das
+  Präfix verhindert versehentliche Identitätszusammenführungen.
+- Browser- und native Clients rufen beim Abmelden und vor dem Wechsel zu anderen identifizierten
+  Konten `reset()` auf.
+- Hardware ist eine `device`-Gruppe. Eine MAC-Adresse ist niemals eine Personen-ID oder ein
+  Gruppenschlüssel; verwenden Sie den gehashten stabilen Gerätebezeichner.
 
-Diese Regeln ermöglichen es Supportmitarbeitern, von einer Anwendungsbenutzer-ID auszugehen und diese zu finden
-Web-, Native-, Server-, Sitzungs-, Fehler- und Protokolldatensätze einer Person ohne Offenlegung
-private Hardware-IDs.
+Diese Regeln ermöglichen es Supportmitarbeitenden, anhand einer Anwendungsbenutzer-ID die Web-,
+nativen, Server-, Sitzungs-, Fehler- und Protokolldatensätze dieser Person zu finden, ohne private
+Hardware-IDs offenzulegen.
 
 ## Erforderlicher Kontext und Privatsphäre
 
-Jeder Dienst fügt `service_name`, `platform`, `environment`, Release oder hinzu
-Version und Bereitstellungskennungen, sofern verfügbar. Auch fehlgeschlagene Serveranfragen
-Route, Methode, Anforderungs-ID und `traceparent` anhängen.
+Jeder Dienst fügt, sofern verfügbar, `service_name`, `platform`, `environment`, eine Release- oder
+Versionsnummer sowie Bereitstellungskennungen hinzu. Fehlgeschlagene Serveranfragen enthalten
+außerdem Route, Methode, Anforderungs-ID und `traceparent`.
 
-Senden Sie keine Anfragetexte, Zugriffstoken, E-Mail-Adressen, vertrauliche Inhalte usw.
-Eingabeaufforderungen, rohe MAC-Adressen oder Geräteanmeldeinformationen. Halten Sie Wiedergabeeingaben maskiert.
-Kinky Makers maskiert den gesamten gerenderten Text. Die Admin-Wiedergabe ist nur strukturell: Text, Eingaben und Attribute werden maskiert; Datensätze, Nachrichten, Abfragen, Bilder, Video, Canvas, Konsole und Netzwerkverkehr werden blockiert.
+Senden Sie keine Anfragekörper, Zugriffstoken, E-Mail-Adressen, intimen Inhalte, Prompts oder
+Antworten, Suchtexte, lokale Dateiinhalte, rohe MAC-Adressen oder Geräteanmeldedaten. Die
+Docs-Wiedergabe maskiert Eingaben und blockiert Gerätepanels. Die Admin-Wiedergabe ist nur
+strukturell: Sie maskiert Text, Eingaben und Attribute und blockiert Datensätze, Nachrichten,
+Abfragen, Bilder, Video und Canvas. Beide Oberflächen unterdrücken lokal die Aufzeichnung von
+Konsole und Netzwerkverkehr. Abfragezeichenfolgen und Fragmente werden aus Ereignis- und Replay-URLs
+entfernt. Die Analytics-Präferenz der übergeordneten Domäne ermöglicht Besuchern, sich auf den
+kanonischen Browseroberflächen abzumelden.
 
-## Freigabeverifizierung
+## Release-Verifizierung
 
 Nach jeder Staging- oder Produktionsbereitstellung:
 
-1. Bestätigen Sie, dass ein Ereignis die erwartete `environment`-, Git-SHA-Bereitstellung enthält
-   ID, Anwendungsversion, Dienst und Plattform.
-2. Bestätigen Sie, dass Web- und native Ereignisse für dasselbe RAD-Konto dieselben Zahlen verwenden
-   eindeutige ID.
-3. Bestätigen Sie die Abmeldung, gefolgt von einer anderen Anmeldung, wodurch keine Identitätszusammenführung erfolgt
-   Verschluckungswarnung.
-4. Bestätigen Sie, dass Web-, Admin-, Kinky Makers-, native und Edge-Funktionsdaten verfügbar sind
-   getrennt nach Service und Umgebung.
-5. Bestätigen Sie, dass eine Testausnahme über die hochgeladene Quellzuordnung zur Quelle aufgelöst wird
-   oder native Symbole.
-6. Bestätigen Sie, dass ein Serverausfall ein Fehlerproblem und ein entsprechendes OTLP-Protokoll verursacht.
+1. Bestätigen Sie, dass ein Ereignis die erwartete `environment`, den Git-SHA, die
+   Bereitstellungs-ID, die Anwendungsversion, den Dienst und die Plattform enthält.
+2. Bestätigen Sie, dass Web- und native Ereignisse für dasselbe RAD-Konto dieselbe numerische
+   distinct ID verwenden.
+3. Bestätigen Sie, dass nach der Abmeldung und einer anderen Anmeldung keine Warnung zur
+   Identitätszusammenführung bei der Erfassung entsteht.
+4. Bestätigen Sie, dass sich Daten aus Web, Admin, Kinky Makers, nativen Clients und Edge-Funktionen
+   nach Dienst und Umgebung trennen lassen.
+5. Bestätigen Sie, dass eine Testausnahme über die hochgeladene Quellzuordnung oder native
+   Symbole bis zur Quelle aufgelöst werden kann.
+6. Bestätigen Sie, dass ein Serverfehler ein Fehler-Issue und ein korreliertes OTLP-Log erzeugt.
 7. Bestätigen Sie, dass Geräteereignisse eine `device`-Gruppe und keine rohe MAC-Adresse enthalten.
 
 Das Repository-Runbook unter `docs/posthog-observability.md` enthält die

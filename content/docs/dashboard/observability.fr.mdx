@@ -1,80 +1,90 @@
 ---
 title: "Observabilité PostHog"
-description: "Préserver les contrats de télémétrie, d'identité, de confidentialité et de publication du tableau de bord R+D."
+description: "Préserver les contrats de télémétrie, d'identité, de confidentialité et de publication du R+D Dashboard."
 ---
 
 # Observabilité PostHog
 
-Toutes les télémétries du référentiel appartiennent au projet **RD Dashboard** PostHog
-(`279829`, US Cloud). Les outils de génération rejettent un ID de projet différent. Ne pas
-connecter des outils de développement, de déploiement ou de mappage source à un autre PostHog
-projet.
+Toute la télémétrie du référentiel relève du projet **RD Dashboard** PostHog
+(`279829`, US Cloud). Les outils de compilation rejettent un ID de projet différent. Ne
+connectez jamais les outils de développement, de déploiement ou de mappage des sources à un autre
+projet PostHog.
 
 ## Configuration du déploiement
 
-Les déploiements Web, administrateur et Kinky Makers utilisent :
+Les déploiements Web, Admin, de toute la documentation et de Kinky Makers utilisent :
 
 - `NEXT_PUBLIC_POSTHOG_KEY`
 - `NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com`
 - `POSTHOG_PROJECT_ID=279829`
-- `POSTHOG_API_KEY` en tant que clé personnelle facultative réservée au serveur avec uniquement le
-  autorisations de téléchargement de carte source dont il a besoin. Sans cela, le déploiement réussit
-  mais ignore le téléchargement de la carte source.
+- `POSTHOG_API_KEY` comme clé personnelle facultative, réservée au serveur, avec uniquement les
+  autorisations nécessaires au téléversement des cartes sources. Sans cette clé, le déploiement
+  réussit mais ignore le téléversement des cartes sources.
+
+Les déploiements de la documentation nécessitent également `NEXT_PUBLIC_SUPABASE_URL` et
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` de la piste de publication, afin que la session
+partagée du tableau de bord puisse résoudre la valeur numérique de `User.id`.
 
 Les environnements EAS natifs nécessitent `EXPO_PUBLIC_POSTHOG_KEY`,
-`EXPO_PUBLIC_POSTHOG_HOST` et `EXPO_PUBLIC_APP_ENV`. Cartes sources natives et
+`EXPO_PUBLIC_POSTHOG_HOST` et `EXPO_PUBLIC_APP_ENV`. Les cartes sources natives et
 les symboles nécessitent en outre `POSTHOG_CLI_API_KEY`,
 `POSTHOG_CLI_HOST=https://us.posthog.com`, et
 `POSTHOG_CLI_PROJECT_ID=279829`.
 
-Les fonctions Supabase Edge nécessitent `POSTHOG_PROJECT_KEY`, `POSTHOG_HOST` et
-`DEPLOYMENT_ENVIRONMENT`. Transférer les demandes ayant échoué vers les journaux. Appareil réussi
-la télémétrie est résumée sous forme d'événements de produit par le proxy Web.
+Les fonctions Edge de Supabase nécessitent `POSTHOG_PROJECT_KEY`, `POSTHOG_HOST` et
+`DEPLOYMENT_ENVIRONMENT`. Transférez les requêtes ayant échoué vers Logs. La télémétrie des
+appareils collectée avec succès est résumée sous forme d'événements produit par le proxy Web.
 
-N'exposez jamais une clé API personnelle via un `NEXT_PUBLIC_` ou `EXPO_PUBLIC_`
-variable.
+N'exposez jamais une clé API personnelle via une variable portant le préfixe `NEXT_PUBLIC_` ou
+`EXPO_PUBLIC_`.
 
 ## Contrat d'identité
 
-- Les événements RAD Web, natifs, d'administration et de serveur identifient une personne connectée avec
-  l'application décimale `User.id`, sérialisée sous forme de chaîne.
-- Kinky Makers utilise `km:<Supabase auth UUID>` jusqu'à ce qu'il partage le profil RAD
-  modèle. Le préfixe empêche les fusions d’identités accidentelles.
-- Le navigateur et les clients natifs appellent `reset()` lors de la déconnexion et avant de modifier
-  comptes identifiés.
-- Le matériel est un groupe `device`. Une adresse MAC n'est jamais un identifiant de personne ou de groupe
-  clé; utilisez l’identifiant de périphérique stable haché.
+- Les événements Web, de documentation, natifs, Admin et côté serveur de RAD identifient une personne connectée
+  avec l'ID d'application décimal `User.id`, sérialisé sous forme de chaîne.
+- Kinky Makers utilise `km:<Supabase auth UUID>` jusqu'à ce qu'il partage le modèle de profil RAD.
+  Le préfixe empêche les fusions d'identités accidentelles.
+- Les clients navigateur et natifs appellent `reset()` lors de la déconnexion et avant de changer
+  de compte identifié.
+- Le matériel constitue un groupe `device`. Une adresse MAC n'est jamais un identifiant de personne
+  ni une clé de groupe ; utilisez l'identifiant stable haché de l'appareil.
 
-Ces règles permettent au personnel d'assistance de partir d'un ID utilisateur d'application et de constater que
-les enregistrements Web, natifs, de serveur, de session, d'erreur et de journal de la personne sans les exposer
-identifiants matériels privés.
+Ces règles permettent au personnel de support de partir d'un ID utilisateur d'application pour
+retrouver les enregistrements Web, natifs, côté serveur, de session, d'erreur et de journal de cette
+personne sans exposer les identifiants matériels privés.
 
 ## Contexte et confidentialité requis
 
-Chaque service attache `service_name`, `platform`, `environment`, version ou
-version et identifiants de déploiement lorsqu’ils sont disponibles. Les requêtes du serveur ont également échoué
-attachez l'itinéraire, la méthode, l'ID de demande et `traceparent`.
+Chaque service ajoute les éléments suivants lorsqu'ils sont disponibles : `service_name`, `platform`,
+`environment`, un numéro de version ou de release, ainsi que les identifiants de déploiement. Les requêtes côté serveur
+ayant échoué ajoutent également la route, la méthode, l'ID de requête et `traceparent`.
 
 N'envoyez pas de corps de requête, de jetons d'accès, d'adresses e-mail, de contenu intime,
-invites, adresses MAC brutes ou informations d’identification de l’appareil. Gardez les entrées de relecture masquées.
-Kinky Makers masque tout le texte rendu. La relecture administrateur est structurelle uniquement : le texte, les entrées et les attributs sont masqués, tandis que les enregistrements, messages, requêtes, images, vidéos, canevas, console et trafic réseau sont bloqués.
+de prompts ou de réponses, de texte de recherche, de contenu des fichiers locaux, d'adresses MAC
+brutes ou d'informations d'identification de l'appareil. La relecture Docs masque les entrées et
+bloque les panneaux d'appareil. La relecture Admin est structurelle uniquement : elle masque le
+texte, les entrées et les attributs et bloque les enregistrements, messages, requêtes, images,
+vidéos et canevas. Les deux surfaces désactivent localement l’enregistrement de la console et du trafic réseau.
+Les chaînes de requête et les fragments sont supprimés des URL d'événements et de relecture.
+La préférence d'analyse du domaine parent permet aux visiteurs de refuser le suivi sur les surfaces
+de navigateur canoniques.
 
-## Vérification de la version
+## Vérification de la publication
 
-Après chaque déploiement intermédiaire ou de production :
+Après chaque déploiement de staging ou de production :
 
-1. Confirmer qu'un événement contient le déploiement attendu de `environment`, Git SHA
-   ID, version de l'application, service et plate-forme.
-2. Confirmez que les événements Web et natifs pour le même compte RAD utilisent le même chiffre
-   ID distinct.
-3. Confirmer la déconnexion suivie d'une connexion différente ne crée aucune fusion d'identité
-   avertissement d'ingestion.
-4. Confirmez que les données Web, d'administration, Kinky Makers, natives et de fonction Edge peuvent être
-   séparés par service et environnement.
-5. Confirmer qu'une exception de test est résolue en source via la carte source téléchargée
-   ou des symboles natifs.
-6. Confirmez qu'une panne de serveur crée un problème d'erreur et un journal OTLP corrélé.
+1. Confirmez qu'un événement contient `environment`, le Git SHA, l'ID de déploiement, la version
+   de l'application, le service et la plateforme attendus.
+2. Confirmez que les événements Web et natifs du même compte RAD utilisent le même distinct ID
+   numérique.
+3. Confirmez qu'une déconnexion suivie d'une autre connexion ne crée aucun avertissement
+   d'ingestion lié à une fusion d'identité.
+4. Confirmez que les données Web, Admin, Kinky Makers, natives et des fonctions Edge
+   peuvent être séparées par service et environnement.
+5. Confirmez qu'une exception de test est résolue jusqu'à la source via la carte source téléversée
+   ou les symboles natifs.
+6. Confirmez qu'une défaillance du serveur crée un problème d'erreur et un journal OTLP corrélé.
 7. Confirmez que les événements de périphérique contiennent un groupe `device` et aucune adresse MAC brute.
 
-Le runbook du référentiel sur `docs/posthog-observability.md` contient le
-liste de contrôle de l'opérateur correspondante.
+Le runbook du référentiel sur `docs/posthog-observability.md` contient la liste de contrôle
+correspondante pour les opérateurs.

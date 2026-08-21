@@ -1,13 +1,13 @@
 ---
 title: "API-overzicht"
-description: "Programmatisch toegang krijgen tot uw Research- en Desire-gegevens met de REST API"
+description: "Krijg met de REST API programmatisch toegang tot uw gegevens van Research and Desire"
 ---
 
 Met de Research and Desire API heeft u toegang tot uw dashboardgegevens vanuit externe applicaties, scripts en integraties. Bij elk API-verzoek worden de rechten van uw account gerespecteerd: u heeft alleen toegang tot gegevens die u mag zien.
 
 <Info>
-  API-toegang is een **Ultra**-functie. Je hebt een actief Ultra-abonnement nodig
-  maak API-tokens. [Meer informatie over Ultra](https://dashboard.researchanddesire.com/app/settings/subscription).
+  API-toegang is een **Ultra**-functie. U hebt een actief Ultra-abonnement nodig
+  om API-tokens te maken. [Meer informatie over Ultra](https://dashboard.researchanddesire.com/app/settings/subscription).
 </Info>
 
 ## Basis-URL
@@ -22,11 +22,11 @@ https://dashboard.researchanddesire.com/api/v1
 
 <CardGroup cols={2}>
   <Card title="Authenticatie" icon="key" href="./authentication">
-    Maak API-tokens en leer hoe u verzoeken kunt verifiëren.
+    Maak API-tokens en leer hoe u verzoeken kunt authenticeren.
   </Card>
 
   <Card title="Eindpuntreferentie" icon="code" href="./endpoints/users">
-    Blader door alle beschikbare eindpunten voor Gebruikers, DTT, LKBX en OSSM.
+    Blader door alle beschikbare eindpunten voor Users, DTT, LKBX en OSSM.
   </Card>
 </CardGroup>
 
@@ -47,14 +47,14 @@ https://dashboard.researchanddesire.com/api/v1
 
   </Step>
 
-  <Step title="Parseer het antwoord">
+  <Step title="Analyseer het antwoord">
     Alle antwoorden volgen een consistent JSON-envelopformaat.
   </Step>
 </Steps>
 
 ## Antwoordformaat
 
-Bij elk antwoord wordt dezelfde envelop gebruikt:
+Bij elk antwoord wordt dezelfde envelopstructuur gebruikt:
 
 **Succes:**
 
@@ -76,14 +76,14 @@ Bij elk antwoord wordt dezelfde envelop gebruikt:
 
 ## Paginering
 
-Lijsteindpunten ondersteunen paginering via queryparameters:
+Eindpunten voor lijsten ondersteunen paginering via queryparameters:
 
 | Parameter | Standaard | Max | Beschrijving                 |
 | --------- | ------- | --- | --------------------------- |
 | `limit`   | 50      | 100 | Aantal records dat moet worden geretourneerd |
 | `offset`  | 0       | -   | Aantal records dat moet worden overgeslagen   |
 
-Gepagineerde antwoorden omwikkelen de data-array met pagineringsmetagegevens:
+Gepagineerde antwoorden bevatten de data-array samen met pagineringsmetagegevens:
 
 ```json
 {
@@ -105,24 +105,23 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
   "https://dashboard.researchanddesire.com/api/v1/users?limit=25&offset=25"
 ```
 
-## Tariefbeperking
+## Beperking van de verzoekfrequentie
 
 <Note>
-  De API hanteert momenteel geen strikte tarieflimieten, maar houd er rekening mee
-  respectvol met uw verzoekvolume. Overmatig gebruik kan leiden tot throttling
-  in toekomstige releases.
+  De API hanteert momenteel geen strikte limieten voor het aantal verzoeken, maar houd uw
+  verzoekvolume redelijk. Overmatig gebruik kan in toekomstige releases worden beperkt.
 </Note>
 
 ## Machtigingen en RLS
 
 Uw API-token neemt exact dezelfde machtigingen over als uw dashboardaccount. Dit betekent:
 
-- Je kunt alleen **je eigen apparaten** en **apparaten die met je zijn gedeeld** via partnerschappen zien
-- Bij het vergrendelen van sessieacties worden de machtigingen van de sleutelhouder gerespecteerd
+- U kunt alleen **uw eigen apparaten** en **apparaten die via partnerschappen met u zijn gedeeld** zien
+- Acties voor slotsessies respecteren de machtigingen van de sleutelhouder
 - Gebruikersquery's retourneren alleen gebruikers waarmee u een verbinding heeft
 
 <Warning>
   Behandel uw API-token als een wachtwoord. Iedereen met uw token heeft toegang tot uw
-  gegevens. Als een token is aangetast, trekt u deze onmiddellijk in via **Instellingen > API
-  Sleutels**.
+  gegevens. Als een token is aangetast, trekt u deze onmiddellijk in via
+  **Instellingen > API-sleutels**.
 </Warning>

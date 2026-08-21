@@ -1,32 +1,32 @@
 ---
 title: "Authenticatie"
-description: "Maak en beheer API-tokens om uw verzoeken te verifiëren"
+description: "Maak en beheer API-tokens om uw verzoeken te authenticeren"
 ---
 
-Voor alle API-aanvragen is een geldig API-token vereist dat wordt doorgegeven in de `Authorization`-header. Tokens zijn JWT's die zijn ondertekend met de identiteit van uw account, dus alle gegevenstoegang respecteert automatisch uw accountrechten.
+Voor alle API-verzoeken is een geldig API-token vereist dat wordt doorgegeven in de `Authorization`-header. Tokens zijn JWTs die zijn ondertekend met de identiteit van uw account, zodat elke toegang tot gegevens automatisch uw accountrechten respecteert.
 
 <Info>
-  Voor het maken van API-tokens is een **Ultra**-abonnement vereist. Als je er geen hebt
-  toch, bezoek [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription) om te upgraden.
+  Voor het maken van API-tokens is een **Ultra**-abonnement vereist. Als u dat nog niet hebt,
+  ga dan naar [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription) om te upgraden.
 </Info>
 
 ## Een token maken
 
 <Steps>
-  <Step title="Navigeer naar API-sleutels">
+  <Step title="Ga naar API-sleutels">
     Ga naar **Instellingen > API-sleutels** in de zijbalk van het dashboard.
   </Step>
 
 <Step title="Klik op Token maken">
   Klik op de knop **Token maken** en geef uw token een beschrijvende naam
-  (bijvoorbeeld "Home Assistant-integratie" of "Python-script").
+  (bijvoorbeeld "Home Assistant Integration" of "Python Script").
 </Step>
 
   <Step title="Kopieer uw token">
     Uw token wordt precies één keer weergegeven. Kopieer het en bewaar het veilig.
 
     <Warning>
-    U kunt dit token niet meer zien. Als u deze kwijtraakt, moet u een nieuwe maken.
+    U kunt dit token niet meer zien. Als u het kwijtraakt, moet u een nieuw token maken.
     </Warning>
 
   </Step>
@@ -70,28 +70,28 @@ const data = await response.json();
 
 ### Tokens bekijken
 
-De instellingenpagina **API Keys** toont al uw actieve tokens met:
+De instellingenpagina **API-sleutels** toont al uw actieve tokens:
 
-- **Naam** — het label dat je hebt toegewezen
+- **Naam** — het label dat u hebt toegewezen
 - **Aangemaakt** — toen het token werd aangemaakt
-- **Laatst gebruikt** — de laatste keer dat het token werd gebruikt om een ​​verzoek in te dienen
+- **Laatst gebruikt** — wanneer het token voor het laatst is gebruikt om een verzoek te doen
 
 ### Tokens intrekken
 
-Klik op het prullenbakpictogram naast een token om het in te trekken. De intrekking vindt onmiddellijk plaats: alle verzoeken die dat token gebruiken, zullen onmiddellijk `401 Unauthorized`-antwoorden ontvangen.
+Klik op het prullenbakpictogram naast een token om dit in te trekken. Het intrekken gebeurt onmiddellijk: verzoeken die dit token gebruiken, krijgen meteen antwoorden met `401 Unauthorized`.
 
-<Tip> Tokens periodiek intrekken en opnieuw maken als best practice op het gebied van beveiliging. </Tip>
+<Tip>Trek tokens regelmatig in en maak ze opnieuw aan als goede beveiligingspraktijk.</Tip>
 
 ### Tokenlimieten
 
-Je kunt maximaal **5 actieve tokens** tegelijk hebben. Als je meer nodig hebt, trek dan eerst een ongebruikt token in.
+U kunt maximaal **5 actieve tokens** tegelijk hebben. Als u er meer nodig hebt, trek dan eerst een ongebruikt token in.
 
 ## Foutreacties
 
 | Status | Betekenis                                                      |
 | ------ | ------------------------------------------------------------ |
-| `401`  | Ontbrekende, ongeldige, verlopen of ingetrokken token                  |
-| `403`  | Token is geldig, maar u heeft geen toestemming voor deze actie |
+| `401`  | Ontbrekend, ongeldig, verlopen of ingetrokken token                    |
+| `403`  | Het token is geldig, maar u hebt geen toestemming voor deze actie       |
 | `404`  | Bron niet gevonden (of niet toegankelijk met uw rechten) |
 
 <ResponseExample>

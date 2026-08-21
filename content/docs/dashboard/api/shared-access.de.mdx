@@ -1,39 +1,40 @@
 ---
 title: "Gemeinsamer Zugriff und Schlüsselinhaber"
-description: "Wie die API Daten an Sie und Ihre verknüpften Benutzer weiterleitet und wie Schlüsselinhaber die Sitzungen eines Lockees lesen"
+description: "Wie die API Daten auf Sie und Ihre verknüpften Benutzer beschränkt und wie Schlüsselinhaber die Sitzungen von Lockees lesen"
 ---
 
-Jeder Endpunkt ist auf die Benutzer beschränkt, auf die Sie Zugriff haben: **Sie selbst sowie alle Personen, die über eine Partnerschaft mit Ihrem Konto verknüpft sind**. Ihr API-Token erbt genau dieselben Berechtigungen wie Ihr Dashboard-Konto, sodass Sie nie Daten sehen, die Sie nicht bereits im Dashboard sehen könnten.
+Jeder Endpunkt ist auf die Benutzer beschränkt, auf die Sie Zugriff haben: **Sie selbst sowie alle Personen, die über eine Partnerschaft mit Ihrem Konto verknüpft sind**. Ihr API-Token erbt exakt dieselben Berechtigungen wie Ihr Dashboard-Konto, sodass Sie nie Daten sehen, die Sie nicht bereits im Dashboard sehen könnten.
 
-Auf dieser Seite wird erläutert, wie diese Festlegung des Gültigkeitsbereichs in der gesamten API funktioniert – insbesondere für Schlüsselinhaber, die die Daten ihres Lockees lesen. Die Anfrage- und Antwortdetails jedes einzelnen Endpunkts finden Sie auf der entsprechenden Seite in der Referenz (z. B. [Sitzungen sperren](/api-reference/lock-sessions/list-lock-sessions)).
+Auf dieser Seite wird erläutert, wie diese Zugriffsbeschränkung in der gesamten API funktioniert – insbesondere für Schlüsselinhaber, die die Daten ihres Lockees lesen. Die Anfrage- und Antwortdetails jedes einzelnen Endpunkts finden Sie auf der entsprechenden Seite in der Referenz (z. B. [Lock Sessions](/api-reference/lock-sessions/list-lock-sessions)).
 
 ## Schlüsselinhaber verwenden dieselben Endpunkte
 
-Schlüsselinhaber sind immer verknüpfte Benutzer. Das bedeutet **es gibt keine separate Schlüsselhalter-API** – als Schlüsselhalter listen und lesen Sie die Daten Ihres Lockees mit genau denselben Endpunkten, die Sie für Ihre eigenen verwenden. Die Ergebnisse umfassen lediglich die Sitzungen und Geräte aller mit Ihnen verknüpften Benutzer.
+Schlüsselinhaber sind immer verknüpfte Benutzer. Das bedeutet: **Es gibt keine separate Schlüsselinhaber-API** – als Schlüsselinhaber rufen Sie die Daten Ihres Lockees über genau dieselben Endpunkte ab, die Sie auch für Ihre eigenen Daten verwenden. Die Ergebnisse umfassen lediglich die Sitzungen und Geräte aller mit Ihnen verknüpften Benutzer.
 
-- [Sperrsitzungen auflisten](/api-reference/lock-sessions/list-lock-sessions) gibt die Sitzungen Ihres Lockees neben Ihren eigenen zurück. Verwenden Sie das Feld `ownerId` in jedem Datensatz, um anzugeben, um welche Sitzung es sich handelt.
-- [Holen Sie sich eine aktive Sperrsitzung](/api-reference/lock-sessions/get-active-lock-session) akzeptiert einen `targetUserId`-Abfrageparameter, sodass ein Schlüsselinhaber überprüfen kann, ob die Sperre eines Lockee ausgeführt wird, ohne dass der Lockee dies meldet.
+- [List Lock Sessions](/api-reference/lock-sessions/list-lock-sessions) gibt die Sitzungen Ihres Lockees neben Ihren eigenen zurück. Verwenden Sie das Feld `ownerId` in jedem Datensatz, um zu erkennen, wem die Sitzung gehört.
+- [Get Active Lock Session](/api-reference/lock-sessions/get-active-lock-session) akzeptiert den Abfrageparameter `targetUserId`, sodass ein Schlüsselinhaber überprüfen kann, ob die Sperre eines Lockees aktiv ist, ohne dass der Lockee dies melden muss.
 
 <Info>
-  Der `ownerId` einer Sperrsitzung ist der Benutzer, der die Sperre trägt. Wenn Sie die Taste gedrückt halten
-  Jemand, seine Sitzungen erscheinen in Ihren Ergebnissen mit ihrem `ownerId`, nicht mit Ihren.
+  Der Wert `ownerId` einer Sperrsitzung bezeichnet den Benutzer, der die Sperre trägt. Wenn Sie
+  als Schlüsselinhaber für jemanden fungieren, erscheinen dessen Sitzungen in
+  Ihren Ergebnissen mit dessen `ownerId`, nicht mit Ihrem.
 </Info>
 
 ## Suchen der ID eines verknüpften Benutzers
 
-Endpunkte, die auf einen anderen Benutzer reagieren (z. B. `targetUserId`), benötigen eine numerische Benutzer-ID. Rufen Sie [Benutzer auflisten](/api-reference/users/list-users) auf, um die mit Ihnen verknüpften Benutzer und deren IDs zu ermitteln. Dadurch werden Sie selbst und alle Personen angezeigt, die über Partnerschaften mit Ihnen verbunden sind, gefiltert nach Ihren Kontoberechtigungen.
+Endpunkte, die auf einen anderen Benutzer zugreifen (z. B. `targetUserId`), benötigen eine numerische Benutzer-ID. Um die mit Ihnen verknüpften Benutzer und ihre IDs zu ermitteln, rufen Sie [List Users](/api-reference/users/list-users) auf – die Antwort enthält Sie selbst und alle über Partnerschaften mit Ihnen verbundenen Personen, gefiltert nach Ihren Kontoberechtigungen.
 
 ## Zugriff außerhalb Ihrer Berechtigungen
 
 Die API gibt niemals Daten – oder auch nur die Existenz von Daten – außerhalb Ihres Zugriffs preis. Wie eine Anfrage abgelehnt wird, hängt davon ab, wie sie das Ziel identifiziert:
 
-| Stil anfordern | Außerhalb Ihres Zugangs |
+| Anfragetyp | Außerhalb Ihres Zugriffs |
 | ------------- | ------------------- |
-| Rufen Sie eine Sitzung anhand der ID ab (z. B. [Sperrsitzung nach ID abrufen](/api-reference/lock-sessions/get-lock-session-by-id)). | Gibt `404` zurück – die API unterscheidet bewusst nicht zwischen „existiert nicht“ und „nicht von Ihnen“. |
-| Übergeben Sie einen `targetUserId` (z. B. [Holen Sie sich eine aktive Sperrsitzung](/api-reference/lock-sessions/get-active-lock-session)) | Gibt `403` zurück – das Ziel ist ein Benutzer, auf den Sie keinen Zugriff haben |
+| Sitzung anhand der ID abrufen (z. B. [Get Lock Session by ID](/api-reference/lock-sessions/get-lock-session-by-id)) | Gibt `404` zurück – die API unterscheidet bewusst nicht zwischen „existiert nicht“ und „nicht von Ihnen“ |
+| Einen `targetUserId` übergeben (z. B. [Get Active Lock Session](/api-reference/lock-sessions/get-active-lock-session)) | Gibt `403` zurück – das Ziel ist ein Benutzer, auf den Sie keinen Zugriff haben |
 
 <Note>
-  Weil eine Nach-ID-Suche `404` sowohl für eine fehlende als auch für eine solche Sitzung zurückgibt
-  gehört jemand anderem, Sie können damit nicht prüfen, ob eine bestimmte Sitzungs-ID vorhanden ist
-  existiert. Das ist Absicht.
+  Da eine Suche nach ID sowohl für eine fehlende Sitzung als auch für eine Sitzung,
+  die jemand anderem gehört, `404` zurückgibt, können Sie damit nicht prüfen, ob
+  eine bestimmte Sitzungs-ID existiert. Das ist beabsichtigt.
 </Note>
