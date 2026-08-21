@@ -1,64 +1,64 @@
 ---
 title: "Kalibrierung"
-description: "Erfahren Sie, wie sich Ihre Chastity Lockbox selbst kalibriert und was zu tun ist, wenn Sie auf den Kalibrierungsbildschirm stoßen."
+description: "Erfahren Sie, wie sich Ihre Chastity Lockbox selbst kalibriert und was zu tun ist, wenn der Kalibrierungsbildschirm angezeigt wird."
 ---
 
 <iframe
-  className="w-vollständiges Seitenverhältnis-Video gerundet-xl"
+  className="w-full aspect-video rounded-xl"
   src="https://www.loom.com/embed/481662e9ed284264b539d9e5fe4ac691"
-  title="So kalibrieren Sie Ihr Lockbox"
-  FrameBorder="0"
+  title="So kalibrieren Sie Ihre Chastity Lockbox"
+  frameBorder="0"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  AllowFullScreen
+  allowFullScreen
 ></iframe>
 
 <AccordionGroup>
   <Accordion title="Videotranskript">
-    0:00 Hallo! Wenn Sie hier sind, liegt das wahrscheinlich daran, dass Sie diese Kalibrierungsmeldung auf Ihrem Keuschheitsschließfach sehen. Dies kann passieren, wenn Ihr Gerät erneut geflasht wurde oder die Kalibrierung aus irgendeinem Grund zurückgesetzt wurde.
+    0:00 Hallo! Wenn Sie hier sind, sehen Sie wahrscheinlich diese Kalibrierungsmeldung auf Ihrer Chastity Lockbox. Das kann passieren, wenn die Firmware Ihres Geräts neu geflasht oder die Kalibrierung aus irgendeinem Grund zurückgesetzt wurde.
 
-    0:11 Das ist kein Problem, Sie müssen es nur einfach sagen oder den Anweisungen auf dem Bildschirm folgen. Hier werde ich also aufgefordert, zum Kalibrieren die rechte Taste gedrückt zu halten.
+    0:11 Das ist kein Problem. Folgen Sie einfach der Aufforderung beziehungsweise den Anweisungen auf dem Bildschirm. Hier werde ich aufgefordert, zum Kalibrieren die rechte Taste gedrückt zu halten.
 
-    0:21 Dadurch wird ermittelt, welcher Pin der richtige Knopf ist, und dann wird der Motor kalibriert.
+    0:21 Dadurch wird ermittelt, welcher Pin der rechten Taste entspricht; anschließend wird der Motor kalibriert.
   </Accordion>
 </AccordionGroup>
 
 ## Was ist Kalibrierung?
 
-Bei der Kalibrierung handelt es sich um einen automatischen Prozess, der Ihrer Chastity Lockbox beibringt, wie sie zusammengebaut ist und wie sie funktionieren soll. Dieser Schritt stellt sicher, dass Ihr Gerät ordnungsgemäß und sicher funktioniert.
+Kalibrierung ist ein automatischer Prozess, durch den Ihre Chastity Lockbox lernt, wie sie aufgebaut ist und wie sie funktionieren soll. Dieser Schritt stellt sicher, dass Ihr Gerät ordnungsgemäß und sicher funktioniert.
 
 ## Wann erfolgt die Kalibrierung?
 
 <Tip>
-Ihr Keuschheitsschloss wird vorkalibriert und sofort einsatzbereit geliefert.
+Ihre Chastity Lockbox wird vorkalibriert und sofort einsatzbereit geliefert.
 </Tip>
 
 Der Kalibrierungsbildschirm wird nur in den folgenden Situationen angezeigt:
 
-1. **Nach dem Flashen der Firmware** – Wenn Sie die Software Ihres Geräts aktualisiert haben, wird die Kalibrierung einmal automatisch ausgeführt
-2. **Nach einem Zurücksetzen auf die Werkseinstellungen** – Durch das Zurücksetzen des Geräts werden die gespeicherten Kalibrierungsdaten gelöscht
+1. **Nach dem Flashen der Firmware** — Wenn Sie die Software Ihres Geräts aktualisiert haben, wird die Kalibrierung einmal automatisch ausgeführt
+2. **Nach einem Zurücksetzen auf die Werkseinstellungen** — Durch das Zurücksetzen des Geräts werden die gespeicherten Kalibrierungsdaten gelöscht
 
 ## Was konfiguriert die Kalibrierung?
 
-Die Kalibrierung erkennt und stellt automatisch drei kritische Parameter ein:
+Die Kalibrierung erkennt und konfiguriert automatisch drei wichtige Parameter:
 
 | Einstellung | Zweck |
 |---------|---------|
 | **Motorausrichtung** | Legt fest, in welche Richtung sich der Motor zum Verriegeln und Entriegeln dreht |
-| **Sperrerkennung** | Bringt dem Gerät bei, zu überprüfen, ob es sicher gesperrt ist |
+| **Schlosserkennung** | Bringt dem Gerät bei, zu erkennen, wann es sicher verriegelt ist |
 | **Motorleistungsstufe** | Stellt die optimale Leistung für eine sichere Verriegelung ein und minimiert gleichzeitig den Batterieverbrauch |
 
-## Begegnung mit dem Kalibrierungsbildschirm
+## Kalibrierungsbildschirm
 
 <Steps>
   <Step title="Tastenkalibrierung">
-    Das Gerät zeigt „Kalibrierung“ an und fordert Sie auf, die Eingabetaste gedrückt zu halten. Dadurch wird identifiziert, welcher physische Pin welcher Taste entspricht – einige Hardwarevarianten haben unterschiedliche Konfigurationen.
+    Das Gerät zeigt „Calibrating“ an und fordert Sie auf, die Enter-Taste gedrückt zu halten. Dadurch wird ermittelt, welcher physische Pin welcher Taste entspricht – einige Hardwarevarianten haben unterschiedliche Konfigurationen.
 
-    Halten Sie die Eingabe-/Sperrtaste (die rechte Taste) gedrückt, bis das Gerät dies bestätigt.
+    Halten Sie die Enter/Lock-Taste (die rechte Taste) gedrückt, bis das Gerät dies bestätigt.
   </Step>
   <Step title="Motorkalibrierung">
-    Das Gerät zeigt „Motor kalibrieren“ an und testet automatisch den Verriegelungsmechanismus:
+    Das Gerät zeigt „Calibrating Motor“ an und testet automatisch den Verriegelungsmechanismus:
 
-    1. Der Motor versucht zu blockieren
+    1. Der Motor versucht zu verriegeln
     2. Sensoren überprüfen die Verriegelungsposition
     3. Der Motor versucht zu entriegeln
     4. Sensoren überprüfen die Entriegelungsposition
@@ -80,10 +80,10 @@ Die Kalibrierung erkennt und stellt automatisch drei kritische Parameter ein:
 
 ## Kalibrierungsfehler
 
-Wenn die Kalibrierung fehlschlägt (Motor erreicht nicht die erwarteten Positionen), kann das Gerät Folgendes tun:
-- Versuchen Sie die Kalibrierung automatisch erneut
-- Zeigt einen Fehler an, der einen manuellen Eingriff erfordert
-- Muss über den Web-Flasher neu geflasht werden
+Wenn die Kalibrierung fehlschlägt (der Motor erreicht die erwarteten Positionen nicht), kann das Gerät:
+- die Kalibrierung automatisch erneut versuchen
+- einen Fehler anzeigen, der einen manuellen Eingriff erfordert
+- über den Web Flasher neu geflasht werden müssen
 
 <Note>
 Wenn Sie Probleme mit der Kalibrierung haben oder Ihr Gerät nicht wie erwartet reagiert, wenden Sie sich an den Kundensupport unter support@researchanddesire.com.

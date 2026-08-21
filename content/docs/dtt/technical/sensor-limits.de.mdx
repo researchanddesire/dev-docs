@@ -10,71 +10,71 @@ Der Deepthroat Trainer nutzt einen Ultraschall-Abstandssensor, um die Position d
 | Spezifikation | Wert |
 |---------------|-------|
 | **Maximale Reichweite** | 22,5 cm (ca. 9 Zoll) |
-| **Tote Zone** | 1,7 cm (ca. 0,67 Zoll) |
-| **Effektiver Nutzbereich** | 20,8 cm (ca. 8,2 Zoll) |
+| **Totzone** | 1,7 cm (ca. 0,67 Zoll) |
+| **Effektiv nutzbarer Bereich** | 20,8 cm (ca. 8,2 Zoll) |
 | **Mindesthublänge** | 0,8 cm (ca. 0,3 Zoll) |
 
 <Info>
-Die Totzone ist der Bereich, der dem Sensor am nächsten liegt und Positionsänderungen nicht genau erkennen kann. Objekte innerhalb dieser Zone werden möglicherweise nicht richtig registriert.
+Die Totzone ist der Bereich unmittelbar vor dem Sensor, in dem er Positionsänderungen nicht genau erkennen kann. Objekte innerhalb dieser Zone werden möglicherweise nicht richtig registriert.
 </Info>
 
-## Wie der Sensor funktioniert
+## Funktionsweise des Sensors
 
 Der Abstandssensor erfasst kontinuierlich Ihre Position und verarbeitet die Daten, um reibungslose und genaue Messwerte zu liefern:
 
-- **Abtastrate**: 40 Abtastwerte werden gemittelt, um das Rauschen zu reduzieren
+- **Abtastrate**: 40 Messwerte werden gemittelt, um das Rauschen zu reduzieren
 - **Geschwindigkeitsberechnung**: Basierend auf Positionsänderungen im Laufe der Zeit
 - **Richtungserkennung**: Verfolgt, ob Sie sich auf den Sensor zu oder von ihm weg bewegen
 
 <Note>
-Der Sensor verwendet einen Ringpuffer der letzten Messwerte. Bei plötzlichen, ruckartigen Bewegungen kann es einen Moment dauern, bis der Puffer aktualisiert wird.
+Der Sensor verwendet einen Ringpuffer der letzten Messwerte. Bei plötzlichen, ruckartigen Bewegungen kann es einen Moment dauern, bis der Puffer aktualisiert ist und die Bewegung genau registriert wird.
 </Note>
 
 ## Positionsmessung
 
-Positionen werden in Zentimetern vom Sensor gemessen:
+Positionen werden in Zentimetern vom Sensor aus gemessen:
 
 - **Startposition**: Normalerweise die „Ruheposition“, weiter vom Sensor entfernt
 - **Endposition**: Die Zieltiefe, näher am Sensor
 - **Zielfenster**: Der akzeptable Bereich um die Zielposition
 
 Für die Trainingsgenauigkeit werden die Positionen auf gültige Bereiche beschränkt:
-- Minimale erkennbare Position: 1,7 cm (Totzonengrenze)
+- Minimale erkennbare Position: 1,7 cm (Grenze der Totzone)
 - Maximal erkennbare Position: 22,5 cm
 
 ## Kalibrierung
 
 Die Kalibrierung erfasst zwei Schlüsselpositionen:
 
-1. **Minimale Position**: Die nächstgelegene angenehme Tiefe (gemittelt aus 100 Proben)
-2. **Maximale Position**: Die Ruhe-/Startposition (100 Proben gemittelt)
+1. **Minimum position**: Die nächstgelegene angenehme Tiefe (gemittelt aus 100 Messwerten)
+2. **Maximum position**: Die Ruhe-/Startposition (100 Messwerte gemittelt)
 
 <Tip>
-Um optimale Ergebnisse zu erzielen, halten Sie das Gerät während der Kalibrierung ruhig. Der Trainer erfasst an jeder Position 100 Proben, um genaue Messungen sicherzustellen.
+Um optimale Ergebnisse zu erzielen, halten Sie während der Kalibrierung still. Der Trainer erfasst an jeder Position 100 Messwerte, um genaue Messungen sicherzustellen.
 </Tip>
 
-### Spielzeugkalibrierung vs. Gerätekalibrierung
+### Spielzeugkalibrierung und Gerätekalibrierung
 
 - **Gerätekalibrierung**: Legt den gesamten Sensorbereich für Ihr Setup fest
-- **Spielzeugkalibrierung**: In der Cloud gespeichert, speichert die Einstellungen für bestimmte Spielzeuge
+- **Spielzeugkalibrierung**: Wird in der Cloud gespeichert und merkt sich die Einstellungen für bestimmte Spielzeuge
 
 Bei Verwendung der Cloud-Kalibrierung (Software 2.0+) werden die Kalibrierungsdaten pro Spielzeug gespeichert und sitzungsübergreifend synchronisiert.
 
 ## Einschränkungen
 
-### Tote Zone
-Objekte im Umkreis von 1,7 cm um den Sensor können nicht genau gemessen werden. Trainingssegmente werden automatisch angepasst, um diese Grenze einzuhalten.
+### Totzone
+Objekte innerhalb von 1,7 cm vom Sensor können nicht genau gemessen werden. Trainingssegmente werden automatisch angepasst, um diese Grenze einzuhalten.
 
 ### Maximale Reichweite
 Der Sensor kann keine Positionen über 22,5 cm erkennen. Wenn Ihr Setup längere Distanzen erfordert, sollten Sie eine Neupositionierung des Trainers in Betracht ziehen.
 
-### Minimaler Hub
-Sehr kleine Bewegungen (weniger als 0,8 cm) werden möglicherweise nicht als separate Striche registriert. Dadurch wird sichergestellt, dass der Trainer Mikrobewegungen nicht als absichtliche Handlungen zählt.
+### Mindesthub
+Sehr kleine Bewegungen (weniger als 0,8 cm) werden möglicherweise nicht als separate Hübe registriert. Dadurch wird sichergestellt, dass der Trainer Mikrobewegungen nicht als absichtliche Handlungen zählt.
 
 ### Umweltfaktoren
 
 <Warning>
-Der Sensor kann beeinträchtigt sein durch:
+Der Sensor kann durch Folgendes beeinträchtigt werden:
 - Reflektierende Oberflächen in der Nähe des Erfassungsbereichs
 - Sehr weiche oder schallabsorbierende Materialien
 - Extreme Temperaturen
@@ -85,7 +85,7 @@ Der Sensor kann beeinträchtigt sein durch:
 <AccordionGroup>
 <Accordion title="Die Sensorwerte scheinen ungenau zu sein">
 - Kalibrieren Sie das Gerät neu
-- Stellen Sie sicher, dass das Spielzeug richtig im Weg des Sensors positioniert ist
+- Stellen Sie sicher, dass das Spielzeug richtig im Erfassungsbereich des Sensors positioniert ist
 - Stellen Sie sicher, dass der Erfassungsbereich durch nichts behindert wird
 </Accordion>
 

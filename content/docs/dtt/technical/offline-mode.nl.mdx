@@ -1,128 +1,128 @@
 ---
 title: "Offline-modus"
-description: "Je trainer gebruiken zonder internetverbinding"
+description: "Uw Trainer gebruiken zonder internetverbinding"
 ---
 
-Uw Deepthroat Trainer kan offline werken met behulp van in de cache opgeslagen sessiegegevens. Hoewel voor sommige functies connectiviteit nodig is, kun je nog steeds trainen als er geen wifi beschikbaar is.
+Uw Deepthroat Trainer kan offline werken met behulp van in de cache opgeslagen sessiegegevens. Hoewel voor sommige functies een verbinding nodig is, kunt u blijven trainen als er geen Wi-Fi beschikbaar is.
 
 ## Wat offline werkt
 
-Met Software 2.0+ slaat de trainer de laatst gedownloade sessie lokaal op:
+Met Software 2.0+ slaat de Trainer de laatst gedownloade sessie lokaal op:
 
 | Functie | Offline-ondersteuning |
 |---------|-----------------|
-| **Trainingen** | Ja: gebruikt een sessie in de cache |
+| **Trainingssessies** | Ja – gebruikt de sessie in de cache |
 | **Positie volgen** | Ja – volledig functioneel |
 | **LED-feedback** | Ja – volledig functioneel |
-| **Cijfers op het apparaat** | Ja — weergegeven na segmenten |
-| **Kalibratie** | Ja: lokaal opgeslagen voor de sessie |
+| **Scores op het apparaat** | Ja – worden na segmenten weergegeven |
+| **Kalibratie** | Ja – lokaal opgeslagen voor de sessie |
 
-## Wat connectiviteit vereist
+## Wat een verbinding vereist
 
 | Functie | Waarom |
 |---------|-----|
-| **Resultaten uploaden** | Cijfers en statistieken moeten worden gesynchroniseerd met het dashboard |
-| **Nieuwe sessies downloaden** | Sjabloonwijzigingen vereisen een nieuwe download |
-| **Firmware-updates** | OTA-updates hebben internettoegang nodig |
-| **Cloudkalibratiesynchronisatie** | Speelgoedkalibratiegegevens op afstand opgeslagen |
-| **Leiderbordupdates** | Punten worden pas bij synchronisatie geregistreerd |
+| **Resultaten uploaden** | Scores en statistieken moeten met het dashboard worden gesynchroniseerd |
+| **Nieuwe sessies downloaden** | Wijzigingen aan sjablonen vereisen een nieuwe download |
+| **Firmware-updates** | OTA-updates vereisen internettoegang |
+| **Cloudkalibratiesynchronisatie** | Kalibratiegegevens van het speeltje worden op afstand opgeslagen |
+| **Klassementsupdates** | Punten worden pas bij synchronisatie geregistreerd |
 
 <Warning>
-Offline sessies worden **niet opgeslagen** in uw dashboard totdat u opnieuw verbinding maakt. Als het apparaat stroom verliest voordat het wordt gesynchroniseerd, kunnen de resultaten van die sessie verloren gaan.
+Offline sessies worden pas in uw dashboard **opgeslagen** wanneer u opnieuw verbinding maakt. Als het apparaat stroom verliest voordat het synchroniseert, kunnen de resultaten van die sessie verloren gaan.
 </Warning>
 
 ## Hoe offline afspelen werkt
 
 ### Automatisch cachen
-Wanneer u instellingen ophaalt terwijl u online bent:
-1. De sessie wordt gedownload vanaf het dashboard
+Wanneer u online instellingen ophaalt:
+1. De sessie wordt vanuit het dashboard gedownload
 2. Er wordt een kopie opgeslagen in de lokale opslag (SPIFFS)
-3. Deze in de cache opgeslagen kopie is beschikbaar voor offline gebruik
+3. Deze kopie in de cache is beschikbaar voor offline gebruik
 
 ### Een offline sessie starten
-1. Schakel de trainer in
-2. Als je offline bent, zie je de melding 'Je bent offline, je cijfers worden mogelijk niet opgeslagen'.
+1. Schakel de Trainer in
+2. Als u offline bent, ziet u de melding "You're offline, your grades may not be saved."
 3. Druk op de knop om door te gaan met de instellingen in de cache
-4. Train normaal: alles werkt lokaal
+4. Train normaal – alles werkt lokaal
 
 <Note>
-De in de cache opgeslagen sessie is uw **laatst gedownloade** sessie. Als u een ander sjabloon offline wilt trainen, downloadt u het eerst terwijl u online bent.
+De sessie in de cache is uw **laatst gedownloade** sessie. Als u offline met een ander sjabloon wilt trainen, downloadt u dit eerst terwijl u online bent.
 </Note>
 
 ## Voorbereiden op offline training
 
-Voordat je offline gaat:
+Voordat u offline gaat:
 
 <Steps>
-<Step title="Maak verbinding met wifi">
-Zorg ervoor dat uw trainer succesvol verbinding maakt met internet.
+<Step title="Verbinding maken met Wi-Fi">
+Zorg ervoor dat uw Trainer succesvol verbinding maakt met internet.
 </Step>
 
-<Step title="Selecteer uw sjabloon">
-Kies op het dashboard de template waarmee je wilt trainen.
+<Step title="Sjabloon selecteren">
+Kies op het dashboard het sjabloon waarmee u wilt trainen.
 </Step>
 
 <Step title="Instellingen ophalen">
-Start een sessie op de trainer om de nieuwste instellingen te downloaden. U kunt afsluiten na het ophalen; de gegevens worden nu in de cache opgeslagen.
+Start een sessie op de Trainer om de nieuwste instellingen te downloaden. U kunt na het ophalen afsluiten – de gegevens zijn nu in de cache opgeslagen.
 </Step>
 
-<Step title="Controleer de cache">
-Optioneel kunt u de wifi-verbinding verbreken en een sessie starten om te controleren of de offlinemodus werkt.
+<Step title="De cache controleren">
+U kunt optioneel de Wi-Fi-verbinding verbreken en een sessie starten om te bevestigen dat de offline modus werkt.
 </Step>
 </Steps>
 
-## Resultaten synchroniseren wanneer u weer online bent
+## Resultaten synchroniseren zodra u weer online bent
 
-Wanneer u opnieuw verbinding maakt met wifi:
-1. Schakel de trainer in
-2. Het apparaat synchroniseert de openstaande resultaten automatisch
+Wanneer u opnieuw verbinding maakt met Wi-Fi:
+1. Schakel de Trainer in
+2. Het apparaat synchroniseert openstaande resultaten automatisch
 3. Controleer uw dashboard om te bevestigen dat de sessie is verschenen
 
 <Info>
-Momenteel worden offline sessies gesynchroniseerd bij het starten van de volgende online sessie. Toekomstige firmware kan achtergrondsynchronisatie toevoegen.
+Momenteel worden offline sessies gesynchroniseerd wanneer de volgende online sessie wordt gestart. Toekomstige firmware kan achtergrondsynchronisatie toevoegen.
 </Info>
 
 ## Beperkingen
 
-### Sessie opslag
-De trainer slaat **één** sessie in de cache tegelijk op. Als u een nieuwe sessie downloadt, wordt de vorige cache overschreven.
+### Opslag van sessies
+De Trainer slaat **één** sessie in de cache tegelijk op. Als u een nieuwe sessie downloadt, wordt de vorige cache overschreven.
 
 ### Resultaten niet opgeslagen
-Resultaten van offline training worden op het apparaat berekend, maar worden niet bewaard. Ze worden tijdens de sessie weergegeven, maar kunnen verloren gaan als:
-- Het apparaat verliest stroom voordat het opnieuw wordt aangesloten
-- U downloadt een nieuwe sessie voordat u gaat synchroniseren
+Resultaten van offline training worden op het apparaat berekend, maar niet opgeslagen. Ze worden tijdens de sessie weergegeven, maar kunnen verloren gaan als:
+- het apparaat stroom verliest voordat het opnieuw verbinding maakt
+- u een nieuwe sessie downloadt voordat u synchroniseert
 
 ### Segmentlimieten
 Offline afspelen gebruikt dezelfde segmentlimieten als de onlinemodus (tot 100 effectieve segmenten met Ultra).
 
-## Beste praktijken
+## Beste werkwijzen
 
 <Tip>
-**Plan vooruit**: Download uw beoogde sessie terwijl u online bent voordat u op reis gaat of ergens heen gaat zonder Wi-Fi.
+**Plan vooruit**: download de gewenste sessie terwijl u online bent voordat u op reis gaat of naar een plaats zonder Wi-Fi gaat.
 </Tip>
 
-- Houd de trainer opgeladen: als u stroom verliest, gaan niet-opgeslagen resultaten verloren
-- Update sjablonen niet terwijl u offline bent (wijzigingen zijn pas van toepassing nadat u ze opnieuw hebt gedownload)
-- Maak indien mogelijk opnieuw verbinding om de resultaten te synchroniseren en updates te ontvangen
+- Houd de Trainer opgeladen – als de stroom uitvalt, gaan niet-opgeslagen resultaten verloren
+- Werk sjablonen niet bij terwijl u offline bent (wijzigingen worden pas toegepast nadat u ze opnieuw hebt gedownload)
+- Maak indien mogelijk opnieuw verbinding om resultaten te synchroniseren en updates te ontvangen
 
 ## Problemen oplossen
 
 <AccordionGroup>
-<Accordion title="De offlinemodus start niet">
-- Zorg ervoor dat u eerder een sessie hebt gedownload terwijl u online was
-- De cache kan leeg zijn als dit een nieuw apparaat is of na een reset
-- Probeer eerst verbinding te maken met wifi en vervolgens de verbinding te verbreken
+<Accordion title="De offline modus start niet">
+- Zorg ervoor dat u eerder online een sessie hebt gedownload
+- De cache kan leeg zijn als dit een nieuw apparaat is of nadat het is gereset
+- Probeer eerst verbinding te maken met Wi-Fi en verbreek de verbinding vervolgens weer
 </Accordion>
 
-<Accordion title="De resultaten zijn niet gesynchroniseerd nadat er opnieuw verbinding was gemaakt">
-- Start een nieuwe sessie terwijl u online bent om de synchronisatie te activeren
-- Controleer uw dashboard. Het kan even duren voordat de resultaten verschijnen
-- Als de resultaten nog steeds ontbreken, zijn de resultaten mogelijk niet opgeslagen vóór het uitschakelen
+<Accordion title="Resultaten zijn na het opnieuw verbinden niet gesynchroniseerd">
+- Start online een nieuwe sessie om de synchronisatie te activeren
+- Controleer uw dashboard – het kan even duren voordat de resultaten verschijnen
+- Als de resultaten nog steeds ontbreken, zijn ze mogelijk vóór het uitschakelen niet opgeslagen
 </Accordion>
 
-<Accordion title="Verkeerde sjabloon wordt offline geladen">
-De offline cache gebruikt uw laatst gedownloade sessie. Sjablonen offline wijzigen:
-1. Maak opnieuw verbinding met wifi
+<Accordion title="Offline wordt het verkeerde sjabloon geladen">
+De offline cache gebruikt uw laatst gedownloade sessie. Zo wijzigt u offline van sjabloon:
+1. Maak opnieuw verbinding met Wi-Fi
 2. Start een sessie met het gewenste sjabloon
 3. Verbreek de verbinding en ga offline verder
 </Accordion>
@@ -130,13 +130,13 @@ De offline cache gebruikt uw laatst gedownloade sessie. Sjablonen offline wijzig
 
 ## Toekomstige verbeteringen
 
-Offline sessiesynchronisatie (meerdere sessies opslaan om later te uploaden) is gepland voor een toekomstige firmwareversie. Zie de <a href="/dtt/technical/introduction">Software 2.0 Preview</a> voor aankomende functies.
+Synchronisatie van offline sessies (meerdere sessies opslaan om later te uploaden) is gepland voor een toekomstige firmwareversie. Zie de <a href="/dtt/technical/introduction">Software 2.0 Preview</a> voor aankomende functies.
 
 ## Gerelateerde handleidingen
 
 <CardGroup cols={2}>
 <Card title="Wi-Fi-installatie" icon="wifi" href="https://docs.researchanddesire.com/dtt/get-started">
-Verbind uw trainer met Wi-Fi.
+Verbind uw Trainer met Wi-Fi.
 </Card>
 
 <Card title="Resultaten controleren" icon="chart-line" href="https://docs.researchanddesire.com/dtt/results">

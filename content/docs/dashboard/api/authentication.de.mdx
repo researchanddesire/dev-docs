@@ -3,26 +3,26 @@ title: "Authentifizierung"
 description: "Erstellen und verwalten Sie API-Tokens zur Authentifizierung Ihrer Anfragen"
 ---
 
-Für alle API-Anfragen ist ein gültiges API-Token erforderlich, das im `Authorization`-Header übergeben wird. Token sind JWTs, die mit der Identität Ihres Kontos signiert sind, sodass jeder Datenzugriff automatisch Ihre Kontoberechtigungen respektiert.
+Für alle API-Anfragen ist ein gültiges API-Token erforderlich, das im `Authorization`-Header übergeben wird. Token sind JWTs, die mit der Identität Ihres Kontos signiert werden, sodass jeder Datenzugriff automatisch Ihre Kontoberechtigungen berücksichtigt.
 
 <Info>
-  Für die Erstellung von API-Tokens ist ein **Ultra**-Abonnement erforderlich. Falls Sie keins haben
-  Besuchen Sie jedoch [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription), um ein Upgrade durchzuführen.
+  Für die Erstellung von API-Tokens ist ein **Ultra**-Abonnement erforderlich. Falls Sie noch keins haben,
+  besuchen Sie [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription), um ein Upgrade durchzuführen.
 </Info>
 
-## Erstellen eines Tokens
+## Token erstellen
 
 <Steps>
-  <Step title="Navigieren Sie zu API-Schlüssel">
+  <Step title="Zu den API-Schlüsseln navigieren">
     Gehen Sie in der Dashboard-Seitenleiste zu **Einstellungen > API-Schlüssel**.
   </Step>
 
-<Step title="Klicken Sie auf Token erstellen">
+<Step title="Auf Token erstellen klicken">
   Klicken Sie auf die Schaltfläche **Token erstellen** und geben Sie Ihrem Token einen aussagekräftigen Namen
   (z. B. „Home Assistant Integration“ oder „Python Script“).
 </Step>
 
-  <Step title="Kopieren Sie Ihren Token">
+  <Step title="Token kopieren">
     Ihr Token wird genau einmal angezeigt. Kopieren Sie es und bewahren Sie es sicher auf.
 
     <Warning>
@@ -32,7 +32,7 @@ Für alle API-Anfragen ist ein gültiges API-Token erforderlich, das im `Authori
   </Step>
 </Steps>
 
-## Verwendung Ihres Tokens
+## Token verwenden
 
 Fügen Sie das Token als Bearer-Token in den `Authorization`-Header ein:
 
@@ -66,31 +66,31 @@ const data = await response.json();
 
 </RequestExample>
 
-## Verwalten von Tokens
+## Tokens verwalten
 
-### Token anzeigen
+### Tokens anzeigen
 
-Auf der Einstellungsseite **API-Schlüssel** werden alle Ihre aktiven Token angezeigt mit:
+Auf der Einstellungsseite **API-Schlüssel** werden alle Ihre aktiven Tokens angezeigt:
 
-- **Name** – die von Ihnen zugewiesene Bezeichnung
-- **Erstellt** – wann das Token erstellt wurde
-- **Zuletzt verwendet** – das letzte Mal, dass das Token für eine Anfrage verwendet wurde
+- **Name** — die von Ihnen zugewiesene Bezeichnung
+- **Erstellt** — wann das Token erstellt wurde
+- **Zuletzt verwendet** — wann das Token zuletzt für eine Anfrage verwendet wurde
 
 ### Token widerrufen
 
-Klicken Sie auf das Papierkorbsymbol neben einem beliebigen Token, um es zu widerrufen. Der Widerruf erfolgt sofort – alle Anfragen, die dieses Token verwenden, erhalten sofort `401 Unauthorized`-Antworten.
+Klicken Sie auf das Papierkorbsymbol neben einem Token, um es zu widerrufen. Der Widerruf erfolgt sofort – Anfragen, die dieses Token verwenden, erhalten unmittelbar Antworten mit `401 Unauthorized`.
 
-<Tip>Revokieren und erstellen Sie Token regelmäßig als bewährte Sicherheitsmethode.</Tip>
+<Tip>Widerrufen und erstellen Sie Tokens regelmäßig neu – eine bewährte Sicherheitsmaßnahme.</Tip>
 
 ### Token-Limits
 
-Sie können bis zu **5 aktive Token** gleichzeitig haben. Wenn Sie mehr benötigen, widerrufen Sie zunächst einen nicht verwendeten Token.
+Sie können bis zu **5 aktive Tokens** gleichzeitig haben. Wenn Sie mehr benötigen, widerrufen Sie zunächst ein nicht verwendetes Token.
 
 ## Fehlerantworten
 
 | Status | Bedeutung                                                      |
 | ------ | ------------------------------------------------------------ |
-| `401`  | Fehlendes, ungültiges, abgelaufenes oder widerrufenes Token                  |
+| `401`  | Fehlendes, ungültiges, abgelaufenes oder widerrufenes Token             |
 | `403`  | Das Token ist gültig, aber Sie haben keine Berechtigung für diese Aktion |
 | `404`  | Ressource nicht gefunden (oder mit Ihren Berechtigungen nicht zugänglich) |
 

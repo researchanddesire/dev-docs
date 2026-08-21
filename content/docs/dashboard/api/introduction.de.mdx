@@ -1,13 +1,13 @@
 ---
 title: "API-Übersicht"
-description: "Greifen Sie programmgesteuert mit der REST-API auf Ihre Forschungs- und Wunschdaten zu"
+description: "Greifen Sie mit der REST-API programmgesteuert auf Ihre Daten von Research and Desire zu"
 ---
 
-Mit der Research and Desire API können Sie über externe Anwendungen, Skripte und Integrationen auf Ihre Dashboard-Daten zugreifen. Jede API-Anfrage respektiert die Berechtigungen Ihres Kontos – Sie können nur auf Daten zugreifen, die Sie sehen dürfen.
+Mit der Research and Desire API können Sie über externe Anwendungen, Skripte und Integrationen auf Ihre Dashboard-Daten zugreifen. Jede API-Anfrage berücksichtigt die Berechtigungen Ihres Kontos – Sie können nur auf Daten zugreifen, die Sie sehen dürfen.
 
 <Info>
-  Der API-Zugriff ist eine **Ultra**-Funktion. Sie benötigen ein aktives Ultra-Abonnement
-  API-Token erstellen. [Erfahren Sie mehr über Ultra](https://dashboard.researchanddesire.com/app/settings/subscription).
+  Der API-Zugriff ist eine **Ultra**-Funktion. Sie benötigen ein aktives Ultra-Abonnement,
+  um API-Token zu erstellen. [Erfahren Sie mehr über Ultra](https://dashboard.researchanddesire.com/app/settings/subscription).
 </Info>
 
 ## Basis-URL
@@ -26,7 +26,7 @@ https://dashboard.researchanddesire.com/api/v1
   </Card>
 
   <Card title="Endpunktreferenz" icon="code" href="./endpoints/users">
-    Durchsuchen Sie alle verfügbaren Endpunkte nach Benutzern, DTT, LKBX und OSSM.
+    Durchsuchen Sie alle verfügbaren Endpunkte für Users, DTT, LKBX und OSSM.
   </Card>
 </CardGroup>
 
@@ -48,13 +48,13 @@ https://dashboard.researchanddesire.com/api/v1
   </Step>
 
   <Step title="Analysieren Sie die Antwort">
-    Alle Antworten folgen einem einheitlichen JSON-Umschlagformat.
+    Alle Antworten folgen einem einheitlichen JSON-Wrapper-Format.
   </Step>
 </Steps>
 
 ## Antwortformat
 
-Jede Antwort verwendet denselben Umschlag:
+Jede Antwort verwendet denselben Wrapper:
 
 **Erfolg:**
 
@@ -74,16 +74,16 @@ Jede Antwort verwendet denselben Umschlag:
 }
 ```
 
-## Pagination
+## Paginierung
 
-Listenendpunkte unterstützen die Paginierung über Abfrageparameter:
+Listen-Endpunkte unterstützen die Paginierung über Abfrageparameter:
 
 | Parameter | Standard | Max | Beschreibung                 |
 | --------- | ------- | --- | --------------------------- |
 | `limit`   | 50      | 100 | Anzahl der zurückzugebenden Datensätze |
 | `offset`  | 0       | -   | Anzahl der zu überspringenden Datensätze   |
 
-Paginierte Antworten umschließen das Datenarray mit Paginierungsmetadaten:
+Gepaginierte Antworten enthalten das Datenarray zusammen mit Paginierungsmetadaten:
 
 ```json
 {
@@ -98,7 +98,7 @@ Paginierte Antworten umschließen das Datenarray mit Paginierungsmetadaten:
 }
 ```
 
-Beispiel: Zweite Seite von 25 Benutzern abrufen:
+Beispiel: Rufen Sie die zweite Seite mit 25 Benutzern ab:
 
 ```bash
 curl -H "Authorization: Bearer YOUR_TOKEN" \
@@ -108,21 +108,21 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 ## Ratenbegrenzung
 
 <Note>
-  Die API erzwingt derzeit keine strengen Ratenbegrenzungen, aber bitte seien Sie vorsichtig
-  respektvoll mit Ihrem Anfragevolumen umgehen. Übermäßige Nutzung kann zu einer Drosselung führen
-  in zukünftigen Versionen.
+  Die API erzwingt derzeit keine strengen Ratenbegrenzungen, aber gehen Sie bitte
+  verantwortungsvoll mit Ihrem Anfragevolumen um. Übermäßige Nutzung kann in
+  zukünftigen Versionen zu einer Drosselung führen.
 </Note>
 
 ## Berechtigungen und RLS
 
-Ihr API-Token erbt genau dieselben Berechtigungen wie Ihr Dashboard-Konto. Das heisst:
+Ihr API-Token erbt exakt dieselben Berechtigungen wie Ihr Dashboard-Konto. Das heißt:
 
-- Sie können nur **Ihre eigenen Geräte** und **Geräte sehen, die über Partnerschaften mit Ihnen geteilt werden**
-- Sperrsitzungsaktionen berücksichtigen die Berechtigungen des Schlüsselinhabers
+- Sie können nur **Ihre eigenen Geräte** und **über Partnerschaften mit Ihnen geteilte Geräte** sehen
+- Aktionen für Sperrsitzungen berücksichtigen die Berechtigungen des Schlüsselinhabers
 - Benutzerabfragen geben nur Benutzer zurück, mit denen Sie eine Verbindung haben
 
 <Warning>
-  Behandeln Sie Ihr API-Token wie ein Passwort. Jeder mit Ihrem Token kann auf Ihr Konto zugreifen
-  Daten. Wenn ein Token gefährdet ist, widerrufen Sie es sofort über **Einstellungen > API
-  Schlüssel**.
+  Behandeln Sie Ihr API-Token wie ein Passwort. Jeder mit Ihrem Token kann auf Ihre
+  Daten zugreifen. Wenn ein Token gefährdet ist, widerrufen Sie es sofort über
+  **Einstellungen > API-Schlüssel**.
 </Warning>

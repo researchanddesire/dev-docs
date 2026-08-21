@@ -5,44 +5,72 @@ description: "Bearbeiten Sie die R+D-Dokumentation auf GitHub und reichen Sie ei
 
 # Tragen Sie zur technischen Dokumentation bei
 
-Jeder bearbeitbare Seitentitel und jede Abschnittsüberschrift ist mit einem dezenten Bleistift versehen. Wenn Sie es auswählen, wird die entsprechende Markdown- oder MDX-Datei genau in der Zeile im Webeditor von GitHub unter `main` geöffnet.
+Jeder bearbeitbare Seitentitel und jede Abschnittsüberschrift ist mit einem
+dezenten Bleistift versehen. Wenn Sie ihn auswählen, wird die entsprechende
+Markdown- oder MDX-Datei in der exakten Zeile im Webeditor von GitHub unter
+`main` geöffnet.
 
 ## Nehmen Sie eine schnelle Bearbeitung vor
 
 1. Wählen Sie den Stift neben dem Seitentitel oder Abschnitt aus, den Sie verbessern möchten.
 2. Melden Sie sich bei GitHub an, wenn Sie dazu aufgefordert werden.
 3. Bearbeiten Sie die markierte Quelle. Wenn Sie keinen Schreibzugriff haben, erstellt GitHub automatisch einen Fork für Sie.
-4. Wählen Sie **Änderungen vorschlagen**, beschreiben Sie die Verbesserung und öffnen Sie eine Pull-Anfrage in `main`.
-5. Lassen Sie die Validierung des öffentlichen Inhalts abschließen und reagieren Sie auf das Feedback des Betreuers.
+4. Wählen Sie **Änderungen vorschlagen**, beschreiben Sie die Verbesserung und
+   öffnen Sie einen Pull Request gegen `main`.
+5. Warten Sie, bis die Validierung des öffentlichen Inhalts abgeschlossen ist, und reagieren Sie auf das Feedback der Maintainer.
 
-Nach der Genehmigung synchronisiert die Automatisierung den byteidentischen Inhalt in das private Anwendungs-Repository und die gerenderte Site wird über den normalen Release-Track bereitgestellt. Mit `[docs-sync]` gekennzeichnete Commits werden vom reziproken Workflow ignoriert, sodass der bidirektionale Spiegel keine Schleife durchführen kann.
+Nach der Genehmigung synchronisiert die Automatisierung den byteidentischen
+Inhalt in das private Anwendungs-Repository, und die gerenderte Website wird
+über den normalen Release-Track bereitgestellt. Mit `[docs-sync]` gekennzeichnete
+Commits werden vom gegenseitigen Workflow ignoriert, sodass die bidirektionale
+Spiegelung keine Schleife erzeugen kann.
 
-Die Synchronisierungsjobs vergleichen Git-Content-Tree-Hashes nach jeder Übertragung. Dadurch bleibt die Byte-Identität der öffentlichen `main`-Dateien mit der gerenderten Quelle erhalten, sodass ein Bearbeitungslink nicht unbemerkt in die falsche Zeile wandern kann.
+Die Synchronisierungsjobs vergleichen nach jeder Übertragung die Hashes des
+Git-Inhaltsbaums. Dadurch bleiben die öffentlichen Dateien auf `main` byteidentisch
+mit der gerenderten Quelle, sodass ein Bearbeitungslink nicht unbemerkt in die
+falsche Zeile wandern kann.
 
 ## Wählen Sie das richtige Repository
 
 | Gerenderte Website                                       | Öffentliche Quelle                                                                         | Bearbeitbarer Inhalt |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------- | ---------------- |
-| [Benutzerhandbücher](https://docs.researchanddesire.com)   | [Researchanddesire/simple-docs](https://github.com/researchanddesire/simple-docs)     | `content/`       |
-| [Entwicklerdokumente](https://dev.researchanddesire.com) | [Researchanddesire/dev-docs](https://github.com/researchanddesire/dev-docs)           | `content/docs/`  |
-| [R+D-Montage](https://ohai.researchanddesire.com)  | [Researchanddesire/Assembly-Docs](https://github.com/researchanddesire/assembly-docs) | `content/docs/`  |
+| [Benutzerhandbücher](https://docs.researchanddesire.com) | [researchanddesire/simple-docs](https://github.com/researchanddesire/simple-docs) | `content/` |
+| [Entwicklerdokumente](https://dev.researchanddesire.com) | [researchanddesire/dev-docs](https://github.com/researchanddesire/dev-docs) | `content/docs/` |
+| [R+D Assembly](https://ohai.researchanddesire.com) | [researchanddesire/assembly-docs](https://github.com/researchanddesire/assembly-docs) | `content/docs/` |
 
-Die Anwendung, der Fumadocs-Renderer, die API-Implementierung, die Bereitstellungseinstellungen und die Anmeldeinformationen verbleiben im privaten Anwendungs-Repository. Einzelne API-Betriebsseiten werden aus dem Dashboard-OpenAPI-Dokument generiert und bieten daher einen Link **Problem mit API-Dokumenten melden** anstelle eines irreführenden Quellzeilenstifts.
+Die Anwendung, der Fumadocs-Renderer, die API-Implementierung, die
+Bereitstellungseinstellungen und die Zugangsdaten verbleiben im privaten
+Anwendungs-Repository. Einzelne API-Operationsseiten werden aus dem Dashboard-
+OpenAPI-Dokument generiert und bieten daher einen Link **Problem mit
+API-Dokumentation melden** anstelle eines irreführenden Stifts für die Quellzeile.
 
 ## Schreiben Sie einen nützlichen Beitrag
 
-- Benennen Sie das unterstützte Produkt, die Hardware-Revision, die Firmware-Version oder das API-Schema, wenn es darauf ankommt.
-- Verknüpfen Sie technische Ansprüche mit der Implementierung oder Spezifikation, die zu ihrer Überprüfung verwendet wurde.
+- Nennen Sie das unterstützte Produkt, die Hardware-Revision, die Firmware-Version
+  oder das API-Schema, wenn es relevant ist.
+- Verknüpfen Sie technische Aussagen mit der Implementierung oder Spezifikation,
+  anhand derer Sie sie verifiziert haben.
 - Bewahren Sie Bilder neben der Seite auf, auf der sie verwendet werden, und überprüfen Sie jeden relativen Pfad.
-- Verwenden Sie die vorhandenen MDX-Beschriftungen, Karten, Registerkarten, Akkordeons und Schritte wieder.
-- Konzentrieren Sie sich bei jeder Pull-Anfrage darauf und geben Sie niemals Anmeldeinformationen, private Produktinformationen oder generierte Build-Ausgaben an.
+- Verwenden Sie die vorhandenen MDX-Callouts, Karten, Tabs, Akkordeons und
+  Schritte wieder.
+- Halten Sie jeden Pull Request fokussiert und geben Sie niemals Zugangsdaten,
+  private Produktinformationen oder generierte Build-Ausgaben an.
 
-Kleinere Korrekturen können komplett in GitHub durchgeführt werden. Für größere Änderungen forken und klonen Sie das öffentliche Repository, bearbeiten Sie seinen `content/`-Baum und verwenden Sie die Fumadocs Preview-Erweiterung für VS Code, bevor Sie den Pull-Request öffnen.
+Kleinere Korrekturen können vollständig in GitHub vorgenommen werden. Für größere
+Änderungen forken und klonen Sie das öffentliche Repository, bearbeiten Sie dessen
+`content/`-Baum und verwenden Sie die Erweiterung Fumadocs Preview für VS Code,
+bevor Sie den Pull Request öffnen.
 
 ## Lizenz
 
-R+D-eigene Dokumentationen und Medien in diesen öffentlichen Repositories sind unter CC BY-SA 4.0 verfügbar, sofern in einer Datei oder einem Verzeichnis nichts anderes angegeben ist. Codebeispiele, Produktquellen, Hardwarematerial und Vermögenswerte Dritter behalten ihre angegebenen Lizenzen.
+Dokumentationstext und Medien im Besitz von R+D sind in diesen öffentlichen
+Repositories unter CC BY-SA 4.0 verfügbar, sofern eine Datei oder ein Verzeichnis
+nichts anderes angibt. Codebeispiele, Produktquellcode, Hardwarematerial und
+Assets Dritter behalten ihre angegebenen Lizenzen.
 
-Physische Build-Prozeduren gehören in [R+D-Montage](https://ohai.researchanddesire.com/ossm). Verbraucheranweisungen gehören in den [Benutzerhandbücher](https://docs.researchanddesire.com/). Konzentrieren Sie sich in den Entwicklerdokumenten auf APIs, Firmware, Protokolle, offizielle Hardwareschnittstellen und Integrationen.
+Physische Montageverfahren gehören in [R+D Assembly](https://ohai.researchanddesire.com/ossm).
+Verbraucheranleitungen gehören in die [Benutzerhandbücher](https://docs.researchanddesire.com/).
+Halten Sie die Entwicklerdokumentation auf APIs, Firmware, Protokolle, offizielle
+Hardwareschnittstellen und Integrationen fokussiert.
 
-GitHub dokumentiert den vollständigen [Bearbeitung und Fork-basierter Pull-Request-Flow](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files).
+GitHub dokumentiert den vollständigen [Bearbeitungs- und Fork-basierten Pull-Request-Ablauf](https://docs.github.com/en/repositories/working-with-files/managing-files/editing-files).

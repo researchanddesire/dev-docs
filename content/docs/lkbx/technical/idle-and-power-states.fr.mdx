@@ -1,5 +1,5 @@
 ---
-title: "États inactifs et alimentés"
+title: "États d’inactivité et d’alimentation"
 description: "Détails techniques sur la gestion de l'alimentation, les délais d'inactivité et la conservation de la batterie sur votre Chastity Lockbox"
 ---
 
@@ -9,7 +9,7 @@ Votre Chastity Lockbox gère automatiquement la consommation d'énergie à trave
 
 Après toute interaction de l'utilisateur, l'appareil passe par des états d'inactivité en fonction du temps d'inactivité :
 
-| État | Temps mort | Rétroéclairage | Wi-Fi | Consommation d'énergie |
+| État | Délai | Rétroéclairage | WiFi | Consommation d'énergie |
 |-------|---------|-----------|------|-----------|
 | Actif | — | Complet (100%) | Connecté | Normale |
 | Inactif | 30 secondes | Estompé (10%) | Connecté | Réduit |
@@ -25,8 +25,8 @@ Ces délais d'attente sont cumulatifs. Le sommeil profond survient 10 minutes ap
 Lorsque vous utilisez activement votre appareil :
 
 - **Luminosité du rétroéclairage** : 100 % (valeur : 255)
-- **Tous les capteurs** : Actif et surveillance
-- **WiFi** : connecté et synchronisé
+- **Tous les capteurs** : Actifs et en cours de surveillance
+- **WiFi** : Connecté et synchronisé
 - **Contrôleur de moteur** : Prêt pour les commandes
 
 Toute pression sur un bouton ou tout tour d'encodeur maintient l'appareil dans l'état actif et réinitialise la minuterie d'inactivité.
@@ -36,20 +36,20 @@ Toute pression sur un bouton ou tout tour d'encodeur maintient l'appareil dans l
 Après 30 secondes sans interaction :
 
 - **Luminosité du rétroéclairage** : Atténuée à environ 10 % (valeur : 24)
-- **Capteurs** : Actif
+- **Capteurs** : Actifs
 - **WiFi** : toujours connecté
-- **Contrôleur de moteur** : autorisé (pas de conduite active)
+- **Contrôleur de moteur** : Réinitialisé (aucune commande active du moteur)
 
 <Tip>
 L'écran grisé est toujours lisible. Cet état permet d'économiser de l'énergie tout en gardant l'écran visible si vous regardez votre appareil.
 </Tip>
 
-### Se réveiller du ralenti
+### Réveil après l'inactivité
 
 Chacune de ces actions ramène l'appareil à l'état actif :
 - Appuyez sur n'importe quel bouton
 - Tournez l'encodeur
-- Câble USB connecté ou déconnecté
+- Connexion ou déconnexion du câble USB
 
 ## État de pseudo-sommeil (2 minutes)
 
@@ -58,14 +58,14 @@ Après 2 minutes sans interaction :
 - **Luminosité du rétroéclairage** : Désactivé (valeur : 0)
 - **Écran** : toujours alimenté, juste sombre
 - **WiFi** : toujours connecté – les commandes du détenteur de clé fonctionnent
-- **Contrôleur de moteur** : Effacé
+- **Contrôleur de moteur** : Réinitialisé
 - **Capteur de courant (INA219)** : passe en mode d'économie d'énergie
 
 <Note>
-Il s’agit de l’état de sommeil le plus profond pendant la charge. Lorsqu'il est connecté à l'alimentation USB, votre appareil n'entrera pas en veille profonde, garantissant ainsi qu'il reste connecté pour recevoir les commandes du porte-clés.
+Il s’agit de l’état de sommeil le plus profond pendant la charge. Lorsqu'il est connecté à l'alimentation USB, votre appareil n'entrera pas en veille profonde, garantissant ainsi qu'il reste connecté pour recevoir les commandes du détenteur de clé.
 </Note>
 
-### Se réveiller du pseudo-sommeil
+### Réveil après le pseudo-sommeil
 
 Mêmes déclencheurs que le réveil en état d'inactivité. La première interaction réveille l'appareil ; vous devrez peut-être appuyer à nouveau pour effectuer l'action souhaitée.
 
@@ -75,7 +75,7 @@ Après 10 minutes sans interaction (et sans chargement) :
 
 - **Rétroéclairage** : éteint
 - **Écran** : mode veille
-- **Wi-Fi** : déconnecté
+- **WiFi** : Déconnecté
 - **Bluetooth** : désactivé
 - **La plupart des périphériques** : hors tension
 
@@ -83,20 +83,20 @@ Après 10 minutes sans interaction (et sans chargement) :
 En veille profonde, votre appareil ne peut pas recevoir de commandes du détenteur de clé jusqu'à ce qu'il se réveille. Les minuteries de verrouillage continuent de fonctionner en interne.
 </Warning>
 
-### Restrictions de sommeil profond
+### Restrictions du sommeil profond
 
 Le sommeil profond ne s'active que lorsque **toutes** ces conditions sont vraies :
 - L'appareil est inactif depuis 10 minutes
 - L'appareil n'est **pas** connecté à l'alimentation USB
-- L'appareil n'est pas dans certains états protégés (calibrage, configuration WiFi)
+- L'appareil n'est pas dans certains états protégés (étalonnage, configuration WiFi)
 
-### Réveillez-vous d'un sommeil profond
+### Réveil après un sommeil profond
 
 - Appuyez sur le bouton Entrée (si sur les broches ≤21) ou sur le bouton Retour
 - Réveil automatique de la minuterie si une minuterie de verrouillage est presque terminée
 
 <Info>
-Lorsqu'il reste moins de temps d'attente pour un verrou temporisé que le délai de pseudo-veille, l'appareil reste automatiquement éveillé pour gérer le déverrouillage.
+Lorsque le temps restant d'un verrou temporisé est inférieur au délai de pseudo-sommeil, l'appareil reste automatiquement éveillé pour gérer le déverrouillage.
 </Info>
 
 ## Comportement de charge
@@ -106,7 +106,7 @@ Lorsque votre appareil est connecté à l'alimentation USB :
 | Condition | Profondeur de sommeil maximale |
 |-----------|-------------------|
 | Chargement | Pseudo-sommeil uniquement |
-| Ne charge pas | Sommeil profond et complet |
+| Ne charge pas | Sommeil profond complet |
 
 Cela garantit que votre appareil reste accessible pour les commandes du tableau de bord pendant le chargement, tout en maximisant la durée de vie de la batterie lorsqu'il est alimenté par batterie.
 
@@ -141,8 +141,8 @@ Chaque interaction de l'utilisateur réinitialise le minuteur d'inactivité. Les
 
 - Pressions sur les boutons (Entrée, Retour)
 - Rotation de l'encodeur
-- Changements d’état d’alimentation USB
-- Changements d’état du capteur (lors d’une surveillance active)
+- Changements de l’état d’alimentation USB
+- Changements de l’état du capteur (lors d’une surveillance active)
 
 ## Référence technique
 
@@ -170,8 +170,8 @@ Deep sleep:   0   (off)
 Guide convivial des modes de veille automatique et manuel.
 </Card>
 
-<Card title="Contrôles des boutons" icon="hand-pointer" href="./button-controls">
-Comment les pressions sur les boutons réveillent l'appareil et ses fonctions.
+<Card title="Commandes du bouton" icon="hand-pointer" href="./button-controls">
+Comment les pressions sur les boutons réveillent l'appareil et déclenchent ses fonctions.
 </Card>
 
 <Card title="Mode hors ligne" icon="wifi-slash" href="./offline-mode">

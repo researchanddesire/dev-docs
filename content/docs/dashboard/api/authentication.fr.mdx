@@ -1,28 +1,28 @@
 ---
 title: "Authentification"
-description: "Créez et gérez des jetons API pour authentifier vos demandes"
+description: "Créez et gérez des jetons API pour authentifier vos requêtes"
 ---
 
-Toutes les requêtes API nécessitent un jeton API valide transmis dans l'en-tête `Authorization`. Les jetons sont des JWT signés avec l'identité de votre compte, de sorte que tout accès aux données respecte automatiquement les autorisations de votre compte.
+Toutes les requêtes API nécessitent un jeton API valide transmis dans l'en-tête `Authorization`. Les jetons sont des JWTs signés avec l'identité de votre compte, de sorte que tout accès aux données respecte automatiquement les autorisations de votre compte.
 
 <Info>
-  La création de jetons API nécessite un abonnement **Ultra**. Si tu n'en as pas
-  pourtant, visitez [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription) pour mettre à niveau.
+  La création de jetons API nécessite un abonnement **Ultra**. Si vous n'en avez pas encore,
+  consultez [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription) pour passer à une formule supérieure.
 </Info>
 
 ## Créer un jeton
 
 <Steps>
-  <Step title="Accédez aux clés API">
+  <Step title="Accéder aux clés API">
     Accédez à **Paramètres > Clés API** dans la barre latérale du tableau de bord.
   </Step>
 
-<Step title="Cliquez sur Créer un jeton">
-  Cliquez sur le bouton **Créer un jeton** et donnez un nom descriptif à votre jeton.
-  (par exemple, « Intégration de Home Assistant » ou « Script Python »).
+<Step title="Cliquer sur Créer un jeton">
+  Cliquez sur le bouton **Créer un jeton** et donnez un nom descriptif à votre jeton
+  (par exemple, « Home Assistant Integration » ou « Python Script »).
 </Step>
 
-  <Step title="Copiez votre jeton">
+  <Step title="Copier votre jeton">
     Votre jeton sera affiché exactement une fois. Copiez-le et conservez-le en toute sécurité.
 
     <Warning>
@@ -34,7 +34,7 @@ Toutes les requêtes API nécessitent un jeton API valide transmis dans l'en-tê
 
 ## Utiliser votre jeton
 
-Incluez le jeton en tant que jeton Bearer dans l'en-tête `Authorization` :
+Incluez le jeton comme jeton Bearer dans l'en-tête `Authorization` :
 
 <RequestExample>
 ```bash cURL
@@ -66,33 +66,33 @@ const data = await response.json();
 
 </RequestExample>
 
-## Gestion des jetons
+## Gérer les jetons
 
-### Affichage des jetons
+### Afficher les jetons
 
-La page des paramètres **Clés API** affiche tous vos jetons actifs avec :
+La page des paramètres **Clés API** affiche tous vos jetons actifs :
 
 - **Nom** : le libellé que vous avez attribué
-- **Créé** : date à laquelle le jeton a été créé
-- **Dernière utilisation** : la dernière fois que le jeton a été utilisé pour effectuer une demande
+- **Créé** : la date de création du jeton
+- **Dernière utilisation** : la dernière fois que le jeton a été utilisé pour effectuer une requête
 
-### Révocation de jetons
+### Révoquer les jetons
 
-Cliquez sur l'icône de la corbeille à côté de n'importe quel jeton pour le révoquer. La révocation est immédiate : toute demande utilisant ce jeton commencera immédiatement à recevoir des réponses `401 Unauthorized`.
+Cliquez sur l'icône de la corbeille à côté d'un jeton pour le révoquer. La révocation est immédiate : les requêtes qui utilisent ce jeton reçoivent immédiatement des réponses `401 Unauthorized`.
 
-<Tip>Révoquez et recréez périodiquement des jetons conformément aux meilleures pratiques de sécurité.</Tip>
+<Tip>Révoquez et recréez régulièrement vos jetons, conformément aux bonnes pratiques de sécurité.</Tip>
 
 ### Limites des jetons
 
-Vous pouvez avoir jusqu'à **5 jetons actifs** à la fois. Si vous en avez besoin de plus, révoquez d'abord un jeton inutilisé.
+Vous pouvez avoir jusqu'à **5 jetons actifs** à la fois. Si vous en avez besoin de davantage, révoquez d'abord un jeton inutilisé.
 
 ## Réponses aux erreurs
 
 | Statut | Signification                                                      |
 | ------ | ------------------------------------------------------------ |
-| `401`  | Jeton manquant, invalide, expiré ou révoqué                  |
-| `403`  | Le jeton est valide mais vous n'avez pas l'autorisation pour cette action |
-| `404`  | Ressource introuvable (ou non accessible avec vos autorisations) |
+| `401`  | Jeton manquant, invalide, expiré ou révoqué                         |
+| `403`  | Le jeton est valide, mais vous n'avez pas l'autorisation d'effectuer cette action |
+| `404`  | Ressource introuvable (ou inaccessible avec vos autorisations)      |
 
 <ResponseExample>
 ```json 401 Unauthorized

@@ -1,145 +1,145 @@
 ---
 title: "Mode hors ligne"
-description: "Utiliser votre home trainer sans connexion Internet"
+description: "Utiliser votre Trainer sans connexion Internet"
 ---
 
-Votre Deepthroat Trainer peut fonctionner hors ligne en utilisant les données de session mises en cache. Même si certaines fonctionnalités nécessitent une connectivité, vous pouvez toujours vous entraîner lorsque le Wi-Fi n'est pas disponible.
+Votre Deepthroat Trainer peut fonctionner hors ligne à l'aide de données de session mises en cache. Même si certaines fonctionnalités nécessitent une connexion, vous pouvez continuer à vous entraîner lorsque le Wi-Fi n'est pas disponible.
 
 ## Ce qui fonctionne hors ligne
 
-Avec le logiciel 2.0+, le formateur stocke localement la dernière séance téléchargée :
+Avec Software 2.0+, le Trainer stocke localement la dernière session téléchargée :
 
-| Fonctionnalité | Assistance hors ligne |
+| Fonctionnalité | Prise en charge hors ligne |
 |---------|-----------------|
-| **Séances de formation** | Oui : utilise une session en cache |
+| **Sessions d'entraînement** | Oui – utilise la session mise en cache |
 | **Suivi de position** | Oui – entièrement fonctionnel |
-| **Retour par LED** | Oui – entièrement fonctionnel |
-| **Notes sur l'appareil** | Oui — affiché après les segments |
-| **Étalonnage** | Oui — stocké localement pour la session |
+| **Retour LED** | Oui – entièrement fonctionnel |
+| **Scores sur l'appareil** | Oui – affichés après les segments |
+| **Étalonnage** | Oui – stocké localement pour la session |
 
-## Ce qui nécessite une connectivité
+## Ce qui nécessite une connexion
 
 | Fonctionnalité | Pourquoi |
 |---------|-----|
-| **Téléchargement des résultats** | Les notes et les statistiques doivent être synchronisées avec le tableau de bord |
+| **Téléversement des résultats** | Les scores et statistiques doivent être synchronisés avec le tableau de bord |
 | **Téléchargement de nouvelles sessions** | Les modifications du modèle nécessitent un nouveau téléchargement |
-| **Mises à jour du micrologiciel** | Les mises à jour OTA nécessitent un accès Internet |
-| **Synchronisation de l'étalonnage du cloud** | Données d'étalonnage des jouets stockées à distance |
-| **Mises à jour du classement** | Les points ne sont pas enregistrés avant la synchronisation |
+| **Mises à jour du firmware** | Les mises à jour OTA nécessitent un accès Internet |
+| **Synchronisation de l'étalonnage cloud** | Les données d'étalonnage du jouet sont stockées à distance |
+| **Mises à jour du classement** | Les points ne sont enregistrés qu'après la synchronisation |
 
 <Warning>
-Les sessions hors ligne ne sont **pas enregistrées** sur votre tableau de bord jusqu'à ce que vous vous reconnectiez. Si l'appareil perd de l'alimentation avant la synchronisation, les résultats de cette session risquent d'être perdus.
+Les sessions hors ligne ne sont **pas enregistrées** dans votre tableau de bord avant votre reconnexion. Si l'appareil perd son alimentation avant la synchronisation, les résultats de cette session peuvent être perdus.
 </Warning>
 
 ## Comment fonctionne la lecture hors ligne
 
 ### Mise en cache automatique
-Lorsque vous récupérez les paramètres en ligne :
+Lorsque vous récupérez les paramètres en ligne :
 1. La session est téléchargée depuis le tableau de bord
-2. Une copie est enregistrée sur le stockage local (SPIFFS)
-3. Cette copie en cache est disponible pour une utilisation hors ligne
+2. Une copie est enregistrée dans le stockage local (SPIFFS)
+3. Cette copie mise en cache est disponible hors ligne
 
 ### Démarrer une session hors ligne
-1. Allumez l’entraîneur
-2. Si vous êtes hors ligne, vous verrez « Vous êtes hors ligne, vos notes ne seront peut-être pas enregistrées ».
+1. Allumez le Trainer
+2. Si vous êtes hors ligne, vous verrez le message "You're offline, your grades may not be saved."
 3. Appuyez sur le bouton pour continuer avec les paramètres mis en cache
-4. Entraînez-vous normalement – ​​tout fonctionne localement
+4. Entraînez-vous normalement – tout fonctionne localement
 
 <Note>
-La session mise en cache est votre **dernière session téléchargée**. Pour entraîner un modèle différent hors ligne, téléchargez-le d'abord en ligne.
+La session mise en cache est votre **dernière session téléchargée**. Pour vous entraîner hors ligne avec un autre modèle, téléchargez-le d'abord lorsque vous êtes en ligne.
 </Note>
 
-## Préparation à la formation hors ligne
+## Préparer un entraînement hors ligne
 
-Avant de vous déconnecter :
+Avant de vous déconnecter :
 
 <Steps>
-<Step title="Connectez-vous au Wi-Fi">
-Assurez-vous que votre entraîneur se connecte correctement à Internet.
+<Step title="Se connecter au Wi-Fi">
+Assurez-vous que votre Trainer se connecte correctement à Internet.
 </Step>
 
-<Step title="Sélectionnez votre modèle">
-Choisissez le modèle avec lequel vous souhaitez vous entraîner sur le tableau de bord.
+<Step title="Sélectionner votre modèle">
+Choisissez dans le tableau de bord le modèle avec lequel vous souhaitez vous entraîner.
 </Step>
 
 <Step title="Récupérer les paramètres">
-Démarrez une session sur le home trainer pour télécharger les derniers paramètres. Vous pouvez quitter après la récupération : les données sont désormais mises en cache.
+Démarrez une session sur le Trainer pour télécharger les derniers paramètres. Vous pouvez quitter après la récupération – les données sont maintenant mises en cache.
 </Step>
 
 <Step title="Vérifier le cache">
-Vous pouvez éventuellement déconnecter le Wi-Fi et démarrer une session pour confirmer que le mode hors ligne fonctionne.
+Vous pouvez éventuellement couper la connexion Wi-Fi et démarrer une session pour confirmer que le mode hors ligne fonctionne.
 </Step>
 </Steps>
 
-## Synchronisation des résultats une fois de retour en ligne
+## Synchroniser les résultats une fois de retour en ligne
 
-Lorsque vous vous reconnectez au Wi-Fi :
-1. Allumez l’entraîneur
-2. L'appareil synchronisera automatiquement les résultats en attente
+Lorsque vous vous reconnectez au Wi-Fi :
+1. Allumez le Trainer
+2. L'appareil synchronise automatiquement les résultats en attente
 3. Vérifiez votre tableau de bord pour confirmer que la session est apparue
 
 <Info>
-Actuellement, les sessions hors ligne se synchronisent au prochain démarrage de session en ligne. Le futur firmware pourrait ajouter une synchronisation en arrière-plan.
+Actuellement, les sessions hors ligne sont synchronisées au prochain démarrage d'une session en ligne. Une future version du firmware pourrait ajouter une synchronisation en arrière-plan.
 </Info>
 
 ## Limites
 
 ### Stockage des sessions
-L'entraîneur stocke **une** session en cache à la fois. Le téléchargement d'une nouvelle session écrase le cache précédent.
+Le Trainer stocke **une** session mise en cache à la fois. Le téléchargement d'une nouvelle session écrase le cache précédent.
 
 ### Résultats non enregistrés
-Les résultats de la formation hors ligne sont calculés sur l'appareil mais ne sont pas conservés. Ils sont affichés pendant la session mais peuvent être perdus si :
-- L'appareil perd de l'alimentation avant de se reconnecter
-- Vous téléchargez une nouvelle session avant de synchroniser
+Les résultats de l'entraînement hors ligne sont calculés sur l'appareil, mais ne sont pas conservés. Ils sont affichés pendant la session, mais peuvent être perdus si :
+- l'appareil perd son alimentation avant de se reconnecter
+- vous téléchargez une nouvelle session avant la synchronisation
 
 ### Limites des segments
 La lecture hors ligne utilise les mêmes limites de segments que le mode en ligne (jusqu'à 100 segments effectifs avec Ultra).
 
-## Meilleures pratiques
+## Bonnes pratiques
 
 <Tip>
-**Planifiez à l'avance** : téléchargez la session prévue en ligne avant de voyager ou d'aller dans un endroit sans Wi-Fi.
+**Planifiez à l'avance** : téléchargez la session prévue lorsque vous êtes en ligne, avant de voyager ou de vous rendre dans un endroit sans Wi-Fi.
 </Tip>
 
-- Gardez l'entraîneur chargé : la perte de puissance entraîne la perte des résultats non enregistrés
-- Ne mettez pas à jour les modèles lorsque vous êtes hors ligne (les modifications ne s'appliqueront pas tant qu'elles ne seront pas retéléchargées)
+- Gardez le Trainer chargé – une perte d'alimentation entraîne la perte des résultats non enregistrés
+- Ne mettez pas à jour les modèles hors ligne (les modifications ne s'appliqueront qu'après un nouveau téléchargement)
 - Reconnectez-vous lorsque cela est possible pour synchroniser les résultats et obtenir des mises à jour
 
 ## Dépannage
 
 <AccordionGroup>
 <Accordion title="Le mode hors ligne ne démarre pas">
-- Assurez-vous d'avoir déjà téléchargé une session en ligne
-- Le cache peut être vide s'il s'agit d'un nouvel appareil ou après une réinitialisation
-- Essayez d'abord de vous connecter au Wi-Fi, puis déconnectez-vous
+- Assurez-vous d'avoir déjà téléchargé une session lorsque vous étiez en ligne
+- Le cache peut être vide si l’appareil est neuf ou a été réinitialisé
+- Essayez d'abord de vous connecter au Wi-Fi, puis déconnectez l’appareil du Wi-Fi
 </Accordion>
 
-<Accordion title="Les résultats n'ont pas été synchronisés après la reconnexion">
+<Accordion title="Les résultats ne se sont pas synchronisés après la reconnexion">
 - Démarrez une nouvelle session en ligne pour déclencher la synchronisation
-- Vérifiez votre tableau de bord : les résultats peuvent mettre un certain temps à apparaître
-- S'ils sont toujours manquants, les résultats n'ont peut-être pas été stockés avant la mise hors tension
+- Vérifiez votre tableau de bord – les résultats peuvent mettre un moment à apparaître
+- S'ils sont toujours absents, les résultats n'ont peut-être pas été enregistrés avant la mise hors tension
 </Accordion>
 
-<Accordion title="Mauvais modèle chargé hors ligne">
-Le cache hors ligne utilise votre dernière session téléchargée. Pour modifier des modèles hors ligne :
+<Accordion title="Le mauvais modèle est chargé hors ligne">
+Le cache hors ligne utilise votre dernière session téléchargée. Pour changer de modèle hors ligne :
 1. Reconnectez-vous au Wi-Fi
-2. Démarrer une session avec le modèle souhaité
-3. Se déconnecter et continuer hors ligne
+2. Démarrez une session avec le modèle souhaité
+3. Déconnectez l’appareil du Wi-Fi et continuez hors ligne
 </Accordion>
 </AccordionGroup>
 
 ## Améliorations futures
 
-La synchronisation des sessions hors ligne (stockage de plusieurs sessions pour un téléchargement ultérieur) est prévue pour une future version du micrologiciel. Consultez l'aperçu <a href="/dtt/technical/introduction">Software 2.0</a> pour connaître les fonctionnalités à venir.
+La synchronisation des sessions hors ligne (stockage de plusieurs sessions pour un téléversement ultérieur) est prévue pour une future version du firmware. Consultez le <a href="/dtt/technical/introduction">Software 2.0 Preview</a> pour connaître les fonctionnalités à venir.
 
 ## Guides associés
 
 <CardGroup cols={2}>
 <Card title="Configuration Wi-Fi" icon="wifi" href="https://docs.researchanddesire.com/dtt/get-started">
-Connectez votre home trainer au Wi-Fi.
+Connectez votre Trainer au Wi-Fi.
 </Card>
 
 <Card title="Vérification des résultats" icon="chart-line" href="https://docs.researchanddesire.com/dtt/results">
-Affichez les résultats de votre session synchronisée.
+Consultez les résultats de votre session synchronisée.
 </Card>
 </CardGroup>

@@ -1,9 +1,9 @@
 ---
 title: "Présentation de l'API"
-description: "Accédez à vos données Research and Desire par programmation avec l'API REST"
+description: "Accédez à vos données de Research and Desire par programmation avec l'API REST"
 ---
 
-L'API Research and Desire vous permet d'accéder aux données de votre tableau de bord à partir d'applications externes, de scripts et d'intégrations. Chaque demande d'API respecte les autorisations de votre compte : vous ne pouvez accéder qu'aux données que vous êtes autorisé à voir.
+L'API Research and Desire vous permet d'accéder aux données de votre tableau de bord à partir d'applications externes, de scripts et d'intégrations. Chaque requête API respecte les autorisations de votre compte : vous ne pouvez accéder qu'aux données que vous êtes autorisé à consulter.
 
 <Info>
   L'accès à l'API est une fonctionnalité **Ultra**. Vous avez besoin d'un abonnement Ultra actif pour
@@ -25,8 +25,8 @@ https://dashboard.researchanddesire.com/api/v1
     Créez des jetons API et découvrez comment authentifier les requêtes.
   </Card>
 
-  <Card title="Référence du point de terminaison" icon="code" href="./endpoints/users">
-    Parcourez tous les points de terminaison disponibles pour les utilisateurs, DTT, LKBX et OSSM.
+  <Card title="Référence des points de terminaison" icon="code" href="./endpoints/users">
+    Parcourez tous les points de terminaison disponibles pour Users, DTT, LKBX et OSSM.
   </Card>
 </CardGroup>
 
@@ -37,8 +37,8 @@ https://dashboard.researchanddesire.com/api/v1
     Accédez à **Paramètres > Clés API** dans le tableau de bord et créez un nouveau jeton. Copiez-le immédiatement : il n'est affiché qu'une seule fois.
   </Step>
 
-  <Step title="Faire des demandes">
-    Incluez votre jeton dans l'en-tête `Authorization` de chaque demande.
+  <Step title="Effectuer des requêtes">
+    Incluez votre jeton dans l'en-tête `Authorization` de chaque requête.
 
     ```bash
     curl -H "Authorization: Bearer YOUR_TOKEN" \
@@ -76,9 +76,9 @@ Chaque réponse utilise la même enveloppe :
 
 ## Pagination
 
-Les points de terminaison de liste prennent en charge la pagination via les paramètres de requête :
+Les points de terminaison de listes prennent en charge la pagination via les paramètres de requête :
 
-| Paramètre | Défaut | Max. | Description                 |
+| Paramètre | Par défaut | Max. | Description                 |
 | --------- | ------- | --- | --------------------------- |
 | `limit`   | 50      | 100 | Nombre d'enregistrements à renvoyer |
 | `offset`  | 0       | -   | Nombre d'enregistrements à ignorer   |
@@ -108,21 +108,20 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 ## Limitation du débit
 
 <Note>
-  L'API n'applique pas actuellement de limites de débit strictes, mais soyez attentif
-  respectueux du volume de votre demande. Une utilisation excessive peut entraîner une limitation
-  dans les versions futures.
+  L'API n'applique pas actuellement de limites de débit strictes, mais veuillez
+  respecter le volume de vos requêtes. Une utilisation excessive peut entraîner
+  une limitation de débit dans de futures versions.
 </Note>
 
 ## Autorisations et RLS
 
-Votre jeton API hérite exactement des mêmes autorisations que votre compte de tableau de bord. Cela signifie:
+Votre jeton API hérite exactement des mêmes autorisations que votre compte de tableau de bord. Cela signifie :
 
 - Vous ne pouvez voir que **vos propres appareils** et les **appareils partagés avec vous** via des partenariats.
-- Les actions de verrouillage de la session respectent les autorisations du détenteur de clé
-- Les requêtes des utilisateurs renvoient uniquement les utilisateurs avec lesquels vous êtes connecté
+- Les actions liées aux sessions de verrouillage respectent les autorisations du détenteur de clé
+- Les requêtes des utilisateurs renvoient uniquement les utilisateurs auxquels vous êtes lié
 
 <Warning>
-  Traitez votre jeton API comme un mot de passe. Toute personne possédant votre token peut accéder à votre
-  données. Si un jeton est compromis, révoquez-le immédiatement depuis ** Paramètres > API
-  Clés**.
+  Traitez votre jeton API comme un mot de passe. Toute personne possédant votre jeton peut accéder à vos
+  données. Si un jeton est compromis, révoquez-le immédiatement depuis **Paramètres > Clés API**.
 </Warning>
