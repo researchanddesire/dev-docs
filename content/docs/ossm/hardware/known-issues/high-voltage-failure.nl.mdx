@@ -1,0 +1,59 @@
+---
+title: "Hoogspanningsfout"
+description: "Hoe het probleem met de DC-DC-converterstoring op vroege Rev 2 OSSM-kaarten op te lossen bij gebruik van 30V+ voedingen"
+---
+
+## Betrokken borden
+
+<Warning>
+Dit probleem heeft betrekking op **Rev 2-kaarten met bestelnummer #1214 of lager**. Als uw bestelnummer hoger is dan #1214, is deze oplossing al op uw bord toegepast.
+</Warning>
+
+## Probleem
+
+Wanneer u een voeding van 30 V of hoger op het bord aansluit **zonder dat er een motor is aangesloten**, vernietigt een korte spanningspiek (ongeveer 1 microseconde) de DC-DC-omzetter.
+
+<Note>
+Dit probleem doet zich **niet** voor als u:
+- Gebruik een standaard 24V-voeding
+- Zorg ervoor dat er een motor op het bord is aangesloten voordat u het apparaat inschakelt
+</Note>
+
+## Oplossing
+
+Voeg een <Tooltip tip="Transient Voltage Suppression - a component that clamps voltage spikes to protect sensitive electronics">TVS-diode</Tooltip> toe om de ingangspiek vast te zetten op een spanning die de DC-DC-omzetter kan verdragen.
+
+### Vereist onderdeel
+
+| Onderdeelnummer | Beschrijving | Geschatte kosten |
+|-------------|-------------|------------------|
+| [1.5KE51CA](https://www.digikey.ca/en/products/detail/littelfuse-inc/1-5KE51CA/688036) | TVS-diode | ~ $ 1 USD |
+
+### Installatiestappen
+
+<Steps>
+<Step title="Bereid de diode voor">
+Buig de draden van de 1.5KE51CA-diode zodat deze overeenkomen met de afstand tussen de soldeervlakken op uw bord.
+</Step>
+
+<Step title="Knip de nabijgelegen pin af">
+Knip de pin gemarkeerd in de onderstaande afbeelding af om ervoor te zorgen dat deze na installatie geen contact maakt met de diodekabel.
+
+<Warning>
+Als u deze stap overslaat, kan er kortsluiting ontstaan ​​tussen de pin en de diodekabel.
+</Warning>
+</Step>
+
+<Step title="Soldeer de diode">
+Soldeer de diode rechtstreeks op het bord, zoals weergegeven in de onderstaande referentieafbeelding.
+
+<Check>
+Controleer of de diodedraden goede soldeerverbindingen hebben en dat er geen draden in aanraking komen met onbedoelde pads of componenten.
+</Check>
+</Step>
+</Steps>
+
+{/* TODO: Add installation reference image */}
+{/* <Frame caption="TVS-diode-installatie toont de juiste plaatsing van de lead">
+<img src="/ossm/images/ossm/hardware/tvs-diode-install.png" alt="TVS-diode gesoldeerd op OSSM-bord met afgesneden pin zichtbaar" />
+</Frame> */}

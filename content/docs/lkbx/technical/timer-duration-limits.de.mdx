@@ -1,0 +1,161 @@
+---
+title: "Timer-Dauerbegrenzungen"
+description: "Vollständige Referenz für Sperrzeitdauern von 30 Sekunden bis 1000 Jahren"
+---
+
+Wenn Sie eine Zeitsperre für Ihr Keuschheitsschloss einrichten, können Sie eine Dauer zwischen 30 Sekunden und über 1000 Jahren wählen. In dieser Anleitung wird erläutert, wie das Timer-System funktioniert und welche Zeitbereiche verfügbar sind.
+
+## Übersicht über den Dauerbereich
+
+| Minimum | Maximal |
+|---------|---------|
+| 30 Sekunden | 1000 Jahre |
+
+<Info>
+Der Timer verwendet intern eine Präzision im Millisekundenbereich und unterstützt so ein äußerst präzises Timing für jede Zeitdauer innerhalb dieses Bereichs.
+</Info>
+
+## Dauer einstellen
+
+Wenn Sie im Hauptmenü **Sperren** auswählen, wird der Timer-Konfigurationsbildschirm angezeigt:
+
+1. **Drehen Sie den Encoder**, um die Dauer anzupassen
+2. Eine visuelle Bogenanzeige zeigt Ihre Position innerhalb der aktuellen Einheitenreichweite an
+3. Die Dauer wird in einem für Menschen lesbaren Format angezeigt (z. B. „10 Minuten“, „3 Tage“).
+4. **Drücken Sie die Eingabetaste**, um zu bestätigen und die Sperre zu starten
+
+### Standardstartwert
+
+Der Timer startet standardmäßig bei **10 Minuten** und ist zur schnellen Anpassung im Minutenbereich positioniert.
+
+## Dauereinheiten und Inkremente
+
+Abhängig vom aktuellen Wert bildet der Encoder unterschiedliche Zeiteinheiten ab. Wenn Sie die Dauer erhöhen, ändert sich die Einheit automatisch:
+
+### Sekunden (30–120 Sekunden)
+
+| Reichweite | Inkrement | Beispielwerte |
+|-------|-----------|----------------|
+| 30–120 Sekunden | 1 Sekunde | 30er, 31er, 32er... 120er |
+
+### Minuten (1–120 Minuten)
+
+| Reichweite | Inkrement | Beispielwerte |
+|-------|-----------|----------------|
+| 1–120 Minuten | 1 Minute | 1 Minute, 2 Minuten... 120 Minuten |
+
+### Stunden (2–24 Stunden)
+
+| Reichweite | Inkrement | Beispielwerte |
+|-------|-----------|----------------|
+| 2–24 Stunden | 1 Stunde | 2h, 3h, 4h... 24h |
+
+### Tage (1–30 Tage)
+
+| Reichweite | Inkrement | Beispielwerte |
+|-------|-----------|----------------|
+| 1–30 Tage | 1 Tag | 1 Tag, 2 Tage... 30 Tage |
+
+### Wochen (4–8 Wochen)
+
+| Reichweite | Inkrement | Beispielwerte |
+|-------|-----------|----------------|
+| 4–8 Wochen | 1 Woche | 4 Wochen, 5 Wochen... 8 Wochen |
+
+### Monate (2–12 Monate)
+
+| Reichweite | Inkrement | Beispielwerte |
+|-------|-----------|----------------|
+| 2–12 Monate | 1 Monat | 2 Monate, 3 Monate... 12 Monate |
+
+### Jahre (1–1000 Jahre)
+
+| Reichweite | Inkrement | Beispielwerte |
+|-------|-----------|----------------|
+| 1–1000 Jahre | 1 Jahr | 1 Jahr, 2 Jahre... 1000 Jahre |
+
+<Warning>
+Extrem lange Laufzeiten werden technisch unterstützt, aber nicht empfohlen. Erwägen Sie die Verwendung des Modus **Für immer sperren** mit Schlüsselhalterkontrolle für unbefristete Sperren, anstatt mehrjährige Timer einzustellen.
+</Warning>
+
+## Visuelle Lichtbogenanzeige
+
+Auf dem Timer-Bildschirm wird ein halbkreisförmiger Bogen angezeigt, der Ihre Position innerhalb des aktuellen Einheitenbereichs anzeigt:
+
+- **Leerer Bogen**: Beim Minimum der aktuellen Einheit
+- **Voller Bogen**: Beim Maximum der aktuellen Einheit
+- **Teilfüllung**: Zeigt die relative Position an
+
+Der Bogen wird zurückgesetzt, wenn Sie in einen neuen Einheitenbereich wechseln (z. B. von Minuten zu Stunden).
+
+## Encoder-Beschleunigung
+
+Für die Timer-Konfiguration ist die Beschleunigung des Encoders aktiviert:
+
+- **Langsame Drehungen**: Präzise, ​​einstufige Änderungen
+- **Schnelle Wendungen**: Größere Sprünge, um Ihr Ziel schnell zu erreichen
+
+<Tip>
+Drehen Sie bei sehr langer Dauer den Encoder schnell, um die Bereiche schneller zu durchlaufen, und verlangsamen Sie ihn dann zur Feinabstimmung.
+</Tip>
+
+## Zeitberechnungen
+
+Intern werden die Dauern mithilfe der folgenden Konvertierungen in Millisekunden gespeichert:
+
+| Einheit | Millisekunden |
+|------|--------------|
+| 1 Sekunde | 1,000 |
+| 1 Minute | 60,000 |
+| 1 Stunde | 3,600,000 |
+| 1 Tag | 86,400,000 |
+| 1 Woche | 604,800,000 |
+| 1 Monat | 2.629.746.000 (~30,44 Tage) |
+| 1 Jahr | 31.556.952.000 (~365,24 Tage) |
+
+<Note>
+Bei Monats- und Jahresberechnungen werden durchschnittliche Längen verwendet, um unterschiedliche Monatslängen und Schaltjahre zu berücksichtigen.
+</Note>
+
+## Anzeigeformat
+
+Die Timer-Anzeige passt sich je nach Dauer an:
+
+| Dauer | Anzeigeformat |
+|----------|---------------|
+| Unter 1 Stunde | MM:SS (z. B. „05:30“) |
+| 1–24 Stunden | Xh MM:SS (z. B. „2h 30:00“) |
+| 1–30 Tage | Xd Xh MM:SS (z. B. „3d 5h 30:00“) |
+| Über 30 Tage | Vereinfacht (z. B. „2 Monate“) |
+
+## Dashboard vs. Geräte-Timer
+
+Wenn Sie das Dashboard zum Erstellen von Sperren verwenden:
+
+- **Dashboard**: Bietet möglicherweise verschiedene Voreinstellungen und Optionen für die Dauer
+- **Gerät**: Verwendet das hier beschriebene Encoder-basierte System
+- Beide werden synchronisiert, wenn eine WLAN-Verbindung besteht
+
+<Info>
+Über das Dashboard erstellte Sperren werden von Ihrem Gerät empfangen und zeigen die verbleibende Zeit im gleichen Format an.
+</Info>
+
+## Verwandte Leitfäden
+
+<CardGroup cols={2}>
+<Card title="Schnellstart" icon="rocket" href="https://docs.researchanddesire.com/lockbox/get-started">
+Erfahren Sie, wie Sie Ihre erste Sperre starten.
+</Card>
+
+<Card title="Permalock-Modus" icon="infinity" href="../device-states/permalock">
+Unbefristete Sperren ohne zeitliche Begrenzung.
+</Card>
+
+<Card title="Tastensteuerung" icon="hand-pointer" href="./button-controls">
+So verwenden Sie den Encoder für die Timer-Auswahl.
+</Card>
+
+<Card title="Versteckzeit" icon="eye-slash" href="../using/hiding-time">
+Verstecken Sie die verbleibende Zeit für zusätzliches Geheimnis.
+</Card>
+</CardGroup>

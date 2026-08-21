@@ -1,0 +1,323 @@
+---
+title: "Structure des dossiers"
+description: "Comprendre l'organisation du code source du micrologiciel OSSM"
+---
+
+# Structure des dossiers
+
+Le micrologiciel OSSM suit une architecture modulaire basée sur les fonctionnalités. Chaque fonctionnalité réside dans son propre dossier d'espace de noms, ce qui facilite la navigation et la maintenance de la base de code.
+
+<Info>
+Parcourez le code source sur GitHub : [Software/src/](https://github.com/KinkyMakers/OSSM-hardware/tree/main/Software/src)
+</Info>
+
+## Aperçu
+
+<Tree>
+  <Tree.Folder name="Software" defaultOpen>
+    <Tree.Folder name="include">
+      <Tree.Folder name="boost">
+        <Tree.File name="sml.hpp" />
+      </Tree.Folder>
+    </Tree.Folder>
+    <Tree.Folder name="lib">
+      <Tree.Folder name="StrokeEngine" />
+    </Tree.Folder>
+    <Tree.Folder name="src" defaultOpen>
+      <Tree.File name="main.cpp" />
+      <Tree.Folder name="ossm" />
+      <Tree.Folder name="services" />
+      <Tree.Folder name="components" />
+      <Tree.Folder name="constants" />
+      <Tree.Folder name="structs" />
+      <Tree.Folder name="utils" />
+      <Tree.Folder name="extensions" />
+    </Tree.Folder>
+    <Tree.Folder name="test" />
+    <Tree.File name="platformio.ini" />
+  </Tree.Folder>
+</Tree>
+
+| Dossier | But |
+|--------|---------|
+| `include/boost/` | Bibliothèques d'en-tête uniquement (machine à états Boost.SML) |
+| `lib/StrokeEngine/` | Bibliothèque de modèles de mouvement (modifiée) |
+| `src/` | Code source principal |
+| `test/` | Tests unitaires |
+
+## Philosophie de conception
+
+Le micrologiciel utilise une **organisation basée sur les fonctionnalités** où le code associé cohabite :
+
+- **Espaces de noms sur classes** - Les fonctionnalités sont organisées en fonctions d'espace de noms plutôt qu'en méthodes de classe
+- **Fichiers colocalisés** : l'en-tête, l'implémentation et le code associé de chaque fonctionnalité se trouvent dans le même dossier.
+- ** Structures d'état globales ** - L'état partagé est géré via des structures d'état dédiées plutôt que par des membres de classe
+- **Modules sans état** - Les fonctions de fonctionnalités fonctionnent sur l'état global, ce qui les rend plus faciles à tester et à raisonner.
+
+<Note>
+La classe `OSSM` dans `ossm/OSSM.h` est conservée pour des raisons de compatibilité descendante avec la gestion des commandes BLE. Les nouvelles fonctionnalités doivent utiliser des fonctions d'espace de noms sans état.
+</Note>
+
+## Application principale (`src/ossm/`)
+
+Le dossier `ossm/` contient la logique d'application principale, organisée par fonctionnalité.
+
+<Tree>
+  <Tree.Folder name="ossm" defaultOpen>
+    <Tree.File name="Events.h" />
+    <Tree.File name="OSSM.h" />
+    <Tree.File name="OSSM.cpp" />
+    <Tree.Folder name="state" />
+    <Tree.Folder name="pages" />
+    <Tree.Folder name="homing" />
+    <Tree.Folder name="menu" />
+    <Tree.Folder name="simple_penetration" />
+    <Tree.Folder name="stroke_engine" />
+    <Tree.Folder name="pattern_controls" />
+    <Tree.Folder name="play_controls" />
+  </Tree.Folder>
+</Tree>
+
+| Dossier | But |
+|--------|---------|
+| `state/` | Architecture des machines à états |
+| `pages/` | Écrans d'interface utilisateur |
+| `homing/` | Séquence de référence |
+| `menu/` | Navigation dans les menus |
+| `simple_penetration/` | Mode de pénétration simple |
+| `stroke_engine/` | Mode moteur de course |
+| `pattern_controls/` | Interface utilisateur de sélection de modèle |
+| `play_controls/` | Commandes lecture/pause/vitesse |
+
+### Machine à états (`ossm/state/`)
+
+Les composants de la machine à états sont séparés pour plus de clarté et de testabilité.
+
+| Déposer | But |
+|------|---------|
+| [`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h) | Définition de la table de transition à l'aide de Boost.SML |
+| [`actions.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h) / `actions.cpp` | Actions de transition d'état (mises à jour de l'affichage, contrôle du moteur) |
+| [`guards.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h) / `guards.cpp` | Vérifications conditionnelles pour les transitions |
+| `state.h` / `state.cpp` | Initialisation de la machine à états et instance globale |
+
+Les **structures d'état** gèrent différents aspects de l'application :
+
+| Déposer | But |
+|------|---------|
+| `session.h` | Session en cours (heure de début, nombre de coups, distance) |
+| `settings.h` | Paramètres utilisateur (vitesse, course, sensation, profondeur, motif) |
+| `calibration.h` | État de référence (décalage du capteur, étapes de course, statut de référence) |
+| `motion.h` | Cibles de mouvement (position, vitesse, temps) |
+| `menu.h` | Sélection de menu actuelle |
+| `ble.h` | État de la connexion Bluetooth |
+| `error.h` | Messages d'erreur |
+
+<Tip>
+Pour plus de détails sur le fonctionnement de la machine à états, voir [State Machine Architecture](/ossm/software/architecture/state-machine).
+</Tip>
+
+### Pages d'interface utilisateur (`ossm/pages/`)
+
+Chaque écran de l'interface utilisateur possède son propre module.
+
+| Module | Description |
+|--------|-------------|
+| `hello.h` | Écran de démarrage avec logos animés |
+| `preflight.h` | Écran de contrôle de sécurité « Réduire la vitesse pour démarrer » |
+| `error.h` | Affichage d'erreur avec option d'aide |
+| `update.h` | Écrans de mise à jour OTA (vérification, mise à jour, pas de mise à jour) |
+| `wifi.h` | Portail de configuration WiFi |
+| `help.h` | Informations d'aide et d'assistance |
+
+### Modes de fonctionnement
+
+Chaque mode de fonctionnement est un module autonome avec sa logique de contrôle de mouvement.
+
+| Module | Description |
+|--------|-------------|
+| `simple_penetration/` | Mouvement de base de va-et-vient à vitesse contrôlée |
+| `stroke_engine/` | Modèles complexes utilisant la bibliothèque StrokeEngine |
+
+### Contrôler les interfaces utilisateur
+
+| Module | Description |
+|--------|-------------|
+| `menu/` | Navigation et rendu dans le menu principal |
+| `pattern_controls/` | Interface de sélection de motif pour le mode Stroke Engine |
+| `play_controls/` | Contrôles de vitesse, de course, de profondeur et de sensation |
+
+### Modules de fonctionnalités
+
+| Module | Description |
+|--------|-------------|
+| `homing/` | Séquence de référencement (balayage avant, balayage arrière, étalonnage) |
+
+## Services matériels (`src/services/`)
+
+Le dossier `services/` fournit des couches d'abstraction matérielle.
+
+<Tree>
+  <Tree.Folder name="services" defaultOpen>
+    <Tree.File name="stepper.h" />
+    <Tree.File name="stepper.cpp" />
+    <Tree.File name="display.h" />
+    <Tree.File name="display.cpp" />
+    <Tree.File name="encoder.h" />
+    <Tree.File name="encoder.cpp" />
+    <Tree.File name="led.h" />
+    <Tree.File name="led.cpp" />
+    <Tree.File name="board.h" />
+    <Tree.File name="board.cpp" />
+    <Tree.File name="tasks.h" />
+    <Tree.File name="tasks.cpp" />
+    <Tree.File name="wm.h" />
+    <Tree.File name="wm.cpp" />
+    <Tree.Folder name="communication" defaultOpen>
+      <Tree.File name="nimble.h" />
+      <Tree.File name="nimble.cpp" />
+      <Tree.File name="queue.h" />
+      <Tree.File name="queue.cpp" />
+      <Tree.File name="command.hpp" />
+      <Tree.File name="state.hpp" />
+      <Tree.File name="patterns.hpp" />
+      <Tree.File name="gpio.hpp" />
+      <Tree.File name="wifi.hpp" />
+      <Tree.File name="config.hpp" />
+    </Tree.Folder>
+  </Tree.Folder>
+</Tree>
+
+| Déposer | But |
+|------|---------|
+| `stepper.h/.cpp` | Contrôle du moteur (FastAccelStepper) |
+| `display.h/.cpp` | Écran OLED (U8g2) |
+| `encoder.h/.cpp` | Entrée du codeur rotatif |
+| `led.h/.cpp` | Indication d'état des LED RVB |
+| `board.h/.cpp` | Initialisation de la carte |
+| `tasks.h/.cpp` | Gestion des tâches FreeRTOS |
+| `wm.h/.cpp` | Gestionnaire Wi-Fi |
+| `communication/` | Communication BLE et WiFi |
+
+<Info>
+Pour plus de détails sur le protocole BLE, voir [BLE Communication](/ossm/software/communication/ble).
+</Info>
+
+## Constantes (`src/constants/`)
+
+Les valeurs de configuration et les énumérations sont centralisées dans le dossier `constants/`.
+
+<Tree>
+  <Tree.Folder name="constants" defaultOpen>
+    <Tree.File name="Config.h" />
+    <Tree.File name="Pins.h" />
+    <Tree.File name="Menu.h" />
+    <Tree.File name="Version.h" />
+    <Tree.File name="UserConfig.h" />
+    <Tree.File name="Images.h" />
+    <Tree.File name="LogTags.h" />
+    <Tree.Folder name="copy">
+      <Tree.File name="en-us.h" />
+      <Tree.File name="fr.h" />
+    </Tree.Folder>
+  </Tree.Folder>
+</Tree>
+
+| Déposer | But |
+|------|---------|
+| `Config.h` | Configuration du système (vitesses, limites, délais d'attente) |
+| `Pins.h` | Définitions des broches GPIO |
+| `Menu.h` | Énumération des options de menu |
+| `Version.h` | Informations sur la version du micrologiciel |
+| `UserConfig.h` | Paramètres configurables par l'utilisateur |
+| `Images.h` | Afficher les ressources bitmap |
+| `LogTags.h` | Balises de journalisation ESP-IDF |
+| `copy/` | Chaînes localisées |
+
+<Tip>
+Pour les options de configuration, voir [Configuration](/ossm/software/getting-started/configuration).
+</Tip>
+
+## Utilitaires (`src/utils/`)
+
+Fonctions et classes d'assistance utilisées dans toute la base de code.
+
+<Tree>
+  <Tree.Folder name="utils" defaultOpen>
+    <Tree.File name="StateLogger.h" />
+    <Tree.File name="RecursiveMutex.h" />
+    <Tree.File name="StrokeEngineHelper.h" />
+    <Tree.File name="format.h" />
+    <Tree.File name="analog.h" />
+    <Tree.File name="update.h" />
+    <Tree.File name="ble.h" />
+  </Tree.Folder>
+</Tree>
+
+| Déposer | But |
+|------|---------|
+| `StateLogger.h` | Enregistre les transitions de la machine d'état pour le débogage |
+| `RecursiveMutex.h` | Wrapper mutex thread-safe pour ESP32 |
+| `StrokeEngineHelper.h` | Utilitaires d'intégration StrokeEngine |
+| `format.h` | Aides au formatage de chaînes |
+| `analog.h` | Moyenne et traitement des entrées analogiques |
+| `update.h` | Utilitaires de mise à jour OTA |
+| `ble.h` | Fonctions d'assistance BLE |
+
+## Structures de données (`src/structs/`)
+
+Types de données partagés utilisés entre les modules.
+
+<Tree>
+  <Tree.Folder name="structs" defaultOpen>
+    <Tree.File name="SettingPercents.h" />
+    <Tree.File name="LanguageStruct.h" />
+    <Tree.File name="Points.h" />
+  </Tree.Folder>
+</Tree>
+
+| Déposer | But |
+|------|---------|
+| `SettingPercents.h` | Paramètres utilisateur sous forme de pourcentages (0-100) |
+| `LanguageStruct.h` | Configuration de la langue |
+| `Points.h` | Structures de coordonnées et de points |
+
+## Bibliothèques
+
+### Boost.SML (`include/boost/sml.hpp`)
+
+[Boost.SML](https://boost-ext.github.io/sml/) est une bibliothèque de machines d'état uniquement en-tête. Il est inclus directement dans le projet pour la stabilité des versions.
+
+### Moteur de course (`lib/StrokeEngine/`)
+
+Une version modifiée de [theelims/StrokeEngine](https://github.com/theelims/StrokeEngine) qui génère des modèles de mouvement. La bibliothèque est vendue et personnalisée pour les exigences spécifiques à OSSM.
+
+## Configuration de construction
+
+Le fichier `platformio.ini` définit les environnements de build :
+
+| Environnement | But |
+|-------------|---------|
+| `development` | Développement local avec journalisation de débogage |
+| `staging` | Tests préliminaires |
+| `production` | Versions de publication avec optimisations |
+| `test` | Configuration des tests unitaires |
+
+## Lectures complémentaires
+
+<CardGroup cols={2}>
+<Card title="Machine à états" icon="diagram-project" href="/ossm/software/architecture/state-machine">
+  Plongez en profondeur dans l’architecture de la machine à états Boost.SML.
+</Card>
+
+<Card title="Configuration" icon="sliders" href="/ossm/software/getting-started/configuration">
+  Personnalisez les paramètres de mouvement, les broches et les paramètres.
+</Card>
+
+<Card title="Service d'affichage" icon="display" href="/ossm/software/display/display-service">
+  Découvrez l’API d’affichage thread-safe.
+</Card>
+
+<Card title="Communication BLE" icon="bluetooth" href="/ossm/software/communication/ble">
+  Comprendre le protocole et les caractéristiques Bluetooth.
+</Card>
+</CardGroup>

@@ -1,0 +1,59 @@
+---
+title: "Panne de haute tension"
+description: "Comment résoudre le problème de défaillance du convertisseur DC-DC sur les premières cartes OSSM Rev 2 lors de l'utilisation d'alimentations 30 V+"
+---
+
+## Cartes concernées
+
+<Warning>
+Ce problème affecte les **cartes Rev 2 portant le numéro de commande n° 1214 ou inférieur**. Si votre numéro de commande est supérieur au #1214, ce correctif a déjà été appliqué à votre tableau.
+</Warning>
+
+## Problème
+
+Lorsque vous connectez une alimentation de 30 V ou plus à la carte **sans moteur connecté**, une brève pointe de tension (environ 1 microseconde) détruit le convertisseur DC-DC.
+
+<Note>
+Ce problème ne se produit **pas** si vous :
+- Utilisez une alimentation standard 24 V
+- Avoir un moteur connecté à la carte avant de mettre sous tension
+</Note>
+
+## Solution
+
+Ajoutez une diode <Tooltip tip="Transient Voltage Suppression - a component that clamps voltage spikes to protect sensitive electronics">TVS</Tooltip> pour fixer la pointe d'entrée à une tension que le convertisseur DC-DC peut tolérer.
+
+### Pièce requise
+
+| Numéro de pièce | Description | Coût approximatif |
+|-------------|-------------|------------------|
+| [1.5KE51CA](https://www.digikey.ca/en/products/detail/littelfuse-inc/1-5KE51CA/688036) | Diode TVS | ~1 $ USD |
+
+### Étapes d'installation
+
+<Steps>
+<Step title="Préparez la diode">
+Pliez les fils de la diode 1,5KE51CA pour qu'ils correspondent à l'espacement des plots de soudure sur votre carte.
+</Step>
+
+<Step title="Coupez la broche à proximité">
+Coupez la broche marquée dans l'image ci-dessous pour vous assurer qu'elle n'entre pas en contact avec le fil de la diode après l'installation.
+
+<Warning>
+Sauter cette étape peut provoquer un court-circuit entre la broche et le fil de la diode.
+</Warning>
+</Step>
+
+<Step title="Souder la diode">
+Soudez la diode directement sur la carte comme indiqué dans l'image de référence ci-dessous.
+
+<Check>
+Vérifiez que les fils de diode ont de bons joints de soudure et qu'aucun fil ne touche des plots ou des composants involontaires.
+</Check>
+</Step>
+</Steps>
+
+{/* TODO: Add installation reference image */}
+{/* <Frame caption="Installation de la diode TVS montrant le placement correct des fils">
+<img src="/ossm/images/ossm/hardware/tvs-diode-install.png" alt="Diode TVS soudée à la carte OSSM avec broche découpée visible" />
+</Frame> */}

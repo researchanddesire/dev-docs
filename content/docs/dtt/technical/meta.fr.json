@@ -1,0 +1,11 @@
+{
+  "title": "Micrologiciel et capteurs",
+  "pages": [
+    "introduction",
+    "device-states",
+    "calibration",
+    "sensor-limits",
+    "offline-mode",
+    "firmware-updates"
+  ]
+}

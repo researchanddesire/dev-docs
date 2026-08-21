@@ -1,0 +1,219 @@
+---
+title: „Feedback und Indikatoren“
+description: „LED-Farben, Summertöne und Vibrationsmuster für RADR“
+---
+
+RADR bietet visuelles, akustisches und haptisches Feedback, um den Gerätestatus zu kommunizieren, ohne dass Sie auf den Bildschirm schauen müssen.
+
+## LED-System
+
+RADR verfügt über drei RGB-LEDs (WS2812B), die um das Gerät herum positioniert sind:
+
+| Position | Standort | Hauptzweck |
+|----------|----------|-----------------|
+| LED 0 | Linker Encoder | Geschwindigkeitsmodusanzeige |
+| LED 1 | Mitte | Verbindungs-/Wiedergabestatus |
+| LED 2 | Rechter Encoder | Anzeige für aktiven Modus |
+
+### LED-Farben und Bedeutungen
+
+#### Systemzustände
+
+| Zustand | LED | Farbe | HSV-Wert | Helligkeit |
+|-------|-----|-------|-----------|------------|
+| Suchen/Scannen | Alle | Blau | 150 | 255 (pulsierend) |
+| Leerlauf (Hauptmenü) | Alle | Weiches Weiß | 180 | 50 |
+| Gerät verbunden | Mitte | Weiß | — | 50 |
+| Angehalten/Gestoppt | Mitte | Rot | — | 255 |
+
+#### OSSM-Steuerungsmodi
+
+Bei der Ansteuerung eines OSSM zeigen die Encoder-LEDs den aktiven Modus an:
+
+| Modus | LED | Farbe | Beschreibung |
+|------|-----|-------|-------------|
+| Geschwindigkeit | Links | Lila | Immer aktiv (Geschwindigkeit wird immer vom linken Encoder gesteuert) |
+| Tiefe | Rechts | Koralle/Rot | Der rechte Encoder stellt die Tiefe ein |
+| Sensation | Rechts | Blau | Der rechte Encoder passt die Empfindung an |
+| Schlaganfall | Rechts | Grün | Der rechte Encoder passt den Hub an |
+
+### LED-Verhaltensmuster
+
+| Muster | Bedeutung |
+|---------|---------|
+| Solide | Statischer Zustand (verbunden, pausiert usw.) |
+| Pulsierend | Aktiver Scan oder Suche |
+| Schneller Blitz | Rückmeldung für Tastendruck oder Moduswechsel |
+
+## Summermuster
+
+RADR verwendet einen piezoelektrischen Summer (GPIO 2), um Audio-Feedback für wichtige Ereignisse bereitzustellen.
+
+### Boot-Sound
+
+**Muster:** Aufsteigende 4-Noten-Sequenz
+
+| Notiz | Frequenz | Dauer |
+|------|-----------|----------|
+| 1 | 523 Hz (C5) | 100 ms |
+| 2 | 659 Hz (E5) | 100 ms |
+| 3 | 784 Hz (G5) | 100 ms |
+| 4 | 1047 Hz (C6) | 150 ms |
+
+Wird abgespielt, wenn RADR eingeschaltet wird.
+
+### Shutdown-Sound
+
+**Muster:** Absteigende 4-Noten-Sequenz
+
+| Notiz | Frequenz | Dauer |
+|------|-----------|----------|
+| 1 | 1047 Hz (C6) | 100 ms |
+| 2 | 784 Hz (G5) | 100 ms |
+| 3 | 659 Hz (E5) | 100 ms |
+| 4 | 523 Hz (C5) | 150 ms |
+
+Wird abgespielt, wenn in den Schlafmodus gewechselt wird.
+
+### Gerät verbunden
+
+**Muster:** Aufsteigende 3-Noten-Sequenz
+
+| Notiz | Frequenz | Dauer |
+|------|-----------|----------|
+| 1 | 1047 Hz (C6) | 80ms |
+| 2 | 1319 Hz (E6) | 80ms |
+| 3 | 1568 Hz (G6) | 120 ms |
+
+Wird abgespielt, wenn die Verbindung zu einem Gerät erfolgreich hergestellt wurde.
+
+### Gerät getrennt
+
+**Muster:** Absteigende 3-Noten-Sequenz
+
+| Notiz | Frequenz | Dauer |
+|------|-----------|----------|
+| 1 | 1568 Hz (G6) | 80ms |
+| 2 | 1319 Hz (E6) | 80ms |
+| 3 | 1047 Hz (C6) | 120 ms |
+
+Wird abgespielt, wenn ein Gerät die Verbindung trennt.
+
+### Angehalten
+
+**Muster:** Doppelter Piepton
+
+| Notiz | Frequenz | Dauer |
+|------|-----------|----------|
+| 1 | 800 Hz | 150 ms |
+| Lücke | — | 100 ms |
+| 2 | 800 Hz | 150 ms |
+
+Wird abgespielt, wenn die Wiedergabe angehalten wird.
+
+### Abspielen/Fortsetzen
+
+**Muster:** Zweifarbig aufsteigend
+
+| Notiz | Frequenz | Dauer |
+|------|-----------|----------|
+| 1 | 1200 Hz | 100 ms |
+| 2 | 1400 Hz | 100 ms |
+
+Wird abgespielt, wenn die Wiedergabe fortgesetzt wird.
+
+### Mario-Münze (Osterei)
+
+**Muster:** Klassischer Münzklang
+
+| Notiz | Frequenz | Dauer |
+|------|-----------|----------|
+| 1 | 2637 Hz (E7) | 80ms |
+| 2 | 3136 Hz (G7) | 300 ms |
+
+Spezielles Feedback für bestimmte Interaktionen.
+
+## Vibrations-Feedback
+
+RADR verfügt über einen Vibrationsmotor (GPIO 47) für haptisches Feedback. Vibrationsmuster spiegeln im Allgemeinen Summermuster wider und bieten eine taktile Rückmeldung, die ohne Ton funktioniert.
+
+### Vibrationsanwendungsfälle
+
+| Ereignis | Vibration |
+|-------|-----------|
+| Knopfdruck | Kurzer Puls |
+| Moduswechsel | Schnelle Vibration |
+| Verbindung | Doppelte Vibration |
+| Pause/Stopp | Starke Vibration |
+
+### Vibrationsmuster-Timings
+
+| Muster | Beschreibung | Impulsdauer (ms) |
+|---------|-------------|---------------------|
+| Einzelimpuls | Schnelles Tippen-Feedback | 50 |
+| Doppelimpuls | Bestätigungsrückmeldung | 50, Pause 200, 50 |
+| Dreifachimpuls | Starke Bestätigung | 10, Pause 50, 20, Pause 50, 30 |
+| Fehlerimpuls | Lange Fehleranzeige | 500 |
+| Abschalten | Absteigende Impulse | 150, 100, 100, 100 |
+| Gerät verbunden | Aufsteigende Impulse | 100, 100, 150 |
+| Gerät getrennt | Absteigende Impulse | 150, 100, 100 |
+| Angehalten | Doppelter Puls | 150, 150 |
+| Abspielen/Fortsetzen | Schneller Doppelimpuls | 100, 100 |
+
+<Info>
+Mithilfe der Vibrationsrückmeldung können Sie RADR nach Gefühl bedienen, was besonders bei schlechten Lichtverhältnissen oder wenn das Gerät nicht direkt sichtbar ist, hilfreich ist.
+</Info>
+
+## Farbschema der Benutzeroberfläche
+
+Die Anzeige von RADR verwendet ein einheitliches Farbschema:
+
+### Hintergrundfarben
+
+| Element | Farbcode | Beschreibung |
+|---------|------------|-------------|
+| Hintergrund | 0x10c5 | Dunkelgrau (Grau 900) |
+| Texthintergrund | Weiß | Primäre Textfarbe |
+| Sekundärtext | 0xDEFB | Hellgrau |
+| Deaktiviert | 0x1082 | Sehr dunkelgrau |
+
+### OSSM-Modusfarben
+
+| Modus | Farbcode | Farbname |
+|------|------------|------------|
+| Geschwindigkeit | 0x5013 | Königliches Lila |
+| Tiefe | 0xE186 | Warme Koralle |
+| Sensation | 0x3C9F | Ozeanblau |
+| Schlaganfall | 0x4E8A | Waldgrün |
+
+### Staatsfarben
+
+| Zustand | Farbe |
+|-------|-------|
+| Aktiv/Normal | Weiß |
+| Angehalten/Gestoppt | Rot |
+| Deaktiviert | Dunkelgrau |
+| Ausgewählt/Hervorgehoben | Akzentfarben |
+
+## Feedback-Timing
+
+| Ereignis | Ansprechzeit |
+|-------|---------------|
+| Knopfdruck | < 10 ms |
+| Encoderwechsel | < 10 ms |
+| Modusschalter | < 50ms |
+| LED-Farbwechsel | < 20 ms |
+
+## Tipps zur Verwendung von Feedback
+
+<Tip>
+Lernen Sie die Summertöne kennen, um RADR zu bedienen, ohne hinzusehen. Der verbundene Ton (aufsteigend) im Vergleich zum getrennten Ton (absteigend) zeigt deutlich den Zustand an.
+</Tip>
+
+<Tip>
+Die linke LED (lila für Geschwindigkeit) und die rechte LED (Modusfarbe) zeigen Ihnen auf einen Blick, welchen Parameter jeder Encoder steuert.
+</Tip>
+
+<Tip>
+Rote mittlere LED bedeutet immer pausiert oder gestoppt. Weiß bedeutet aktiv und bereit.
+</Tip>

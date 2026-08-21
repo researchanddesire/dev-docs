@@ -1,0 +1,15 @@
+{
+  "title": "Entwicklerdokumente",
+  "pages": [
+    "index",
+    "quickstart",
+    "dashboard",
+    "api-reference",
+    "integrations",
+    "ossm",
+    "radr",
+    "dtt",
+    "lkbx",
+    "contributing"
+  ]
+}

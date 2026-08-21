@@ -1,0 +1,806 @@
+---
+title: "Protocole BLE"
+description: "Contrôlez votre OSSM sans fil à l'aide du Bluetooth Low Energy (BLE) à partir de n'importe quel appareil ou application compatible"
+---
+
+L'OSSM utilise Bluetooth Low Energy (BLE) pour le contrôle et la surveillance sans fil. Vous pouvez créer des applications client qui se connectent à l'OSSM pour envoyer des commandes et recevoir des mises à jour d'état en temps réel.
+
+<Info>
+BLE fournit un contrôle sans fil à faible latence avec reconnexion automatique et synchronisation d'état.
+</Info>
+
+## Avant de commencer
+
+Pour vous connecter à votre OSSM via BLE, assurez-vous :
+
+- Votre appareil prend en charge Bluetooth Low Energy (BLE 4.0+)
+- L'OSSM est sous tension et n'est pas connecté à un autre client BLE
+- Vous êtes à environ 10 mètres de l'appareil
+
+## Architecture des services
+
+L'OSSM implémente un service BLE personnalisé avec de multiples caractéristiques organisées en groupes fonctionnels.
+
+### UUID du service principal
+
+```
+522b443a-4f53-534d-0001-420badbabe69
+```
+
+Les caractéristiques sont organisées par [plages d'espaces de noms](#uuid-namespace-structure)  pour faciliter l'expansion et la découverte.
+
+## Référence caractéristique
+
+### Caractéristiques des commandes (inscriptibles)
+
+Utilisez ces caractéristiques pour envoyer des commandes et configurer l'OSSM.
+
+#### Caractéristique de commande principale
+
+| Propriété | Valeur |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-1000-420badbabe69` |
+| Propriétés | LIRE, ÉCRIRE |
+| But | Envoyer des commandes pour contrôler le comportement d'OSSM |
+
+**Format de commande**
+
+```
+set:<parameter>:<value>
+go:<state>
+```
+
+**Commandes disponibles**
+
+| Commande | Paramètre | Plage de valeurs | Description |
+| ------- | --------- | ----------- | ----------- |
+| `set:speed:<value>` | vitesse | 0-100 | Définir le pourcentage de vitesse de course |
+| `set:stroke:<value>` | accident vasculaire cérébral | 0-100 | Définir le pourcentage de longueur de course |
+| `set:depth:<value>` | profondeur | 0-100 | Définir le pourcentage de profondeur de pénétration |
+| `set:sensation:<value>` | sensation | 0-100 | Définir le pourcentage d'intensité de sensation |
+| `set:pattern:<value>` | modèle | 0-6 | Définir le motif de trait (voir [motifs](#pattern-information-characteristics)) |
+| `go:simplePenetration` | - | - | Passer en mode pénétration simple depuis le menu |
+| `go:strokeEngine` | - | - | Passer en mode moteur de course depuis le menu |
+| `go:streaming` | - | - | Passer en mode streaming (expérimental) depuis le menu |
+| `go:menu` | - | - | Revenir au menu principal depuis n'importe quel mode |
+| `stream:<pos>:<time>` | pos, heure | pos : 0-100, temps : ms | Envoyer une commande de position en mode streaming (expérimental) |
+
+**Format de réponse**
+
+| Réponse | Signification |
+| -------- | ------- |
+| `ok:<original_command>` | Commande exécutée avec succès |
+| `fail:<original_command>` | Échec de la commande (vérifier le format ou l'état actuel) |
+
+<Tip>
+Attendez toujours la réponse avant d'envoyer une autre commande. Les commandes sont traitées séquentiellement.
+</Tip>
+
+#### Caractéristique de configuration du bouton de vitesse
+
+| Propriété | Valeur |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-1010-420badbabe69` |
+| Propriétés | LIRE, ÉCRIRE |
+| But | Configurer si le bouton de vitesse physique limite les commandes de vitesse BLE |
+
+**Valeurs de configuration**
+
+| Valeur | Description |
+| ----- | ----------- |
+| `true`, `1`, `t` | Le bouton de vitesse agit comme limite supérieure (par défaut) |
+| `false`, `0`, `f` | Le bouton de vitesse et la vitesse BLE sont indépendants |
+
+<Tabs>
+<Tab title="Bouton comme limite (par défaut)">
+Lorsqu'elles sont réglées sur `true`, les commandes de vitesse BLE (0-100) sont traitées comme un pourcentage de la position physique actuelle du bouton.
+
+**Exemple** : Bouton à 50%, commande BLE `set:speed:80` → Vitesse effective = 40%
+
+Ce mode fournit une limite de sécurité matérielle que les utilisateurs peuvent contrôler physiquement.
+</Tab>
+
+<Tab title="Mode indépendant">
+Lorsqu'elles sont réglées sur `false`, les commandes de vitesse BLE (0-100) sont utilisées directement comme valeur de vitesse, ignorant la position du bouton.
+
+**Exemple** : commande BLE `set:speed:80` → Vitesse effective = 80 %
+
+<Warning>
+En mode indépendant, les commandes BLE peuvent remplacer le bouton physique. Assurez-vous que votre application met en œuvre des contrôles de sécurité appropriés.
+</Warning>
+</Tab>
+</Tabs>
+
+**Format de réponse**
+
+| Réponse | Signification |
+| -------- | ------- |
+| `true` ou `false` | Valeur de configuration actuelle |
+| `error:invalid_value` | Entrée invalide fournie |
+
+
+#### Caractéristique de configuration de compensation de latence
+
+| Propriété | Valeur |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-1030-420badbabe69` |
+| Propriétés | LIRE, ÉCRIRE |
+| But | Configurer si l'OSSM tente de compenser la latence|
+
+**Valeurs de configuration**
+
+| Valeur | Description |
+| ----- | ----------- |
+| `true`, `1`, `t` | La compensation de latence est active |
+| `false`, `0`, `f` | La compensation de latence est inactive (par défaut) |
+
+<Tabs>
+<Tab title="Activé">
+Lorsqu'il est défini sur `true`, l'OSSM s'attend à recevoir les commandes et les heures exactes du funscript et à ce que les commandes soient envoyées.
+avec le même délai entre les commandes que la valeur du temps. En calculant le temps entre les commandes reçues et la variable temps
+l'OSSM est capable de déterminer la latence introduite par BLE et de la corriger en modifiant légèrement la vitesse du mouvement.
+Si le temps entre les commandes ne correspond pas à la variable intime, cela ne doit pas être activé. Le réglage du tampon est utilisé pour
+ajouter du retard à tous les mouvements. Cela donne à l'OSSM le temps de recevoir la commande suivante avant que la précédente ne soit terminée. Cela permet
+la suppression de tout retard introduit par des commandes tardives, ainsi que le lissage du mouvement en combinant des mouvements se déplaçant dans la même direction.
+Les joueurs Funscript doivent ajouter cette valeur de tampon à leur décalage de lecture et inclure un paramètre supplémentaire pour affiner le décalage de lecture.
+pour tenir compte du temps de transmission et de tout retard inhérent au funscript lui-même.
+</Tab>
+
+<Tab title="Désactivé">
+Lorsqu'il est défini sur `false`, l'OSSM exécutera les commandes dès leur réception. Les commandes arrivées en retard seront exécutées en retard. Commandes
+qui arrivent tôt seront exécutés lorsque la commande précédente sera terminée.
+
+</Tab>
+</Tabs>
+
+**Format de réponse**
+
+| Réponse | Signification |
+| -------- | ------- |
+| `true` ou `false` | Valeur de configuration actuelle |
+| `error:invalid_value` | Entrée invalide fournie |
+
+#### Caractéristique de configuration WiFi
+
+| Propriété | Valeur |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-1020-420badbabe69` |
+| Propriétés | LIRE, ÉCRIRE |
+| But | Configurez les informations d'identification WiFi et vérifiez l'état de la connexion |
+
+**Format d'écriture**
+
+```
+set:wifi:<ssid>|<password>
+```
+
+Le caractère pipe (`|`) est utilisé comme délimiteur entre le SSID et le mot de passe. Cela permet à la fois au SSID et au mot de passe de contenir des deux-points.
+
+**Format de lecture** (JSON)
+
+```json
+{
+  "connected": true,
+  "ssid": "NetworkName",
+  "ip": "192.168.1.100",
+  "rssi": -45
+}
+```
+
+Lorsqu'il n'est pas connecté, le champ `ssid` contiendra le dernier SSID enregistré (le cas échéant), `ip` sera vide et `rssi` sera 0.
+
+**Format de réponse**
+
+| Réponse | Signification |
+| -------- | ------- |
+| `ok:wifi:connected` | Connecté avec succès |
+| `ok:wifi:saved` | Identifiants enregistrés, tentative de connexion |
+| `fail:wifi:invalid_format` | Format de commande incorrect (délimiteur de canal manquant) |
+| `fail:wifi:invalid_ssid` | Longueur du SSID invalide (doit comporter entre 1 et 32 caractères) |
+| `fail:wifi:invalid_password` | Longueur du mot de passe invalide (doit comporter entre 8 et 63 caractères) |
+| `fail:wifi:connection_failed` | Impossible de se connecter au réseau |
+| `fail:wifi:save_failed` | Échec de l'enregistrement des informations d'identification sur NVS |
+
+<Tip>
+Les informations d'identification WiFi sont conservées dans un stockage non volatile (NVS) et seront conservées lors des redémarrages de l'appareil. L'appareil tentera de se connecter automatiquement à l'aide des informations d'identification enregistrées au démarrage.
+</Tip>
+
+<Warning>
+Les informations d'identification WiFi sont transmises en texte brut via BLE. Assurez-vous que vous faites confiance à la connexion et que vous vous trouvez dans un environnement sécurisé lors de la configuration des paramètres WiFi.
+</Warning>
+
+**Exemple d'utilisation**
+
+```javascript
+// Configure WiFi
+const wifiCommand = "set:wifi:MyNetwork|MyPassword123";
+await commandChar.writeValue(new TextEncoder().encode(wifiCommand));
+
+// Read the response
+const response = await commandChar.readValue();
+console.log(new TextDecoder().decode(response)); // "ok:wifi:connected"
+
+// Check WiFi status
+const wifiConfigChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-1020-420badbabe69"
+);
+const statusValue = await wifiConfigChar.readValue();
+const status = JSON.parse(new TextDecoder().decode(statusValue));
+console.log(status);
+// { "connected": true, "ssid": "MyNetwork", "ip": "192.168.1.100", "rssi": -45 }
+```
+
+### Caractéristiques de l'état (lecture seule)
+
+Abonnez-vous à ces caractéristiques pour surveiller l'état actuel de l'OSSM.
+
+#### Caractéristique de l'état actuel
+
+| Propriété | Valeur |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-2000-420badbabe69` |
+| Propriétés | LIRE, NOTIFIER |
+| But | Surveiller l'état et les paramètres actuels d'OSSM |
+
+**Format JSON d'état**
+
+```json
+{
+  "state": "<state_name>",
+  "speed": 0-100,
+  "stroke": 0-100,
+  "sensation": 0-100,
+  "depth": 0-100,
+  "pattern": 0-6
+}
+```
+
+<AccordionGroup>
+<Accordion title="États disponibles">
+| État | Description |
+| ----- | ----------- |
+| `idle` | Initialisation |
+| `homing` | Séquence de référence active |
+| `homing.forward` | Prise de référence avant en cours |
+| `homing.backward` | Retour en arrière en cours |
+| `menu` | Menu principal affiché |
+| `menu.idle` | État d'inactivité du menu |
+| `simplePenetration` | Mode de pénétration simple |
+| `simplePenetration.idle` | Pénétration simple au ralenti |
+| `simplePenetration.preflight` | Vérifications avant vol |
+| `strokeEngine` | Mode moteur de course |
+| `strokeEngine.idle` | Moteur au ralenti |
+| `strokeEngine.preflight` | Vérifications avant vol |
+| `strokeEngine.pattern` | Sélection de motif |
+| `streaming` | Mode streaming (expérimental) |
+| `update` | Mode mise à jour |
+| `update.checking` | Vérification des mises à jour |
+| `update.updating` | Mise à jour en cours |
+| `update.idle` | Mise à jour inactive |
+| `wifi` | Mode de configuration Wi-Fi |
+| `wifi.idle` | Configuration WiFi inactive |
+| `help` | Écran d'aide |
+| `help.idle` | Aide au ralenti |
+| `error` | État d'erreur |
+| `error.idle` | Erreur d'inactivité |
+| `error.help` | Aide sur les erreurs |
+| `restart` | État de redémarrage |
+
+Pour l'implémentation complète de la machine d'état, voir [OSSM.h](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/OSSM.h) dans le référentiel source.
+</Accordion>
+</AccordionGroup>
+
+**Comportement de notification**
+
+- Les changements d'état déclenchent des notifications immédiates
+- Notifications périodiques toutes les 1 000 ms lorsqu'aucun changement d'état ne se produit
+- Les notifications s'arrêtent lorsqu'aucun client n'est connecté
+
+### Caractéristiques des informations sur le modèle
+
+#### Caractéristique de la liste de modèles
+
+| Propriété | Valeur |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-3000-420badbabe69` |
+| Propriétés | LIRE |
+| But | Obtenez les modèles de traits disponibles |
+
+**Format de réponse**
+
+```json
+[
+  { "name": "Simple Stroke", "idx": 0 },
+  { "name": "Teasing Pounding", "idx": 1 },
+  { "name": "Robo Stroke", "idx": 2 },
+  { "name": "Half'n'Half", "idx": 3 },
+  { "name": "Deeper", "idx": 4 },
+  { "name": "Stop'n'Go", "idx": 5 },
+  { "name": "Insist", "idx": 6 }
+]
+```
+
+#### Caractéristique de description du modèle
+
+| Propriété | Valeur |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-3010-420badbabe69` |
+| Propriétés | LIRE, ÉCRIRE |
+| But | Obtenez des descriptions pour des modèles de traits individuels |
+
+Pour récupérer une description de modèle :
+
+<Steps>
+<Step title="Écrire l'index du modèle">
+Écrivez le numéro d'index (0-6) à la caractéristique.
+</Step>
+
+<Step title="Lire le descriptif">
+Lisez la caractéristique pour recevoir la chaîne de description du modèle.
+</Step>
+</Steps>
+
+**Descriptions des modèles**
+
+| Modèle | Indice | Description |
+| ------- | ----- | ----------- |
+| Coup simple | 0 | Accélération, roue libre et décélération également réparties ; aucune sensation |
+| Taquiner martèlement | 1 | Changements de vitesse avec sensation ; équilibre les mouvements plus rapides |
+| Coup de robot | 2 | La sensation varie en accélération ; du robotique au progressif |
+| Moitié-moitié | 3 | Les traits en pleine et demi-profondeur alternent ; la sensation affecte la vitesse |
+| Plus profond | 4 | La profondeur de course augmente par cycle ; Les jeux de sensations comptent |
+| Stop'n'Go | 5 | Pauses entre les coups ; la sensation ajuste la longueur |
+| Insister | 6 | Modifie la longueur, maintient la vitesse ; la sensation influence la direction |
+
+### Commandes de streaming (expérimental)
+
+<Warning>
+Le streaming de position est expérimental et n’est pas recommandé pour une utilisation générale. Le protocole et le comportement peuvent changer dans les futures mises à jour du micrologiciel.
+</Warning>
+
+En mode streaming (`go:streaming`), l'OSSM accepte les commandes de position en temps réel qui permettent une lecture synchronisée avec du contenu externe tel que des funscripts.
+
+#### Commande de position du flux
+
+| Propriété | Valeur |
+| -------- | ----- |
+| Format | `stream:<position>:<time>` |
+| Position | 0-100 (pourcentage de course) |
+| Temps | Millisecondes pour atteindre la position cible |
+
+**Exemples de commandes**
+
+```
+stream:0:200      # Move to 0% (retracted) in 200ms
+stream:100:150    # Move to 100% (extended) in 150ms
+stream:50:300     # Move to 50% (mid-stroke) in 300ms
+```
+
+**Comment ça marche**
+
+1. Entrez en mode streaming avec `go:streaming`
+2. L'OSSM se met en position 0 (complètement rétracté)
+3. Envoyer des commandes `stream:<pos>:<time>` pour contrôler le mouvement
+4. Le firmware calcule la vitesse requise pour atteindre la position cible dans le temps spécifié
+5. Motion utilise une accélération maximale pour une sensation de réactivité
+
+<Note>
+La position 0 représente complètement rétractée (origine) et la position 100 représente complètement déployée. Le paramètre de temps indique la durée du mouvement, permettant à l'OSSM de calculer la vitesse appropriée pour une lecture fluide.
+</Note>
+
+**Exigences**
+
+- Version du micrologiciel 3.0 ou ultérieure
+- OSSM doit être en mode streaming (état : `streaming` ou `streaming.idle`)
+- Commandes envoyées via la caractéristique de commande principale
+
+<Tip>
+Pour la lecture de funscript, consultez l'outil [Funscript Player](/ossm/software/communication/ble#streaming-mode) qui gère automatiquement le timing et la génération de commandes.
+</Tip>
+
+### Caractéristiques GPIO
+
+#### Caractéristique de contrôle GPIO
+
+| Propriété | Valeur |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-4000-420badbabe69` |
+| Propriétés | LIRE, ÉCRIRE |
+| But | Contrôlez les broches de sortie GPIO pour les accessoires et les intégrations |
+
+Écrivez les commandes au format `<pin>:<state>` où la broche est 1-4 et l'état est `high`/`low` ou `1`/`0`.
+
+**Mappage des broches :**
+
+| Épingle logique | ESP32GPIO |
+| ----------- | ---------- |
+| 1 | GPIO2 |
+| 2 | GPIO15 |
+| 3 | GPIO22 |
+| 4 | GPIO33 |
+
+**Format de réponse :**
+
+| Réponse | Signification |
+| -------- | ------- |
+| `ok:<pin>:<state>` | Épingle définie avec succès |
+| `error:invalid_format` | Format de commande non reconnu |
+| `error:pin_out_of_range` | Numéro de broche non 1-4 |
+
+<Info>
+Pour une documentation GPIO détaillée, y compris des exemples d'intégration matérielle, voir [GPIO Control](/ossm/software/communication/gpio).
+</Info>
+
+## Émulation Fleshy Thrust Sync (tests uniquement)
+
+<Warning>
+Cette fonctionnalité est destinée uniquement aux tests de développement et son utilisation n'est **pas recommandée**. Il nécessite une version spéciale du micrologiciel et pourra être supprimé dans les versions futures.
+</Warning>
+
+Le micrologiciel OSSM peut éventuellement émuler le protocole BLE Fleshy Thrust Sync (FTS) pour les tests de compatibilité avec des applications telles que faptap.net. Cette fonctionnalité est désactivée par défaut et nécessite la compilation du firmware avec l'indicateur `PRETEND_TO_BE_FLESHY_THRUST_SYNC`.
+
+### Service FTS
+
+| Propriété | Valeur |
+| -------- | ----- |
+| UUID du service | `0000ffe0-0000-1000-8000-00805f9b34fb` |
+| UUID caractéristique | `0000ffe1-0000-1000-8000-00805f9b34fb` |
+| Propriétés | LIRE, ÉCRIRE, NOTIFIER, INDIQUER |
+
+### Format de protocole binaire
+
+FTS utilise un format binaire compact plutôt que des commandes texte :
+
+| Octet | Description | Gamme |
+| ---- | ----------- | ----- |
+| 0 | Position | 0-180 (uint8) |
+| 1 | Octet de poids fort du temps | MSB du temps en ms |
+| 2 | Temps octet de poids faible | LSB du temps en ms |
+
+**Mappage de position** : 0 = entièrement rétracté, 180 = entièrement étendu
+
+**Format de l'heure** : entier non signé de 16 bits en gros-boutiste (ordre des octets du réseau)
+
+### Exemple
+
+Pour passer à la position 90 (étendue à 50 %) en 250 ms :
+
+```
+Byte 0: 0x5A (90 decimal - position)
+Byte 1: 0x00 (250 >> 8 = 0)
+Byte 2: 0xFA (250 & 0xFF = 250)
+```
+
+<Note>
+L'émulation FTS utilise le même mécanisme de streaming sous-jacent que la commande native `stream:pos:time`. L'OSSM doit être en mode streaming pour que les commandes prennent effet.
+</Note>
+
+### Pourquoi pas recommandé
+
+- Le protocole FTS est une spécification tierce non contrôlée par le projet OSSM
+- Les modifications de protocole dans les applications compatibles FTS peuvent rompre la compatibilité
+- Le protocole de streaming OSSM natif (`stream:pos:time`) est préféré pour les nouvelles intégrations
+- Cette fonctionnalité existe principalement pour tester la compatibilité avec les écosystèmes FTS existants
+
+## Service d'informations sur les appareils
+
+L'OSSM implémente le service d'information sur les appareils BLE standard pour l'identification.
+
+| Caractéristiques | UUID | Valeur |
+| -------------- | ---- | ----- |
+| Service | `180A` | Service d'informations sur les appareils |
+| Nom du fabricant | `2A29` | "Recherche et désir" |
+| ID système | `2A23` | `88:1A:14:FF:FE:34:29:63` |
+
+## Structure de l'espace de noms UUID
+
+L'OSSM utilise un espace de noms UUID structuré pour une expansion organisée.
+
+### UUID du service
+
+```
+0x0001 = Service UUID
+```
+
+### Plages d'espaces de noms
+
+| Gamme | Portée hexagonale | Description |
+| ----- | --------- | ----------- |
+| 0x0 | 0x0000–0x0FFF | Réservé aux messages système |
+| 0x1 | 0x1000–0x1FFF | Commandes et configuration |
+| 0x2 | 0x2000–0x2FFF | Informations sur l'état |
+| 0x3 | 0x3000–0x3FFF | Informations sur le modèle |
+| 0x4 | 0x4000–0x4FFF | Paramétrage des broches GPIO |
+| 0x5–0xD | 0x5000–0xDFFF | Réservé pour une utilisation future |
+| 0xE | 0xE000–0xEFFF | Réservé aux statistiques |
+| 0xF | 0xF000–0xFFFF | Expérimental / bac à sable (volatile) |
+
+### Affectations de caractéristiques actuelles
+
+<Tabs>
+<Tab title="Commandes (0x1xxx)">
+```
+522b443a-4f53-534d-1000-420badbabe69  # Primary command
+522b443a-4f53-534d-1010-420badbabe69  # Speed knob configuration
+522b443a-4f53-534d-1020-420badbabe69  # WiFi configuration
+```
+</Tab>
+
+<Tab title="État (0x2xxx)">
+```
+522b443a-4f53-534d-2000-420badbabe69  # Current state
+```
+</Tab>
+
+<Tab title="Modèles (0x3xxx)">
+```
+522b443a-4f53-534d-3000-420badbabe69  # Pattern list
+522b443a-4f53-534d-3010-420badbabe69  # Pattern description
+```
+</Tab>
+
+<Tab title="GPIO (0x4xxx)">
+```
+522b443a-4f53-534d-4000-420badbabe69  # GPIO control
+```
+</Tab>
+</Tabs>
+
+## Gestion des connexions
+
+### Publicité
+
+| Paramètre | Valeur |
+| ------- | ----- |
+| Nom de l'appareil | `OSSM` |
+| UUID de service | Service principal + Service d'informations sur les appareils |
+| Intervalle de publicité | 20-40 ms (optimisé pour la fiabilité) |
+| Redémarrage automatique | La publicité reprend lorsque tous les clients se déconnectent |
+
+### Sécurité
+
+| Paramètre | Valeur |
+| ------- | ----- |
+| Couplage | "Just Works" (aucune authentification requise) |
+| Cryptage | Connexions sécurisées BLE activées |
+| Collage | Désactivé (pas de couplage persistant) |
+
+<Note>
+L'OSSM utilise le couplage « Just Works » pour faciliter son utilisation. Toute personne à portée de BLE peut se connecter lorsque l'appareil fait de la publicité.
+</Note>
+
+### Sécurité de déconnexion
+
+Lorsqu'une connexion BLE est perdue de manière inattendue, l'OSSM réduit automatiquement la vitesse pour éviter un fonctionnement incontrôlable.
+
+**Comportement de décélération :**
+
+1. Connexion perdue détectée
+2. **Délai d'une seconde** — permet de brèves interruptions de signal sans déclenchement
+3. **Rampe de 2 secondes** — la vitesse diminue de la valeur actuelle à zéro à l'aide de la courbe sinusoïdale d'entrée-sortie facile
+4. L'appareil continue à vitesse nulle jusqu'à ce qu'il soit reconnecté ou arrêté manuellement
+
+<Info>
+La courbe sinusoïdale facile d'entrée et de sortie offre une décélération douce qui semble naturelle et réduit les contraintes mécaniques. Si la vitesse était déjà nulle au moment de la déconnexion, aucune rampe ne se produit.
+</Info>
+
+**Considérations client :**
+
+- Mettre en œuvre une surveillance des connexions pour détecter rapidement les déconnexions
+- Envisagez une logique de reconnexion automatique
+- Les commandes locales (potentiomètre, encodeur) restent actives pendant et après la déconnexion
+- Les utilisateurs peuvent arrêter manuellement via le bouton de vitesse ou appuyer longuement pour un arrêt d'urgence
+
+## Guide de mise en œuvre client
+
+### Flux de connexion
+
+Suivez ces étapes pour établir une connexion et commencer à contrôler votre OSSM :
+
+<Steps>
+<Step title="Rechercher l'appareil">
+Recherchez les appareils BLE portant le nom « OSSM ».
+
+<Check>
+L'appareil apparaît dans les résultats de l'analyse.
+</Check>
+</Step>
+
+<Step title="Connectez-vous à l'appareil">
+Établissez une connexion du GATT à l’OSSM.
+</Step>
+
+<Step title="Découvrez les prestations">
+Découvrez tous les services et caractéristiques de l'appareil.
+
+<Check>
+L'UUID du service principal `522b443a-4f53-534d-0001-420badbabe69` est trouvé.
+</Check>
+</Step>
+
+<Step title="Abonnez-vous aux notifications d'état">
+Activez les notifications sur la caractéristique d'état pour recevoir des mises à jour en temps réel.
+</Step>
+
+<Step title="Lire l'état initial">
+Lisez l'état actuel et la liste des modèles pour initialiser votre application.
+</Step>
+
+<Step title="Envoyer des commandes">
+Commencez à envoyer des commandes pour contrôler l’OSSM.
+</Step>
+</Steps>
+
+### Meilleures pratiques
+
+<CardGroup cols={2}>
+<Card title="Gestion des commandes" icon="terminal">
+- Valider le format de la commande avant de l'envoyer
+- Gérer les réponses `ok:` et `fail:`
+- Implémenter une logique de nouvelle tentative pour les commandes critiques
+- Surveiller les changements d'état pour confirmer l'exécution de la commande
+</Card>
+
+<Card title="Surveillance de l'État" icon="eye">
+- Abonnez-vous aux notifications sur les caractéristiques de l'état
+- Analyser les mises à jour de l'état JSON de manière fiable
+- Gérer les transitions d'état de manière appropriée
+- Implémenter la gestion des délais d'attente pour les mises à jour manquantes
+</Card>
+</CardGroup>
+
+## Exemple de code
+
+<CodeGroup>
+```javascript Web Bluetooth (JavaScript)
+// Connect to OSSM
+const device = await navigator.bluetooth.requestDevice({
+  filters: [{ name: "OSSM" }],
+  optionalServices: ["522b443a-4f53-534d-0001-420badbabe69"],
+});
+
+const server = await device.gatt.connect();
+const service = await server.getPrimaryService(
+  "522b443a-4f53-534d-0001-420badbabe69"
+);
+
+// Get characteristics
+const commandChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-1000-420badbabe69"
+);
+const stateChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-2000-420badbabe69"
+);
+const speedKnobConfigChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-1010-420badbabe69"
+);
+const wifiConfigChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-1020-420badbabe69"
+);
+const patternsChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-3000-420badbabe69"
+);
+
+// Subscribe to state updates
+await stateChar.startNotifications();
+stateChar.addEventListener("characteristicvaluechanged", (event) => {
+  const state = JSON.parse(new TextDecoder().decode(event.target.value));
+  console.log("State update:", state);
+});
+
+// Configure speed knob behavior (true = knob as limit, false = independent)
+await speedKnobConfigChar.writeValue(new TextEncoder().encode("true"));
+
+// Configure WiFi
+await wifiConfigChar.writeValue(new TextEncoder().encode("set:wifi:MyNetwork|MyPassword123"));
+
+// Check WiFi status
+const wifiStatus = await wifiConfigChar.readValue();
+console.log("WiFi:", JSON.parse(new TextDecoder().decode(wifiStatus)));
+
+// Send a command
+const command = "set:speed:75";
+await commandChar.writeValue(new TextEncoder().encode(command));
+
+// Read available patterns
+const patterns = await patternsChar.readValue();
+const patternList = JSON.parse(new TextDecoder().decode(patterns));
+console.log("Available patterns:", patternList);
+```
+
+```python Python (bleak)
+import asyncio
+import json
+from bleak import BleakClient
+
+SERVICE_UUID = "522b443a-4f53-534d-0001-420badbabe69"
+COMMAND_UUID = "522b443a-4f53-534d-1000-420badbabe69"
+STATE_UUID = "522b443a-4f53-534d-2000-420badbabe69"
+SPEED_KNOB_UUID = "522b443a-4f53-534d-1010-420badbabe69"
+WIFI_CONFIG_UUID = "522b443a-4f53-534d-1020-420badbabe69"
+
+def state_callback(sender, data):
+    """Handle state update notifications."""
+    state = json.loads(data.decode())
+    print(f"State update: {state}")
+
+async def connect_to_ossm():
+    async with BleakClient("OSSM") as client:
+        # Subscribe to state updates
+        await client.start_notify(STATE_UUID, state_callback)
+
+        # Configure speed knob behavior
+        await client.write_gatt_char(
+            SPEED_KNOB_UUID,
+            "true".encode()  # Knob acts as upper limit
+        )
+
+        # Configure WiFi
+        await client.write_gatt_char(
+            WIFI_CONFIG_UUID,
+            "set:wifi:MyNetwork|MyPassword123".encode()
+        )
+
+        # Check WiFi status
+        wifi_status = await client.read_gatt_char(WIFI_CONFIG_UUID)
+        print(f"WiFi status: {json.loads(wifi_status.decode())}")
+
+        # Send a command
+        command = "set:speed:75"
+        await client.write_gatt_char(COMMAND_UUID, command.encode())
+
+        # Keep connection alive to receive notifications
+        await asyncio.sleep(10)
+
+asyncio.run(connect_to_ossm())
+```
+</CodeGroup>
+
+## Dépannage
+
+<AccordionGroup>
+<Accordion title="La connexion échoue">
+**Symptômes** : Impossible de découvrir ou de se connecter à l'OSSM.
+
+**Solutions** :
+- Assurez-vous que l'OSSM est sous tension et à portée (~ 10 mètres).
+- Vérifiez qu'aucun autre appareil n'est actuellement connecté à l'OSSM
+- Redémarrez l'OSSM pour réinitialiser la pile BLE
+- Essayez de vous rapprocher de l'appareil
+</Accordion>
+
+<Accordion title="Les commandes ne fonctionnent pas">
+**Symptômes** : les commandes renvoient `fail:` ou n'ont aucun effet.
+
+**Solutions** :
+- Vérifiez que le format de commande correspond exactement à la spécification
+- Vérifiez que l'OSSM est dans un état qui accepte les commandes (par exemple, `strokeEngine` ou `simplePenetration`).
+- Utilisez d'abord `go:strokeEngine` ou `go:simplePenetration` si vous êtes dans l'état du menu.
+- Lisez l'état actuel pour comprendre quelles commandes sont valides
+</Accordion>
+
+<Accordion title="Aucune mise à jour de l'état">
+**Symptômes** : les caractéristiques de l'état ne sont jamais mises à jour après l'abonnement.
+
+**Solutions** :
+- Vérifier que l'abonnement aux notifications a réussi
+- Vérifiez que votre bibliothèque BLE prend en charge les notifications
+- Assurez-vous de lire les notifications à partir de l'UUID de caractéristique correct
+- Essayez de vous déconnecter et de vous reconnecter
+</Accordion>
+
+<Accordion title="Réponses invalides">
+**Symptômes** : réception de données inattendues ou mal formées.
+
+**Solutions** :
+- Assurez-vous de décoder les réponses sous forme de texte UTF-8
+- Vérifiez que l'analyse JSON gère correctement le format d'état
+- Recherchez les problèmes d'encodage dans votre bibliothèque BLE
+</Accordion>
+</AccordionGroup>
+
+### Informations de débogage
+
+<Tip>
+Activez la journalisation ESP32 au niveau DEBUG pour obtenir des informations détaillées sur le protocole. Surveillez l’état de la connexion BLE, les modifications de MTU et les transitions de la machine d’état.
+</Tip>

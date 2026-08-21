@@ -1,0 +1,209 @@
+---
+title: "Konfigurationsreferenz"
+description: "Verstehen und Anpassen der OSSM-Firmware-Konfigurationsparameter für Ihren spezifischen Build"
+---
+
+Die OSSM-Firmware verwendet eine Reihe von Konfigurationskonstanten, die Bewegungsgrenzen, Hardwareeigenschaften und Benutzerpräferenzen definieren. In dieser Referenz werden alle konfigurierbaren Parameter und deren Änderung für benutzerdefinierte Builds dokumentiert.
+
+<Warning>
+Eine falsche Änderung der Konfigurationswerte kann Ihre Hardware beschädigen oder einen unsicheren Betrieb verursachen. Ändern Sie Werte nur, wenn Sie deren Auswirkungen verstehen und Ihre Hardwarespezifikationen überprüft haben.
+</Warning>
+
+## Konfiguration des Bewegungssystems
+
+Diese Parameter definieren, wie sich das OSSM bewegt, und sind in `src/constants/Config.h` unter dem Namespace `Config::Driver` zu finden.
+
+### Geschwindigkeit und Beschleunigung
+
+| Parameter | Standard | Einheit | Beschreibung |
+|-----------|---------|------|-------------|
+| `maxSpeedMmPerSecond` | 900.0 | mm/s | Maximale Lineargeschwindigkeit des Aktuators |
+| `maxAcceleration` | 10000.0 | mm/s² | Maximale Beschleunigungs-/Verzögerungsrate |
+
+<Info>
+Diese Grenzwerte gelten für alle Betriebsarten. Die tatsächlich erreichte Geschwindigkeit hängt von Ihrem Motor, Ihrer Stromversorgung und Ihrem mechanischen Aufbau ab.
+</Info>
+
+### Motorkonfiguration
+
+| Parameter | Standard | Einheit | Beschreibung |
+|-----------|---------|------|-------------|
+| `motorStepPerRevolution` | 800.0 | Schritte/Umdrehung | Motorschritte pro voller Umdrehung |
+| `pulleyToothCount` | 20.0 | Zähne | Anzahl der Zähne der Antriebsscheibe |
+| `beltPitchMm` | 2.0 | mm | Abstand zwischen den Riemenzähnen (GT2-Standard) |
+
+Diese Werte ergeben zusammen die Berechnung von `stepsPerMM`:
+
+```cpp
+stepsPerMM = motorStepPerRevolution / (pulleyToothCount * beltPitchMm)
+// Default: 800 / (20 * 2) = 20 steps/mm
+```
+
+<Tip>
+Wenn Sie andere Hardware verwenden (z. B. eine 16-Zahn-Riemenscheibe oder einen GT3-Riemen), aktualisieren Sie diese Werte entsprechend. Falsche Werte führen dazu, dass die Firmware Positionen falsch berechnet.
+</Tip>
+
+### Hubgrenzen
+
+| Parameter | Standard | Einheit | Beschreibung |
+|-----------|---------|------|-------------|
+| `maxStrokeSteps` | 500.0 | mm | Maximal nutzbare Hublänge |
+| `minStrokeLengthMm` | 50.0 | mm | Mindesthub zum Bestehen der Homing-Validierung |
+
+<Note>
+`maxStrokeSteps` definiert den absoluten Maximalweg. Stellen Sie dies auf Ihre Schienenlänge abzüglich des linearen Blockhalters (75 mm bei Standard-OSSM) abzüglich einer Sicherheitsmarge von 20 mm ein.
+</Note>
+
+### Homing-Konfiguration
+
+| Parameter | Standard | Einheit | Beschreibung |
+|-----------|---------|------|-------------|
+| `sensorlessCurrentLimit` | 1.5 | % | Aktueller Schwellenwert, der das Ende der Reise anzeigt |
+
+Das OSSM verwendet eine sensorlose Referenzfahrt – es erkennt, wann der Aktuator das Ende des Hubs erreicht, indem es den Motorstrom überwacht. Wenn der Strom diesen Schwellenwert überschreitet, weiß die Firmware, dass der Aktuator einen physischen Stopp erreicht hat.
+
+## Erweiterte Konfiguration
+
+Diese Parameter optimieren das Firmware-Verhalten und sind in `Config::Advanced` zu finden.
+
+| Parameter | Standard | Einheit | Beschreibung |
+|-----------|---------|------|-------------|
+| `strokeZeroOffsetMm` | 6.0 | mm | Pufferabstand von der physischen Ausgangsposition |
+| `commandDeadZonePercentage` | 1.0 | % | Totzone des Potentiometers zur Vermeidung von Geräuschen |
+| `accelerationScaling` | 100.0 | - | Beeinflusst die Bewegungsaggressivität bei einfacher Penetration |
+
+<AccordionGroup>
+<Accordion title="hubZeroOffsetMm">
+Nach der Referenzfahrt fährt der Antrieb um diesen Abstand vom physischen Endanschlag zurück. Dadurch wird verhindert, dass der Antrieb im Normalbetrieb wiederholt gegen den Endanschlag stößt.
+</Accordion>
+
+<Accordion title="commandDeadZonePercentage">
+Analoge Potentiometer können verrauschte Messwerte nahe Null erzeugen. Diese Totzone stellt sicher, dass der Geschwindigkeitsknopf bei vollständiger Drehung gegen den Uhrzeigersinn den Wert „Null“ anzeigt, selbst wenn der elektrische Messwert leicht über 0 % liegt.
+</Accordion>
+
+<Accordion title="BeschleunigungSkalierung">
+Im Modus „Einfache Penetration“ wird die Beschleunigung wie folgt berechnet:
+```cpp
+acceleration = maxSpeedMmPerSecond * speed * speed / accelerationScaling
+```
+Höhere Werte erzeugen sanftere Beschleunigungskurven.
+</Accordion>
+</AccordionGroup>
+
+## Benutzerkonfiguration
+
+Benutzereinstellungen werden in `src/constants/UserConfig.h` definiert.
+
+### Sprache
+
+```cpp
+static LanguageStruct language = enUs;  // or 'fr' for French
+```
+
+Verfügbare Sprachen:
+- `enUs` – Englisch (USA)
+- `fr` – Französisch
+
+<Note>
+Die Sprachauswahl erfordert derzeit eine Neukompilierung der Firmware. Für zukünftige Versionen ist eine Laufzeit-Sprachauswahl geplant.
+</Note>
+
+### Anzeigeeinheiten
+
+```cpp
+static bool displayMetric = true;
+```
+
+Bei `true` werden Entfernungen in Metern angezeigt. Bei `false` werden Entfernungen in Fuß angezeigt.
+
+## Pin-Definitionen
+
+Hardware-Pins sind in `src/constants/Pins.h` definiert. Ändern Sie diese, wenn Sie benutzerdefinierte Hardware erstellen.
+
+### Pins anzeigen
+
+| Stift | Standard-GPIO | Beschreibung |
+|-----|--------------|-------------|
+| `oledReset` | -1 | OLED-Reset-Pin (-1, wenn mit Board-Reset geteilt) |
+| `ledPin` | 25 | RGB-LED-Datenpin (WS2812B) |
+
+### Treiberstifte
+
+| Stift | Standard-GPIO | Beschreibung |
+|-----|--------------|-------------|
+| `motorStepPin` | 14 | Schritt-/Servo-STEP-Signal |
+| `motorDirectionPin` | 27 | Schrittmotor-/Servo-DIR-Signal |
+| `motorEnablePin` | 26 | Schrittmotor-/Servo-ENA-Signal |
+| `currentSensorPin` | 36 | Analoger Strommesseingang |
+| `stopPin` | 19 | Not-Aus-Schalter (optional) |
+| `limitSwitchPin` | 12 | Endschaltereingang (optional) |
+
+### Remote-Pins
+
+| Stift | Standard-GPIO | Beschreibung |
+|-----|--------------|-------------|
+| `speedPotPin` | 34 | Analoger Eingang des Geschwindigkeitspotentiometers |
+| `encoderSwitch` | 35 | Encoder-Tasteneingabe |
+| `encoderA` | 18 | Encoderkanal A |
+| `encoderB` | 5 | Encoderkanal B |
+| `displayData` | 21 | I2C SDA für OLED |
+| `displayClock` | 19 | I2C SCL für OLED |
+
+### GPIO-Erweiterungspins
+
+Diese Pins sind für Zubehör über [BLE GPIO-Steuerung](/ossm/software/communication/gpio) erhältlich:
+
+| Logischer Pin | GPIO | Beschreibung |
+|-------------|------|-------------|
+| Pin 1 | GPIO 2 | Allzweckausgabe |
+| Pin 2 | GPIO 15 | Allzweckausgabe |
+| Pin 3 | GPIO 22 | Allzweckausgabe |
+| Pin 4 | GPIO 33 | Allzweckausgabe |
+
+## Konfiguration ändern
+
+<Steps>
+<Step title="Klonen Sie das Repository">
+Klonen Sie das OSSM-Firmware-Repository, falls Sie dies noch nicht getan haben:
+
+```bash
+git clone https://github.com/KinkyMakers/OSSM-hardware.git
+cd OSSM-hardware/Software
+```
+</Step>
+
+<Step title="Konfigurationsdateien bearbeiten">
+Öffnen Sie die entsprechende Konfigurationsdatei in Ihrem Editor:
+
+- `src/constants/Config.h` – Bewegung und erweiterte Parameter
+- `src/constants/UserConfig.h` – Benutzereinstellungen
+- `src/constants/Pins.h` – Hardware-Pinbelegung
+</Step>
+
+<Step title="Neu erstellen und hochladen">
+Verwenden Sie PlatformIO, um die geänderte Firmware zu kompilieren und hochzuladen:
+
+1. Klicken Sie auf die Schaltfläche **Erstellen**, um die Kompilierung Ihrer Änderungen zu überprüfen
+2. Klicken Sie auf **Hochladen**, um die neue Firmware zu flashen
+
+<Check>
+Nach dem Hochladen wird der OSSM neu gestartet und verwendet Ihre neue Konfiguration.
+</Check>
+</Step>
+</Steps>
+
+<Warning>
+Testen Sie Konfigurationsänderungen immer sorgfältig. Beginnen Sie mit niedrigen Geschwindigkeiten und vergewissern Sie sich, dass die Referenzfahrt erfolgreich abgeschlossen wurde, bevor Sie den Normalbetrieb durchführen.
+</Warning>
+
+## Verwandte Seiten
+
+<CardGroup cols={2}>
+<Card title="PlatformIO-Setup" icon="wrench" href="/ossm/software/getting-started/platformio">
+  Richten Sie Ihre Entwicklungsumgebung ein, um Firmware zu ändern und hochzuladen.
+</Card>
+
+<Card title="Sicherheitsfunktionen" icon="shield" href="/ossm/software/getting-started/safety-features">
+  Verstehen Sie, wie sich Konfigurationswerte auf Sicherheitssysteme auswirken.
+</Card>
+</CardGroup>

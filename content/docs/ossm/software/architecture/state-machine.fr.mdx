@@ -1,0 +1,375 @@
+---
+title: "Machine à états"
+description: "Comprendre l'architecture de la machine à états du micrologiciel OSSM"
+---
+
+# Architecture des machines à états
+
+Le micrologiciel OSSM utilise une machine à états déclarative pour gérer le comportement de l'appareil. Cela garantit des transitions prévisibles entre les modes de fonctionnement et évite les états non valides qui pourraient provoquer un comportement inattendu.
+
+## Diagramme d'état
+
+Le diagramme suivant montre tous les états et transitions dans la machine à états OSSM :
+
+<MermaidControls />
+
+```mermaid
+stateDiagram-v2
+    direction TB
+
+    [*] --> idle
+    idle --> homing : done
+
+    state homing {
+        direction LR
+        forward --> backward : done
+        forward --> [*] : error
+        backward --> [*] : error
+    }
+
+    homing --> menu : homed
+    homing --> error : failed
+
+    state menu {
+        direction LR
+        [*] --> selecting
+    }
+
+    menu --> simplePenetration : select
+    menu --> strokeEngine : select
+    menu --> streaming : select
+    menu --> update : select
+    menu --> wifi : select
+    menu --> help : select
+    menu --> restart : select
+
+    state simplePenetration {
+        direction LR
+        [*] --> sp_preflight
+        sp_preflight --> sp_playing : done
+    }
+    simplePenetration --> homing : not homed
+    simplePenetration --> menu : longPress
+
+    state strokeEngine {
+        direction LR
+        [*] --> se_preflight
+        se_preflight --> se_playing : done
+        se_playing --> se_pattern : doublePress
+        se_pattern --> se_playing : buttonPress
+        se_playing --> se_playing : buttonPress
+    }
+    strokeEngine --> homing : not homed
+    strokeEngine --> menu : longPress
+
+    state streaming {
+        direction LR
+        [*] --> st_preflight
+        st_preflight --> st_playing : done
+    }
+    streaming --> homing : not homed
+    streaming --> menu : longPress
+
+    state update {
+        direction LR
+        [*] --> checking
+        checking --> updating : available
+        checking --> noUpdate : current
+        noUpdate --> [*] : buttonPress
+        updating --> [*] : complete
+    }
+    update --> wifi : offline
+    update --> menu : buttonPress
+
+    state wifi {
+        direction LR
+        [*] --> portal
+    }
+    wifi --> menu : done
+    wifi --> restart : longPress
+
+    state help {
+        [*] --> helpScreen
+    }
+    help --> menu : buttonPress
+
+    state error {
+        direction LR
+        [*] --> errorScreen
+        errorScreen --> errorHelp : buttonPress
+        errorHelp --> [*] : buttonPress
+    }
+
+    restart --> [*]
+```
+
+## Aperçu de la conception
+
+La machine à états est implémentée à l'aide de [Boost.SML](https://boost-ext.github.io/sml/) (State Machine Language), une bibliothèque C++14 en en-tête uniquement qui fournit un langage spécifique au domaine pour définir les machines à états.
+
+### Pourquoi Boost.SML ?
+
+Boost.SML a été choisi pour OSSM car il offre :
+
+- **Vérification au moment de la compilation** - Les transitions non valides sont détectées au moment de la compilation, pas au moment de l'exécution
+- **Zéro surcharge d'exécution** - Performances équivalentes à un commutateur/boîtier écrit à la main
+- **Syntaxe déclarative** - La table de transition se lit comme une documentation
+- **Thread safety** – Prise en charge intégrée de l'accès simultané via des politiques
+- **Faible encombrement** - En-tête unique, ~ 2 000 lignes de code, aucune dépendance
+
+### Syntaxe de la table de transition
+
+Chaque ligne du tableau de transition suit ce modèle :
+
+```cpp
+source_state + event [guard] / action = target_state
+```
+
+Par exemple:
+
+```cpp
+"menu.idle"_s + buttonPress[(isOption(Menu::SimplePenetration))] = "simplePenetration"_s
+```
+
+Cela se lit comme suit : "Lorsque vous êtes dans l'état `menu.idle` et qu'un événement `buttonPress` se produit, si la garde `isOption(Menu::SimplePenetration)` renvoie vrai, passez à l'état `simplePenetration`."
+
+<Info>
+Pour un didacticiel complet sur la syntaxe des tables de transition, consultez le [Tutoriel Boost.SML](https://boost-ext.github.io/sml/tutorial.html) .
+</Info>
+
+## Événements
+
+Les événements déclenchent des transitions d'état. Il s'agit de structures simples définies dans `Events.h` et peuvent être distribuées depuis n'importe où dans la base de code.
+
+| Événement | Description | Source typique |
+|-------|-------------|----------------|
+| `ButtonPress` | Clic sur un seul bouton | Bouton encodeur rotatif |
+| `LongPress` | Bouton maintenu pendant une durée prolongée | Bouton de l'encodeur rotatif (maintenu) |
+| `DoublePress` | Deux clics rapides sur un bouton | Bouton encodeur rotatif |
+| `Done` | Opération asynchrone terminée | Tâche de référencement, vérification avant vol |
+| `Error` | L'opération a échoué | Panne de référencement, course trop courte |
+| `EmergencyStop` | Arrêt immédiat requis | Systèmes de sécurité |
+| `Home` | Demander une séquence de référencement | Commande externe |
+
+### Répartition des événements
+
+Les événements sont distribués à l'aide de l'instance globale `stateMachine` :
+
+```cpp
+#include "ossm/state/state.h"
+
+// From anywhere in the codebase
+stateMachine->process_event(ButtonPress{});
+stateMachine->process_event(Done{});
+```
+
+La machine à états est initialisée au démarrage dans [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp) et exposée en tant que pointeur global.
+
+<Tip>
+Les événements sont définis comme des structures vides. Le type lui-même a une signification : aucune charge utile de données n’est nécessaire.
+</Tip>
+
+## Gardes
+
+Les gardes sont des contrôles conditionnels qui déterminent si une transition doit avoir lieu. Ils renvoient `true` pour autoriser la transition ou `false` pour la bloquer.
+
+| Garde | Description | Renvoie `true` lorsque... |
+|-------|-------------|------------------------|
+| `isOnline` | Vérifier la connexion WiFi | L'appareil est connecté au WiFi |
+| `isUpdateAvailable` | Rechercher les mises à jour du micrologiciel | Le serveur signale une version plus récente disponible |
+| `isStrokeTooShort` | Valider le résultat de la prise d'origine | La course mesurée est inférieure au seuil minimum |
+| `isOption(Menu)` | Vérifier l'élément de menu sélectionné | La sélection de menu actuelle correspond à l'option spécifiée |
+| `isPreflightSafe` | Valider la position du bouton de vitesse | Le potentiomètre de vitesse est dans la zone morte (démarrage sûr) |
+| `isFirstHomed` | Vérification de retour initiale unique | C'est le premier retour réussi depuis le démarrage |
+| `isNotHomed` | Vérifier l'état de retour | L'appareil n'a pas été hébergé ou l'accueil a été invalidé |
+
+### Mise en œuvre de la garde
+
+Les gardes sont définis comme des lambdas `constexpr` dans l'espace de noms [`guards`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h). Ils appellent des fonctions d'implémentation déclarées pour garder l'en-tête léger :
+
+```cpp
+// In guards.h - forward declaration
+bool ossmIsPreflightSafe();
+
+namespace guards {
+    // Constexpr lambda wraps the implementation
+    constexpr auto isPreflightSafe = []() {
+        return ossmIsPreflightSafe();
+    };
+
+    // Parameterized guard using nested lambda
+    constexpr auto isOption = [](Menu option) {
+        return [option]() { return ossmGetMenuOption() == option; };
+    };
+}
+```
+
+La logique réelle réside dans `guards.cpp`, ce qui permet de maintenir des temps de compilation rapides et de permettre des modifications d'implémentation sans recompiler la table de transition.
+
+<Info>
+Pour en savoir plus sur les modèles de garde, consultez la [documentation Boost.SML Guards](https://boost-ext.github.io/sml/user-guide.html#guards) .
+</Info>
+
+## Actes
+
+Les actions sont des fonctions exécutées lors des transitions d'état. Ils effectuent des effets secondaires tels que la mise à jour de l’affichage, le démarrage des moteurs ou la réinitialisation des paramètres.
+
+### Afficher les actions
+
+| Action | Description |
+|--------|-------------|
+| `drawHello` | Afficher l'écran de bienvenue/démarrage |
+| `(drawMenu)` | Rendre le menu principal |
+| `drawPlayControls` | Afficher les commandes de vitesse/course/profondeur |
+| `drawPatternControls` | Afficher l'interface utilisateur de sélection de modèle |
+| `drawPreflight` | Afficher l'avertissement « réduire la vitesse pour démarrer » |
+| `drawHelp` | Afficher les informations d'aide/support |
+| `drawWiFi` | Afficher l'écran de configuration WiFi |
+| `drawUpdate` | Afficher l'écran "Vérification des mises à jour" |
+| `drawNoUpdate` | Afficher le message « le firmware est à jour » |
+| `drawUpdating` | Afficher la progression de la mise à jour |
+| `drawError` | Afficher l'état d'erreur avec un message |
+
+### Actions de mouvement
+
+| Action | Description |
+|--------|-------------|
+| `startHoming` | Commencer la séquence de référence |
+| `clearHoming` | Réinitialiser les variables d'état de référence |
+| `startSimplePenetration` | Démarrer la tâche du mode Pénétration simple |
+| `startStrokeEngine` | Tâche de démarrage du mode Moteur de course |
+| `startStreaming` | Démarrer la tâche du mode Streaming |
+| `emergencyStop` | Forcer l'arrêt du moteur et désactiver les sorties |
+
+### Paramètres Actions
+
+| Action | Description |
+|--------|-------------|
+| `resetSettingsStrokeEngine` | Initialiser les paramètres par défaut pour Stroke Engine (vitesse = 0, course = 50, profondeur = 10, sensation = 50) |
+| `resetSettingsSimplePen` | Initialiser les valeurs par défaut pour la pénétration simple (vitesse=0, course=0, profondeur=50) |
+| `incrementControl` | Parcourez les paramètres de contrôle (course → profondeur → sensation) |
+| `setHomed` | Marquer l'appareil comme hébergé avec succès |
+| `setNotHomed` | Invalider le retour à la maison (nécessite un retour à la maison avant de jouer) |
+
+### Actions du système
+
+| Action | Description |
+|--------|-------------|
+| `restart` | Redémarrez l'ESP32 |
+| `resetWiFi` | Effacer les informations d'identification WiFi enregistrées |
+| `updateOSSM` | Téléchargez et installez la mise à jour du micrologiciel |
+
+### Mise en œuvre des actions
+
+Les actions sont définies comme lambdas `constexpr` dans l'espace de noms [`actions`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h). Comme des gardiens, ils délèguent à des fonctions de mise en œuvre déclarées en avant :
+
+```cpp
+// In actions.h - forward declarations
+void ossmDrawHello();
+void ossmEmergencyStop();
+
+namespace actions {
+    constexpr auto drawHello = []() { ossmDrawHello(); };
+    constexpr auto emergencyStop = []() { ossmEmergencyStop(); };
+}
+```
+
+Les fonctions d'implémentation dans `actions.cpp` font appel aux modules de fonctionnalités appropriés :
+
+```cpp
+// In actions.cpp
+void ossmEmergencyStop() {
+    stepper->forceStop();
+    stepper->disableOutputs();
+}
+
+void ossmDrawHello() {
+    pages::drawHello();  // Delegates to pages namespace
+}
+```
+
+Ce modèle maintient la machine à états découplée des implémentations spécifiques et permet de développer des modules de fonctionnalités indépendamment.
+
+<Warning>
+Les actions ne doivent pas bloquer le thread principal. Les opérations de longue durée devraient plutôt générer des tâches FreeRTOS.
+</Warning>
+
+<Info>
+Pour en savoir plus sur les modèles d'action, consultez la [documentation sur les actions Boost.SML](https://boost-ext.github.io/sml/user-guide.html#actions) .
+</Info>
+
+## Sécurité des fils
+
+La machine à états OSSM est configurée avec des politiques thread-safe pour gérer les événements de plusieurs tâches FreeRTOS :
+
+```cpp
+sml::sm<OSSMStateMachine, sml::thread_safe<ESP32RecursiveMutex>, sml::logger<StateLogger>>
+```
+
+Cela utilise un mutex récursif pour protéger les transitions d'état, permettant l'envoi d'événements en toute sécurité depuis :
+
+- La boucle principale
+- Gestionnaires d’interruption de bouton
+- Gestionnaires de commandes BLE
+- Tâches en arrière-plan
+
+La machine à états est initialisée dans [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp) :
+
+```cpp
+// Global state machine instance
+StateMachine* stateMachine = nullptr;
+
+void initStateMachine() {
+    stateMachine = new StateMachine{};
+    stateMachine->process_event(Done{});  // Trigger initial transition
+}
+```
+
+<Info>
+Pour en savoir plus sur les politiques de sécurité des threads, consultez la [documentation sur les politiques Boost.SML](https://boost-ext.github.io/sml/user-guide.html#policies) .
+</Info>
+
+## Journalisation d'état
+
+Le micrologiciel comprend un `StateLogger` qui enregistre toutes les transitions d'état pour le débogage :
+
+```cpp
+sml::logger<StateLogger>
+```
+
+Cela génère des informations de transition via la journalisation ESP-IDF, ce qui facilite le suivi du comportement de la machine à états pendant le développement.
+
+## Notes d'architecture
+
+La machine à états suit une **architecture modulaire découplée** :
+
+- **Définition de la machine d'état** ([`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h)) contient uniquement la table de transition
+- **Les actions et les gardes** sont des lambdas `constexpr` qui délèguent aux fonctions d'implémentation
+- **Les modules de fonctionnalités** (comme `pages::`, `simple_penetration::`, `stroke_engine::`) contiennent la logique réelle
+- **Les structures d'état globales** gèrent l'état de l'application au lieu des membres de la classe
+
+<Note>
+La classe `OSSM` dans `ossm/OSSM.h` est conservée pour des raisons de compatibilité descendante avec la gestion des commandes BLE. Les nouvelles fonctionnalités doivent utiliser des fonctions d'espace de noms sans état qui fonctionnent sur l'état global.
+</Note>
+
+Pour un aperçu complet de l'organisation du code source, voir [Structure des dossiers](/ossm/software/architecture/folder-structure).
+
+## Lectures complémentaires
+
+<CardGroup cols={2}>
+<Card title="Structure des dossiers" icon="folder-tree" href="/ossm/software/architecture/folder-structure">
+  Comprendre l'organisation du code source et la philosophie de conception.
+</Card>
+
+<Card title="Tutoriel Boost.SML" icon="graduation-cap" href="https://boost-ext.github.io/sml/tutorial.html">
+  Guide étape par étape pour créer des machines à états avec Boost.SML.
+</Card>
+
+<Card title="Guide de l'utilisateur Boost.SML" icon="book" href="https://boost-ext.github.io/sml/user-guide.html">
+  Référence complète pour toutes les fonctionnalités de Boost.SML.
+</Card>
+
+<Card title="Modes de fonctionnement" icon="play" href="/ossm/software/getting-started/operating-modes">
+  Découvrez les modes Pénétration simple, Moteur de course et Streaming.
+</Card>
+</CardGroup>

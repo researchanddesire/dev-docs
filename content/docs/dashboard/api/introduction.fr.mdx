@@ -1,0 +1,128 @@
+---
+title: "Présentation de l'API"
+description: "Accédez à vos données Research and Desire par programmation avec l'API REST"
+---
+
+L'API Research and Desire vous permet d'accéder aux données de votre tableau de bord à partir d'applications externes, de scripts et d'intégrations. Chaque demande d'API respecte les autorisations de votre compte : vous ne pouvez accéder qu'aux données que vous êtes autorisé à voir.
+
+<Info>
+  L'accès à l'API est une fonctionnalité **Ultra**. Vous avez besoin d'un abonnement Ultra actif pour
+  créer des jetons API. [En savoir plus sur Ultra](https://dashboard.researchanddesire.com/app/settings/subscription).
+</Info>
+
+## URL de base
+
+Tous les points de terminaison de l'API sont disponibles sur :
+
+```
+https://dashboard.researchanddesire.com/api/v1
+```
+
+## Concepts clés
+
+<CardGroup cols={2}>
+  <Card title="Authentification" icon="key" href="./authentication">
+    Créez des jetons API et découvrez comment authentifier les requêtes.
+  </Card>
+
+  <Card title="Référence du point de terminaison" icon="code" href="./endpoints/users">
+    Parcourez tous les points de terminaison disponibles pour les utilisateurs, DTT, LKBX et OSSM.
+  </Card>
+</CardGroup>
+
+## Comment ça marche
+
+<Steps>
+  <Step title="Créer un jeton API">
+    Accédez à **Paramètres > Clés API** dans le tableau de bord et créez un nouveau jeton. Copiez-le immédiatement : il n'est affiché qu'une seule fois.
+  </Step>
+
+  <Step title="Faire des demandes">
+    Incluez votre jeton dans l'en-tête `Authorization` de chaque demande.
+
+    ```bash
+    curl -H "Authorization: Bearer YOUR_TOKEN" \
+      https://dashboard.researchanddesire.com/api/v1/users
+    ```
+
+  </Step>
+
+  <Step title="Analyser la réponse">
+    Toutes les réponses suivent un format d'enveloppe JSON cohérent.
+  </Step>
+</Steps>
+
+## Format de réponse
+
+Chaque réponse utilise la même enveloppe :
+
+**Succès:**
+
+```json
+{
+  "ok": true,
+  "data": { ... }
+}
+```
+
+**Erreur:**
+
+```json
+{
+  "ok": false,
+  "error": "Human-readable error message"
+}
+```
+
+## Pagination
+
+Les points de terminaison de liste prennent en charge la pagination via les paramètres de requête :
+
+| Paramètre | Défaut | Max. | Description                 |
+| --------- | ------- | --- | --------------------------- |
+| `limit`   | 50      | 100 | Nombre d'enregistrements à renvoyer |
+| `offset`  | 0       | -   | Nombre d'enregistrements à ignorer   |
+
+Les réponses paginées enveloppent le tableau de données avec des métadonnées de pagination :
+
+```json
+{
+  "ok": true,
+  "data": {
+    "data": [ ... ],
+    "pagination": {
+      "limit": 50,
+      "offset": 0
+    }
+  }
+}
+```
+
+Exemple : récupérer la deuxième page de 25 utilisateurs :
+
+```bash
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "https://dashboard.researchanddesire.com/api/v1/users?limit=25&offset=25"
+```
+
+## Limitation du débit
+
+<Note>
+  L'API n'applique pas actuellement de limites de débit strictes, mais soyez attentif
+  respectueux du volume de votre demande. Une utilisation excessive peut entraîner une limitation
+  dans les versions futures.
+</Note>
+
+## Autorisations et RLS
+
+Votre jeton API hérite exactement des mêmes autorisations que votre compte de tableau de bord. Cela signifie:
+
+- Vous ne pouvez voir que **vos propres appareils** et les **appareils partagés avec vous** via des partenariats.
+- Les actions de verrouillage de la session respectent les autorisations du détenteur de clé
+- Les requêtes des utilisateurs renvoient uniquement les utilisateurs avec lesquels vous êtes connecté
+
+<Warning>
+  Traitez votre jeton API comme un mot de passe. Toute personne possédant votre token peut accéder à votre
+  données. Si un jeton est compromis, révoquez-le immédiatement depuis ** Paramètres > API
+  Clés**.
+</Warning>

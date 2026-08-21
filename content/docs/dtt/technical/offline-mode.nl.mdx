@@ -1,0 +1,145 @@
+---
+title: "Offline-modus"
+description: "Je trainer gebruiken zonder internetverbinding"
+---
+
+Uw Deepthroat Trainer kan offline werken met behulp van in de cache opgeslagen sessiegegevens. Hoewel voor sommige functies connectiviteit nodig is, kun je nog steeds trainen als er geen wifi beschikbaar is.
+
+## Wat offline werkt
+
+Met Software 2.0+ slaat de trainer de laatst gedownloade sessie lokaal op:
+
+| Functie | Offline-ondersteuning |
+|---------|-----------------|
+| **Trainingen** | Ja: gebruikt een sessie in de cache |
+| **Positie volgen** | Ja – volledig functioneel |
+| **LED-feedback** | Ja – volledig functioneel |
+| **Cijfers op het apparaat** | Ja — weergegeven na segmenten |
+| **Kalibratie** | Ja: lokaal opgeslagen voor de sessie |
+
+## Wat connectiviteit vereist
+
+| Functie | Waarom |
+|---------|-----|
+| **Resultaten uploaden** | Cijfers en statistieken moeten worden gesynchroniseerd met het dashboard |
+| **Nieuwe sessies downloaden** | Sjabloonwijzigingen vereisen een nieuwe download |
+| **Firmware-updates** | OTA-updates hebben internettoegang nodig |
+| **Cloudkalibratiesynchronisatie** | Speelgoedkalibratiegegevens op afstand opgeslagen |
+| **Leiderbordupdates** | Punten worden pas bij synchronisatie geregistreerd |
+
+<Warning>
+Offline sessies worden **niet opgeslagen** in uw dashboard totdat u opnieuw verbinding maakt. Als het apparaat stroom verliest voordat het wordt gesynchroniseerd, kunnen de resultaten van die sessie verloren gaan.
+</Warning>
+
+## Hoe offline afspelen werkt
+
+### Automatisch cachen
+Wanneer u instellingen ophaalt terwijl u online bent:
+1. De sessie wordt gedownload vanaf het dashboard
+2. Er wordt een kopie opgeslagen in de lokale opslag (SPIFFS)
+3. Deze in de cache opgeslagen kopie is beschikbaar voor offline gebruik
+
+### Een offline sessie starten
+1. Schakel de trainer in
+2. Als je offline bent, zie je de melding 'Je bent offline, je cijfers worden mogelijk niet opgeslagen'.
+3. Druk op de knop om door te gaan met de instellingen in de cache
+4. Train normaal: alles werkt lokaal
+
+<Note>
+De in de cache opgeslagen sessie is uw **laatst gedownloade** sessie. Als u een ander sjabloon offline wilt trainen, downloadt u het eerst terwijl u online bent.
+</Note>
+
+## Voorbereiden op offline training
+
+Voordat je offline gaat:
+
+<Steps>
+<Step title="Maak verbinding met wifi">
+Zorg ervoor dat uw trainer succesvol verbinding maakt met internet.
+</Step>
+
+<Step title="Selecteer uw sjabloon">
+Kies op het dashboard de template waarmee je wilt trainen.
+</Step>
+
+<Step title="Instellingen ophalen">
+Start een sessie op de trainer om de nieuwste instellingen te downloaden. U kunt afsluiten na het ophalen; de gegevens worden nu in de cache opgeslagen.
+</Step>
+
+<Step title="Controleer de cache">
+Optioneel kunt u de wifi-verbinding verbreken en een sessie starten om te controleren of de offlinemodus werkt.
+</Step>
+</Steps>
+
+## Resultaten synchroniseren wanneer u weer online bent
+
+Wanneer u opnieuw verbinding maakt met wifi:
+1. Schakel de trainer in
+2. Het apparaat synchroniseert de openstaande resultaten automatisch
+3. Controleer uw dashboard om te bevestigen dat de sessie is verschenen
+
+<Info>
+Momenteel worden offline sessies gesynchroniseerd bij het starten van de volgende online sessie. Toekomstige firmware kan achtergrondsynchronisatie toevoegen.
+</Info>
+
+## Beperkingen
+
+### Sessie opslag
+De trainer slaat **één** sessie in de cache tegelijk op. Als u een nieuwe sessie downloadt, wordt de vorige cache overschreven.
+
+### Resultaten niet opgeslagen
+Resultaten van offline training worden op het apparaat berekend, maar worden niet bewaard. Ze worden tijdens de sessie weergegeven, maar kunnen verloren gaan als:
+- Het apparaat verliest stroom voordat het opnieuw wordt aangesloten
+- U downloadt een nieuwe sessie voordat u gaat synchroniseren
+
+### Segmentlimieten
+Offline afspelen gebruikt dezelfde segmentlimieten als de onlinemodus (tot 100 effectieve segmenten met Ultra).
+
+## Beste praktijken
+
+<Tip>
+**Plan vooruit**: Download uw beoogde sessie terwijl u online bent voordat u op reis gaat of ergens heen gaat zonder Wi-Fi.
+</Tip>
+
+- Houd de trainer opgeladen: als u stroom verliest, gaan niet-opgeslagen resultaten verloren
+- Update sjablonen niet terwijl u offline bent (wijzigingen zijn pas van toepassing nadat u ze opnieuw hebt gedownload)
+- Maak indien mogelijk opnieuw verbinding om de resultaten te synchroniseren en updates te ontvangen
+
+## Problemen oplossen
+
+<AccordionGroup>
+<Accordion title="De offlinemodus start niet">
+- Zorg ervoor dat u eerder een sessie hebt gedownload terwijl u online was
+- De cache kan leeg zijn als dit een nieuw apparaat is of na een reset
+- Probeer eerst verbinding te maken met wifi en vervolgens de verbinding te verbreken
+</Accordion>
+
+<Accordion title="De resultaten zijn niet gesynchroniseerd nadat er opnieuw verbinding was gemaakt">
+- Start een nieuwe sessie terwijl u online bent om de synchronisatie te activeren
+- Controleer uw dashboard. Het kan even duren voordat de resultaten verschijnen
+- Als de resultaten nog steeds ontbreken, zijn de resultaten mogelijk niet opgeslagen vóór het uitschakelen
+</Accordion>
+
+<Accordion title="Verkeerde sjabloon wordt offline geladen">
+De offline cache gebruikt uw laatst gedownloade sessie. Sjablonen offline wijzigen:
+1. Maak opnieuw verbinding met wifi
+2. Start een sessie met het gewenste sjabloon
+3. Verbreek de verbinding en ga offline verder
+</Accordion>
+</AccordionGroup>
+
+## Toekomstige verbeteringen
+
+Offline sessiesynchronisatie (meerdere sessies opslaan om later te uploaden) is gepland voor een toekomstige firmwareversie. Zie de <a href="/dtt/technical/introduction">Software 2.0 Preview</a> voor aankomende functies.
+
+## Gerelateerde handleidingen
+
+<CardGroup cols={2}>
+<Card title="Wi-Fi-installatie" icon="wifi" href="https://docs.researchanddesire.com/dtt/get-started">
+Verbind uw trainer met Wi-Fi.
+</Card>
+
+<Card title="Resultaten controleren" icon="chart-line" href="https://docs.researchanddesire.com/dtt/results">
+Bekijk de resultaten van uw gesynchroniseerde sessie.
+</Card>
+</CardGroup>

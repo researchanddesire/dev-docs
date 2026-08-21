@@ -1,0 +1,194 @@
+---
+title: "Firmware-Updates"
+description: "Wie Ihr Trainer Software-Updates empfängt und installiert"
+---
+
+Ihr Deepthroat Trainer empfängt Firmware-Updates Over-the-Air (OTA), wenn er mit WLAN verbunden ist. Updates bringen neue Funktionen, Verbesserungen und Fehlerbehebungen.
+
+## So funktionieren Updates
+
+### Automatische Überprüfung
+Jedes Mal, wenn Sie das Gerät einschalten und eine WLAN-Verbindung herstellen, prüft der Trainer während der Preflight-Phase, ob Updates verfügbar sind.
+
+### Update-Prozess
+Wenn ein Update verfügbar ist:
+1. Auf dem Bildschirm wird „Aktualisierung“ mit Fortschrittsinformationen angezeigt
+2. Neue Firmware wird automatisch heruntergeladen
+3. Das Gerät startet mit der neuen Version neu
+
+<Warning>
+Schalten Sie das Gerät während eines Updates nicht aus. Warten Sie, bis der Vorgang abgeschlossen ist, und starten Sie den Vorgang automatisch neu. Das Unterbrechen eines Updates könnte zu Problemen führen.
+</Warning>
+
+## Firmware-Streams
+
+Ihr Trainer erhält möglicherweise Updates von verschiedenen Firmware-Streams:
+
+| Strom | Beschreibung |
+|--------|-------------|
+| **Produktion** | Stabile Versionen für den allgemeinen Gebrauch |
+| **Beta** | Vorschauversionen mit neuen Funktionen (möglicherweise mit Fehlern) |
+| **Alpha** | Frühe Test-Builds (intern/begrenzte Nutzung) |
+
+<Info>
+Die meisten Benutzer erhalten Produktionsupdates automatisch. Die Beta-Registrierung wird normalerweise über Ihr Dashboard-Konto oder Ihre Abonnementstufe verwaltet.
+</Info>
+
+### Aktueller Beta-Status
+Aktive Abonnenten werden häufig während der Einführung für den Beta-Stream registriert. Ein Dashboard-Umschalter zum Wechseln zwischen Produktions-, Beta- und neuesten Streams ist geplant.
+
+Einzelheiten zu den aktuellen Betafunktionen finden Sie in der <a href="/dtt/technical/introduction">Software 2.0 Preview</a>.
+
+## Welche Updates beinhalten
+
+Firmware-Updates können Folgendes umfassen:
+
+- **Neue Funktionen** – Trainingsmodi, Verbesserungen der Benutzeroberfläche, Anpassung
+- **Fehlerbehebungen** – Probleme aus früheren Versionen behoben
+- **Leistung** – Schnellere Reaktion, bessere Stabilität
+- **Sicherheit** – Schutzverbesserungen
+
+## Versionsinformationen
+
+Ihre aktuelle Firmware-Version wird beim Gerätestart angezeigt. Beachten Sie diese Informationen, wenn Sie den Support kontaktieren.
+
+## Manuelle Update-Prüfung
+
+So erzwingen Sie eine Update-Prüfung:
+1. Stellen Sie sicher, dass eine WLAN-Verbindung besteht
+2. Schalten Sie das Gerät aus und wieder ein
+3. Die Preflight-Prüfungen suchen automatisch nach Updates
+
+Es gibt keine manuelle Schaltfläche „Nach Updates suchen“ – die Prüfung erfolgt automatisch bei jedem Start, wenn online.
+
+## Manuelles USB-Flashen
+
+Wenn Ihr Trainer keine OTA-Updates empfangen kann (aufgrund von Verbindungsproblemen oder Netzwerkeinschränkungen), können Sie die Firmware manuell über ein USB-Kabel und den Web Flasher aktualisieren.
+
+<Info>
+Verwenden Sie das manuelle USB-Flashen, wenn Sie Verbindungsprobleme beheben oder wenn Sie vom Support dazu aufgefordert werden. Die meisten Benutzer werden dies nicht benötigen – OTA-Updates erledigen alles automatisch.
+</Info>
+
+### Voraussetzungen
+
+- Ein USB-Kabel, das **Datenübertragung** unterstützt (nicht nur Laden)
+- Ein Computer mit einem verfügbaren USB-Anschluss
+- Google Chrome, Edge oder ein anderer Chromium-basierter Browser
+
+<Warning>
+**Hardware-Kompatibilität:** Trainer, die vor dem 1. Juli 2025 gekauft wurden, verfügen nicht über die erforderliche USB-Schnittstelle zum manuellen Flashen. Wenn Sie eine Meldung sehen, dass Ihr Gerät nicht flashbar ist, oder wenn der Webflasher Ihr Gerät nicht erkennt, wenden Sie sich an [support@researchanddesire.com](mailto:support@researchanddesire.com), um Hilfe zu erhalten.
+</Warning>
+
+### Flash-Anweisungen
+
+<Steps>
+<Step title="Verbinden Sie Ihren Trainer">
+  Stecken Sie das USB-Kabel in Ihren Deepthroat Trainer und verbinden Sie das andere Ende mit Ihrem Computer.
+</Step>
+
+<Step title="Öffnen Sie den Web Flasher">
+  Navigieren Sie in Ihrem Browser zu [Dashboard.researchanddesire.com/app/tools/web-flasher](https://dashboard.researchanddesire.com/app/tools/web-flasher).
+</Step>
+
+<Step title="Wählen Sie Firmware-Optionen aus">
+  Im Web Flasher:
+  1. Wählen Sie **Deepthroat Trainer** aus der Geräte-Dropdown-Liste aus
+  2. Wählen Sie **Produktion** aus der Firmware-Stream-Dropdown-Liste aus
+</Step>
+
+<Step title="Stellen Sie eine Verbindung zu Ihrem Gerät her">
+  Klicken Sie auf **Verbinden** und wählen Sie Ihr Gerät aus der Liste aus. Suchen Sie nach einem Gerät mit der Bezeichnung:
+  - **UART-Brücke**
+  - **USB JTAG** (oder ähnlich)
+
+  <Warning>
+  Wenn kein Gerät angezeigt wird, überprüfen Sie, ob Ihr Kabel die Datenübertragung unterstützt, und versuchen Sie es mit einem anderen USB-Anschluss.
+  </Warning>
+</Step>
+
+<Step title="Flashen Sie die Firmware">
+  Klicken Sie auf **Flash**, um die Firmware zu installieren. Warten Sie, bis der Vorgang abgeschlossen ist.
+
+  <Warning>
+  Aktivieren Sie „Gerät löschen“ **nicht**, es sei denn, Sie werden vom Support ausdrücklich dazu aufgefordert. Durch das Löschen wird Ihre Trainer-ID gelöscht und eine erneute Bereitstellung erforderlich.
+  </Warning>
+</Step>
+</Steps>
+
+### Nach dem Flashen
+
+Sobald der Flashvorgang abgeschlossen ist, startet Ihr Trainer mit der neuen Firmware neu. Stellen Sie eine WLAN-Verbindung her, um die Konnektivität zu überprüfen.
+
+Wenn Sie nach dem Herstellen der Verbindung **E-DTT-1** („Kein Internet. Überprüfen Sie Firewall und Router.“) sehen, bestätigt dies, dass Ihr Gerät durch eine Netzwerkbeschränkung blockiert wird. Befolgen Sie die Fehlerbehebungsanleitung <a href="https://docs.researchanddesire.com/dtt/troubleshooting">E-DTT-1</a>, um das Problem zu beheben.
+
+## Aktualisierungsanforderungen
+
+| Erfordernis | Details |
+|-------------|---------|
+| **Internet** | WLAN-Verbindung erforderlich |
+| **Batterie** | Ausreichende Ladung empfohlen |
+| **Zeit** | Aktualisierungen dauern normalerweise 1–3 Minuten |
+
+## Fehlerbehebung
+
+<AccordionGroup>
+<Accordion title="Das Update startet nicht">
+- Stellen Sie sicher, dass die WLAN-Verbindung besteht und funktioniert
+- Überprüfen Sie, ob das Gerät auf das Internet zugreifen kann (keine Firewall-Blockaden).
+- Versuchen Sie, das Gerät aus- und wieder einzuschalten und erneut anzuschließen
+</Accordion>
+
+<Accordion title="Das Update schlägt fehl oder wird wiederholt neu gestartet">
+- Sorgen Sie für eine stabile Stromversorgung (schließen Sie das Ladegerät an, wenn die Batterie schwach ist).
+- Prüfen Sie, ob das WLAN-Signal stark ist
+- Bei wiederholten Fehlern wenden Sie sich an den Support
+</Accordion>
+
+<Accordion title="Die Trainer-ID zeigt nach der Aktualisierung vertauschte oder zufällige Zeichen an">
+Wenn Ihre Trainer-ID beschädigte Zeichen (z. B. „.t“, „U]t“ oder andere zufällige Symbole) anzeigt und sich bei jedem Neustart ändert, wurden die Bereitstellungsdaten des Geräts während der Firmware-Aktualisierung gelöscht.
+
+**Ursache:**
+Dies geschieht normalerweise, wenn der Web-Flasher mit aktivierter Option „Gerät löschen“ verwendet wird. Die Löschoption löscht alle gespeicherten Daten, einschließlich der eindeutigen Trainer-ID, die während der Herstellung zugewiesen wurde.
+
+**Lösung:**
+Kontaktieren Sie den Support unter [support@researchanddesire.com](mailto:support@researchanddesire.com). Enthalten:
+- Ihre Bestellnummer
+- Eine Beschreibung dessen, was Sie auf dem Bildschirm sehen
+- Die Schritte, die Sie unternommen haben, bevor das Problem auftrat
+
+Der Support kann Ihr Gerät mit einer neuen Trainer-ID erneut bereitstellen.
+
+<Warning>
+Aktivieren Sie bei Verwendung des Web-Flashers „Gerät löschen“ nur nach ausdrücklicher Anweisung des Supports. Bei normalen Firmware-Updates muss das Gerät nicht gelöscht werden.
+</Warning>
+</Accordion>
+
+<Accordion title="Die Funktionen stimmen nicht mit der Dokumentation überein">
+- Möglicherweise befinden Sie sich auf einem anderen Firmware-Stream als dokumentiert
+- Einige Funktionen sind nur als Beta/Vorschau verfügbar
+- Überprüfen Sie Ihre aktuelle Version anhand der Versionshinweise
+</Accordion>
+
+<Accordion title="Kann ich die Firmware downgraden?">
+Ein Downgrade wird im Normalbetrieb nicht unterstützt. Wenn Sie Probleme mit einer neuen Version haben, wenden Sie sich an den Support.
+</Accordion>
+</AccordionGroup>
+
+## Kommunikation freigeben
+
+Aktualisierungen und Änderungen werden kommuniziert über:
+- Dashboard-Ankündigungen
+- Aktualisierungen der Dokumentation
+- Die <a href="/dtt/technical/introduction">Software 2.0 Preview</a>-Seite
+
+## Verwandte Leitfäden
+
+<CardGroup cols={2}>
+<Card title="Vorschau auf Software 2.0" icon="sparkles" href="/dtt/technical/introduction">
+Aktuelle Beta-Funktionen und Roadmap.
+</Card>
+
+<Card title="WLAN-Einrichtung" icon="wifi" href="https://docs.researchanddesire.com/dtt/get-started">
+Verbinden Sie Ihren Trainer für Updates.
+</Card>
+</CardGroup>

@@ -1,0 +1,180 @@
+---
+title: "Leerlauf- und Power-Zustände"
+description: "Technische Details zur Energieverwaltung, Leerlauf-Timeouts und Batterieschonung Ihrer Chastity Lockbox"
+---
+
+Ihre Chastity Lockbox verwaltet den Stromverbrauch automatisch über eine Reihe von Ruhezuständen. In diesem Leitfaden werden die technischen Details zur Funktionsweise dieser Zustände erläutert und was Übergänge zwischen ihnen auslöst.
+
+## Verlauf des Leerlaufzustands
+
+Nach jeder Benutzerinteraktion durchläuft das Gerät basierend auf der Inaktivitätszeit folgende Ruhezustände:
+
+| Zustand | Time-out | Hintergrundbeleuchtung | W-lan | Stromverbrauch |
+|-------|---------|-----------|------|-----------|
+| Aktiv | — | Voll (100 %) | Verbunden | Normal |
+| Leerlauf | 30 Sekunden | Gedimmt (10 %) | Verbunden | Reduziert |
+| Pseudo-Schlaf | 2 Minuten | Aus | Verbunden | Niedrig |
+| Tiefer Schlaf | 10 Minuten | Aus | Getrennt | Minimal |
+
+<Info>
+Diese Zeitüberschreitungen sind kumulativ. Der Tiefschlaf tritt 10 Minuten nach der letzten Interaktion ein, nicht 10 Minuten nach Beginn des Pseudoschlafs.
+</Info>
+
+## Aktiver Zustand
+
+Wenn Sie Ihr Gerät aktiv nutzen:
+
+- **Helligkeit der Hintergrundbeleuchtung**: 100 % (Wert: 255)
+- **Alle Sensoren**: Aktiv und überwachend
+- **WiFi**: Verbunden und synchronisiert
+- **Motorsteuerung**: Bereit für Befehle
+
+Jeder Tastendruck oder jede Encoderdrehung hält das Gerät im aktiven Zustand und setzt den Leerlauf-Timer zurück.
+
+## Ruhezustand (30 Sekunden)
+
+Nach 30 Sekunden ohne Interaktion:
+
+- **Helligkeit der Hintergrundbeleuchtung**: Auf ca. 10 % gedimmt (Wert: 24)
+- **Sensoren**: Aktiv
+- **WiFi**: Immer noch verbunden
+- **Motorsteuerung**: Gelöscht (keine aktive Fahrt)
+
+<Tip>
+Der abgedunkelte Bildschirm ist weiterhin lesbar. Dieser Zustand spart Strom, während das Display sichtbar bleibt, wenn Sie einen Blick auf Ihr Gerät werfen.
+</Tip>
+
+### Erwachen Sie aus dem Leerlauf
+
+Jede dieser Aktionen bringt das Gerät in den aktiven Zustand zurück:
+- Drücken Sie eine beliebige Taste
+- Drehen Sie den Encoder
+- USB-Kabel angeschlossen oder getrennt
+
+## Pseudo-Schlafzustand (2 Minuten)
+
+Nach 2 Minuten ohne Interaktion:
+
+- **Helligkeit der Hintergrundbeleuchtung**: Aus (Wert: 0)
+- **Bildschirm**: Immer noch eingeschaltet, nur dunkel
+- **WLAN**: Immer noch verbunden – Schlüsselbefehle funktionieren
+- **Motorsteuerung**: Gelöscht
+- **Stromsensor (INA219)**: Wechselt in den Energiesparmodus
+
+<Note>
+Dies ist der tiefste Schlafzustand während des Ladevorgangs. Wenn Ihr Gerät an die USB-Stromversorgung angeschlossen ist, geht es nicht in den Tiefschlaf, sodass es verbunden bleibt, um Schlüsselbefehle zu empfangen.
+</Note>
+
+### Erwachen Sie aus dem Pseudoschlaf
+
+Dieselben Auslöser wie bei der Aktivierung im Leerlaufzustand. Die erste Interaktion weckt das Gerät; Möglicherweise müssen Sie erneut drücken, um die beabsichtigte Aktion auszuführen.
+
+## Tiefschlafzustand (10 Minuten)
+
+Nach 10 Minuten ohne Interaktion (und ohne Aufladen):
+
+- **Hintergrundbeleuchtung**: Aus
+- **Bildschirm**: Schlafmodus
+- **WLAN**: Nicht verbunden
+- **Bluetooth**: Aus
+- **Die meisten Peripheriegeräte**: Ausgeschaltet
+
+<Warning>
+Im Tiefschlaf kann Ihr Gerät keine Schlüsselbefehle empfangen, bis es aufwacht. Schloss-Timer laufen intern weiter.
+</Warning>
+
+### Einschränkungen beim Tiefschlaf
+
+Der Tiefschlaf wird nur aktiviert, wenn **alle** dieser Bedingungen zutreffen:
+- Das Gerät war 10 Minuten lang inaktiv
+- Das Gerät ist **nicht** an die USB-Stromversorgung angeschlossen
+- Das Gerät befindet sich nicht in bestimmten geschützten Zuständen (Kalibrierung, WLAN-Einrichtung)
+
+### Wachen Sie aus dem Tiefschlaf auf
+
+- Drücken Sie die Eingabetaste (bei Pins ≤21) oder die Zurück-Taste
+- Automatische Timer-Aktivierung, wenn ein Sperr-Timer fast abgelaufen ist
+
+<Info>
+Wenn bei einer zeitgesteuerten Sperre weniger als das Pseudo-Ruhe-Timeout verbleibt, bleibt das Gerät automatisch wach, um die Entsperrung durchzuführen.
+</Info>
+
+## Ladeverhalten
+
+Wenn Ihr Gerät an die USB-Stromversorgung angeschlossen ist:
+
+| Zustand | Maximale Schlaftiefe |
+|-----------|-------------------|
+| Aufladen | Nur Pseudoschlaf |
+| Lädt nicht | Voller Tiefschlaf |
+
+Dadurch wird sichergestellt, dass Ihr Gerät während des Ladevorgangs für Dashboard-Befehle erreichbar bleibt und gleichzeitig die Akkulaufzeit im Akkubetrieb maximiert wird.
+
+## Timerbasiertes Wecken
+
+Für zeitgesteuerte Sperren berechnet Ihr Gerät eine optimale Weckzeit:
+
+```
+sleepDuration = max(remainingTimeMs - PSEUDO_SLEEP_TIMEOUT, 0)
+```
+
+Das bedeutet, dass das Gerät aus dem Tiefschlaf erwacht, bevor Ihr Sperrtimer abläuft, sodass Sie die Entsperrung nicht verpassen.
+
+## Stromverbrauch
+
+Ungefähre Stromaufnahme in jedem Bundesstaat:
+
+| Zustand | Geschätzter Strom |
+|-------|------------------|
+| Aktiv | ~80-100mA |
+| Leerlauf | ~40-60mA |
+| Pseudo-Schlaf | ~20-30mA |
+| Tiefer Schlaf | ~0,5-2mA |
+
+<Tip>
+Für eine maximale Akkulaufzeit bei längerer Sperrung halten Sie das Gerät vom Ladegerät fern, wenn es nicht benötigt wird. Es wechselt automatisch in den Tiefschlaf und wacht bei wichtigen Ereignissen auf.
+</Tip>
+
+## Interaktionsverfolgung
+
+Bei jeder Benutzerinteraktion wird der Leerlauf-Timer zurückgesetzt. Zu den erfassten Interaktionen gehören:
+
+- Tastendrücke (Eingabe, Zurück)
+- Encoder-Rotation
+- Der USB-Stromversorgungsstatus ändert sich
+- Sensorzustandsänderungen (bei aktiver Überwachung)
+
+## Technische Referenz
+
+### Konstanten
+
+```
+IDLE_TIMEOUT = 30000         // 30 seconds
+PSEUDO_SLEEP_TIMEOUT = 120000  // 2 minutes
+SLEEP_TIMEOUT = 600000       // 10 minutes
+```
+
+### LED-PWM-Werte
+
+```
+Active:       255 (100%)
+Idle:         24  (~10%)
+Pseudo-sleep: 0   (off)
+Deep sleep:   0   (off)
+```
+
+## Verwandte Leitfäden
+
+<CardGroup cols={2}>
+<Card title="Schlafmodus" icon="moon" href="../device-states/sleep-mode">
+Benutzerfreundliche Anleitung zu automatischen und manuellen Schlafmodi.
+</Card>
+
+<Card title="Tastensteuerung" icon="hand-pointer" href="./button-controls">
+Wie Tastendrücke das Gerät und seine Funktionen wecken.
+</Card>
+
+<Card title="Offline-Modus" icon="wifi-slash" href="./offline-mode">
+Was passiert, wenn der Tiefschlaf die WLAN-Verbindung trennt?
+</Card>
+</CardGroup>

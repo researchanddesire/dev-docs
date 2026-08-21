@@ -1,0 +1,160 @@
+---
+title: "Gerätezustände und Bildschirme"
+description: "Verstehen der Bildschirme und Zustände, die Ihr Trainer während des Betriebs anzeigt"
+---
+
+Ihr Deepthroat Trainer durchläuft während des Betriebs verschiedene Zustände, jeweils mit einem eigenen Anzeigebildschirm. Wenn Sie diese Zustände verstehen, können Sie sich besser auf dem Gerät zurechtfinden und etwaige Probleme beheben.
+
+## Startsequenz
+
+Wenn Sie Ihren Trainer einschalten, durchläuft er diese Zustände:
+
+### Willkommensbildschirm
+- Zeigt Ihre **Trainer-ID** (5-stelliger alphanumerischer Code) an.
+- Zeigt den WLAN-Verbindungsstatus an
+- **Timeout**: 15 Sekunden vor dem automatischen Weiterschalten
+
+<Info>
+Notieren Sie sich Ihre Trainer-ID – Sie benötigen sie, um das Gerät mit Ihrem Dashboard-Konto zu koppeln.
+</Info>
+
+### Kontrollen vor dem Flug
+Nach dem Begrüßungsbildschirm führt das Gerät Systemprüfungen durch:
+- Überprüft die WLAN-Verbindung
+- Überprüft, ob das Gerät gekoppelt ist
+- Sucht nach verfügbaren Updates
+
+Während diese Prüfungen abgeschlossen sind, wird auf dem Bildschirm „Vorbereitung...“ angezeigt.
+
+## Wi-Fi-Konfiguration
+
+### Wi-Fi-Setup-Bildschirm
+Wird beim Aufrufen des WLAN-Konfigurationsmodus angezeigt:
+- Zeigt einen QR-Code für eine einfache Verbindung an
+- Zeigt „Mit ‚Trainer-Setup‘ verbinden“ an.
+- **Eingabe über**: Langes Drücken während des Begrüßungsbildschirms
+
+<Tip>
+Das WLAN-Konfigurationsportal hat eine Zeitüberschreitung von 400 Sekunden. Wenn es abläuft, wird das Gerät neu gestartet.
+</Tip>
+
+## Kopplungsstatus
+
+Wenn Ihr Gerät nicht mit einem Dashboard-Konto gekoppelt ist:
+- Zeigt einen QR-Code an, der mit den Dashboard-Einstellungen verknüpft ist
+- Zeigt „Koppeln Sie mich für mehr Einstellungen und Spaß!“
+- Drücken Sie die Taste, um zu überspringen und offline fortzufahren
+
+## Status aktualisieren
+
+Wenn ein Firmware-Update verfügbar ist:
+- Zeigt „Aktualisierung“ mit einer Fortschrittsanzeige an
+- Zeigt „Danke fürs Warten! Du bist fast spielbereit.“
+- Das Gerät wird nach dem Update automatisch neu gestartet
+
+<Warning>
+Schalten Sie das Gerät während eines Updates nicht aus. Warten Sie, bis der Vorgang abgeschlossen ist, und starten Sie den Vorgang automatisch neu.
+</Warning>
+
+## Spielen Sie Flow-Zustände ab
+
+### Bildschirme vor der Sitzung
+
+| Bildschirm | Beschreibung |
+|--------|-------------|
+| **Vorflug** | „Getting ready…“ – prüft Konnektivität und Einstellungen |
+| **Einstellungen abrufen** | „Ich erhalte Ihre Einstellungen vom Dashboard.“ |
+| **Einstellungen laden** | „Sie sind offline, Ihre Noten werden möglicherweise nicht gespeichert.“ (Offline-Modus) |
+| **Schlechter Gesundheitscheck** | Fehler E-DTT-1 – siehe <a href="https://docs.researchanddesire.com/dtt/troubleshooting">Fehlerbehebungsanleitung</a> |
+
+### Kalibrierungsbildschirme
+
+| Bildschirm | Beschreibung |
+|--------|-------------|
+| **Kalibrierung Min.** | Erfassen Sie die minimale (nächste) Position – drücken Sie die Taste, wenn Sie bereit sind |
+| **Kalibrierung Max** | Erfassen Sie die maximale (Ruhe-)Position – drücken Sie die Taste, wenn Sie bereit sind |
+
+<Note>
+Zur Gewährleistung der Genauigkeit werden bei der Kalibrierung 100 Proben an jeder Position erfasst. Halten Sie die Taste ruhig, während Sie sie drücken.
+</Note>
+
+### Sitzungsdetails
+
+Bevor das Training beginnt, werden Ihnen Informationsbildschirme angezeigt:
+
+| Bildschirm | Inhalt | Time-out |
+|--------|---------|---------|
+| **Sitzungsdetails** | Sitzungsname, Gesamtsegmente | 10 Sekunden |
+| **Spielzeugdetails** | Zugewiesener Spielzeugname und Einstellungen | 10 Sekunden |
+| **Segmentdetails** | Aktueller Segmentname und Parameter | 10 Sekunden |
+
+<Tip>
+Im Freisprechmodus (Ultra) werden diese Bildschirme automatisch weitergeschaltet. Andernfalls drücken Sie die Taste, um fortzufahren.
+</Tip>
+
+### Trainingsbildschirme
+
+| Bildschirm | Beschreibung |
+|--------|-------------|
+| **Countdown** | „Ab 3... 2... 1... Viel Glück!“ |
+| **Aktives Training** | Echtzeitanzeige mit Position, Ziel und Fortschritt |
+| **Grad** | Ihr Punkte- und Leistungsfeedback (Timeout: 30 Sekunden) |
+
+### Pass/Fail-Bildschirme (falls aktiviert)
+
+| Bildschirm | Beschreibung | Time-out |
+|--------|-------------|---------|
+| **Fehlgeschlagen** | Zeigt „Fehlgeschlagen“ mit Versuchsanzahl an (z. B. „Versuch 1/3“) | Drücken Sie, um es erneut zu versuchen |
+| **Drei Schläge** | „Sie scheitern – 3 Fehlversuche“ – Sitzung wird neu gestartet | 5 Sekunden |
+
+### Sitzung abgeschlossen
+
+| Bildschirm | Beschreibung |
+|--------|-------------|
+| **Letzte Seite** | „Gut gemacht! Du hast die Sitzung beendet.“ (Timeout: 10 Sekunden) |
+
+Um den Abschluss zu feiern, wechselt die LED auf der letzten Seite zu Magenta.
+
+## Fehlerzustände
+
+| Fehler | Bildschirminhalt |
+|-------|----------------|
+| **E-DTT-1** | „Kein Internet. Überprüfen Sie Firewall und Router.“ |
+| **Segmentfehler** | „ERROR“-Header mit Reset-Option |
+
+Ausführliche Informationen zur Fehlerbehebung finden Sie im Leitfaden <a href="https://docs.researchanddesire.com/dtt/troubleshooting">Error Codes</a>.
+
+## Übersicht über Zustandsdiagramme
+
+```
+Power On → Welcome → Preflight → [Update if available]
+                              → [Pairing if needed]
+                              → Play Preflight → Fetch/Load Settings
+                                              → Calibration (if needed)
+                                              → Session Details
+                                              → Countdown → Training
+                                              → Grade → [Next Segment or Final]
+```
+
+## Schaltflächenaktionen nach Bundesstaat
+
+| Zustand | Kurz drücken | Langes Drücken |
+|-------|-------------|------------|
+| Willkommen | Starten Sie den Preflight | Rufen Sie die WLAN-Einrichtung auf |
+| Sitzungsdetails | Nächster Bildschirm | Springe zum Training |
+| Segmentdetails | Startsegment | Springe zum Training |
+| Grad | Nächstes Segment | — |
+| Fehlgeschlagen | Segment erneut versuchen | — |
+| Finale | Spielen Sie noch einmal | — |
+
+## Verwandte Leitfäden
+
+<CardGroup cols={2}>
+<Card title="Tastensteuerung" icon="hand-pointer" href="https://docs.researchanddesire.com/dtt/get-started">
+Vollständige Anleitung zu Tasteninteraktionen.
+</Card>
+
+<Card title="Fehlercodes" icon="triangle-exclamation" href="https://docs.researchanddesire.com/dtt/troubleshooting">
+Beheben Sie Fehlermeldungen.
+</Card>
+</CardGroup>

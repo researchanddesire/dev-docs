@@ -1,0 +1,8 @@
+{
+  "title": "Lockbox",
+  "root": true,
+  "pages": [
+    "index",
+    "technical"
+  ]
+}

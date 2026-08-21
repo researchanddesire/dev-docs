@@ -1,0 +1,166 @@
+---
+title: "Softwareoverzicht"
+description: "Firmware-architectuur en ontwikkelingsgids voor de RADR draadloze afstandsbediening"
+---
+
+In dit gedeelte wordt de RADR-firmware besproken, inclusief architectuur, ontwikkelingsinstellingen en hoe u de codebase kunt wijzigen of eraan kunt bijdragen.
+
+## Firmware-overzicht
+
+RADR draait op een ESP32-S3-microcontroller met aangepaste firmware geschreven in C++ met behulp van het Arduino-framework en PlatformIO.
+
+| Onderdeel | Technologie |
+|-----------|------------|
+| MCU | ESP32-S3 met PSRAM |
+| Kader | Arduino voor ESP32 |
+| Bouw systeem | PlatformIO |
+| Taal | C++ |
+| Bibliotheek weergeven | TFT_eSPI |
+| BLE-stapel | Vlot |
+
+## Firmwareversie
+
+| Onderdeel | Versie |
+|-----------|---------|
+| Grote versie | 1 |
+| Kleine versie | 0 |
+| Patch-versie | 24 |
+| Volledige versie | 1.0.24 |
+
+<Info>
+Controleer regelmatig op firmware-updates om toegang te krijgen tot nieuwe functies en apparaatondersteuning.
+</Info>
+
+## Broncode
+
+De volledige firmwarebron is beschikbaar op GitHub:
+
+<Card title="RADR-firmware" icon="code" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Software">
+Blader door de broncode en documentatie.
+</Card>
+
+## Architectuuroverzicht
+
+### Hoofdcomponenten
+
+| Onderdeel | Doel |
+|-----------|---------|
+| Staatsmachine | Beheert schermstatussen en navigatiestroom |
+| Apparaatbeheer | Verwerkt de detectie en verbinding van Bluetooth-apparaten |
+| Beeldschermstuurprogramma | Rendert de gebruikersinterface met behulp van TFT_eSPI met canvasbuffering |
+| Invoerbehandelaar | Verwerkt encoder-, knop- en bumperingangen |
+| Feedbacksysteem | Regelt LED's, zoemer en trillingen |
+| Apparaatregister | Wijst Bluetooth UUID's toe aan apparaattypen |
+
+### Sleuteldiensten
+
+```
+├── BluetoothService    # BLE scanning and connection
+├── DisplayService      # Screen rendering
+├── InputService        # Encoder and button handling
+├── FeedbackService     # LED, buzzer, vibration
+├── DeviceService       # Connected device control
+├── WiFiService         # WiFi and OTA updates
+└── StorageService      # LittleFS configuration
+```
+
+## Ontwikkelingsomgeving
+
+### Vereisten
+
+- [Visuele studiocode](https://code.visualstudio.com/)
+- [PlatformIO-extensie](https://platformio.org/install/ide?install=vscode)
+- USB-C-kabel voor flitsen
+
+### Aan de slag
+
+<Steps>
+<Step title="Kloon de repository">
+```bash
+git clone https://github.com/researchanddesire/radr-wireless-remote.git
+cd radr-wireless-remote/Software
+```
+</Step>
+
+<Step title="Openen in VS-code">
+Open de map `Software` in VS Code. PlatformIO detecteert automatisch de projectconfiguratie.
+</Step>
+
+<Step title="Bouw de firmware">
+Klik op de PlatformIO Build-knop of voer het volgende uit:
+```bash
+pio run
+```
+</Step>
+
+<Step title="Flits naar apparaat">
+Sluit RADR aan via USB-C en klik op Uploaden, of voer het volgende uit:
+```bash
+pio run --target upload
+```
+</Step>
+</Steps>
+
+## Belangrijkste kenmerken
+
+### Op canvas gebaseerde weergave
+
+RADR maakt gebruik van dubbelgebufferde canvasweergave voor soepele weergave-updates:
+
+- Sprites op volledig scherm voorkomen flikkering
+- Gedeeltelijke updates voor prestatiekritieke gebieden
+- Consistente UI-vernieuwingssnelheid van 60 fps
+
+### Architectuur van staatsmachines
+
+De gebruikersinterface gebruikt een hiërarchische statusmachine:
+
+- Duidelijke overgangen tussen schermen
+- Geïsoleerde statuslogica voor elk scherm
+- Gebeurtenisgestuurde invoerverwerking
+
+### Apparaatregister
+
+RADR ondersteunt meerdere apparaattypen via een register met twee niveaus:
+
+| Register | Beschrijving |
+|----------|-------------|
+| Ingebouwd | Ondersteuning voor hardgecodeerde R+D-apparaten (OSSM) |
+| Dynamisch | Op JSON gebaseerde Buttplug.io-apparaatdefinities |
+
+Het dynamische register (`registry.json`) kan via firmware-updates worden bijgewerkt om nieuwe apparaatondersteuning toe te voegen zonder codewijzigingen.
+
+## Configuratiebestanden
+
+| Bestand | Doel |
+|------|---------|
+| `platformio.ini` | Bouw configuratie en afhankelijkheden |
+| `src/config.h` | Hardware-pindefinities en constanten |
+| `data/registry.json` | Buttplug.io apparaat UUID-toewijzingen |
+
+## Technische referentie
+
+<CardGroup cols={2}>
+<Card title="Webflitser" icon="bolt" href="/radr/software/ota-updates/introduction">
+Flash-firmware met behulp van de webgebaseerde tool.
+</Card>
+
+<Card title="BLE-communicatie" icon="bluetooth" href="/radr/software/communication/ble">
+Bluetooth-protocoldetails en apparaatcommunicatie.
+</Card>
+</CardGroup>
+
+## Bijdragen
+
+Lees de [bijdragerichtlijnen](https://github.com/researchanddesire/radr-wireless-remote/blob/main/CONTRIBUTING.md) voordat u een wijziging indient voor de `main`-vertakking.
+
+### Codestijl
+
+- Volg de bestaande codeopmaak
+- Gebruik beschrijvende variabelen- en functienamen
+- Documenteer publieke functies en complexe logica
+- Test wijzigingen op daadwerkelijke hardware voordat u ze indient
+
+## Licentie
+
+RADR-firmware wordt uitgebracht onder de **CERN Open Hardware License Version 2 - Strongly Reciprocal (CERN-OHL-S v2)**. Zie de repository [licentie](https://github.com/researchanddesire/radr-wireless-remote/blob/main/LICENSE) voor details.

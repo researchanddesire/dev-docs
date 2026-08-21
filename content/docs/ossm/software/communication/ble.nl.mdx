@@ -1,0 +1,806 @@
+---
+title: "BLE-protocol"
+description: "Bedien uw OSSM draadloos met behulp van Bluetooth Low Energy (BLE) vanaf elk compatibel apparaat of elke applicatie"
+---
+
+De OSSM maakt gebruik van Bluetooth Low Energy (BLE) voor draadloze bediening en monitoring. U kunt clienttoepassingen bouwen die verbinding maken met de OSSM om opdrachten te verzenden en realtime statusupdates te ontvangen.
+
+<Info>
+BLE biedt draadloze bediening met lage latentie, automatische herverbinding en statussynchronisatie.
+</Info>
+
+## Voordat je begint
+
+Om verbinding te maken met uw OSSM via BLE, zorg ervoor dat:
+
+- Uw apparaat ondersteunt Bluetooth Low Energy (BLE 4.0+)
+- De OSSM is ingeschakeld en niet verbonden met een andere BLE-client
+- U bevindt zich binnen ongeveer 10 meter van het apparaat
+
+## Service-architectuur
+
+De OSSM implementeert een aangepaste BLE-service met meerdere kenmerken, georganiseerd in functionele groepen.
+
+### Primaire service-UUID
+
+```
+522b443a-4f53-534d-0001-420badbabe69
+```
+
+Kenmerken zijn georganiseerd door [naamruimtebereiken](#uuid-namespace-structure) voor eenvoudige uitbreiding en ontdekking.
+
+## Karakteristieke referentie
+
+### Commandokarakteristieken (schrijfbaar)
+
+Gebruik deze kenmerken om opdrachten te verzenden en de OSSM te configureren.
+
+#### Primair commandokenmerk
+
+| Eigendom | Waarde |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-1000-420badbabe69` |
+| Eigenschappen | LEES, SCHRIJF |
+| Doel | Stuur opdrachten om het OSSM-gedrag te controleren |
+
+**Opdrachtformaat**
+
+```
+set:<parameter>:<value>
+go:<state>
+```
+
+**Beschikbare opdrachten**
+
+| Commando | Parameter | Waardebereik | Beschrijving |
+| ------- | --------- | ----------- | ----------- |
+| `set:speed:<value>` | snelheid | 0-100 | Stel het percentage slagsnelheid in |
+| `set:stroke:<value>` | hartinfarct | 0-100 | Slaglengtepercentage instellen |
+| `set:depth:<value>` | diepte | 0-100 | Stel het penetratiedieptepercentage in |
+| `set:sensation:<value>` | gevoel | 0-100 | Stel het percentage van de sensatie-intensiteit in |
+| `set:pattern:<value>` | patroon | 0-6 | Lijnpatroon instellen (zie [patronen](#pattern-information-characteristics)) |
+| `go:simplePenetration` | - | - | Schakel via het menu over naar de eenvoudige penetratiemodus |
+| `go:strokeEngine` | - | - | Schakel vanuit het menu naar de slagmotormodus |
+| `go:streaming` | - | - | Schakel vanuit het menu naar de streamingmodus (experimenteel). |
+| `go:menu` | - | - | Keer vanuit elke modus terug naar het hoofdmenu |
+| `stream:<pos>:<time>` | pos, tijd | pos: 0-100, tijd: ms | Een positiecommando verzenden in streamingmodus (experimenteel) |
+
+**Reactieformaat**
+
+| Antwoord | Betekenis |
+| -------- | ------- |
+| `ok:<original_command>` | Opdracht succesvol uitgevoerd |
+| `fail:<original_command>` | Opdracht mislukt (controleer formaat of huidige status) |
+
+<Tip>
+Wacht altijd op het antwoord voordat u een nieuw commando verzendt. Commando's worden opeenvolgend verwerkt.
+</Tip>
+
+#### Configuratiekarakteristiek van de snelheidsknop
+
+| Eigendom | Waarde |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-1010-420badbabe69` |
+| Eigenschappen | LEES, SCHRIJF |
+| Doel | Configureer of de fysieke snelheidsknop BLE-snelheidsopdrachten beperkt |
+
+**Configuratiewaarden**
+
+| Waarde | Beschrijving |
+| ----- | ----------- |
+| `true`, `1`, `t` | Snelheidsknop fungeert als bovengrens (standaard) |
+| `false`, `0`, `f` | Snelheidsknop en BLE-snelheid zijn onafhankelijk |
+
+<Tabs>
+<Tab title="Knop als limiet (standaard)">
+Indien ingesteld op `true`, worden BLE-snelheidsopdrachten (0-100) behandeld als een percentage van de huidige fysieke knoppositie.
+
+**Voorbeeld**: Knop op 50%, BLE-commando `set:speed:80` → Effectieve snelheid = 40%
+
+Deze modus biedt een hardwareveiligheidslimiet die gebruikers fysiek kunnen controleren.
+</Tab>
+
+<Tab title="Onafhankelijke modus">
+Wanneer ingesteld op `false`, worden BLE-snelheidsopdrachten (0-100) direct gebruikt als snelheidswaarde, waarbij de knoppositie wordt genegeerd.
+
+**Voorbeeld**: BLE-commando `set:speed:80` → Effectieve snelheid = 80%
+
+<Warning>
+In de onafhankelijke modus kunnen BLE-opdrachten de fysieke knop overschrijven. Zorg ervoor dat uw toepassing de juiste veiligheidscontroles implementeert.
+</Warning>
+</Tab>
+</Tabs>
+
+**Reactieformaat**
+
+| Antwoord | Betekenis |
+| -------- | ------- |
+| `true` of `false` | Huidige configuratiewaarde |
+| `error:invalid_value` | Ongeldige invoer opgegeven |
+
+
+#### Configuratiekarakteristiek voor latentiecompensatie
+
+| Eigendom | Waarde |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-1030-420badbabe69` |
+| Eigenschappen | LEES, SCHRIJF |
+| Doel | Configureer of de OSSM de latentie probeert te compenseren|
+
+**Configuratiewaarden**
+
+| Waarde | Beschrijving |
+| ----- | ----------- |
+| `true`, `1`, `t` | Latentiecompensatie is actief |
+| `false`, `0`, `f` | Latentiecompensatie is inactief (standaard) |
+
+<Tabs>
+<Tab title="Ingeschakeld">
+Wanneer ingesteld op `true`, verwacht de OSSM de exacte opdrachten en tijden van het funscript te ontvangen en dat de opdrachten worden verzonden
+met dezelfde vertraging tussen commando's als de tijdswaarde. Door de tijd tussen ontvangen opdrachten en de tijdvariabele te berekenen
+de OSSM kan de door BLE geïntroduceerde latentie bepalen en hiervoor corrigeren met kleine veranderingen in de bewegingssnelheid.
+Als de tijd tussen opdrachten niet overeenkomt met de intime-variabele, mag dit niet worden ingeschakeld. De bufferinstelling wordt kunstmatig gebruikt
+voeg vertraging toe aan alle bewegingen. Dit geeft de OSSM de tijd om de volgende opdracht te ontvangen voordat de vorige is voltooid. Dit maakt het mogelijk
+het verwijderen van eventuele vertragingen die door late commando's worden geïntroduceerd, evenals het verzachten van bewegingen door bewegingen in dezelfde richting te combineren.
+Funscript-spelers moeten deze bufferwaarde toevoegen aan hun afspeeloffset en een extra instelling toevoegen voor het fijnafstellen van de afspeeloffset
+om rekening te houden met de transmissietijd en eventuele vertragingen die inherent zijn aan het funscript zelf.
+</Tab>
+
+<Tab title="Uitgeschakeld">
+Indien ingesteld op `false`, zal de OSSM opdrachten uitvoeren zodra deze worden ontvangen. Commando's die te laat arriveren, worden te laat uitgevoerd. Commando's
+die vroeg arriveren, worden uitgevoerd wanneer het vorige commando is voltooid.
+
+</Tab>
+</Tabs>
+
+**Reactieformaat**
+
+| Antwoord | Betekenis |
+| -------- | ------- |
+| `true` of `false` | Huidige configuratiewaarde |
+| `error:invalid_value` | Ongeldige invoer opgegeven |
+
+#### Kenmerkend voor WiFi-configuratie
+
+| Eigendom | Waarde |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-1020-420badbabe69` |
+| Eigenschappen | LEES, SCHRIJF |
+| Doel | Configureer WiFi-inloggegevens en controleer de verbindingsstatus |
+
+**Schrijfformaat**
+
+```
+set:wifi:<ssid>|<password>
+```
+
+Het pipe-teken (`|`) wordt gebruikt als scheidingsteken tussen SSID en wachtwoord. Hierdoor kunnen zowel de SSID als het wachtwoord dubbele punten bevatten.
+
+**Leesformaat** (JSON)
+
+```json
+{
+  "connected": true,
+  "ssid": "NetworkName",
+  "ip": "192.168.1.100",
+  "rssi": -45
+}
+```
+
+Als er geen verbinding is, bevat het veld `ssid` de laatst opgeslagen SSID (indien aanwezig), `ip` is leeg en `rssi` is 0.
+
+**Reactieformaat**
+
+| Antwoord | Betekenis |
+| -------- | ------- |
+| `ok:wifi:connected` | Succesvol verbonden |
+| `ok:wifi:saved` | Inloggegevens opgeslagen, poging tot verbinding |
+| `fail:wifi:invalid_format` | Opdrachtformaat onjuist (ontbrekend pijpscheidingsteken) |
+| `fail:wifi:invalid_ssid` | SSID-lengte ongeldig (moet 1-32 tekens bevatten) |
+| `fail:wifi:invalid_password` | Wachtwoordlengte ongeldig (moet 8-63 tekens bevatten) |
+| `fail:wifi:connection_failed` | Kan geen verbinding maken met het netwerk |
+| `fail:wifi:save_failed` | Kan de referenties niet opslaan in NVS |
+
+<Tip>
+WiFi-inloggegevens worden bewaard in niet-vluchtige opslag (NVS) en blijven behouden wanneer het apparaat opnieuw wordt opgestart. Het apparaat probeert bij het opstarten automatisch verbinding te maken met behulp van de opgeslagen inloggegevens.
+</Tip>
+
+<Warning>
+WiFi-inloggegevens worden in platte tekst via BLE verzonden. Zorg ervoor dat u de verbinding vertrouwt en dat u zich in een veilige omgeving bevindt wanneer u de WiFi-instellingen configureert.
+</Warning>
+
+**Voorbeeldgebruik**
+
+```javascript
+// Configure WiFi
+const wifiCommand = "set:wifi:MyNetwork|MyPassword123";
+await commandChar.writeValue(new TextEncoder().encode(wifiCommand));
+
+// Read the response
+const response = await commandChar.readValue();
+console.log(new TextDecoder().decode(response)); // "ok:wifi:connected"
+
+// Check WiFi status
+const wifiConfigChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-1020-420badbabe69"
+);
+const statusValue = await wifiConfigChar.readValue();
+const status = JSON.parse(new TextDecoder().decode(statusValue));
+console.log(status);
+// { "connected": true, "ssid": "MyNetwork", "ip": "192.168.1.100", "rssi": -45 }
+```
+
+### Statuskenmerken (alleen-lezen)
+
+Abonneer u op deze kenmerken om de huidige status van de OSSM te controleren.
+
+#### Kenmerkend voor de huidige toestand
+
+| Eigendom | Waarde |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-2000-420badbabe69` |
+| Eigenschappen | LEES, MELD |
+| Doel | Bewaak de huidige OSSM-status en -instellingen |
+
+**Staat JSON-indeling**
+
+```json
+{
+  "state": "<state_name>",
+  "speed": 0-100,
+  "stroke": 0-100,
+  "sensation": 0-100,
+  "depth": 0-100,
+  "pattern": 0-6
+}
+```
+
+<AccordionGroup>
+<Accordion title="Beschikbare staten">
+| Staat | Beschrijving |
+| ----- | ----------- |
+| `idle` | Initialiseren |
+| `homing` | Thuisvolgorde actief |
+| `homing.forward` | Voorwaartse homing wordt uitgevoerd |
+| `homing.backward` | Achterwaartse homing wordt uitgevoerd |
+| `menu` | Hoofdmenu weergegeven |
+| `menu.idle` | Inactieve status van het menu |
+| `simplePenetration` | Eenvoudige penetratiemodus |
+| `simplePenetration.idle` | Eenvoudige penetratie inactief |
+| `simplePenetration.preflight` | Controles vóór de vlucht |
+| `strokeEngine` | Slagmotormodus |
+| `strokeEngine.idle` | Laat de motor stationair draaien |
+| `strokeEngine.preflight` | Controles vóór de vlucht |
+| `strokeEngine.pattern` | Patroon selectie |
+| `streaming` | Streamingmodus (experimenteel) |
+| `update` | Update-modus |
+| `update.checking` | Controleren op updates |
+| `update.updating` | Update wordt uitgevoerd |
+| `update.idle` | Update inactief |
+| `wifi` | WiFi-instelmodus |
+| `wifi.idle` | WiFi-installatie is inactief |
+| `help` | Help-scherm |
+| `help.idle` | Hulp inactief |
+| `error` | Foutstatus |
+| `error.idle` | Fout bij inactiviteit |
+| `error.help` | Hulp bij fouten |
+| `restart` | Staat opnieuw opstarten |
+
+Zie [OSSM.h](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/OSSM.h) in de bronrepository voor de volledige implementatie van de statusmachine.
+</Accordion>
+</AccordionGroup>
+
+**Meldingsgedrag**
+
+- Statuswijzigingen leiden tot onmiddellijke meldingen
+- Periodieke meldingen elke 1000 ms als er geen statuswijziging plaatsvindt
+- Meldingen stoppen als er geen clients zijn verbonden
+
+### Kenmerken van patrooninformatie
+
+#### Karakteristiek patroonlijst
+
+| Eigendom | Waarde |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-3000-420badbabe69` |
+| Eigenschappen | LEZEN |
+| Doel | Verkrijg beschikbare lijnpatronen |
+
+**Reactieformaat**
+
+```json
+[
+  { "name": "Simple Stroke", "idx": 0 },
+  { "name": "Teasing Pounding", "idx": 1 },
+  { "name": "Robo Stroke", "idx": 2 },
+  { "name": "Half'n'Half", "idx": 3 },
+  { "name": "Deeper", "idx": 4 },
+  { "name": "Stop'n'Go", "idx": 5 },
+  { "name": "Insist", "idx": 6 }
+]
+```
+
+#### Patroonbeschrijving karakteristiek
+
+| Eigendom | Waarde |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-3010-420badbabe69` |
+| Eigenschappen | LEES, SCHRIJF |
+| Doel | Ontvang beschrijvingen voor individuele streekpatronen |
+
+Een patroonbeschrijving ophalen:
+
+<Steps>
+<Step title="Schrijf de patroonindex">
+Schrijf het indexnummer (0-6) bij het kenmerk.
+</Step>
+
+<Step title="Lees de beschrijving">
+Lees het kenmerk om de patroonbeschrijvingsreeks te ontvangen.
+</Step>
+</Steps>
+
+**Patroonbeschrijvingen**
+
+| Patroon | Index | Beschrijving |
+| ------- | ----- | ----------- |
+| Simpele beroerte | 0 | Versnelling, uitrollen en vertragen gelijkelijk verdeeld; geen sensatie |
+| Plagen beukende | 1 | Snelheid verschuift met gevoel; balanceert snellere slagen |
+| Robo-beroerte | 2 | Sensatie varieert acceleratie; van robotachtig tot geleidelijk |
+| Half en half | 3 | Slagen op volledige en halve diepte wisselen elkaar af; sensatie beïnvloedt de snelheid |
+| Dieper | 4 | De slagdiepte neemt per cyclus toe; sensatiesets tellen mee |
+| Stop'n'Go | 5 | Pauzes tussen slagen; gevoel past de lengte aan |
+| Volharden | 6 | Wijzigt de lengte, handhaaft de snelheid; sensatie beïnvloedt de richting |
+
+### Streamingopdrachten (experimenteel)
+
+<Warning>
+Positiestreaming is experimenteel en wordt niet aanbevolen voor algemeen gebruik. Het protocol en het gedrag kunnen veranderen in toekomstige firmware-updates.
+</Warning>
+
+In de streamingmodus (`go:streaming`) accepteert de OSSM real-time positieopdrachten die gesynchroniseerd afspelen met externe inhoud zoals funscripts mogelijk maken.
+
+#### Commando voor streampositie
+
+| Eigendom | Waarde |
+| -------- | ----- |
+| Formaat | `stream:<position>:<time>` |
+| Positie | 0-100 (percentage beroerte) |
+| Tijd | Milliseconden om de doelpositie te bereiken |
+
+**Voorbeeldopdrachten**
+
+```
+stream:0:200      # Move to 0% (retracted) in 200ms
+stream:100:150    # Move to 100% (extended) in 150ms
+stream:50:300     # Move to 50% (mid-stroke) in 300ms
+```
+
+**Hoe het werkt**
+
+1. Ga naar de streamingmodus met `go:streaming`
+2. De OSSM-woningen naar positie 0 (volledig ingetrokken)
+3. Verzend `stream:<pos>:<time>`-opdrachten om beweging te besturen
+4. De firmware berekent de vereiste snelheid om de doelpositie binnen de opgegeven tijd te bereiken
+5. Motion maakt gebruik van maximale versnelling voor een responsief gevoel
+
+<Note>
+Positie 0 staat voor volledig ingetrokken (thuis), en positie 100 staat voor volledig uitgeschoven. De tijdparameter geeft aan hoe lang de beweging moet duren, waardoor de OSSM de juiste snelheid kan berekenen voor een soepele weergave.
+</Note>
+
+**Vereisten**
+
+- Firmwareversie 3.0 of hoger
+- OSSM moet in streamingmodus staan ​​(status: `streaming` of `streaming.idle`)
+- Commando's verzonden via het primaire commandokenmerk
+
+<Tip>
+Voor het afspelen van funscripts, zie de [Funscript-speler](/ossm/software/communication/ble#streaming-mode)-tool die automatisch de timing en het genereren van opdrachten afhandelt.
+</Tip>
+
+### GPIO-kenmerken
+
+#### GPIO-besturingskarakteristiek
+
+| Eigendom | Waarde |
+| -------- | ----- |
+| UUID | `522b443a-4f53-534d-4000-420badbabe69` |
+| Eigenschappen | LEES, SCHRIJF |
+| Doel | Beheer GPIO-uitgangspinnen voor accessoires en integraties |
+
+Schrijf opdrachten in het formaat `<pin>:<state>`, waarbij pin 1-4 is en de status `high`/`low` of `1`/`0` is.
+
+**Pin-toewijzing:**
+
+| Logische pin | ESP32GPIO |
+| ----------- | ---------- |
+| 1 | GPIO2 |
+| 2 | GPIO15 |
+| 3 | GPIO22 |
+| 4 | GPIO33 |
+
+**Reactieformaat:**
+
+| Antwoord | Betekenis |
+| -------- | ------- |
+| `ok:<pin>:<state>` | Pin succesvol ingesteld |
+| `error:invalid_format` | Commandoformaat niet herkend |
+| `error:pin_out_of_range` | Pinnummer niet 1-4 |
+
+<Info>
+Zie [GPIO-besturing](/ossm/software/communication/gpio) voor gedetailleerde GPIO-documentatie, inclusief voorbeelden van hardware-integratie.
+</Info>
+
+## Fleshy Thrust Sync-emulatie (alleen testen)
+
+<Warning>
+Deze functie is alleen bedoeld voor ontwikkelingstests en wordt **niet aanbevolen voor gebruik**. Het vereist een speciale firmware-build en kan in toekomstige versies worden verwijderd.
+</Warning>
+
+De OSSM-firmware kan optioneel het Fleshy Thrust Sync (FTS) BLE-protocol emuleren voor compatibiliteitstests met applicaties zoals faptap.net. Deze functie is standaard uitgeschakeld en vereist het compileren van firmware met de vlag `PRETEND_TO_BE_FLESHY_THRUST_SYNC`.
+
+### FTS-service
+
+| Eigendom | Waarde |
+| -------- | ----- |
+| Service-UUID | `0000ffe0-0000-1000-8000-00805f9b34fb` |
+| Karakteristieke UUID | `0000ffe1-0000-1000-8000-00805f9b34fb` |
+| Eigenschappen | LEES, SCHRIJF, MELD, INDIEN |
+
+### Binair protocolformaat
+
+FTS gebruikt een compact binair formaat in plaats van tekstopdrachten:
+
+| Byte | Beschrijving | Bereik |
+| ---- | ----------- | ----- |
+| 0 | Positie | 0-180 (uint8) |
+| 1 | Tijd hoge byte | MSB van tijd in ms |
+| 2 | Tijd lage byte | LSB van tijd in ms |
+
+**Positietoewijzing**: 0 = volledig ingetrokken, 180 = volledig uitgeschoven
+
+**Tijdnotatie**: 16-bit geheel getal zonder teken in big-endian (volgorde van netwerkbytes)
+
+### Voorbeeld
+
+Om binnen 250 ms naar positie 90 (50% uitgeschoven) te gaan:
+
+```
+Byte 0: 0x5A (90 decimal - position)
+Byte 1: 0x00 (250 >> 8 = 0)
+Byte 2: 0xFA (250 & 0xFF = 250)
+```
+
+<Note>
+De FTS-emulatie gebruikt hetzelfde onderliggende streamingmechanisme als de native `stream:pos:time`-opdracht. De OSSM moet zich in de streamingmodus bevinden om opdrachten van kracht te laten worden.
+</Note>
+
+### Waarom niet aanbevolen
+
+- Het FTS-protocol is een specificatie van derden die niet wordt beheerd door het OSSM-project
+- Protocolwijzigingen in FTS-compatibele applicaties kunnen de compatibiliteit verbreken
+- Het native OSSM-streamingprotocol (`stream:pos:time`) heeft de voorkeur voor nieuwe integraties
+- Deze functie is voornamelijk bedoeld voor het testen van de compatibiliteit met bestaande FTS-ecosystemen
+
+## Apparaatinformatiedienst
+
+De OSSM implementeert de standaard BLE Device Information Service voor identificatie.
+
+| Kenmerkend | UUID | Waarde |
+| -------------- | ---- | ----- |
+| Dienst | `180A` | Apparaatinformatieservice |
+| Naam van de fabrikant | `2A29` | "Onderzoek en verlangen" |
+| Systeem-ID | `2A23` | `88:1A:14:FF:FE:34:29:63` |
+
+## UUID-naamruimtestructuur
+
+De OSSM gebruikt een gestructureerde UUID-naamruimte voor georganiseerde uitbreiding.
+
+### Service-UUID
+
+```
+0x0001 = Service UUID
+```
+
+### Naamruimtebereiken
+
+| Bereik | Hex-bereik | Beschrijving |
+| ----- | --------- | ----------- |
+| 0x0 | 0x0000–0x0FFF | Gereserveerd voor systeemberichten |
+| 0x1 | 0x1000–0x1FFF | Commando's en configuratie |
+| 0x2 | 0x2000–0x2FFF | Staat informatie |
+| 0x3 | 0x3000–0x3FFF | Patroon informatie |
+| 0x4 | 0x4000–0x4FFF | GPIO-pininstelling |
+| 0x5–0xD | 0x5000–0xDFFF | Gereserveerd voor toekomstig gebruik |
+| 0xE | 0xE000–0xEFFF | Gereserveerd voor statistieken |
+| 0xF | 0xF000–0xFFFF | Experimenteel / sandbox (vluchtig) |
+
+### Actuele karakteristieke opdrachten
+
+<Tabs>
+<Tab title="Commando's (0x1xxx)">
+```
+522b443a-4f53-534d-1000-420badbabe69  # Primary command
+522b443a-4f53-534d-1010-420badbabe69  # Speed knob configuration
+522b443a-4f53-534d-1020-420badbabe69  # WiFi configuration
+```
+</Tab>
+
+<Tab title="Staat (0x2xxx)">
+```
+522b443a-4f53-534d-2000-420badbabe69  # Current state
+```
+</Tab>
+
+<Tab title="Patronen (0x3xxx)">
+```
+522b443a-4f53-534d-3000-420badbabe69  # Pattern list
+522b443a-4f53-534d-3010-420badbabe69  # Pattern description
+```
+</Tab>
+
+<Tab title="GPIO (0x4xxx)">
+```
+522b443a-4f53-534d-4000-420badbabe69  # GPIO control
+```
+</Tab>
+</Tabs>
+
+## Verbindingsbeheer
+
+### Reclame
+
+| Instelling | Waarde |
+| ------- | ----- |
+| Apparaatnaam | `OSSM` |
+| Service-UUID's | Primaire service + Apparaatinformatieservice |
+| Advertentie-interval | 20-40 ms (geoptimaliseerd voor betrouwbaarheid) |
+| Automatische herstart | Het adverteren wordt hervat wanneer alle clients de verbinding verbreken |
+
+### Beveiliging
+
+| Instelling | Waarde |
+| ------- | ----- |
+| Koppelen | "Werkt gewoon" (geen authenticatie vereist) |
+| Encryptie | BLE beveiligde verbindingen ingeschakeld |
+| Verbinden | Uitgeschakeld (geen permanente koppeling) |
+
+<Note>
+De OSSM maakt gebruik van "Just Works"-koppeling voor gebruiksgemak. Iedereen binnen het BLE-bereik kan verbinding maken wanneer het apparaat adverteert.
+</Note>
+
+### Veiligheid bij ontkoppeling
+
+Wanneer een BLE-verbinding onverwacht wordt verbroken, verlaagt de OSSM automatisch de snelheid om overtoeren te voorkomen.
+
+**Uitloopgedrag:**
+
+1. Verbinding verbroken gedetecteerd
+2. **1 seconde vertraging** — zorgt voor korte signaaluitval zonder triggering
+3. **2 seconden ramp** — snelheid neemt af van huidige waarde naar nul met behulp van een 'easy-in-out-sinus'-curve
+4. Het apparaat blijft op nulsnelheid totdat het opnieuw wordt aangesloten of handmatig wordt gestopt
+
+<Info>
+De 'easy-in-out-sinus'-curve zorgt voor een soepele vertraging die natuurlijk aanvoelt en de mechanische belasting vermindert. Als het toerental bij het ontkoppelen al nul was, vindt er geen helling plaats.
+</Info>
+
+**Overwegingen voor de klant:**
+
+- Implementeer verbindingsmonitoring om verbroken verbindingen snel te detecteren
+- Overweeg automatische herverbindingslogica
+- Lokale bedieningselementen (potentiometer, encoder) blijven actief tijdens en na het ontkoppelen
+- Gebruikers kunnen handmatig stoppen via de snelheidsknop of lang indrukken voor een noodstop
+
+## Implementatiehandleiding voor klanten
+
+### Verbindingsstroom
+
+Volg deze stappen om een ​​verbinding tot stand te brengen en uw OSSM te bedienen:
+
+<Steps>
+<Step title="Scan naar het apparaat">
+Scannen naar BLE-apparaten met de naam "OSSM".
+
+<Check>
+Apparaat verschijnt in scanresultaten.
+</Check>
+</Step>
+
+<Step title="Maak verbinding met het apparaat">
+Breng een GATT-verbinding met de OSSM tot stand.
+</Step>
+
+<Step title="Ontdek diensten">
+Ontdek alle diensten en kenmerken op het toestel.
+
+<Check>
+Primaire service UUID `522b443a-4f53-534d-0001-420badbabe69` is gevonden.
+</Check>
+</Step>
+
+<Step title="Abonneer u op staatsmeldingen">
+Schakel meldingen over het statuskenmerk in om realtime updates te ontvangen.
+</Step>
+
+<Step title="Lees de beginstatus">
+Lees de huidige status- en patroonlijst om uw toepassing te initialiseren.
+</Step>
+
+<Step title="Stuur opdrachten">
+Begin met het verzenden van opdrachten om de OSSM te besturen.
+</Step>
+</Steps>
+
+### Beste praktijken
+
+<CardGroup cols={2}>
+<Card title="Commandoafhandeling" icon="terminal">
+- Valideer het opdrachtformaat voordat u het verzendt
+- Behandel zowel `ok:`- als `fail:`-reacties
+- Implementeer logica voor opnieuw proberen voor kritieke opdrachten
+- Controleer statuswijzigingen om de uitvoering van opdrachten te bevestigen
+</Card>
+
+<Card title="Staatstoezicht" icon="eye">
+- Abonneer u op statuskenmerkmeldingen
+- Parseer JSON-statusupdates op betrouwbare wijze
+- Ga op de juiste manier om met statusovergangen
+- Implementeer time-outafhandeling voor ontbrekende updates
+</Card>
+</CardGroup>
+
+## Voorbeeldcode
+
+<CodeGroup>
+```javascript Web Bluetooth (JavaScript)
+// Connect to OSSM
+const device = await navigator.bluetooth.requestDevice({
+  filters: [{ name: "OSSM" }],
+  optionalServices: ["522b443a-4f53-534d-0001-420badbabe69"],
+});
+
+const server = await device.gatt.connect();
+const service = await server.getPrimaryService(
+  "522b443a-4f53-534d-0001-420badbabe69"
+);
+
+// Get characteristics
+const commandChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-1000-420badbabe69"
+);
+const stateChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-2000-420badbabe69"
+);
+const speedKnobConfigChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-1010-420badbabe69"
+);
+const wifiConfigChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-1020-420badbabe69"
+);
+const patternsChar = await service.getCharacteristic(
+  "522b443a-4f53-534d-3000-420badbabe69"
+);
+
+// Subscribe to state updates
+await stateChar.startNotifications();
+stateChar.addEventListener("characteristicvaluechanged", (event) => {
+  const state = JSON.parse(new TextDecoder().decode(event.target.value));
+  console.log("State update:", state);
+});
+
+// Configure speed knob behavior (true = knob as limit, false = independent)
+await speedKnobConfigChar.writeValue(new TextEncoder().encode("true"));
+
+// Configure WiFi
+await wifiConfigChar.writeValue(new TextEncoder().encode("set:wifi:MyNetwork|MyPassword123"));
+
+// Check WiFi status
+const wifiStatus = await wifiConfigChar.readValue();
+console.log("WiFi:", JSON.parse(new TextDecoder().decode(wifiStatus)));
+
+// Send a command
+const command = "set:speed:75";
+await commandChar.writeValue(new TextEncoder().encode(command));
+
+// Read available patterns
+const patterns = await patternsChar.readValue();
+const patternList = JSON.parse(new TextDecoder().decode(patterns));
+console.log("Available patterns:", patternList);
+```
+
+```python Python (bleak)
+import asyncio
+import json
+from bleak import BleakClient
+
+SERVICE_UUID = "522b443a-4f53-534d-0001-420badbabe69"
+COMMAND_UUID = "522b443a-4f53-534d-1000-420badbabe69"
+STATE_UUID = "522b443a-4f53-534d-2000-420badbabe69"
+SPEED_KNOB_UUID = "522b443a-4f53-534d-1010-420badbabe69"
+WIFI_CONFIG_UUID = "522b443a-4f53-534d-1020-420badbabe69"
+
+def state_callback(sender, data):
+    """Handle state update notifications."""
+    state = json.loads(data.decode())
+    print(f"State update: {state}")
+
+async def connect_to_ossm():
+    async with BleakClient("OSSM") as client:
+        # Subscribe to state updates
+        await client.start_notify(STATE_UUID, state_callback)
+
+        # Configure speed knob behavior
+        await client.write_gatt_char(
+            SPEED_KNOB_UUID,
+            "true".encode()  # Knob acts as upper limit
+        )
+
+        # Configure WiFi
+        await client.write_gatt_char(
+            WIFI_CONFIG_UUID,
+            "set:wifi:MyNetwork|MyPassword123".encode()
+        )
+
+        # Check WiFi status
+        wifi_status = await client.read_gatt_char(WIFI_CONFIG_UUID)
+        print(f"WiFi status: {json.loads(wifi_status.decode())}")
+
+        # Send a command
+        command = "set:speed:75"
+        await client.write_gatt_char(COMMAND_UUID, command.encode())
+
+        # Keep connection alive to receive notifications
+        await asyncio.sleep(10)
+
+asyncio.run(connect_to_ossm())
+```
+</CodeGroup>
+
+## Problemen oplossen
+
+<AccordionGroup>
+<Accordion title="Verbinding mislukt">
+**Symptomen**: Kan de OSSM niet ontdekken of er verbinding mee maken.
+
+**Oplossingen**:
+- Zorg ervoor dat de OSSM is ingeschakeld en binnen bereik is (~10 meter)
+- Controleer of er momenteel geen ander apparaat is verbonden met de OSSM
+- Start de OSSM opnieuw om de BLE-stack te resetten
+- Probeer dichter bij het apparaat te komen
+</Accordion>
+
+<Accordion title="Commando's werken niet">
+**Symptomen**: opdrachten retourneren `fail:` of hebben geen effect.
+
+**Oplossingen**:
+- Controleer of het opdrachtformaat exact overeenkomt met de specificatie
+- Controleer of de OSSM zich in een staat bevindt die opdrachten accepteert (bijvoorbeeld `strokeEngine` of `simplePenetration`)
+- Gebruik eerst `go:strokeEngine` of `go:simplePenetration` als u zich in de menustatus bevindt
+- Lees de huidige status om te begrijpen welke opdrachten geldig zijn
+</Accordion>
+
+<Accordion title="Geen staatsupdates">
+**Symptomen**: statuskenmerk wordt nooit bijgewerkt na aanmelding.
+
+**Oplossingen**:
+- Controleer of het aanmeldingsabonnement succesvol was
+- Controleer of uw BLE-bibliotheek meldingen ondersteunt
+- Zorg ervoor dat u meldingen van de juiste kenmerkende UUID leest
+- Probeer de verbinding te verbreken en opnieuw verbinding te maken
+</Accordion>
+
+<Accordion title="Ongeldige reacties">
+**Symptomen**: onverwachte of verkeerd opgemaakte gegevens ontvangen.
+
+**Oplossingen**:
+- Zorg ervoor dat u de antwoorden decodeert als UTF-8-tekst
+- Controleer of JSON-parsering het statusformaat correct verwerkt
+- Controleer op coderingsproblemen in uw BLE-bibliotheek
+</Accordion>
+</AccordionGroup>
+
+### Foutopsporingsinformatie
+
+<Tip>
+Schakel ESP32-logboekregistratie op DEBUG-niveau in voor gedetailleerde protocolinformatie. Bewaak de BLE-verbindingsstatus, MTU-wijzigingen en statusmachine-overgangen.
+</Tip>

@@ -1,0 +1,182 @@
+---
+title: „Bluetooth-Kommunikation“
+description: „BLE-Protokolldetails und Gerätekommunikation für RADR“
+---
+
+Dieses Dokument behandelt die Bluetooth Low Energy (BLE)-Kommunikationsprotokolle, die RADR für die Kommunikation mit unterstützten Geräten verwendet.
+
+## BLE-Übersicht
+
+RADR nutzt Bluetooth Low Energy (BLE) für die gesamte Gerätekommunikation. Als BLE-Zentralgerät sucht RADR nach Peripheriegeräten wie OSSM und Lovense-Spielzeugen und stellt eine Verbindung zu diesen her.
+
+| Parameter | Wert |
+|-----------|-------|
+| BLE-Rolle | Zentral |
+| Gerätename | OSSM-REMOTE |
+| Sendeleistung | 9 dBm |
+| Stapel | Flink |
+
+## Scan-Parameter
+
+| Parameter | Wert |
+|-----------|-------|
+| Scanintervall | 100 ms |
+| Scanfenster | 100 ms |
+| Scantyp | Aktiv |
+| Scandauer | 5000 ms (5 Sekunden) |
+
+Während des aktiven Scannens sendet RADR Scananforderungspakete an Geräte, um deren vollständige Werbedaten, einschließlich Gerätenamen, abzurufen.
+
+## Verbindungsparameter
+
+RADR verwendet optimierte Verbindungsparameter für eine reaktionsfähige Steuerung:
+
+| Parameter | Wert | Beschreibung |
+|-----------|-------|-------------|
+| Mindestintervall | 12 | Mindestverbindungsintervall 15 ms |
+| Maximales Intervall | 12 | Maximales Verbindungsintervall 15 ms |
+| Latenz | 0 | Keine Slave-Latenz (sofortige Antworten) |
+| Überwachungszeitüberschreitung | 150 | 1500 ms Zeitüberschreitung für verlorene Verbindungen |
+| Verbindungs-Timeout | 5000ms | Maximale Zeit zum Verbindungsaufbau |
+
+Das Verbindungsintervall von 15 ms ermöglicht eine reaktionsfähige Steuerung mit minimaler Latenz zwischen Encoderumdrehungen und Gerätereaktion.
+
+## Geräteerkennung
+
+RADR identifiziert unterstützte Geräte anhand ihrer beworbenen Dienst-UUIDs:
+
+### Forschungs- und Wunschgeräte
+
+| Gerät | Dienst-UUID |
+|--------|--------------|
+| OSSM | `522B443A-4F53-534D-0001-420BADBABE69` |
+| LKBX | Ausstehende Umsetzung |
+| DTT | Ausstehende Umsetzung |
+
+### Lovense-Geräte
+
+| Gerät | Dienst-UUID |
+|--------|--------------|
+| Dom 2 | `57300001-0023-4BD4-BBD5-A6920E4C5653` |
+| Andere | Über die Buttplug.io-Registrierung |
+
+### Buttplug.io-Geräte
+
+Über das Buttplug.io-Protokoll unterstützte Geräte werden mithilfe von UUIDs aus der dynamischen Registrierung (`registry.json`) identifiziert. Diese Registrierung kann über Firmware-Updates ohne Codeänderungen aktualisiert werden.
+
+## OSSM-Protokoll
+
+RADR kommuniziert mit OSSM über ein benutzerdefiniertes BLE-Protokoll:
+
+### Servicestruktur
+
+```
+Service: 522B443A-4F53-534D-0001-420BADBABE69
+├── Position Characteristic
+├── Speed Characteristic
+├── Depth Characteristic
+├── Sensation Characteristic
+├── Stroke Characteristic
+└── Pattern Characteristic
+```
+
+### Befehlsformat
+
+Befehle werden als Byte-Arrays an das entsprechende Merkmal gesendet:
+
+| Parameter | Datentyp | Reichweite |
+|-----------|-----------|-------|
+| Geschwindigkeit | uint8_t | 0-100 |
+| Tiefe | uint8_t | 0-100 |
+| Sensation | uint8_t | 0-100 |
+| Schlaganfall | uint8_t | 0-100 |
+| Muster | uint8_t | Musterindex |
+
+### Musterauswahl
+
+Muster werden nach Index ausgewählt:
+
+| Index | Mustername |
+|-------|--------------|
+| 0 | Einfacher Schlaganfall |
+| 1 | Neckendes Stampfen |
+| 2 | Robo Stroke |
+| 3 | Halb und halb |
+| 4 | Tiefer |
+| 5 | Stop'n'Go |
+| 6 | Pochen |
+
+## Lovense-Protokoll
+
+Für Lovense-Geräte mit direkter Integration (Domi) verwendet RADR das Lovense BLE-Protokoll:
+
+### Vibrationskontrolle
+
+```
+Command: Vibrate:{level};
+Level: 0-16
+```
+
+### Batterieabfrage
+
+```
+Command: Battery;
+Response: {percentage}
+```
+
+### Leistungskontrolle
+
+```
+Command: PowerOff;
+```
+
+## Buttplug.io-Geräte
+
+Für über Buttplug.io unterstützte Geräte implementiert RADR eine Teilmenge des Buttplug-Protokolls:
+
+- **Vibrieren** – Vibrationsstufe einstellen (0-1 Float, dem Gerätebereich zugeordnet)
+- **Linear** – Für Schubgeräte
+- **Drehen** – Für rotierende Geräte
+
+Nicht alle Geräte unterstützen alle Befehle. RADR fragt während der Verbindung Gerätefunktionen ab.
+
+## Verbindungswiederherstellung
+
+Wenn RADR die Verbindung zu einem Gerät verliert:
+
+1. **Erkennung** – Verbindungsverlust innerhalb des Überwachungszeitlimits (1500 ms) erkannt
+2. **Wiederverbindung** – Automatischer Wiederverbindungsversuch innerhalb von 2–5 Sekunden
+3. **Sicherheit** – Für OSSM schrittweises Herunterfahren während der Trennung
+4. **Fehler** – Nach fehlgeschlagener erneuter Verbindung kehren Sie zum Hauptmenü zurück
+
+## Sicherheit
+
+RADR nutzt offene BLE-Verbindungen ohne Pairing oder Bonding:
+
+- Keine PIN erforderlich
+- Keine Verschlüsselung (Befehle sind Klartext)
+- Einzelne Verbindung gleichzeitig
+
+<Warning>
+Die BLE-Kommunikation ist nicht verschlüsselt. Verwenden Sie RADR in privaten Umgebungen, in denen die Funkabhörung kein Problem darstellt.
+</Warning>
+
+## Debuggen
+
+Zum BLE-Debugging während der Entwicklung:
+
+1. Verwenden Sie einen BLE-Sniffer (nRF Connect, Wireshark mit BLE-Adapter)
+2. Aktivieren Sie die serielle Protokollierung in der Firmware (`LOG_LEVEL_DEBUG`).
+3. Überwachen Sie Verbindungsereignisse und charakteristische Schreibvorgänge
+
+## Weiterführende Literatur
+
+<CardGroup cols={2}>
+<Card title="NimBLE-Dokumentation" icon="book" href="https://mynewt.apache.org/latest/network/index.html">
+NimBLE-Stack-Dokumentation.
+</Card>
+
+<Card title="Buttplug.io-Protokoll" icon="book" href="https://buttplug-spec.docs.buttplug.io/">
+Spezifikation des Buttplug-Geräteprotokolls.
+</Card>
+</CardGroup>

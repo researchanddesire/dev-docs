@@ -1,0 +1,219 @@
+---
+title: „Batterie und Strom“
+description: „Batterieüberwachung, Laden und Energiemanagement für RADR“
+---
+
+In diesem Handbuch werden das Batteriesystem, die Lade- und Energieverwaltungsfunktionen von RADR behandelt.
+
+## Batteriesystem
+
+RADR verwendet eine Lithiumbatterie mit intelligenter Überwachung:
+
+| Komponente | Beschreibung |
+|-----------|-------------|
+| Akku-Typ | Lithium-Polymer (LiPo) |
+| Tankanzeige-IC | MAX17048 |
+| Ladeanschluss | USB-C |
+| Ladeanzeige | Hardware-LED |
+
+### MAX17048 Kraftstoffanzeige
+
+Der MAX17048 ist ein Präzisions-Kraftstoffmessgerät, das Folgendes bietet:
+
+- **Batterieprozentsatz** – Genaue Ladezustandsanzeige (0–100 %).
+- **Batteriespannung** – Spannungsmessung in Echtzeit
+- **Warnungen bei niedrigem Batteriestand** – Programmierbare Schwellenwertbenachrichtigungen
+
+<Info>
+Die Ladezustandsanzeige verwendet proprietäre Algorithmen, um die verbleibende Batterielebensdauer genau abzuschätzen und dabei Faktoren wie Temperatur und Entladerate auszugleichen.
+</Info>
+
+## Batterieanzeige
+
+Der Batteriestatus wird in der Statusleiste oben auf dem Bildschirm angezeigt:
+
+| Ebene | Ungefähre Reichweite |
+|-------|-------------------|
+| Voll | 90–100% |
+| Hoch | 60–89% |
+| Medium | 30–59% |
+| Niedrig | 10–29% |
+| Kritisch | 0–9% |
+
+<Warning>
+Wenn der Akku ein kritisches Niveau erreicht, speichern Sie Ihre Sitzung und laden Sie RADR auf, um ein unerwartetes Herunterfahren zu vermeiden.
+</Warning>
+
+## Aufladen
+
+### USB-C-Aufladung
+
+RADR wird über den USB-C-Anschluss oben am Gerät neben dem Netzschalter aufgeladen.
+
+- Schließen Sie ein beliebiges Standard-USB-C-Kabel an
+- Kompatibel mit USB-Ladegeräten, Powerbanks und Computer-USB-Anschlüssen
+- Der Ladevorgang funktioniert, während RADR ein- oder ausgeschaltet ist
+
+### Ladeanzeige
+
+Eine Hardware-LED zeigt den Ladestatus an:
+
+| LED-Status | Bedeutung |
+|-----------|---------|
+| LED an | Der Ladevorgang läuft |
+| LED aus | Vollständig aufgeladen oder nicht angeschlossen |
+
+<Note>
+Die Lade-LED ist von den softwaregesteuerten RGB-LEDs von RADR getrennt. Die Steuerung erfolgt direkt über den Ladekreis.
+</Note>
+
+<Note>
+RADR verlässt sich auf die Hardware-Lade-LED und nicht auf eine softwarebasierte Ladeerkennung. Dies ermöglicht eine genauere und zuverlässigere Anzeige des Ladestatus.
+</Note>
+
+### Ladetipps
+
+<Tip>
+Für den schnellsten Ladevorgang verwenden Sie ein USB-Ladegerät mit einer Nennleistung von 5 V/1 A oder höher.
+</Tip>
+
+<Tip>
+Sie können RADR während des Ladevorgangs verwenden, der Ladevorgang kann jedoch bei aktiver Nutzung länger dauern.
+</Tip>
+
+## Machtstaaten
+
+RADR hat mehrere Leistungszustände:
+
+### Aktiv (verbunden)
+
+- Display an, Hintergrundbeleuchtung aktiv
+- Bluetooth mit einem Gerät verbunden
+- LEDs aktiv
+- Höchster Stromverbrauch
+
+### Aktiv (Leerlauf)
+
+- Display an, Hintergrundbeleuchtung aktiv
+- Bluetooth-Scannen oder im Menü
+- LEDs im Leerlaufmuster
+- Mittlerer Stromverbrauch
+
+### Schlafmodus
+
+- Display aus, Hintergrundbeleuchtung aus
+- Bluetooth deaktiviert
+- LEDs aus
+- Sehr geringer Stromverbrauch
+- GPIO-Wake aktiviert
+
+### Ausschalten
+
+- Alle Systeme ausgeschaltet
+- Kein Stromverbrauch
+- Zum Aufwecken ist ein Netzschalter erforderlich
+
+## Tiefschlafmodus
+
+Der Tiefschlaf ermöglicht erhebliche Energieeinsparungen, wenn Sie RADR nicht verwenden, aber später schnell darauf zugreifen möchten.
+
+<Info>
+Technisch gesehen verwendet RADR intern den „leichten Schlaf“-Modus und nicht den echten Tiefschlaf. Dies sorgt für eine zuverlässigere Tastenaktivierung bei gleichzeitig sehr geringem Stromverbrauch. Das Benutzererlebnis ist dasselbe: Das Gerät scheint ausgeschaltet zu sein, bis eine Taste gedrückt wird.
+</Info>
+
+### In den Schlafmodus wechseln
+
+1. Wählen Sie im Hauptmenü **Schlaf**
+2. RADR führt die Abschaltsequenz aus:
+   - Trennt alle angeschlossenen Geräte
+   - Spielt den Shutdown-Summerton ab
+   - Schaltet die Hintergrundbeleuchtung des Displays aus
+   - Löscht alle LEDs
+   - Geht in den Tiefschlaf
+
+### Wake-Quellen
+
+Die folgenden Tasten können RADR aus dem Tiefschlaf wecken:
+
+| Taste | GPIO |
+|--------|------|
+| Unter-Bildschirm-Mitte | GPIO 39 |
+| Unter dem Bildschirm links | GPIO 38 |
+| Unter dem Bildschirm rechts | GPIO 40 |
+
+Drücken Sie eine dieser Tasten, um RADR zu aktivieren. Das Gerät führt einen vollständigen Neustart durch.
+
+### Schlafen vs. Ausschalten
+
+| Besonderheit | Schlafmodus | Ausschalten |
+|---------|------------|-----------|
+| Stromverbrauch | Sehr niedrig | Keiner |
+| Wachzeit | ~2 Sekunden | ~5 Sekunden |
+| Wake-Methode | Knopfdruck | Netzschalter |
+| Zustand erhalten | NEIN | NEIN |
+| Anwendungsfall | Zwischen den Sitzungen | Lagerung |
+
+<Tip>
+Verwenden Sie während Sitzungen mit Pausen den Schlafmodus. Für längere Lagerung nutzen Sie den Netzschalter.
+</Tip>
+
+## Tipps zur Energieverwaltung
+
+### Maximierung der Batterielebensdauer
+
+1. **Ruhemodus verwenden** – Versetzen Sie RADR in Pausen in den Ruhezustand, anstatt es im Leerlauf zu lassen
+2. **Geringere Helligkeit** – Die Hintergrundbeleuchtung des Displays ist ein erheblicher Stromverbraucher
+3. **Trennen Sie die Verbindung, wenn Sie fertig sind** – Aktive Bluetooth-Verbindungen verbrauchen mehr Strom
+4. **Für Speicher ausschalten** – Verwenden Sie den physischen Schalter für erweiterten Speicher
+
+### Überwachung des Batteriezustands
+
+- Überprüfen Sie den Batterieprozentsatz regelmäßig in der Statusleiste
+- Laden Sie das Gerät vor den Sitzungen auf, um Unterbrechungen während der Sitzung zu vermeiden
+- Lassen Sie den Akku nicht häufig vollständig entladen
+
+### Best Practices für das Laden
+
+- Verwenden Sie hochwertige USB-C-Kabel
+- Laden Sie bei gemäßigten Temperaturen (extreme Hitze/Kälte vermeiden)
+- Jedes Standard-USB-Ladegerät funktioniert (5 V).
+- Vor dem ersten Gebrauch vollständig aufladen
+
+## Spezifikationen
+
+| Parameter | Wert |
+|-----------|-------|
+| Betriebsspannung | 3,3 V (geregelt) |
+| Ladespannung | 5V USB |
+| Tiefschlafstrom | < 100μA |
+| Aktiver Strom | Variiert je nach Aktivität |
+
+## Fehlerbehebung
+
+<AccordionGroup>
+<Accordion title="Der Batterieprozentsatz scheint ungenau zu sein">
+- Nach längerer Lagerung muss die Kraftstoffanzeige möglicherweise kalibriert werden
+- Laden Sie das Gerät vollständig auf und entladen Sie es dann einmal vollständig, um es neu zu kalibrieren
+- Die Batteriewerte stabilisieren sich nach einigen Ladezyklen
+</Accordion>
+
+<Accordion title="RADR wird nicht aufgeladen">
+- Versuchen Sie es mit einem anderen USB-C-Kabel
+- Versuchen Sie es mit einer anderen USB-Stromquelle
+- Stellen Sie sicher, dass der USB-C-Anschluss sauber und unbeschädigt ist
+- Überprüfen Sie, ob die Lade-LED leuchtet, wenn das Gerät angeschlossen ist
+</Accordion>
+
+<Accordion title="Der Akku ist schnell leer">
+- Überprüfen Sie, ob Sie RADR im Aktiv-/Ruhezustand belassen
+- Verwenden Sie den Schlafmodus, wenn Sie ein Gerät nicht aktiv steuern
+- Aktive Bluetooth-Verbindungen verbrauchen mehr Strom
+- Ältere Akkus haben möglicherweise eine geringere Kapazität
+</Accordion>
+
+<Accordion title="Werde nicht aus dem Schlaf aufwachen">
+- Halten Sie eine Taste unter dem Bildschirm 2–3 Sekunden lang gedrückt
+- Versuchen Sie es mit dem Netzschalter, wenn die Tasten nicht reagieren
+- Stellen Sie sicher, dass der Akku nicht vollständig leer ist
+</Accordion>
+</AccordionGroup>

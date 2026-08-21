@@ -1,0 +1,271 @@
+---
+title: "Apparaatregister"
+description: "Hoe RADR apparaatinstanties ontdekt en maakt op basis van BLE-service-UUID's"
+---
+
+Het apparaatregister is het kernsysteem dat de UUID's van Bluetooth Low Energy (BLE)-services toewijst aan apparaatfabrieken. Wanneer RADR naar apparaten scant, gebruikt het service-UUID's om te bepalen welke fabriek de apparaatinstantie moet maken.
+
+## Architectuuroverzicht
+
+RADR maakt gebruik van een registersysteem met twee niveaus:
+
+| Laag | Beschrijving | Voorbeeld |
+|------|-------------|---------|
+| Hardgecodeerd | Apparaten die rechtstreeks in code zijn geregistreerd bij aangepaste fabrieken | OSSM |
+| Dynamisch | Apparaten geladen vanuit `registry.json` met behulp van de ButtplugIO-fabriek | Lovense, Satisfyer, Kiiroo |
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Device Registry                          │
+│                                                             │
+│  ┌─────────────────────┐    ┌─────────────────────────────┐│
+│  │   Hardcoded Devices │    │      Dynamic Devices        ││
+│  │   (Custom Factory)  │    │   (ButtplugIOFactory)       ││
+│  │                     │    │                             ││
+│  │  Service UUID →     │    │  registry.json →            ││
+│  │  Lambda → Device    │    │  Service UUID →             ││
+│  │                     │    │  Spec files → Device        ││
+│  └─────────────────────┘    └─────────────────────────────┘│
+└─────────────────────────────────────────────────────────────┘
+```
+
+Het register wordt één keer gevuld bij het opstarten van het apparaat via `initRegistry()`.
+
+## Registerstructuur
+
+Het register is een globale kaart die service-UUID's associeert met fabrieksfuncties:
+
+```cpp
+std::unordered_map<std::string, DeviceFactory> registry;
+```
+
+Waar `DeviceFactory` wordt gedefinieerd als:
+
+```cpp
+typedef Device *(*DeviceFactory)(const NimBLEAdvertisedDevice *advertisedDevice);
+```
+
+### Sleutelfuncties
+
+| Functie | Doel |
+|----------|---------|
+| `initRegistry()` | Vult het register met hardgecodeerde en dynamische apparaten |
+| `getDeviceFactory()` | Zoekt een fabriek op via service-UUID |
+
+## Hardgecodeerde apparaten
+
+Hardgecodeerde apparaten worden rechtstreeks in `initRegistry()` geregistreerd bij een lambda-fabriek. Deze aanpak wordt gebruikt voor apparaten met aangepaste protocollen die gespecialiseerde afhandeling vereisen.
+
+### OSSM-voorbeeld
+
+```cpp
+registry.emplace(
+    OSSM_SERVICE_ID,  // "522B443A-4F53-534D-0001-420BADBABE69"
+    [](const NimBLEAdvertisedDevice *advertisedDevice) -> Device * {
+        return new OSSM(advertisedDevice);
+    });
+```
+
+De OSSM maakt gebruik van een aangepast BLE-protocol met meerdere kenmerken voor snelheid, diepte, sensatie en slagcontrole. Dit vereist een speciale apparaatklasse in plaats van de generieke ButtplugIO-implementatie.
+
+### Wanneer moet u hardgecodeerde registratie gebruiken?
+
+Gebruik hardgecodeerde registratie wanneer:
+
+- Het apparaat maakt gebruik van een aangepast protocol dat niet wordt gedekt door Buttplug.io
+- U hebt een gespecialiseerde gebruikersinterface of besturingslogica nodig
+- Het apparaat vereist een unieke karakteristieke bediening
+
+## Dynamische apparaten (ButtplugIO)
+
+Dynamische apparaten worden geladen vanuit het `data/registry.json`-bestand op het bestandssysteem. Hierdoor kan ondersteuning voor nieuwe apparaten worden toegevoegd zonder de code te wijzigen.
+
+### register.json-structuur
+
+Het register wijst service-UUID's toe aan reeksen protocolspecificatiebestanden:
+
+```json
+{
+  "0000fff0-0000-1000-8000-00805f9b34fb": ["/protocols/lovense.json"],
+  "88f80580-0000-01e6-aace-0002a5d5c51b": ["/protocols/kiiroo-v2.json"],
+  "51361500-c5e7-47c7-8a6e-47ebc99d80e8": ["/protocols/satisfyer.json"]
+}
+```
+
+Elke invoer wijst een BLE-service UUID (sleutel) toe aan een of meer protocolspecificatiebestanden (waardearray).
+
+### Fabrieksstroom
+
+Wanneer een apparaat met een geregistreerde service-UUID wordt ontdekt:
+
+1. `ButtplugIODeviceFactory` leest `registry.json` van LittleFS
+2. Haalt de lijst met spec-bestanden op voor de service-UUID
+3. Voor elk specificatiebestand:
+   - Laadt en parseert de JSON-configuratie
+   - Komt overeen met de geadverteerde apparaatnaam met `communication[0].btle.names`-patronen
+   - Extraheert TX/RX-kenmerken voor de service-UUID
+4. Creëert een `LovenseDevice`-instantie met de overeenkomende configuratie
+
+### Protocolspecificatie bestandsformaat
+
+Spec-bestanden volgen het Buttplug.io v4-formaat:
+
+```json
+{
+  "defaults": {
+    "name": "Lovense Device",
+    "features": [...]
+  },
+  "configurations": [
+    {
+      "identifier": ["B"],
+      "name": "Max",
+      "features": [...]
+    }
+  ],
+  "communication": [{
+    "btle": {
+      "names": ["LVS-*", "LOVE-*"],
+      "services": {
+        "0000fff0-0000-1000-8000-00805f9b34fb": {
+          "tx": "0000fff2-0000-1000-8000-00805f9b34fb",
+          "rx": "0000fff1-0000-1000-8000-00805f9b34fb"
+        }
+      }
+    }
+  }]
+}
+```
+
+| Veld | Doel |
+|-------|---------|
+| `defaults` | Standaardapparaatnaam en functieset |
+| `configurations` | Apparaatspecifieke varianten en identificatiegegevens |
+| `communication[].btle.names` | Patronen van apparaatnaam (ondersteunt het jokerteken `*`)  |
+| `communication[].btle.services` | TX/RX karakteristieke UUID's per dienst |
+
+## Apparaatdetectiestroom
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  BLE Scan    │────▶│  Get Service │────▶│  Lookup in   │────▶│   Factory    │
+│  Discovers   │     │    UUID      │     │   Registry   │     │   Creates    │
+│   Device     │     │              │     │              │     │   Device     │
+└──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
+```
+
+1. **Scan**: RADR-scans voor BLE-apparaten
+2. **UUID extraheren**: Haalt de geadverteerde service-UUID op
+3. **Register opzoeken**: `getDeviceFactory(serviceUUID)` vindt de fabriek
+4. **Apparaat maken**: In de fabriek wordt de juiste apparaatklasse geïnstantieerd
+
+## Ondersteuning voor nieuwe apparaten toevoegen
+
+### Optie A: Dynamisch (Buttplug.io-register)
+
+Voor apparaten die compatibel zijn met het Buttplug.io-protocol:
+
+<Steps>
+<Step title="Verkrijg of maak het specificatiebestand">
+Haal de Buttplug.io v4-protocolspecificatie voor het apparaat op. Deze zijn beschikbaar in de [Buttplug device config repository](https://github.com/buttplugio/buttplug) .
+</Step>
+
+<Step title="Voeg een spec-bestand toe aan protocollen">
+Plaats het JSON-specificatiebestand in `data/protocols/`:
+```
+data/protocols/your-device.json
+```
+</Step>
+
+<Step title="Update register.json">
+Voeg de service-UUID-toewijzing toe aan `data/registry.json`:
+```json
+{
+  "your-service-uuid": ["/protocols/your-device.json"]
+}
+```
+</Step>
+
+<Step title="Bestandssysteem uploaden">
+Gebruik PlatformIO om het bestandssysteem naar het apparaat te uploaden.
+</Step>
+</Steps>
+
+### Optie B: hardgecodeerd (aangepast protocol)
+
+Voor apparaten die aangepaste protocolverwerking vereisen:
+
+<Steps>
+<Step title="Apparaatklasse maken">
+Maak een nieuwe apparaatklasse in `src/devices/` die de basisklasse `Device` uitbreidt.
+</Step>
+
+<Step title="Implementeer de vereiste methoden">
+Implementeer `getServiceUUID()`, `getName()` en alle apparaatspecifieke besturingslogica.
+</Step>
+
+<Step title="Registreer u in initRegistry">
+Registratiecode toevoegen in `initRegistry()`:
+```cpp
+registry.emplace(
+    YOUR_SERVICE_UUID,
+    [](const NimBLEAdvertisedDevice *adv) -> Device * {
+        return new YourDevice(adv);
+    });
+```
+</Step>
+
+<Step title="Firmware opnieuw opbouwen">
+Compileer en flash de bijgewerkte firmware.
+</Step>
+</Steps>
+
+## Ontwikkelingsworkflow
+
+### Het register bijwerken (ontwikkeling)
+
+Wanneer u lokaal ontwikkelt, gebruikt u de functie "Upload Filesystem" van PlatformIO om de map `data/` naar LittleFS te flashen:
+
+1. Wijzig `data/registry.json` of voeg spec-bestanden toe aan `data/protocols/`
+2. Klik in VS Code met PlatformIO op **Bestandssysteem uploaden** (of voer `pio run --target uploadfs` uit)
+3. Het apparaat gebruikt het bijgewerkte register bij de volgende keer opstarten
+
+<Warning>
+"Upload Filesystem" wist de bestaande LittleFS-partitie vóór het schrijven. Eventuele runtime-wijzigingen gaan verloren.
+</Warning>
+
+### Het register bijwerken (productie)
+
+<Info>
+OTA-registerupdates zijn een functie die in behandeling is. Momenteel vereisen registerupdates een firmware-flash.
+</Info>
+
+De geplande workflow voor productieapparaten:
+
+1. Navigeer naar **Instellingen > Zoeken naar updates** op het apparaat
+2. RADR controleert op registerupdates van de server
+3. Bijgewerkte `registry.json` en protocolbestanden worden OTA gedownload
+4. Ondersteuning voor nieuwe apparaten is beschikbaar zonder een volledige firmware-update
+
+## Belangrijke bronbestanden
+
+| Bestand | Doel |
+|------|---------|
+| `src/devices/registry.h` | Registerinterface en typedefinities |
+| `src/devices/registry.cpp` | Registerimplementatie en -initialisatie |
+| `src/devices/buttplugio/buttplugIOFactory.cpp` | Dynamische apparaatfabriek |
+| `src/devices/device.h` | Basisapparaatklasse |
+| `data/registry.json` | Service UUID om bestandstoewijzingen te specificeren |
+| `data/protocols/*.json` | Buttplug.io v4 apparaatspecificaties |
+
+## Verder lezen
+
+<CardGroup cols={2}>
+<Card title="BLE-communicatie" icon="bluetooth" href="/radr/software/communication/ble">
+Bluetooth-protocoldetails en verbindingsafhandeling.
+</Card>
+
+<Card title="Buttplug.io-protocol" icon="book" href="https://buttplug-spec.docs.buttplug.io/">
+Officiële Buttplug-apparaatprotocolspecificatie.
+</Card>
+</CardGroup>

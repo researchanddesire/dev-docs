@@ -1,0 +1,12 @@
+{
+  "title": "Invoering",
+  "pages": [
+    "introduction",
+    "operating-modes",
+    "safety-features",
+    "configuration",
+    "wifi-and-updates",
+    "platformio",
+    "led-status"
+  ]
+}

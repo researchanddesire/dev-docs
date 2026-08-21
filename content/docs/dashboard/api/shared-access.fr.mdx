@@ -1,0 +1,39 @@
+---
+title: "Accès partagé et détenteurs de clés"
+description: "Comment l'API étend les données à vous et à vos utilisateurs liés, et comment les détenteurs de clés lisent les sessions d'un bloqué"
+---
+
+Chaque point de terminaison est limité aux utilisateurs auxquels vous avez accès : **vous-même, ainsi que toute personne liée à votre compte via un partenariat**. Votre jeton API hérite exactement des mêmes autorisations que votre compte de tableau de bord, vous ne voyez donc jamais les données que vous ne pouviez pas déjà voir dans le tableau de bord.
+
+Cette page explique comment cette portée fonctionne dans l'API, en particulier pour les détenteurs de clés qui lisent les données de leur détenu. Pour les détails de la demande et de la réponse de tout point de terminaison individuel, consultez sa page dans la référence (par exemple, [Lock Sessions](/api-reference/lock-sessions/list-lock-sessions)).
+
+## Les détenteurs de clés utilisent les mêmes points de terminaison
+
+Les détenteurs de clés sont toujours des utilisateurs liés. Cela signifie **qu'il n'y a pas d'API de détenteur de clé distincte** — en tant que détenteur de clé, vous répertoriez et lisez les données de votre détenu avec exactement les mêmes points de terminaison que vous utilisez pour les vôtres. Les résultats incluent simplement les sessions et les appareils de tout utilisateur lié à vous.
+
+- [List Lock Sessions](/api-reference/lock-sessions/list-lock-sessions) renvoie les sessions de votre verrouillé aux côtés des vôtres. Utilisez le champ `ownerId` sur chaque enregistrement pour indiquer à qui appartient la session.
+- [Get Active Lock Session](/api-reference/lock-sessions/get-active-lock-session) accepte un paramètre de requête `targetUserId`, afin qu'un détenteur de clé puisse vérifier que le verrou d'un détenu est en cours d'exécution sans que celui-ci ne le signale.
+
+<Info>
+  Le `ownerId` d'une session de verrouillage est l'utilisateur qui porte le verrou. Lorsque vous maintenez la touche enfoncée pour
+  quelqu'un, ses séances apparaissent dans vos résultats avec son `ownerId`, pas le vôtre.
+</Info>
+
+## Trouver l'ID d'un utilisateur lié
+
+Les points de terminaison qui agissent sur un autre utilisateur (tels que `targetUserId`) prennent un ID utilisateur numérique. Pour découvrir les utilisateurs liés à vous et leurs identifiants, appelez [List Users](/api-reference/users/list-users) - il vous renvoie vous-même ainsi que toutes les personnes connectées à vous via des partenariats, filtrés par les autorisations de votre compte.
+
+## Accès en dehors de vos autorisations
+
+L'API ne révèle jamais de données – ni même l'existence de données – en dehors de votre accès. La manière dont une demande est rejetée dépend de la manière dont elle identifie la cible :
+
+| Style de demande | En dehors de votre accès |
+| ------------- | ------------------- |
+| Récupérer une session par ID (par exemple [Get Lock Session by ID](/api-reference/lock-sessions/get-lock-session-by-id)) | Renvoie `404` — l'API ne fait délibérément pas de distinction entre « n'existe pas » et « pas le vôtre » |
+| Transmettez un `targetUserId` (par exemple, [Get Active Lock Session](/api-reference/lock-sessions/get-active-lock-session)) | Renvoie `403` — la cible est un utilisateur auquel vous n'avez pas accès |
+
+<Note>
+  Parce qu'une recherche par ID renvoie `404` pour une session manquante et celle qui
+  appartient à quelqu'un d'autre, vous ne pouvez pas l'utiliser pour vérifier si un ID de session donné
+  existe. C'est intentionnel.
+</Note>

@@ -1,0 +1,9 @@
+{
+  "title": "TNT",
+  "root": true,
+  "pages": [
+    "index",
+    "specs",
+    "technical"
+  ]
+}

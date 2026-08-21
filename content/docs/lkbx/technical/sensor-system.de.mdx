@@ -1,0 +1,229 @@
+---
+title: "Sensorsystem"
+description: "Technische Dokumentation für die Schlosserkennung und die Rückplattensensoren in Ihrem Keuschheitsschloss"
+---
+
+Ihr Keuschheitsschloss verwendet mehrere Sensoren, um den Schlosszustand und die Position der Rückplatte zu erkennen. In dieser Anleitung wird erläutert, wie das Sensorsystem funktioniert und was das Gerät überwacht.
+
+## Sensorübersicht
+
+Ihr Gerät verfügt über zwei Arten von Sensoren:
+
+| Sensortyp | Menge | Zweck |
+|-------------|----------|---------|
+| TMR-Sensoren | 3 | Position des Verriegelungspaddels erkennen |
+| Hall-Effekt-Sensoren | 2 | Erkennen Sie das Vorhandensein der Rückplatte |
+
+## TMR-Sensoren (Paddelerkennung)
+
+Drei TMR-Sensoren (Tunnel Magnetoresistance) erkennen, ob sich das Verriegelungspaddel in der verriegelten oder entriegelten Position befindet.
+
+### Wie sie funktionieren
+
+- Sensoren erfassen das Magnetfeld des Paddels
+- Wenn sich das Paddel in der verriegelten Position befindet, zeigen die Sensoren NIEDRIG an
+- Wenn das Paddel entriegelt ist, zeigen die Sensoren HIGH an
+
+### Erkennungslogik
+
+Das Gerät betrachtet das Paddel als **gesperrt**, wenn:
+
+```
+(TMR1 AND TMR2 AND TMR3) OR
+(TMR1 AND TMR2) OR
+(TMR1 AND TMR3) OR
+(TMR2 AND TMR3)
+```
+
+<Info>
+Es genügen zwei von drei Sensoren, die die verriegelte Position erkennen. Dies sorgt für Redundanz – wenn ein Sensor ausfällt, funktioniert die Sperrerkennung weiterhin.
+</Info>
+
+### Warum drei Sensoren?
+
+- **Redundanz**: Die Zwei-von-Drei-Abstimmung sorgt für eine zuverlässige Erkennung
+- **Fehlertoleranz**: Der Ausfall eines einzelnen Sensors beeinträchtigt nicht die Sperrerkennung
+- **Genauigkeit**: Mehrere Sensoren reduzieren falsche Messwerte
+
+## Hall-Effekt-Sensoren (Rückplattenerkennung)
+
+Zwei Hall-Effekt-Sensoren erkennen, ob die Backplate richtig befestigt ist.
+
+### Wie sie funktionieren
+
+- Sensoren erkennen in der Rückplatte eingebettete Magnete
+- Wenn die Rückplatte angebracht ist, zeigt mindestens ein Sensor LOW an
+- Wenn die Rückplatte entfernt wird, zeigen beide Sensoren HIGH an
+
+### Erkennungslogik
+
+Das Gerät betrachtet die Rückplatte als **geschlossen**, wenn:
+
+```
+Hall1 OR Hall2
+```
+
+Jeder Sensor, der den Rückplattenmagneten erkennt, ist ausreichend.
+
+<Warning>
+Das Gerät lässt keine Verriegelung zu, wenn die Rückplatte nicht erkannt wird. Dies ist eine Sicherheitsfunktion, um ein Verriegeln ohne ordnungsgemäßen Verschluss zu verhindern.
+</Warning>
+
+## Sensorüberprüfung während des Betriebs
+
+### Sperrbetrieb
+
+Wenn Sie eine Sperre initiieren:
+
+1. Der Motor treibt das Paddel in die Verriegelungsposition
+2. Das Gerät wartet bis zu 2 Sekunden, bis das Paddel die Position erreicht
+3. TMR-Sensoren überprüfen, ob das Paddel verriegelt ist
+4. Hall-Sensoren überprüfen, ob die Rückplatte geschlossen ist
+5. Wenn alle Prüfungen erfolgreich sind → Sperre bestätigt
+6. Wenn Prüfungen fehlschlagen → Fehler angezeigt
+
+### Betrieb entsperren
+
+Wenn das Gerät entsperrt wird:
+
+1. Der Motor treibt das Paddel in die Entriegelungsposition
+2. Das Gerät wartet bis zu 2 Sekunden, bis sich das Paddel bewegt
+3. TMR-Sensoren überprüfen, ob das Paddel entriegelt ist
+4. Wenn die Prüfung erfolgreich ist → Entsperren bestätigt
+5. Wenn die Prüfung fehlschlägt → E-LOCK-2-Fehler wird angezeigt
+
+## Fehlerbedingungen
+
+| Fehler | Zustand | Sensoren beteiligt |
+|-------|-----------|-----------------|
+| E-LOCK-1 | Kann nicht gesperrt werden | TMR-Sensoren erkennen die verriegelte Position nicht |
+| E-LOCK-2 | Kann nicht entsperrt werden | TMR-Sensoren erkennen weiterhin die verriegelte Position |
+| E-LOCK-3 | Keine Rückplatte | Hall-Sensoren erkennen die Rückplatte nicht |
+
+<Tip>
+Die meisten Sensorfehler werden durch physische Hindernisse verursacht. Stellen Sie sicher, dass die Bewegung des Paddels durch nichts blockiert wird und dass die Rückplatte richtig sitzt.
+</Tip>
+
+## Aktivitätsprotokollierung
+
+Wenn Ihr Gerät mit WLAN verbunden ist, meldet es regelmäßig Sensorzustände an das Dashboard:
+
+### Gemeldete Daten
+
+| Feld | Beschreibung |
+|-------|-------------|
+| tmr1, tmr2, tmr3 | Einzelne TMR-Sensorzustände |
+| Halle1, Halle2 | Einzelne Zustände des Hallsensors |
+| isPaddleLocked | Berechneter Zustand der Paddle-Sperre |
+| isBackplateClosed | Berechneter Backplate-Status |
+| aktueller Zustand | Position der Gerätezustandsmaschine |
+| Batterieprozent | Aktueller Batteriestand |
+| isCharging | USB-Stromversorgung angeschlossen |
+
+### Wenn Protokolle gesendet werden
+
+- Bei Zustandsänderungen (Sperr-/Entsperrereignisse)
+- Bei Sensorzustandsänderungen
+- Regelmäßig während aktiver Sitzungen
+
+<Info>
+Diese Telemetrie hilft Ihrem Schlüsselinhaber, den Gerätestatus zu überwachen und ermöglicht dem Support die Ferndiagnose von Problemen.
+</Info>
+
+## Aktuelle Überwachung
+
+Ein INA219-Stromsensor überwacht den Motorstrom während des Sperr-/Entriegelungsvorgangs:
+
+### Zweck
+
+- Erkennen Sie, wann der Motor seine Bewegung abgeschlossen hat
+- Vermeiden Sie das Abwürgen von Motorschäden
+- Überprüfen Sie den ordnungsgemäßen Betrieb
+
+### Aktuelle Grenzwerte
+
+Wenn der durchschnittliche Strom während des Motorbetriebs über einen längeren Zeitraum 50 mA überschreitet, stoppt der Motor automatisch, um Schäden zu vermeiden.
+
+## Sensorstatus in der Benutzeroberfläche
+
+Das Schlosssymbol in der Statusleiste zeigt den Sensorstatus an:
+
+| Schlosssymbol | Paddelzustand | Indikatorpunkt | Backplate-Status |
+|-----------|--------------|---------------|-----------------|
+| Gesperrt | Paddel in verriegelter Position | Grün | Rückplatte erkannt |
+| Gesperrt | Paddel in verriegelter Position | Gelb | Rückplatte nicht erkannt |
+| Entsperrt | Paddel in entriegelter Position | Grün | Rückplatte erkannt |
+| Entsperrt | Paddel in entriegelter Position | Gelb | Rückplatte nicht erkannt |
+
+Detaillierte Symbolbeschreibungen finden Sie unter [Statussymbole](../using/symbols).
+
+## Fehlerbehebung bei Sensorproblemen
+
+<AccordionGroup>
+<Accordion title="E-LOCK-1: Konnte nicht gesperrt werden">
+Die TMR-Sensoren erkennen das Paddel in der verriegelten Position nicht. Überprüfen:
+- Nichts blockiert das Paddel
+- Die Rückplatte sitzt richtig
+- Versuchen Sie eine Neukalibrierung, wenn das Problem weiterhin besteht
+</Accordion>
+
+<Accordion title="E-LOCK-2: Konnte nicht entsperrt werden">
+Die TMR-Sensoren erkennen das Paddel immer noch als verriegelt. Überprüfen:
+- Nichts hindert die Paddelbewegung
+- Gerät verfügt über ausreichend Akku
+- Wenden Sie sich an den Support, wenn der Motor zwar Geräusche macht, sich das Paddel aber nicht bewegt
+</Accordion>
+
+<Accordion title="E-LOCK-3: Keine Rückplatte">
+Die Hall-Sensoren erkennen die Rückplatte nicht. Überprüfen:
+- Die Rückplatte sitzt vollständig und rastet ein
+- Kontaktbereich zwischen Gerät und Rückplatte reinigen
+- Entfernen Sie sich von starken magnetischen Quellen
+</Accordion>
+
+<Accordion title="Gelbe Rückplattenanzeige">
+Die Rückplattenanzeige leuchtet gelb, wenn die Hall-Sensoren die Rückplatte nicht erkennen. Stellen Sie sicher, dass die Rückplatte vollständig angebracht ist, bevor Sie sie verriegeln.
+</Accordion>
+</AccordionGroup>
+
+## Technische Spezifikationen
+
+### TMR-Sensoren
+
+| Parameter | Wert |
+|-----------|-------|
+| Stifte | 17, 18, 21 |
+| Aktiver Zustand | NIEDRIG, wenn Paddel erkannt wird |
+| Wählen | 2 von 3 erforderlich |
+
+### Hall-Effekt-Sensoren
+
+| Parameter | Wert |
+|-----------|-------|
+| Stifte | 6, 15 |
+| Aktiver Zustand | LOW, wenn Magnet erkannt wird |
+| Wählen | 1 von 2 erforderlich |
+
+### Stromsensor (INA219)
+
+| Parameter | Wert |
+|-----------|-------|
+| I2C-Pins | SDA: 9, SCL: 10 |
+| Aktuelle Grenze | Durchschnittlich 50 mA |
+| Überwachungszeitraum | Während des Motorbetriebs |
+
+## Verwandte Leitfäden
+
+<CardGroup cols={2}>
+<Card title="Gerätefehler" icon="triangle-exclamation" href="../errors/introduction">
+Fehlerbehebung bei Fehlercodes.
+</Card>
+
+<Card title="Statussymbole" icon="display" href="../using/symbols">
+Schloss- und Rückplattenanzeigen verstehen.
+</Card>
+
+<Card title="Kalibrierung" icon="sliders" href="../device-states/calibration">
+Wie die Kalibrierung Sensoren konfiguriert.
+</Card>
+</CardGroup>

@@ -1,0 +1,377 @@
+---
+title: "Anzeigedienst"
+description: "Verwenden Sie den Thread-sicheren Anzeigedienst, um mit U8G2 auf das 128×64 SSD1306 OLED zu zeichnen."
+---
+
+## Überblick
+
+Der Anzeigedienst ist ein globaler, threadsicherer Wrapper um den U8G2-Treiber für ein 128×64 SSD1306 OLED. Sie verwenden es, um Text und Grafiken aus jeder Aufgabe ohne Flimmern oder Tearing zu rendern. Ein FreeRTOS-Mutex garantiert exklusiven Zugriff beim Zeichnen; Hilfsfunktionen kümmern sich um das Löschen von Regionen, die teilweise Aktualisierung, das Ausschneiden und das Zwischenspeichern von Text.
+
+<Info>
+Auf dieser Seite wird die Entwickler-API auf Firmware-Ebene dokumentiert, die auf unseren Geräten verwendet wird. Informationen zum benutzerseitigen Anzeigeverhalten (z. B. Ausblenden der Bildschirme für die verbleibende Zeit oder den Gerätestatus) finden Sie auf den entsprechenden Seiten am Ende.
+</Info>
+
+## Voraussetzungen
+
+- ESP32 mit Hardware-I2C verfügbar
+- U8G2-Bibliothek in Ihren Firmware-Build integriert
+- FreeRTOS (für den Display-Mutex)
+- Für SDA/SCL konfigurierte Pins im `Pins.h` Ihres Boards
+
+## Hardwarekonfiguration
+
+| Eigentum | Wert |
+|---|---|
+| Anzeige | SSD1306 OLED |
+| Auflösung | 128×64 Pixel |
+| Schnittstelle | I2C (Hardware) |
+| Drehung | U8G2_R0 (0°) |
+| I2C-Adresse | 0x3C |
+| Kontrast | 255 (maximal) |
+
+<Note>
+Einige U8G2-Konstruktoren erwarten die 8-Bit-I2C-Adresse. Wenn ja, übergeben Sie `0x3C << 1`. Stellen Sie sicher, dass dies mit Ihrer Konstruktorsignatur übereinstimmt.
+</Note>
+
+## Layoutmodell
+
+Der Bildschirm wird als Raster aus 8×8-Pixel-Zellen behandelt:
+
+- Raster: 8 Zeilen × 16 Spalten
+- Ursprung: (0,0) oben links
+- Zellengröße: 8×8 Pixel
+
+### Regionen
+
+<AccordionGroup>
+<Accordion title="Kopfzeile (Zeile 0)">
+- Zellen 0–12: Kopftext (13 Zellen = 104 px)
+- Zellen 13–15: Statussymbole (3 Zellen = 24 px)
+</Accordion>
+
+<Accordion title="Seitenbereich (Zeilen 1–6)">
+- 6 Reihen hoch (48 px)
+- 16 Zellen breit (128 px)
+- Der gesamte Hauptinhalt sollte hier gerendert werden
+</Accordion>
+
+<Accordion title="Fußzeile (Zeile 7)">
+- Zellen 0–14: Fußzeilentext (15 Zellen = 120 px)
+- Zelle 15: Timeout-Anzeige (1 Zelle = 8 px)
+</Accordion>
+</AccordionGroup>
+
+<Tip>
+U8G2-Text-APIs verwenden die Baseline für `y`. Beginnen Sie bei Schriftarten mit einer Höhe von 8 Pixeln die erste Textzeile bei `y = 8` und fügen Sie dann den Aufstieg/die Zeilenhöhe der Schriftart für nachfolgende Zeilen hinzu.
+</Tip>
+
+## Thread-Sicherheit
+
+Der Anzeigedienst stellt einen FreeRTOS-Mutex bereit. Vor dem Zeichnen immer sperren und wieder entsperren, wenn Sie fertig sind.
+
+```cpp display_mutex.h
+#pragma once
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+
+extern SemaphoreHandle_t displayMutex;
+```
+
+<Warning>
+Wenn Sie den Mutex nicht freigeben, werden alle anderen Aufgaben blockiert, die die Anzeige benötigen. Koppeln Sie immer einen erfolgreichen `xSemaphoreTake` mit `xSemaphoreGive` in einem Pfad im `finally`-Stil.
+</Warning>
+
+### Grundlegendes Nutzungsmuster
+
+```cpp example_usage.cpp
+// Acquire, draw, refresh affected region(s), release
+if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
+  // ... drawing commands, e.g.:
+  display.drawStr(x, y, "HELLO WORLD");
+
+  // Call an appropriate refresh helper (see below)
+  refreshPage();
+
+  xSemaphoreGive(displayMutex);
+}
+```
+
+## Initialisierung
+
+Rufen Sie `initDisplay()` einmal beim Start auf.
+
+```cpp display_init.h
+#pragma once
+void initDisplay();
+```
+
+<Steps>
+<Step title="Erstellen Sie Ressourcen und konfigurieren Sie das Panel">
+`initDisplay()` erstellt den Anzeige-Mutex, initialisiert die U8G2-Anzeigeinstanz, legt Adressierung/Rotation/Kontrast fest und löscht den Puffer.
+
+<Check>
+Nach der Initialisierung sollte der Bildschirm leer und von hinten beleuchtet sein und `displayMutex` darf nicht Null sein.
+</Check>
+</Step>
+
+<Step title="Zeichnung überprüfen">
+Rendern Sie eine einzelne Textzeile im Seitenbereich.
+
+```cpp sanity_check.cpp
+if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
+  clearPage();
+  display.setFont(u8g2_font_spleen5x8_mu);
+  display.drawStr(0, 16, "SANITY PASS");
+  refreshPage();
+  xSemaphoreGive(displayMutex);
+}
+```
+</Step>
+</Steps>
+
+## Räumungshelfer
+
+Löschen Sie effizient nur das, was Sie neu zeichnen möchten. Alle Helfer verwenden einen internen `updateDisplayArea()`, um eine teilweise Aktualisierung der betroffenen Region durchzuführen.
+
+| Funktion | Beschreibung | Region gelöscht |
+|---|---|---|
+| `clearHeader()` | Löscht nur den Kopfzeilentext | Zeile 0, Zellen 0–12 |
+| `clearIcons()` | Löscht nur den Symbolbereich | Zeile 0, Zellen 13–15 |
+| `clearFooter()` | Löscht nur Fußzeilentext | Zeile 7, Zellen 0–14 |
+| `clearTimeout()` | Löscht die Timeout-Anzeige | Zeile 7, Zelle 15 |
+| `clearPage(includeFooter=false, includeHeader=false)` | Löscht den Seitenbereich; optionale Kopf-/Fußzeile | Zeilen 1–6 (plus Kopf-/Fußzeile auf Anfrage) |
+
+```cpp clear_helpers.h
+void clearHeader();
+void clearIcons();
+void clearFooter();
+void clearTimeout();
+void clearPage(bool includeFooter = false, bool includeHeader = false);
+```
+
+<Note>
+`clearPage()` legt ein Clipping-Fenster fest, um zu verhindern, dass Inhalte in die Kopf- oder Fußzeile gelangen.
+</Note>
+
+## Helfer aktualisieren
+
+Rufen Sie einen Aktualisierungshelfer auf, nachdem Sie eine Region geändert haben. Diese führen minimale Aktualisierungen der Anzeige durch.
+
+| Funktion | Beschreibung | Region aktualisiert |
+|---|---|---|
+| `refreshHeader()` | Verschiebt Kopfzeilentext | Zeile 0, Zellen 0–12 |
+| `refreshIcons()` | Verschiebt den Symbolbereich | Zeile 0, Zellen 13–15 |
+| `refreshFooter()` | Verschiebt Fußzeilentext | Zeile 7, Zellen 0–14 |
+| `refreshTimeout()` | Drückt die Timeout-Anzeige | Zeile 7, Zelle 15 |
+| `refreshPage(includeFooter=false, includeHeader=false)` | Pusht den Hauptinhalt; optionale Kopf-/Fußzeile | Zeilen 1–6 (plus Kopf-/Fußzeile auf Anfrage) |
+
+```cpp refresh_helpers.h
+void refreshHeader();
+void refreshIcons();
+void refreshFooter();
+void refreshTimeout();
+void refreshPage(bool includeFooter = false, bool includeHeader = false);
+```
+
+## Content-Helfer
+
+### `setHeader()`
+
+Legt den Kopfzeilentext fest. Der Dienst schreibt den letzten Wert in Großbuchstaben und speichert ihn zwischen, um redundante Neuzeichnungen zu vermeiden.
+
+```cpp header.h
+void setHeader(String &text);
+```
+
+<Tip>
+Wenn Sie `setHeader()` mit demselben Wert aufrufen, überspringt der Dienst sowohl das Zeichnen als auch die Aktualisierung.
+</Tip>
+
+### `setFooter()`
+
+Legt links- und rechtsbündigen Fußzeilentext fest. Beide werden in Großbuchstaben geschrieben und zwischengespeichert.
+
+```cpp footer.h
+void setFooter(String &left, String &right);
+```
+
+- Die linke Zeichenfolge wird am linken Rand des Fußzeilenbereichs ausgerichtet
+- Die rechte Zeichenfolge wird am rechten Rand des Fußzeilenbereichs ausgerichtet
+
+### `drawWrappedText()`
+
+Zeichnen Sie Text mit automatischem Zeilenumbruch und optionaler zentrierter Ausrichtung.
+
+```cpp wrapped_text.h
+int drawWrappedText(int x, int y, const String &text, bool center = false);
+```
+
+<ParamField path="x" type="int" required>
+Start-X-Koordinate in Pixel.
+</ParamField>
+<ParamField path="y" type="int" required>
+Y-Koordinate der Anfangsbasislinie in Pixel.
+</ParamField>
+<ParamField path="text" type="String" required>
+Text zum Rendern. Unterstützt das Literal `\n` für Zeilenumbrüche.
+</ParamField>
+<ParamField path="center" type="bool" default="false">
+Zentrieren Sie jede umbrochene Zeile innerhalb des Seitenbereichs, wenn `true`.
+</ParamField>
+
+<ResponseField name="return" type="int" required>
+Anzahl der gezeichneten Linien.
+</ResponseField>
+
+## Gemeinsame Muster
+
+### Zeichnen Sie einen vollständigen Bildschirm
+
+```cpp draw_screen.cpp
+if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
+  clearPage();
+  display.setFont(u8g2_font_spleen5x8_mu);
+  display.drawStr(0, 16, "MAIN CONTENT");
+  refreshPage();
+  xSemaphoreGive(displayMutex);
+}
+```
+
+<Check>
+Dieses Muster löscht nur den Seitenbereich, zeichnet neuen Inhalt und führt aus Geschwindigkeitsgründen eine teilweise Aktualisierung durch.
+</Check>
+
+### Nur den Header aktualisieren
+
+```cpp update_header.cpp
+if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
+  String headerText = "NEW HEADER"; // case‑insensitive; will be uppercased
+  setHeader(headerText);
+  // setHeader internally decides whether a refresh is required
+  xSemaphoreGive(displayMutex);
+}
+```
+
+### Zeichnen Sie umbrochenen, zentrierten Text
+
+```cpp wrapped_text.cpp
+if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
+  clearPage();
+  int lines = drawWrappedText(0, 16, "Long text that will wrap", /*center=*/true);
+  (void)lines; // optionally use the line count
+  refreshPage();
+  xSemaphoreGive(displayMutex);
+}
+```
+
+## Zeichnungsrichtlinien
+
+<Steps>
+<Step title="Sperren Sie den Mutex für jede Zeichensequenz">
+Wickeln Sie die Zeichnung ein und aktualisieren Sie sie in einem kritischen Abschnitt, der von `displayMutex` geschützt wird.
+
+```cpp lock_and_draw.cpp
+if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
+  // Drawing
+  xSemaphoreGive(displayMutex);
+}
+```
+</Step>
+
+<Step title="Bevorzugen Sie Regionshelfer gegenüber vollständigen Clearings">
+Minimieren Sie Busverkehr und Flimmern, indem Sie die Hilfsprogramme `clear*()` und `refresh*()` verwenden.
+
+<CodeGroup>
+```cpp Recommended
+clearPage();
+display.drawStr(0, 16, "Content");
+refreshPage();
+```
+
+```cpp Avoid
+// Full‑buffer clears cost time and cause visible flicker
+// display.clearBuffer();
+```
+</CodeGroup>
+</Step>
+
+<Step title="Respektiere Grenzen">
+Halten Sie den Inhalt innerhalb von:
+
+- Kopfzeile: Zeile 0, Zellen 0–12
+- Symbole: Zeile 0, Zellen 13–15
+- Seite: Zeilen 1–6
+- Fußzeile: Zeile 7, Zellen 0–14; Zeitüberschreitung bei Zelle 15
+
+Verwenden Sie `clearPage()`, um den Seiteninhalt von der Kopf-/Fußzeile wegzuschneiden.
+</Step>
+
+<Step title="Wählen Sie lesbare Schriftarten">
+| Bereich | Empfohlene Schriftart |
+|---|---|
+| Kopf-/Fußzeile | `u8g2_font_spleen5x8_mu` |
+| Seiteninhalt | Aus Gründen der Lesbarkeit auswählen; Passen Sie den Zeilenabstand anhand der Schriftartmetriken an |
+
+<Note>
+Berücksichtigen Sie bei der Berechnung der `y`-Versatze zwischen Zeilen den Aufstieg der Schriftart und die Gesamtzeilenhöhe.
+</Note>
+</Step>
+</Steps>
+
+## Leistungsüberlegungen
+
+- Bei Teilaktualisierungen werden nur die von Ihnen geänderten Regionen neu gezeichnet
+- Text-Caching vermeidet unnötige Zeichen-/Aktualisierungszyklen
+- Durch das Ausschneiden bleibt das Zeichnen innerhalb des vorgesehenen Bereichs erhalten und das Überzeichnen wird reduziert
+- Mutex-geschützte Sequenzen verhindern ein Mid-Frame-Tearing zwischen Aufgaben
+
+## Fehlerbehebung
+
+<AccordionGroup>
+<Accordion title="Nach init erscheint nichts">
+- Bestätigen Sie, dass `initDisplay()` einmal aufgerufen wird
+- Überprüfen Sie die I2C-Adresse (versuchen Sie je nach Konstruktor `0x3C` und `0x3C << 1`).
+- Stellen Sie sicher, dass SDA/SCL mit dem `Pins.h` Ihres Boards übereinstimmen
+</Accordion>
+
+<Accordion title="Die Anzeigeaktualisierungen sind langsam oder flackern">
+- Verwenden Sie Regionslöschungen/-aktualisierungen anstelle von vollständigen Pufferlöschungen
+- Stapeln Sie Ihre Zeichnung in einem Mutex-geschützten Block
+- Vermeiden Sie unnötige Schriftartänderungen zwischen Zeichenaufrufen
+</Accordion>
+
+<Accordion title="Der Text scheint vertikal falsch ausgerichtet zu sein">
+- Denken Sie daran, dass U8G2 eine Baseline für `y` verwendet
+- Beginnen Sie die erste 8-Pixel-Schriftzeile bei `y = 8` oder berechnen Sie anhand des Schriftaufstiegs
+</Accordion>
+
+<Accordion title="Deadlock oder blockierte Aufgaben">
+- Geben Sie den Mutex immer in Fehlerpfaden frei
+- Bevorzugen Sie Wrapper im RAII-Stil oder `goto cleanup`-Muster
+</Accordion>
+</AccordionGroup>
+
+## Abhängigkeiten
+
+| Abhängigkeit | Zweck |
+|---|---|
+| U8G2 | SSD1306-Rendering und Schriftartenverarbeitung |
+| FreeRTOS | Mutex für Thread-Sicherheit |
+| ESP32 HAL | Hardware-I2C-Schnittstelle |
+| `Pins.h` | Platinen-Pin-Definitionen für SDA/SCL |
+
+## Verwandte Seiten
+
+<CardGroup cols={3}>
+<Card title="Anzeigezeit ausblenden (Benutzerfunktion)" icon="eye-off" href="https://docs.researchanddesire.com/lockbox/start-end-lock">
+Wie die Benutzeroberfläche die verbleibende Zeit auf Gerät, Dashboard und Benachrichtigungen verbirgt.
+</Card>
+
+<Card title="Ablauf der Notentriegelungsanzeige" icon="alert-triangle" href="https://docs.researchanddesire.com/lockbox/emergency-unlock">
+Bildschirmablauf und Folgen der Auslösung der Notentsperrung auf dem Gerät.
+</Card>
+
+<Card title="Geräteunterstützungsmatrix" icon="list" href="https://docs.researchanddesire.com/radr/supported-devices">
+Unterstützte und geplante Geräte im Zeitraum 2025–2026.
+</Card>
+</CardGroup>

@@ -1,0 +1,223 @@
+---
+title: "Muster"
+description: "Erfahren Sie, wie Muster durch die Generierung trapezförmiger Bewegungsparameter für Abwechslung in der StrokeEngine-Bewegung sorgen."
+---
+
+Muster unterscheiden StrokeEngine von anderen Bewegungssystemen. Bei jedem Muster handelt es sich um ein kleines Programm, das den nächsten Satz trapezförmiger Bewegungsparameter generiert: Zielposition, Geschwindigkeit und Beschleunigung.
+
+## Verfügbare Muster
+
+<Note>
+Die OSSM-Firmware stellt **7 Muster** (Indizes 0-6) zur Verfügung: Simple Stroke, Teasing or Pounding, Robo Stroke, Half'n'Half, Deeper, Stop'n'Go und Insist. Jack Hammer und Stroke Nibbler sind in der StrokeEngine-Bibliothek verfügbar, aber derzeit nicht in der OSSM-Firmware implementiert.
+</Note>
+
+### OSSM-Muster (0-6)
+
+<AccordionGroup>
+<Accordion title="Einfacher Schlaganfall">
+Erstellt ein trapezförmiges Hubprofil mit 1/3 Beschleunigung, 1/3 Leerlauf und 1/3 Verzögerung.
+
+<Note>
+Der Empfindungsparameter hat auf dieses Muster keinen Einfluss.
+</Note>
+</Accordion>
+
+<Accordion title="Necken oder Stampfen">
+Passt das Geschwindigkeitsverhältnis zwischen Ein- und Ausbewegungen anhand des Empfindungswerts an:
+
+- **Positive Empfindung (> 0)**: Beschleunigt die Einführbewegung (bis zu 5x) für ein hartes, stoßendes Gefühl
+- **Negatives Gefühl (< 0)**: Beschleunigt die Auswärtsbewegung für ein aufregenderes Gefühl
+
+Die Gesamthubzeit bleibt konstant und hängt nur vom globalen Geschwindigkeitsparameter ab.
+</Accordion>
+
+<Accordion title="Robo Stroke">
+Steuert die Hubbeschleunigung über den Empfindungswert:
+
+- **Positive Werte**: Erhöhen Sie die Beschleunigung, bis die Bewegung eine konstante Geschwindigkeit erreicht (fühlt sich roboterhaft an)
+- **Neutral (0)**: Entspricht Simple Stroke (1/3, 1/3, 1/3 Profil)
+- **Negative Werte**: Reduzieren Sie die Beschleunigung auf ein Dreiecksprofil
+</Accordion>
+
+<Accordion title="Halb und halb">
+Ähnlich wie Teasing oder Pounding, aber jeder zweite Schlag erreicht nur die halbe Tiefe.
+
+- **Positive Empfindung (> 0)**: Beschleunigt die Einführbewegung (bis zu 5x) für ein hartes, stoßendes Gefühl
+- **Negatives Gefühl (< 0)**: Beschleunigt die Auswärtsbewegung für ein aufregenderes Gefühl
+
+Die Schlagzeit bleibt bei allen Strichen gleich, auch bei Strichen mit halber Tiefe.
+</Accordion>
+
+<Accordion title="Tiefer">
+Erhöht die Eintauchtiefe mit jedem Hub schrittweise bis zum Erreichen des Maximums, wird dann zurückgesetzt und neu gestartet.
+
+Der Sensationswert steuert, wie viele Hübe einen Rampenzyklus absolvieren.
+</Accordion>
+
+<Accordion title="Stop'n'Go">
+Fügt Pausen zwischen einer Reihe von Strichen ein. Die Anzahl der Hübe steigt von 1 auf 5 und zurück.
+
+Der Empfindungswert steuert die Pausendauer zwischen Schlagserien.
+</Accordion>
+
+<Accordion title="Bestehen Sie darauf">
+Reduziert die effektive Hublänge bei konstanter Hubgeschwindigkeit. Dadurch entstehen Schwingungsmuster mit höheren Empfindungswerten.
+
+- **Positives Gefühl**: Die Striche wandern nach vorne
+- **Negatives Gefühl**: Die Schläge wandern nach hinten
+</Accordion>
+</AccordionGroup>
+
+### Nur-Bibliothek-Muster
+
+Diese Muster sind in der StrokeEngine-Bibliothek verfügbar, aber in der OSSM-Firmware **derzeit nicht implementiert**. Sie sind hier für Entwickler dokumentiert, die benutzerdefinierte Firmware oder andere StrokeEngine-basierte Projekte erstellen.
+
+<AccordionGroup>
+<Accordion title="Jack Hammer">
+Erzeugt ein Vibrationsmuster, das beim Einführen vibriert und in einer Bewegung sanft herausgezogen wird.
+
+Der Empfindungswert legt die Vibrationsamplitude von 3 mm bis 25 mm fest.
+</Accordion>
+
+<Accordion title="Strichknabber">
+Fügt den Strichen eine Vibrationsüberlagerung hinzu, die sowohl beim Ein- als auch beim Ausfahren vibriert.
+
+Der Empfindungswert legt die Vibrationsamplitude von 3 mm bis 25 mm fest.
+</Accordion>
+</AccordionGroup>
+
+## Erstellen benutzerdefinierter Muster
+
+Sie können Ihre eigenen Muster erstellen, indem Sie die Klasse `Pattern` in der Nur-Header-Datei [Muster.h](https://github.com/theelims/StrokeEngine/blob/main/src/pattern.h) unterklassifizieren.
+
+<Steps>
+<Step title="Unterklasse der Pattern-Klasse">
+Erstellen Sie eine neue Klasse, die `Pattern` erweitert. Eine minimale Implementierung finden Sie unter `SimpleStroke`:
+
+```cpp pattern.h
+class SimpleStroke : public Pattern {
+    public:
+        SimpleStroke(const char *str) : Pattern(str) {}
+```
+
+Der Konstruktor speichert die Anzeigenamenzeichenfolge des Musters.
+</Step>
+
+<Step title="Überschreiben Sie Set-Funktionen bei Bedarf">
+Implementieren Sie Set-Funktionen erneut, wenn Sie benutzerdefinierte Berechnungen benötigen:
+
+```cpp pattern.h
+void setTimeOfStroke(float speed = 0) {
+    // In & Out have same time, so divide by 2
+    _timeOfStroke = 0.5 * speed;
+}
+```
+</Step>
+
+<Step title="Implementieren Sie die nextTarget-Funktion">
+Dies ist die Kernfunktion, die StrokeEngine nach jedem Strich aufruft, um die nächsten Bewegungsparameter abzurufen.
+
+```cpp pattern.h
+motionParameter nextTarget(unsigned int index) {
+    // Maximum speed of the trapezoidal motion
+    _nextMove.speed = int(1.5 * _stroke/_timeOfStroke);
+
+    // Acceleration to meet the profile
+    _nextMove.acceleration = int(3.0 * _nextMove.speed/_timeOfStroke);
+
+    // Odd stroke moves out
+    if (index % 2) {
+        _nextMove.stroke = _depth - _stroke;
+
+    // Even stroke moves in
+    } else {
+        _nextMove.stroke = _depth;
+    }
+
+    _index = index;
+    return _nextMove;
+}
+```
+
+<Info>
+Der Parameter `index` beginnt bei 0, wenn das Muster zum ersten Mal aufgerufen wird, und erhöht sich nach jedem Strich um 1. Verwenden Sie dies, um Muster zu erstellen, die sich im Laufe der Zeit ändern.
+</Info>
+</Step>
+
+<Step title="Debugging-Ausgabe hinzufügen">
+Kapseln Sie `Serial.print()`-Anweisungen mit Präprozessoranweisungen, damit sie umgeschaltet werden können:
+
+```cpp pattern.h
+#ifdef DEBUG_PATTERN
+    Serial.println("TimeOfInStroke: " + String(_timeOfInStroke));
+    Serial.println("TimeOfOutStroke: " + String(_timeOfOutStroke));
+#endif
+```
+</Step>
+
+<Step title="Registrieren Sie das Muster">
+Fügen Sie eine Instanz Ihrer Musterklasse zum Array `patternTable[]` am Ende der Datei hinzu:
+
+```cpp pattern.h
+static Pattern *patternTable[] = {
+    new SimpleStroke("Simple Stroke"),
+    new TeasingPounding("Teasing or Pounding"),
+    new YourNewPattern("Your Pattern Name")  // Add your pattern here
+};
+```
+</Step>
+</Steps>
+
+## Musteranforderungen
+
+### Tiefen- und Strichgrenzen
+
+<Warning>
+Muster müssen Strichpositionen innerhalb des Intervalls `[0, stroke]` zurückgeben. StrokeEngine überwacht alle zurückgegebenen `motionParameter`-Werte und schneidet Positionen außerhalb von `[depth - stroke, depth]` ab, um Verletzungen vorzubeugen.
+</Warning>
+
+Die in StrokeEngine festgelegten Tiefen- und Strichwerte sind axiomatische Grenzen. Ihr Muster definiert den Umschlag, den es innerhalb dieser Grenzen verwendet. Für die Geschwindigkeit über `timeOfStroke` gelten die gleichen Sicherheitsbeschränkungen.
+
+### Anmutige Parameteränderungen
+
+Ihr Muster muss Parameteränderungen ordnungsgemäß verarbeiten. Wenn sich die Tiefen- oder Strichwerte während des Vorgangs ändern, muss das Muster:
+
+- Bleiben Sie jederzeit innerhalb des Intervalls `[depth, depth - stroke]`
+- Führen Sie Transferbewegungen mit der gleichen Geschwindigkeit aus wie normale Bewegungen
+- Vermeiden Sie unberechenbares Verhalten
+
+<Tip>
+Testen Sie Ihr Muster gründlich anhand von Parameteränderungen, insbesondere Tiefen- und Strichänderungen, die möglicherweise zusätzliche Strichabstände erfordern.
+</Tip>
+
+### Verwendung des Indexparameters
+
+Der Parameter `index` liefert wichtige Statusinformationen:
+
+- **Wird auf 0 zurückgesetzt**, wenn `StrokeEngine.setPattern(int)` oder `StrokeEngine.startMotion()` aufgerufen wird
+- **Inkremente** nach jedem erfolgreich ausgeführten Zug
+- **Durch den Vergleich von `index == _index`** wird ermittelt, ob es sich um eine Aktualisierung des aktuellen Strichs und nicht um einen neuen Strich handelt
+
+Speichern Sie den letzten Index in `_index`, bevor Sie in zeitlich variierenden Mustern zum Verfolgungshubstatus zurückkehren.
+
+### Pausen implementieren
+
+Muster können Pausen zwischen Strichen einfügen. Wenn die Zielposition erreicht ist, fragt StrokeEngine alle paar Millisekunden nach neuen Bewegungsbefehlen.
+
+Um eine Pause zu implementieren, geben Sie `_nextMove.skip = true` von Ihrer `nextTarget()`-Funktion zurück. StrokeEngine wird später erneut abfragen, anstatt eine neue Bewegung zu starten.
+
+Die Basisklasse `Pattern` stellt drei Hilfsfunktionen für die Pausenverwaltung bereit:
+
+| Funktion | Beschreibung |
+|----------|-------------|
+| `_startDelay()` | Startet den Verzögerungstimer |
+| `_updateDelay(int delayInMillis)` | Legt die Pausendauer in Millisekunden fest (kann jederzeit aktualisiert werden) |
+| `_isStillDelayed()` | Gibt `true` zurück, wenn die geplante Zeit nicht erreicht wurde |
+
+<Note>
+Wenn ein Strich überfällig wird, wird er sofort ausgeführt. Eine Beispielimplementierung finden Sie im Stop'n'Go-Muster.
+</Note>
+
+## Mitwirkende Muster
+
+Nachdem Sie Ihr Muster gründlich getestet haben, senden Sie eine Pull-Anfrage mit Ihrer aktualisierten [Muster.h](https://github.com/theelims/StrokeEngine/blob/main/src/pattern.h)-Datei.

@@ -1,0 +1,20 @@
+---
+title: Démarrage rapide pour les développeurs
+description: Choisissez l'interface prise en charge pour une intégration R+D.
+---
+
+# Choisissez une interface
+
+- Utilisez l'[API Dashboard](/dashboard/api/introduction) pour les données et actions cloud autorisées par le compte.
+- Utilisez le [protocole OSSM BLE](/ossm/software/communication/ble) ou l'[interface GPIO](/ossm/software/communication/gpio) pour les intégrations prises en charge au niveau des appareils.
+- Utilisez le [registre de périphérique RADR](/radr/software/device-registry/introduction) lors de l'ajout du comportement de périphérique RADR pris en charge.
+- Utilisez le [port accessoire DTT](/dtt/specs/accessory-port) uniquement dans ses limites électriques et de capteur documentées.
+
+# Avant la mise en œuvre
+
+1. Lire les contraintes d'authentification et de sécurité de l'interface choisie.
+2. Confirmez la révision du micrologiciel et du matériel cible.
+3. Testez la perte de connectivité, les entrées non valides et le comportement d'arrêt.
+4. Utilisez la [Référence API](/api-reference) générée pour les schémas de point de terminaison au lieu de copier des exemples d'anciens guides.
+
+L'assemblage physique appartient à [Assemblage R+D](https://ohai.researchanddesire.com/ossm) ; le couplage et le fonctionnement du consommateur appartiennent aux [Guides de l'utilisateur](https://docs.researchanddesire.com/) .

@@ -1,0 +1,212 @@
+---
+title: "Caractéristiques de sécurité"
+description: "Comprenez les mécanismes de sécurité intégrés au micrologiciel OSSM pour vous protéger, vous et votre matériel"
+---
+
+Le micrologiciel OSSM comprend plusieurs fonctionnalités de sécurité conçues pour prévenir les accidents, protéger le matériel et garantir un fonctionnement prévisible. Ce guide explique chaque mécanisme de sécurité et son fonctionnement.
+
+<Warning>
+Les fonctions de sécurité complètent, et non remplacent, les pratiques d'utilisation sûres. Suivez toujours les [consignes de sécurité](https://docs.researchanddesire.com/ossm/safety)  lorsque vous utilisez votre OSSM.
+</Warning>
+
+## Contrôle de sécurité avant le vol
+
+Avant d'entrer dans un mode de fonctionnement, l'OSSM effectue une vérification en amont pour éviter les démarrages accidentels à grande vitesse.
+
+### Comment ça marche
+
+Lorsque vous sélectionnez Pénétration simple ou Moteur de course dans le menu :
+
+1. Le firmware lit le potentiomètre de vitesse
+2. Si la vitesse est supérieure à 1 % (`commandDeadZonePercentage`), un écran d'avertissement apparaît
+3. L'avertissement affiche la vitesse actuelle et vous demande de la diminuer
+4. Une fois que la vitesse descend en dessous de 1 %, le mode démarre automatiquement
+
+### Ce que tu verras
+
+```
+Simple Penetration
+Speed: 45%
+Decrease the speed to begin playing.
+```
+
+### Contourner le contrôle en amont
+
+Vous ne pouvez pas contourner le contrôle préalable au vol. Le mode ne démarrera pas tant que le bouton de vitesse ne sera pas proche de zéro. Cela garantit que vous commencez toujours à une vitesse sûre et que vous l’augmentez consciemment.
+
+<Tip>
+Si l'écran de contrôle en amont apparaît, tournez simplement votre bouton de vitesse à fond dans le sens inverse des aiguilles d'une montre. Le mode démarrera dans une seconde une fois que la lecture descendra en dessous du seuil.
+</Tip>
+
+### Quitter le contrôle en amont
+
+**Appuyez longuement sur l'encodeur** pour revenir au menu principal sans démarrer le mode.
+
+## Sécurité de déconnexion BLE
+
+Lorsque vous contrôlez votre OSSM via Bluetooth, une déconnexion inattendue pourrait faire fonctionner l'appareil à grande vitesse. Le micrologiciel inclut une décélération automatique pour éviter cela.
+
+### Comment ça marche
+
+Lorsqu'une connexion BLE est perdue :
+
+1. Le firmware capture la vitesse actuelle à la déconnexion
+2. Après un délai de **1 seconde**, la décélération commence
+3. Pendant **2 secondes**, la vitesse diminue jusqu'à zéro à l'aide d'une courbe sinusoïdale d'entrée-sortie facile
+4. L'appareil continue de fonctionner à vitesse nulle jusqu'à ce qu'il soit reconnecté ou arrêté manuellement
+
+### Pourquoi ce retard ?
+
+Le délai d'une seconde empêche les faux déclenchements dus à des pertes momentanées de signal. De brèves interférences ne provoqueront pas de ralentissements inutiles pendant le fonctionnement normal.
+
+### Courbe de rampe
+
+La courbe sinusoïdale d'entrée-sortie facile permet une décélération en douceur :
+
+- Démarre lentement (légère décélération initiale)
+- Accélère au milieu de la rampe
+- Se termine lentement (arrêt final doux)
+
+Cela semble plus naturel qu’une décélération linéaire et réduit les contraintes mécaniques.
+
+<Note>
+Si la vitesse était déjà nulle lorsque la connexion a été interrompue, aucune rampe ne se produit : l'appareil continue simplement au repos.
+</Note>
+
+### Commande manuelle
+
+Les commandes locales (potentiomètre et encodeur) restent actives pendant et après la déconnexion. Tu peux:
+
+- Arrêtez manuellement l'appareil à l'aide du bouton de vitesse
+- Appuyez longuement sur l'encodeur pour l'arrêt d'urgence
+- Reconnectez-vous via BLE pour reprendre le contrôle
+
+## Sécurité du retour
+
+La séquence de référencement comprend plusieurs contrôles de sécurité pour détecter les problèmes mécaniques avant le début de l'opération.
+
+### Protection contre l'expiration du délai
+
+La prise en charge doit être terminée dans un délai de **40 secondes**. Si l'actionneur n'a pas trouvé les deux extrémités de sa course dans ce délai :
+
+1. Le moteur s'arrête
+2. Un écran d'erreur s'affiche : "La prise en charge a pris trop de temps. Veuillez vérifier votre câblage et réessayer."
+3. Un code QR apparaît avec un lien vers des ressources de dépannage
+4. Appuyez sur l'encodeur pour redémarrer
+
+**Causes courantes d'expiration :**
+- Alimentation électrique insuffisante
+- Câblage du moteur débranché
+- Obstruction mécanique
+- Ceinture trop lâche ou cassée
+
+### Détection de courant
+
+L'OSSM utilise une prise d'origine sans capteur : il détecte la fin de la course en surveillant le courant du moteur. Lorsque le courant dépasse `sensorlessCurrentLimit` (par défaut : 1,5 %), le micrologiciel sait que l'actionneur a atteint un arrêt physique.
+
+<Info>
+La prise en référence sans capteur élimine le besoin de commutateurs de fin de course tout en détectant les limites mécaniques de manière fiable.
+</Info>
+
+### Validation de la course minimale
+
+Après la prise d'origine, le micrologiciel valide que la longueur de course mesurée dépasse `minStrokeLengthMm` (par défaut : 50 mm). Si la course est trop courte :
+
+1. Un écran d'erreur s'affiche : "Course trop courte. Veuillez vérifier votre courroie d'entraînement."
+2. L'appareil entre dans un état d'erreur
+3. Appuyez sur l'encodeur pour afficher l'aide, puis appuyez à nouveau pour redémarrer
+
+**Causes courantes de course courte :**
+- Courroie qui glisse sur les poulies
+- Tension de courroie trop lâche
+- Liaison ou obstruction mécanique
+- Configuration moteur incorrecte
+
+### Tampon de décalage
+
+Après avoir détecté chaque fin de course, l'actionneur recule de `strokeZeroOffsetMm` (par défaut : 6 mm). Ce tampon :
+
+- Empêche l'actionneur d'atteindre à plusieurs reprises la butée physique
+- Fournit une marge de sécurité pour les erreurs de position
+- Réduit l’usure des composants mécaniques
+
+## Arrêt d'urgence
+
+A tout moment du fonctionnement, vous pouvez déclencher un arrêt immédiat.
+
+### Comment déclencher
+
+**Appuyez longuement sur l'encodeur pendant environ 3 secondes** depuis n'importe quel mode de fonctionnement.
+
+### Ce qui se produit
+
+1. `forceStop()` est appelé sur le pilote pas à pas
+2. Les sorties moteur sont immédiatement désactivées
+3. L'appareil est marqué comme « non hébergé »
+4. Vous revenez au menu principal
+
+<Warning>
+L'arrêt d'urgence fait perdre à l'OSSM sa référence de position. Vous devez redémarrer et rentrer chez vous avant de recommencer à fonctionner.
+</Warning>
+
+### Quand utiliser
+
+Utilisez l'arrêt d'urgence lorsque :
+
+- Quelque chose ne va pas pendant le fonctionnement
+- Vous devez arrêter immédiatement pour quelque raison que ce soit
+- L'appareil se comporte de manière inattendue
+- Vous entendez des bruits inhabituels provenant du système mécanique
+
+<Note>
+N'hésitez pas à utiliser l'arrêt d'urgence, il est là pour votre sécurité. Le rapatriement ne prend que quelques secondes.
+</Note>
+
+## États d'erreur
+
+Lorsque le micrologiciel détecte un problème, il entre dans un état d'erreur avec des informations utiles.
+
+### Écran d'erreur
+
+L'écran d'erreur affiche :
+
+1. En-tête "Erreur"
+2. Une description du problème
+3. Instructions pour les prochaines étapes
+
+### Écran d'aide
+
+Appuyez sur l'encodeur sur l'écran d'erreur pour afficher l'écran d'aide, qui affiche :
+
+- En-tête « Obtenir de l'aide »
+- Instructions pour visiter Discord ou GitHub
+- Un code QR reliant à [unbox.ossm.tech](https://unbox.ossm.tech)
+
+Appuyez à nouveau sur l'encodeur pour redémarrer l'appareil.
+
+## Valeurs de sécurité de configuration
+
+Plusieurs paramètres de configuration affectent le comportement de sécurité :
+
+| Paramètre | Défaut | Effet |
+|-----------|---------|--------|
+| `commandDeadZonePercentage` | 1.0% | Seuil de contrôle en amont pour le bouton de vitesse |
+| `sensorlessCurrentLimit` | 1.5% | Seuil actuel pour la détection de référence |
+| `minStrokeLengthMm` | 50mm | Course minimale valide après la prise d'origine |
+| `strokeZeroOffsetMm` | 6mm | Tampon de sécurité des butées physiques |
+
+<Warning>
+La modification de ces valeurs peut réduire les marges de sécurité. Ne les changez que si vous en comprenez les implications et si vous avez effectué des tests approfondis.
+</Warning>
+
+## Pages connexes
+
+<CardGroup cols={2}>
+<Card title="Dépannage" icon="wrench" href="https://docs.researchanddesire.com/ossm/troubleshooting">
+  Diagnostiquez et résolvez les problèmes courants avec votre OSSM.
+</Card>
+
+<Card title="Référence de configuration" icon="sliders" href="/ossm/software/getting-started/configuration">
+  Comprendre tous les paramètres configurables et leurs valeurs par défaut.
+</Card>
+</CardGroup>

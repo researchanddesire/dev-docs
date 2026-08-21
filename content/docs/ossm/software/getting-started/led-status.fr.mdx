@@ -1,0 +1,112 @@
+---
+title: "Indication d'état de la LED RVB"
+description: "Comprenez les modèles de LED RVB qui indiquent l'état de la connexion BLE et les opérations de la machine sur votre OSSM"
+---
+
+La LED RVB sur la broche 25 fournit un retour visuel sur l'état actuel de votre OSSM. Vous pouvez rapidement identifier si la machine est en mode référence, recherche une connexion Bluetooth ou communique activement avec un appareil connecté.
+
+## Comprendre la priorité du statut
+
+La LED affiche différents modèles en fonction de l'état de fonctionnement actuel. Les opérations de la machine ont toujours la priorité sur les indications d'état BLE.
+
+| Priorité | État | Modèle de LED |
+|----------|-------|-------------|
+| Le plus haut | Retour à destination | Effet respiratoire violet foncé |
+| Inférieur | Statut BLE | Varie selon l'état de la connexion |
+
+## Modèles d'état de la machine
+
+<AccordionGroup>
+<Accordion title="Retour en cours">
+Lorsque votre OSSM est en prise directe, la LED affiche un **effet respiratoire violet foncé** avec un motif de pulsation fluide. Cela continue jusqu'à ce que la prise en charge se termine ou échoue.
+
+<Info>
+L'indicateur de référencement est prioritaire sur tous les modèles d'état BLE. Vous ne verrez pas les changements d’état du BLE tant que la prise en charge n’est pas terminée.
+</Info>
+</Accordion>
+</AccordionGroup>
+
+## Modèles d'état de connexion BLE
+
+<AccordionGroup>
+<Accordion title="Publicité (recherche de connexions)">
+Lorsque votre OSSM recherche une connexion Bluetooth :
+
+1. **L'effet arc-en-ciel** s'affiche pendant 1 seconde
+2. **Le bleu de respiration rapide** suit avec une pulsation rapide (10x vitesse normale)
+3. **Auto-dim** s'active après 30 secondes, réduisant la luminosité à ~ 12 % avec une légère pulsation
+
+<Tip>
+La fonction d'atténuation automatique réduit la distraction visuelle si vous utilisez une télécommande filaire au lieu de Bluetooth. La LED reste visible mais ne sera pas gênante lors de sessions prolongées.
+</Tip>
+</Accordion>
+
+<Accordion title="Connecté">
+Lorsqu'un appareil se connecte via Bluetooth :
+
+1. **L'effet arc-en-ciel** s'affiche pendant 1 seconde pour confirmer la connexion
+2. **La LED bleue s'estompe** jusqu'à un niveau faible (~ 12 % de luminosité) et reste atténuée
+3. **Des impulsions de communication** apparaissent lorsque la luminosité augmente subtilement pendant le transfert de données
+
+</Accordion>
+
+<Accordion title="Déconnecté">
+Lorsqu'aucune connexion Bluetooth n'existe :
+
+- **La LED s'éteint complètement**
+
+<Note>
+Un état déconnecté diffère de la publicité. Si vous allumez l'OSSM, il commence immédiatement à faire de la publicité, vous verrez donc le motif de respiration bleu plutôt qu'aucune lumière.
+</Note>
+</Accordion>
+</AccordionGroup>
+
+## Indication de communication
+
+Lorsque BLE est connecté et que la LED est atténuée, vous verrez de brèves impulsions de luminosité pendant :
+
+- **Réception de commandes** depuis votre appareil connecté
+- **Envoi de réponses** vers l'appareil
+- **Mises à jour d'état** transmises à l'appareil
+
+<Info>
+L'impulsion de communication est subtile : un fondu de 100 ms avec une augmentation minimale de la luminosité. Cela fournit un retour d'information sans être distrayant pendant le fonctionnement.
+</Info>
+
+## Couleurs d’indication d’état
+
+Le firmware définit des couleurs standard pour différents états de la machine. Ceux-ci sont utilisés par les fonctions d'indication d'état et peuvent apparaître dans les futures mises à jour du micrologiciel.
+
+| Statut | Couleur | Description |
+|--------|-------|-------------|
+| Inactif | Bleu | État par défaut en attente |
+| En cours d'exécution | Vert | Mouvement actif en cours |
+| Erreur | Rouge | Condition d'erreur détectée |
+| Retour à destination | Jaune | Séquence de référence active |
+| De liaison | Violet | Connexion BLE en cours |
+
+<Note>
+Actuellement, seul l’état de référence (respiration violet foncé) est activement affiché pendant les opérations de la machine. D'autres couleurs d'état sont définies pour une utilisation future ou des implémentations de micrologiciels personnalisés.
+</Note>
+
+## Référence technique
+
+<AccordionGroup>
+<Accordion title="Constantes de configuration">
+| Constante | Valeur | Description |
+|----------|-------|-------------|
+| `ADVERTISING_TIMEOUT` | 30 secondes | Temps avant que la publicité ne s'assombrisse automatiquement |
+| Luminosité atténuée | ~12% | Niveau de luminosité une fois connecté ou après un délai d'attente |
+| Impulsion de communication | 100 ms | Indication de la durée du transfert de données |
+</Accordion>
+
+<Accordion title="Fonctions clés">
+| Fonction | But |
+|----------|---------|
+| `showBLEAdvertisingDimmed()` | Affiche de douces pulsations à luminosité réduite |
+
+<Note>
+Le délai d'expiration de la publicité se réinitialise automatiquement lorsque l'état de la connexion BLE change (événements de connexion ou de déconnexion).
+</Note>
+</Accordion>
+</AccordionGroup>

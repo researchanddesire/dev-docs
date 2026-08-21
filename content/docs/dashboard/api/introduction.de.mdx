@@ -1,0 +1,128 @@
+---
+title: "API-Übersicht"
+description: "Greifen Sie programmgesteuert mit der REST-API auf Ihre Forschungs- und Wunschdaten zu"
+---
+
+Mit der Research and Desire API können Sie über externe Anwendungen, Skripte und Integrationen auf Ihre Dashboard-Daten zugreifen. Jede API-Anfrage respektiert die Berechtigungen Ihres Kontos – Sie können nur auf Daten zugreifen, die Sie sehen dürfen.
+
+<Info>
+  Der API-Zugriff ist eine **Ultra**-Funktion. Sie benötigen ein aktives Ultra-Abonnement
+  API-Token erstellen. [Erfahren Sie mehr über Ultra](https://dashboard.researchanddesire.com/app/settings/subscription).
+</Info>
+
+## Basis-URL
+
+Alle API-Endpunkte sind verfügbar unter:
+
+```
+https://dashboard.researchanddesire.com/api/v1
+```
+
+## Schlüsselkonzepte
+
+<CardGroup cols={2}>
+  <Card title="Authentifizierung" icon="key" href="./authentication">
+    Erstellen Sie API-Tokens und erfahren Sie, wie Sie Anfragen authentifizieren.
+  </Card>
+
+  <Card title="Endpunktreferenz" icon="code" href="./endpoints/users">
+    Durchsuchen Sie alle verfügbaren Endpunkte nach Benutzern, DTT, LKBX und OSSM.
+  </Card>
+</CardGroup>
+
+## Wie es funktioniert
+
+<Steps>
+  <Step title="Erstellen Sie ein API-Token">
+    Gehen Sie im Dashboard zu **Einstellungen > API-Schlüssel** und erstellen Sie ein neues Token. Kopieren Sie es sofort – es wird nur einmal angezeigt.
+  </Step>
+
+  <Step title="Stellen Sie Anfragen">
+    Fügen Sie Ihr Token in den `Authorization`-Header jeder Anfrage ein.
+
+    ```bash
+    curl -H "Authorization: Bearer YOUR_TOKEN" \
+      https://dashboard.researchanddesire.com/api/v1/users
+    ```
+
+  </Step>
+
+  <Step title="Analysieren Sie die Antwort">
+    Alle Antworten folgen einem einheitlichen JSON-Umschlagformat.
+  </Step>
+</Steps>
+
+## Antwortformat
+
+Jede Antwort verwendet denselben Umschlag:
+
+**Erfolg:**
+
+```json
+{
+  "ok": true,
+  "data": { ... }
+}
+```
+
+**Fehler:**
+
+```json
+{
+  "ok": false,
+  "error": "Human-readable error message"
+}
+```
+
+## Pagination
+
+Listenendpunkte unterstützen die Paginierung über Abfrageparameter:
+
+| Parameter | Standard | Max | Beschreibung                 |
+| --------- | ------- | --- | --------------------------- |
+| `limit`   | 50      | 100 | Anzahl der zurückzugebenden Datensätze |
+| `offset`  | 0       | -   | Anzahl der zu überspringenden Datensätze   |
+
+Paginierte Antworten umschließen das Datenarray mit Paginierungsmetadaten:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "data": [ ... ],
+    "pagination": {
+      "limit": 50,
+      "offset": 0
+    }
+  }
+}
+```
+
+Beispiel: Zweite Seite von 25 Benutzern abrufen:
+
+```bash
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "https://dashboard.researchanddesire.com/api/v1/users?limit=25&offset=25"
+```
+
+## Ratenbegrenzung
+
+<Note>
+  Die API erzwingt derzeit keine strengen Ratenbegrenzungen, aber bitte seien Sie vorsichtig
+  respektvoll mit Ihrem Anfragevolumen umgehen. Übermäßige Nutzung kann zu einer Drosselung führen
+  in zukünftigen Versionen.
+</Note>
+
+## Berechtigungen und RLS
+
+Ihr API-Token erbt genau dieselben Berechtigungen wie Ihr Dashboard-Konto. Das heisst:
+
+- Sie können nur **Ihre eigenen Geräte** und **Geräte sehen, die über Partnerschaften mit Ihnen geteilt werden**
+- Sperrsitzungsaktionen berücksichtigen die Berechtigungen des Schlüsselinhabers
+- Benutzerabfragen geben nur Benutzer zurück, mit denen Sie eine Verbindung haben
+
+<Warning>
+  Behandeln Sie Ihr API-Token wie ein Passwort. Jeder mit Ihrem Token kann auf Ihr Konto zugreifen
+  Daten. Wenn ein Token gefährdet ist, widerrufen Sie es sofort über **Einstellungen > API
+  Schlüssel**.
+</Warning>

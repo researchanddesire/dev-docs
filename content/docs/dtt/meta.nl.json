@@ -1,0 +1,9 @@
+{
+  "title": "DTT",
+  "root": true,
+  "pages": [
+    "index",
+    "specs",
+    "technical"
+  ]
+}

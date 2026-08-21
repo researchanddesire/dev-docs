@@ -1,0 +1,214 @@
+---
+title: "PCB-Übersicht"
+description: "Einführung in die OSSM-Leiterplattendesigns und Verdrahtungsoptionen"
+---
+
+In diesem Abschnitt wird erläutert, wie die OSSM-Platine Ihren ESP32-basierten Controller mit dem Motortreiber verbindet. Sie können die offizielle OSSM-Leiterplatte verwenden oder einen DIY-Verkabelungsaufbau erstellen.
+
+<Card title="Kaufen Sie die OSSM-Leiterplatte" icon="cart-shopping" href="https://www.researchanddesire.com/products/ossm-reference-board">
+Erhältlich vorinstalliert bei Research and Desire mit der neuesten Firmware, sofort einsatzbereit mit Ihrem OSSM.
+</Card>
+
+## Verfügbare Optionen
+
+<CardGroup cols={2}>
+  <Card title="Offizielle OSSM-Platine" icon="microchip" href="#official-ossm-wiring">
+    Referenzplatine mit 5-V-Schritt-/Richtungsausgängen, integriertem Schutz und standardisierten Anschlüssen für zuverlässigen Betrieb.
+  </Card>
+  <Card title="DIY-Verkabelung" icon="plug" href="#alternative-wiring-configurations">
+    Steckbretter oder kundenspezifische Kabelbäume für die Prototypenerstellung oder die Verwendung alternativer Motortreiber.
+  </Card>
+</CardGroup>
+
+## Wählen Sie Ihren Ansatz
+
+<Tabs>
+  <Tab title="Offizielle Platine">
+    Die offizielle OSSM-Leiterplatte bietet:
+    - Vorab zugeordnetes GPIO für Schritt/Verzeichnis/Aktivierung
+    - 3,3-V-zu-5-V-Signalumwandlung für schnelle, rauschresistente Steuerung
+    - JST-PH-Anschlüsse für ordentliches Kabelmanagement
+    - Eingebauter Strom- und Gegen-EMF-Schutz
+    - Ein für die offizielle OSSM-Konfiguration validiertes Design
+
+    <Tip>
+    Für die meisten Bauherren ist die offizielle Leiterplatte der schnellste und zuverlässigste Weg zum Erfolg.
+    </Tip>
+  </Tab>
+  <Tab title="DIY-Verkabelung">
+    Wählen Sie eine DIY-Verkabelung, wenn Sie:
+    - Sie möchten einen Prototyp erstellen, bevor Sie sich für eine Leiterplatte entscheiden
+    - Es muss eine Schnittstelle zu einem nicht standardmäßigen Treiber hergestellt werden
+    - Habe bereits kompatible Teile zur Hand
+    - Erlernen Sie das System lieber auf der Signalebene
+
+    <Warning>
+    Ein ESP32 verwendet eine 3,3-V-Logik. Viele Motortreiber erwarten 5-V-Schritt-/Richtungssignale. Schließen Sie immer einen Pegelumsetzer ein, wenn Sie einen ESP32 direkt an einen 5-V-Treiber anschließen.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Wichtige Überlegungen
+
+Berücksichtigen Sie vor Ihrer Entscheidung die folgenden Faktoren:
+
+<AccordionGroup>
+  <Accordion title="Kompatibilität der Spannungsebene">
+    ESP32-Karten arbeiten mit einer 3,3-V-Logik, während viele Treiber 5-V-Eingänge verwenden. Ohne ordnungsgemäße Pegelverschiebung kann es zu Folgendem kommen:
+    - Fehlende Schritte bei höheren Geschwindigkeiten
+    - Unzuverlässige Richtungsänderungen
+    - Gefahr der Beschädigung von Bauteilen
+
+    Überprüfen Sie vor der Verkabelung die Anforderungen an die Eingangsspannung Ihres spezifischen Treibers.
+  </Accordion>
+  <Accordion title="Signalintegrität">
+    Hochgeschwindigkeits-Schrittsignale (bis zu 200 kHz) erfordern eine saubere Verkabelung:
+    - Halten Sie Schritt- und Richtungsleitungen kurz
+    - Verlegen Sie die Signale entfernt von den Motorstromkabeln
+    - Bei Längen über 30 cm verwenden Sie verdrillte Adernpaare oder abgeschirmte Kabel
+  </Accordion>
+  <Accordion title="Anforderungen an die Stromversorgung">
+    Bemessen Sie die Treiberversorgung für Ihren Motor:
+    - Servomotoren verwenden üblicherweise 24–48 V Gleichstrom
+    - Schritttreiber variieren je nach Modell (12–48 V typisch)
+    - Versorgen Sie den ESP32 unabhängig von der Motorleistung über USB oder eine geregelte 5-V-Schiene mit Strom
+  </Accordion>
+</AccordionGroup>
+
+## Offizielle OSSM-Verkabelung
+
+Verwenden Sie diesen Abschnitt, wenn Sie die OSSM-Platine mit dem OSSM-Goldmotor (Serie 57AIM) oder einem kompatiblen Schritt-/Richtungstreiber verkabeln.
+
+<Steps>
+<Step title="Sammeln Sie Teile">
+  - OSSM-Leiterplatte
+  - 24-V-Stromversorgung (UL-zertifiziert empfohlen)
+  - PH-4-Signalkabel und grüner Motorstromanschluss (im OSSM-Motorsatz enthalten)
+  - Passender Motor und Treiber
+
+  <Note>
+  Für die physische Montage und Verkabelung verwenden Sie die offizielle Verkabelungsstufe <a href="https://ohai.researchanddesire.com/ossm/build/wiring"></a>.
+  </Note>
+</Step>
+
+<Step title="Motorstrom anschließen">
+  - Isolieren Sie die rot/schwarzen Stromkabel ab.
+  - Stecken Sie Rot (+) und Schwarz (–) in den zweipoligen Motorstromanschluss auf der Platine.
+  - Fest anziehen, um unterbrochene Verbindungen zu vermeiden.
+
+  <Check>
+  Ziehen Sie vorsichtig an jedem Draht. Wenn es sich bewegt, ziehen Sie die Klemme wieder fest.
+  </Check>
+</Step>
+
+<Step title="Schritt-/Richtungssignale anschließen">
+  - Stecken Sie das verschlüsselte PH-4-Signalkabel in den 4-Pin-Header der Platine.
+  - Führen Sie das andere Ende wie beschriftet zum Motor-/Treibersteuereingang.
+
+  <Tip>
+  Die Platine gibt 5-V-Active-Low-Step/Dir-Signale auf dem PH-4-Header aus, was die Störfestigkeit bei vielen Treibern verbessert.
+  </Tip>
+</Step>
+
+<Step title="Strom anlegen und prüfen">
+  - Schließen Sie die 24-V-Versorgung an die 2,1 mm x 5,5 mm-Hohlbuchse der Platine an.
+  - Einschalten. Der Motor/Treiber sollte Strom anzeigen und bereit sein.
+
+```bash
+# Quick preflight
+1) Power on the PCB
+2) Confirm motor/driver status LED indicates power
+3) Connect your controller and home the axis when mechanically assembled
+```
+
+  <Check>
+  Wenn die Fernbedienung während des Prüfstandstests angeschlossen wird, kann die Referenzfahrt möglicherweise erst abgeschlossen werden, wenn der Aktuator vollständig auf einer Schiene montiert ist.
+  </Check>
+</Step>
+</Steps>
+
+## Alternative Verkabelungskonfigurationen
+
+Wenn Sie einen anderen Schritt-/Dir-Treiber anschließen oder Prototypen auf einem Steckbrett erstellen:
+
+<Steps>
+<Step title="Fügen Sie einen Pegelumsetzer hinzu (erforderlich für 5-V-Treiber)">
+  Verwenden Sie einen unidirektionalen 3,3V→5V-Pegelumsetzer für STEP, DIR und ENABLE. Stellen Sie eine Verbindung zwischen ESP32, Levelshifter und Fahrer her.
+
+  ```text
+  ESP32 (3.3V) → Level Shifter → Driver (5V)
+       STEP  ────────────────→  STEP
+       DIR   ────────────────→  DIR
+       EN    ────────────────→  EN (if used)
+       GND   ─────────────────  GND (common)
+  ```
+
+  <Warning>
+  Treiben Sie einen 5-V-Eingang nicht direkt über einen ESP32-Pin an.
+  </Warning>
+</Step>
+
+<Step title="Verdrahten Sie die Stromversorgung korrekt">
+  - Halten Sie die Motorleistung von den 5-V-Logikschienen getrennt.
+  - Versorgungskabel für Strom dimensionieren. Verwenden Sie 16–24 AWG an den Motorausgangsklemmen der Leiterplatte.
+</Step>
+
+<Step title="Signale validieren">
+  - Beginnen Sie mit einer niedrigen Schrittfrequenz und steigern Sie diese schrittweise.
+  - Bestätigen Sie, dass Richtungsänderungen sauber erfolgen und dass keine Schritte übersehen werden.
+</Step>
+</Steps>
+
+## Spezifikationen
+
+Diese Spezifikationen fassen die OSSM-PCB-Funktionen zusammen.
+
+### Leistungsaufnahme
+
+| Parameter | Wert |
+|-----------|-------|
+| Stromspannung | 24V DC |
+| Maximaler Strom | 5A |
+| Stecker | 2,1 mm × 5,5 mm Hohlstecker |
+
+<Warning>
+Verwenden Sie ein hochwertiges, UL-zertifiziertes Netzteil. Minderwertige Netzteile liefern häufig nicht die Nennleistung und können den Motor oder die Platine beschädigen.
+</Warning>
+
+### Signalausgänge
+
+| Parameter | Spezifikation |
+|-----------|---------------|
+| Signaltyp | Step-Dir |
+| Logikebene | 5V aktiv niedrig |
+| Stecker | JST-PH-4 |
+
+### Motorleistung
+
+| Parameter | Spezifikation |
+|-----------|---------------|
+| Stromspannung | 24V |
+| Maximaler Strom | 6A |
+| Terminals | 2× Schraubklemmen |
+| Drahtstärke | 16–24 AWG |
+
+### Gegen-EMF-Schutz
+
+Die Leiterplatte verfügt über einen integrierten Schutz gegen regenerative Spannungsspitzen:
+
+- Inline-Diode zum Schutz des Netzteils vor Rückstrom
+- 1500 µF Kondensator zur Bewältigung regenerativer Energie
+
+## Verwandte Leitfäden
+
+<CardGroup cols={2}>
+  <Card title="OSSM PCB-Referenz" icon="file" href="/ossm/hardware/pcb/board-design">
+    Detaillierte elektrische Spezifikationen und Steckerbelegung.
+  </Card>
+  <Card title="Offizielle Verkabelungsphase" icon="bolt" href="https://ohai.researchanddesire.com/ossm/build/wiring">
+    Schritt-für-Schritt-Verkabelung für den OSSM Gold Motor (Serie 57AIM).
+  </Card>
+  <Card title="Firmware und Updates" icon="cpu" href="/ossm/software/getting-started/wifi-and-updates">
+    Verwenden Sie den Web-Flasher, um Firmware auf Ihr Board zu laden.
+  </Card>
+</CardGroup>

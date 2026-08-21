@@ -1,0 +1,244 @@
+---
+title: "Vue d'ensemble des PCB"
+description: "Documentation technique pour le PCB principal RADR (OSSM Wireless v0.4)"
+---
+
+Cette section couvre la conception principale du PCB RADR, y compris les schémas, les spécifications des composants et les fichiers de fabrication.
+
+## Aperçu du conseil d'administration
+
+| Spécification | Valeur |
+|---------------|-------|
+| Nom du conseil d'administration | OSSM sans fil |
+| Version | v0.4 |
+| Microcontrôleur | ESP32-S3 avec PSRAM |
+| Logiciel de conception | Concepteur Altium |
+| Nombre de couches | 2 (estimé) |
+
+Le PCB RADR intègre toute l'électronique requise pour une télécommande sans fil autonome, y compris le microcontrôleur, l'interface d'affichage, la gestion de l'alimentation, les entrées utilisateur et les systèmes de rétroaction.
+
+<Frame>
+<img src="/radr/hardware/PCB/RADR-PCB-render.webp" alt="Rendu de PCB RADR" />
+</Frame>
+
+## Composants de base
+
+### Microcontrôleur
+
+| Paramètre | Valeur |
+|-----------|-------|
+| MCU | ESP32-S3 |
+| Mémoire | Comprend PSRAM |
+| Sans fil | WiFi + Bluetooth LE |
+| Tension de fonctionnement | 3,3 V |
+
+L'ESP32-S3 fournit :
+- Processeur Xtensa LX7 double cœur
+- Bluetooth Low Energy intégré pour la communication des appareils
+- GPIO suffisant pour toutes les entrées, sorties et périphériques
+- Modes veille à faible consommation pour économiser la batterie
+
+### Gestion de l'alimentation
+
+| Composant | Fonction |
+|-----------|----------|
+| Connecteur USB-C | Entrée de charge 5V |
+| CI de charge | Chargement de la batterie LiPo |
+| MAX17048 | Jauge de carburant (surveillance de la batterie) |
+| LDO/Régulateur | Alimentation du système 3,3 V |
+
+Le système électrique prend en charge :
+- Chargement USB-C (entrée 5V)
+- Indicateur LED de chargement du matériel
+- Pourcentage de batterie précis via jauge de carburant I²C
+- Courant de sommeil profond < 100 μA
+
+### Interface d'affichage
+
+| Paramètre | Valeur |
+|-----------|-------|
+| Type d'affichage | Écran LCD TFT |
+| Résolution | 320 x 240 pixels |
+| Profondeur de couleur | 16 bits (RVB565) |
+| Interface | IPS |
+| Rétroéclairage | Contrôlé par PWM |
+
+### Entrées utilisateur
+
+| Saisir | Taper | GPIO |
+|-------|------|------|
+| Encodeur gauche | Rotatif + Poussée | GPIO10, 11 |
+| Encodeur droit | Rotatif + Poussée | GPIO 42, 41 |
+| Épaule gauche | Interrupteur momentané | GPIO48 |
+| Épaule droite | Interrupteur momentané | GPIO1 |
+| Sous l'écran gauche | Interrupteur momentané | GPIO38 |
+| Centre sous l'écran | Interrupteur momentané | GPIO39 |
+| Sous l'écran à droite | Interrupteur momentané | GPIO40 |
+
+<Note>
+Les affectations GPIO indiquées concernent les cartes v0.4 avec PSRAM. Les cartes v1.x antérieures utilisent des broches différentes pour l'encodeur gauche (GPIO 35, 36) et les LED (GPIO 37).
+</Note>
+
+### Sorties de retour
+
+| Composant | Taper | GPIO |
+|-----------|------|------|
+| LED d'état | WS2812B RVB (x3) | GPIO12 |
+| Ronfleur | Piézoélectrique | GPIO2 |
+| Moteur vibrant | Moteur ERM | GPIO47 |
+
+### Expansion
+
+| Connecteur | Interface | But |
+|-----------|-----------|---------|
+| QWIIC | I²C | Capteurs/périphériques externes |
+| USB-C | USB2.0 | Programmation et recharge |
+
+## Sections schématiques
+
+Le schéma est organisé en blocs fonctionnels :
+
+| Section | Description |
+|---------|-------------|
+| Pouvoir | Entrée USB-C, circuit de charge, régulation de tension |
+| MCU | ESP32-S3, cristal, réinitialisation, sélection de démarrage |
+| Afficher | Connecteur LCD TFT, pilote de rétroéclairage |
+| Entrées | Encodeurs rotatifs, boutons, résistances pull-up/pull-down |
+| Retour | Ligne de données LED, pilote de buzzer, pilote de moteur |
+| Batterie | Jauge de carburant MAX17048, connecteur de batterie |
+| Expansion | Connecteur QWIIC, en-tête de programmation |
+
+## Considérations relatives à la disposition des PCB
+
+### Placement des composants
+
+- **MCU** positionné au centre pour un routage de trace équilibré
+- **Connecteur USB-C** sur le bord de la carte pour plus d'accessibilité
+- **Connecteur d'affichage** orienté pour l'acheminement du câble plat vers le boîtier
+- **Connecteur de batterie** positionné pour le placement interne de la batterie
+- **Connecteur QWIIC** accessible pour les modules d'extension
+
+### Considérations sur l'antenne
+
+L'ESP32-S3 utilise une antenne PCB intégrée ou une antenne externe (selon la version). La zone de l’antenne doit être dégagée :
+- Plans de sol directement en dessous
+- Proximité de l'enceinte métallique
+- Signaux de commutation haute fréquence
+
+<Warning>
+Ne placez pas de composants ni de traces d'acheminement dans la zone d'exclusion de l'antenne. Cela dégrade considérablement les performances sans fil.
+</Warning>
+
+## Fichiers de conception
+
+Tous les fichiers de conception sont disponibles dans le référentiel GitHub :
+
+| Déposer | Format | Description |
+|------|--------|-------------|
+| PCB - OSSM Wireless v0.4.pcbdoc | Concepteur Altium | Disposition PCB avec cuivre, sérigraphie, limes de perçage |
+| Schéma - OSSM Wireless V0.4.schdoc | Concepteur Altium | Capture schématique complète |
+| Schéma RADR - OSSM Wireless V0.4.pdf | PDF | Référence schématique imprimable |
+| Nomenclature RADR - OSSM sans fil - v0.4 - S3.xlsx | Exceller | Nomenclature avec numéros de pièces |
+| Rendu PCB RADR.png | PNG | Rendu 3D d'une planche assemblée |
+
+<Card title="Télécharger les fichiers de conception" icon="download" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Hardware/Electronics">
+Accédez aux fichiers de projet Altium, aux Gerbers et à la nomenclature sur GitHub.
+</Card>
+
+## Fabrication
+
+### Fabrication de PCB
+
+Spécifications recommandées pour la commande :
+
+| Paramètre | Valeur |
+|-----------|-------|
+| Calques | 2 |
+| Épaisseur | 1,6 mm |
+| Finition de surface | HASL ou ENIG |
+| Poids du cuivre | 1 once |
+| Masque de soudure | N'importe quelle couleur |
+| Sérigraphie | Blanc |
+
+### Options d'assemblage
+
+| Méthode | Recommandé pour |
+|--------|-----------------|
+| Assemblage manuel | Prototypes, unités uniques |
+| Service PCBA | Quantités de production |
+
+<Tip>
+Des services tels que JLCPCB et PCBWay proposent une fabrication et un assemblage combinés de PCB. Téléchargez les Gerbers et la nomenclature pour une solution clé en main.
+</Tip>
+
+### Composants critiques
+
+Ces composants nécessitent une attention particulière lors du montage :
+
+| Composant | Remarques |
+|-----------|-------|
+| Module ESP32-S3 | Vérifiez l'orientation, assurez-vous que tous les plots sont soudés |
+| Connecteur USB-C | Nécessite un alignement précis, vérifiez les courts-circuits |
+| MAX17048 | Petit package QFN, nécessite une redistribution appropriée |
+| LED WS2812B | Sensible à la chaleur, respecter le profil de refusion |
+
+## Historique des versions
+
+| Version | Changements |
+|---------|---------|
+| v0.4 | Version actuelle avec ESP32-S3 |
+
+<Note>
+La version v0.4 utilise la variante ESP32-S3. Le suffixe "S3" dans le nom du fichier BOM indique cette variante.
+</Note>
+
+## Dépannage
+
+<AccordionGroup>
+<Accordion title="La carte ne s'allume pas">
+- Vérifiez la connexion et le câble USB-C
+- Vérifiez la sortie du régulateur 3,3 V
+- Vérifiez les courts-circuits sur les rails d'alimentation
+- Assurez-vous que la batterie est connectée et chargée
+</Accordion>
+
+<Accordion title="L'affichage ne fonctionne pas">
+- Vérifier la connexion du câble ruban
+- Vérifiez les signaux SPI avec l'oscilloscope
+- Confirmer le signal PWM du rétroéclairage
+- Test des rails d'alimentation de l'écran
+</Accordion>
+
+<Accordion title="Bluetooth ne se connecte pas">
+- Vérifiez la zone de l'antenne pour les courts-circuits ou les ponts
+- Vérifiez que l'ESP32-S3 est correctement programmé
+- Assurez-vous qu'il n'y a pas de métal à proximité de la zone de l'antenne
+- Test avec le blindage RF retiré (le cas échéant)
+</Accordion>
+
+<Accordion title="La batterie ne charge pas">
+- Vérifiez que les résistances USB-C CC sont présentes
+- Vérifiez les connexions du circuit intégré de charge
+- Mesurer la tension de la batterie au niveau du connecteur
+- Confirmer le circuit LED de charge
+</Accordion>
+
+<Accordion title="Les boutons ne répondent pas">
+- Vérifier les résistances pull-up/pull-down
+- Vérifier les affectations GPIO dans le firmware
+- Tester la continuité du bouton au MCU
+- Vérifiez les joints de soudure à froid
+</Accordion>
+</AccordionGroup>
+
+## Documentation connexe
+
+<CardGroup cols={2}>
+<Card title="Batterie et alimentation" icon="battery-full" href="/radr/hardware/specifications/battery-and-power">
+Documentation détaillée sur la gestion de l’alimentation et la charge.
+</Card>
+
+<Card title="Systèmes de rétroaction" icon="lightbulb" href="/radr/hardware/specifications/feedback-and-indicators">
+Détails de la LED, du buzzer et du moteur de vibration.
+</Card>
+</CardGroup>

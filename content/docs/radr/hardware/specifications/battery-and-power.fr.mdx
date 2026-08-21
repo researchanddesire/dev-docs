@@ -1,0 +1,219 @@
+---
+title: "Batterie et alimentation"
+description: « Surveillance, charge et gestion de l'alimentation de la batterie pour RADR »
+---
+
+Ce guide couvre le système de batterie, les fonctionnalités de charge et de gestion de l'alimentation du RADR.
+
+## Système de batterie
+
+RADR utilise une batterie au lithium avec surveillance intelligente :
+
+| Composant | Description |
+|-----------|-------------|
+| Type de batterie | Lithium Polymère (LiPo) |
+| CI de jauge de carburant | MAX17048 |
+| Port de chargement | USB-C |
+| Indicateur de charge | Voyant matériel |
+
+### MAX17048 Jauge de carburant
+
+Le MAX17048 est une jauge de carburant de précision qui fournit :
+
+- **Pourcentage de batterie** — Lecture précise de l'état de charge (0 à 100 %)
+- **Tension de la batterie** — Mesure de tension en temps réel
+- **Alertes de batterie faible** – Notifications de seuil programmables
+
+<Info>
+La jauge de carburant utilise des algorithmes exclusifs pour estimer avec précision la durée de vie restante de la batterie, en compensant des facteurs tels que la température et le taux de décharge.
+</Info>
+
+## Indicateur de batterie
+
+L'état de la batterie est affiché dans la barre d'état en haut de l'écran :
+
+| Niveau | Portée approximative |
+|-------|-------------------|
+| Complet | 90–100% |
+| Haut | 60–89% |
+| Moyen | 30–59% |
+| Faible | 10–29% |
+| Critique | 0–9% |
+
+<Warning>
+Lorsque la batterie atteint des niveaux critiques, enregistrez votre session et chargez RADR pour éviter un arrêt inattendu.
+</Warning>
+
+## Chargement
+
+### Chargement USB-C
+
+RADR se charge via le port USB-C situé en haut de l'appareil, à côté de l'interrupteur d'alimentation.
+
+- Connectez n'importe quel câble USB-C standard
+- Compatible avec les chargeurs USB, les banques d'alimentation et les ports USB des ordinateurs
+- La charge fonctionne lorsque le RADR est allumé ou éteint
+
+### Indicateur de charge
+
+Une LED matérielle indique l'état de charge :
+
+| État du voyant | Signification |
+|-----------|---------|
+| LED allumée | Chargement en cours |
+| LED éteinte | Complètement chargé ou non connecté |
+
+<Note>
+La LED de charge est distincte des LED RVB contrôlées par logiciel de RADR. Il est contrôlé directement par le circuit de charge.
+</Note>
+
+<Note>
+RADR s'appuie sur le voyant de charge matériel plutôt que sur la détection de charge basée sur le logiciel. Cela fournit une indication plus précise et plus fiable de l’état de charge.
+</Note>
+
+### Conseils de chargement
+
+<Tip>
+Pour une charge plus rapide, utilisez un chargeur USB évalué à 5 V/1 A ou plus.
+</Tip>
+
+<Tip>
+Vous pouvez utiliser RADR pendant le chargement, mais le chargement peut prendre plus de temps pendant une utilisation active.
+</Tip>
+
+## États de puissance
+
+RADR a plusieurs états d'alimentation :
+
+### Actif (connecté)
+
+- Affichage allumé, rétroéclairage actif
+- Bluetooth connecté à un appareil
+- LED actives
+- Consommation d'énergie la plus élevée
+
+### Actif (inactif)
+
+- Affichage allumé, rétroéclairage actif
+- Balayage Bluetooth ou dans le menu
+- LED en mode veille
+- Consommation d'énergie moyenne
+
+### Mode veille
+
+- Affichage éteint, rétroéclairage éteint
+- Bluetooth désactivé
+- LED éteintes
+- Très faible consommation d'énergie
+- Réveil GPIO activé
+
+### Mise hors tension
+
+- Tous les systèmes éteints
+- Aucune consommation d'énergie
+- Nécessite un interrupteur d'alimentation pour se réveiller
+
+## Mode veille profonde
+
+La veille profonde permet des économies d'énergie significatives lorsque vous n'utilisez pas RADR mais que vous souhaitez un accès rapide plus tard.
+
+<Info>
+Techniquement, RADR utilise le mode « veille légère » en interne plutôt que le véritable mode sommeil profond. Cela permet un réveil des boutons plus fiable tout en obtenant une très faible consommation d'énergie. L'expérience utilisateur est la même : l'appareil apparaît éteint jusqu'à ce qu'un bouton soit enfoncé.
+</Info>
+
+### Passer en mode veille
+
+1. Dans le menu principal, sélectionnez **Veille**
+2. RADR effectue la séquence d'arrêt :
+   - Déconnecte tous les appareils connectés
+   - Joue le son du buzzer d'arrêt
+   - Éteint le rétroéclairage de l'écran
+   - Efface toutes les LED
+   - Entre dans un sommeil profond
+
+### Sources de réveil
+
+Les boutons suivants peuvent sortir le RADR d'une veille profonde :
+
+| Bouton | GPIO |
+|--------|------|
+| Centre sous l'écran | GPIO39 |
+| Sous l'écran gauche | GPIO38 |
+| Sous l'écran à droite | GPIO40 |
+
+Appuyez sur l'un de ces boutons pour réactiver RADR. L'appareil effectue un redémarrage complet.
+
+### Veille ou mise hors tension
+
+| Fonctionnalité | Mode veille | Mise hors tension |
+|---------|------------|-----------|
+| Consommation d'énergie | Très faible | Aucun |
+| Heure de réveil | ~2 secondes | ~5 secondes |
+| Méthode de réveil | Appuyez sur le bouton | Interrupteur d'alimentation |
+| Etat conservé | Non | Non |
+| Cas d'utilisation | Entre les séances | Stockage |
+
+<Tip>
+Utilisez le mode veille pendant les séances avec pauses. Utilisez l'interrupteur d'alimentation pour un stockage prolongé.
+</Tip>
+
+## Conseils de gestion de l'alimentation
+
+### Maximiser la durée de vie de la batterie
+
+1. **Utiliser le mode veille** : lorsque vous prenez des pauses, mettez RADR en veille au lieu de le laisser inactif
+2. **Luminosité inférieure** — Le rétroéclairage de l'écran est un consommateur d'énergie important.
+3. **Déconnectez-vous une fois terminé** : les connexions Bluetooth actives consomment plus d'énergie
+4. **Mise hors tension pour le stockage** : utilisez le commutateur physique pour un stockage étendu
+
+### Surveillance de l'état de la batterie
+
+- Vérifiez périodiquement le pourcentage de batterie dans la barre d'état
+- Chargez avant les séances pour éviter les interruptions en cours de séance
+- Ne laissez pas la batterie se décharger complètement fréquemment
+
+### Meilleures pratiques de recharge
+
+- Utilisez des câbles USB-C de qualité
+- Chargez à des températures modérées (évitez la chaleur/le froid extrême)
+- N'importe quel chargeur USB standard fonctionne (5V)
+- Chargez complètement avant la première utilisation
+
+## Caractéristiques
+
+| Paramètre | Valeur |
+|-----------|-------|
+| Tension de fonctionnement | 3,3 V (régulé) |
+| Tension de charge | USB 5 V |
+| Courant de sommeil profond | < 100 μA |
+| Courant actif | Varie selon l'activité |
+
+## Dépannage
+
+<AccordionGroup>
+<Accordion title="Le pourcentage de batterie semble inexact">
+- La jauge de carburant peut avoir besoin d'être calibrée après un stockage prolongé
+- Chargez complètement, puis déchargez complètement une fois pour recalibrer
+- Les lectures de la batterie se stabilisent après quelques cycles de charge
+</Accordion>
+
+<Accordion title="RADR ne facturera pas">
+- Essayez un autre câble USB-C
+- Essayez une autre source d'alimentation USB
+- Assurez-vous que le port USB-C est propre et en bon état
+- Vérifiez que le voyant de charge s'allume lorsqu'il est connecté
+</Accordion>
+
+<Accordion title="La batterie se décharge rapidement">
+- Vérifiez si vous laissez RADR en état actif/inactif
+- Utilisez le mode veille lorsque vous ne contrôlez pas activement un appareil
+- Les connexions Bluetooth actives consomment plus d'énergie
+- Les batteries plus anciennes peuvent avoir une capacité réduite
+</Accordion>
+
+<Accordion title="Je ne me réveillerai pas du sommeil">
+- Appuyez et maintenez enfoncé un bouton sous l'écran pendant 2 à 3 secondes.
+- Essayez l'interrupteur d'alimentation si les boutons ne répondent pas
+- Assurez-vous que la batterie n'est pas complètement épuisée
+</Accordion>
+</AccordionGroup>

@@ -1,0 +1,223 @@
+---
+title: "Patronen"
+description: "Leer hoe patronen variatie creëren in StrokeEngine-beweging door trapeziumvormige bewegingsparameters te genereren"
+---
+
+Patronen onderscheiden StrokeEngine van andere bewegingssystemen. Elk patroon is een klein programma dat de volgende set trapeziumvormige bewegingsparameters genereert: doelpositie, snelheid en versnelling.
+
+## Beschikbare patronen
+
+<Note>
+De OSSM-firmware onthult **7 patronen** (indices 0-6): Simple Stroke, Teasing or Pounding, Robo Stroke, Half'n'Half, Deeper, Stop'n'Go en Insist. Jack Hammer en Stroke Nibbler zijn beschikbaar in de StrokeEngine-bibliotheek, maar zijn momenteel niet geïmplementeerd in de OSSM-firmware.
+</Note>
+
+### OSSM-patronen (0-6)
+
+<AccordionGroup>
+<Accordion title="Simpele beroerte">
+Creëert een trapeziumvormig slagprofiel met 1/3 versnelling, 1/3 uitloop en 1/3 vertraging.
+
+<Note>
+De sensatieparameter heeft geen effect op dit patroon.
+</Note>
+</Accordion>
+
+<Accordion title="Plagen of beuken">
+Past de snelheidsverhouding tussen in- en uitbewegingen aan met behulp van de sensatiewaarde:
+
+- **Positieve sensatie (> 0)**: Maakt de beweging sneller (tot 5x) voor een hard bonzend gevoel
+- **Negatieve sensatie (< 0)**: Maakt de uitbeweging sneller voor een meer plagend gevoel
+
+De totale slagtijd blijft constant en hangt alleen af ​​van de globale snelheidsparameter.
+</Accordion>
+
+<Accordion title="Robo-beroerte">
+Regelt de slagversnelling via de sensatiewaarde:
+
+- **Positieve waarden**: Verhoog de versnelling totdat beweging een constante snelheid wordt (voelt robotachtig aan)
+- **Neutraal (0)**: gelijk aan Simple Stroke (1/3, 1/3, 1/3 profiel)
+- **Negatieve waarden**: verminder de versnelling tot een driehoeksprofiel
+</Accordion>
+
+<Accordion title="Half en half">
+Vergelijkbaar met plagen of beuken, maar elke tweede slag bereikt slechts de helft van de diepte.
+
+- **Positieve sensatie (> 0)**: Maakt de beweging sneller (tot 5x) voor een hard bonzend gevoel
+- **Negatieve sensatie (< 0)**: Maakt de uitbeweging sneller voor een meer plagend gevoel
+
+De slagtijd blijft voor alle slagen hetzelfde, ook voor halve diepteslagen.
+</Accordion>
+
+<Accordion title="Dieper">
+Verhoogt geleidelijk de inbrengdiepte met elke slag totdat het maximum wordt bereikt, wordt vervolgens gereset en opnieuw gestart.
+
+De sensatiewaarde bepaalt hoeveel slagen één hellingcyclus voltooien.
+</Accordion>
+
+<Accordion title="Stop'n'Go">
+Voegt pauzes in tussen een reeks streken. Het aantal slagen loopt op van 1 naar 5 en terug.
+
+De sensatiewaarde regelt de pauzeduur tussen slagreeksen.
+</Accordion>
+
+<Accordion title="Sta erop">
+Vermindert de effectieve slaglengte terwijl de slagsnelheid constant blijft. Hierdoor ontstaan ​​trillingspatronen bij hogere sensatiewaarden.
+
+- **Positieve sensatie**: slagen dwalen naar voren
+- **Negatieve sensatie**: beroertes dwalen naar achteren
+</Accordion>
+</AccordionGroup>
+
+### Patronen die alleen uit de bibliotheek bestaan
+
+Deze patronen zijn beschikbaar in de StrokeEngine-bibliotheek, maar zijn **momenteel niet geïmplementeerd** in de OSSM-firmware. Ze worden hier gedocumenteerd voor ontwikkelaars die aangepaste firmware of andere op StrokeEngine gebaseerde projecten bouwen.
+
+<AccordionGroup>
+<Accordion title="Jac Hamer">
+Creëert een trillingspatroon dat trilt bij het naar binnen gaan en in één beweging soepel naar buiten trekt.
+
+De sensatiewaarde stelt de trillingsamplitude in van 3 mm tot 25 mm.
+</Accordion>
+
+<Accordion title="Slagknabbelaar">
+Voegt een vibrerende overlay toe aan de slagen, die zowel bij het in- als uitstappen trillen.
+
+De sensatiewaarde stelt de trillingsamplitude in van 3 mm tot 25 mm.
+</Accordion>
+</AccordionGroup>
+
+## Aangepaste patronen maken
+
+U kunt uw eigen patronen maken door de klasse `Pattern` in te delen in het bestand header-only [pattern.h](https://github.com/theelims/StrokeEngine/blob/main/src/pattern.h).
+
+<Steps>
+<Step title="Subklasse de Pattern-klasse">
+Maak een nieuwe klasse die `Pattern` uitbreidt. Zie `SimpleStroke` voor een minimale implementatie:
+
+```cpp pattern.h
+class SimpleStroke : public Pattern {
+    public:
+        SimpleStroke(const char *str) : Pattern(str) {}
+```
+
+De constructor slaat de weergavenaamreeks van het patroon op.
+</Step>
+
+<Step title="Overschrijf set-functies indien nodig">
+Implementeer set-functies opnieuw wanneer u aangepaste berekeningen nodig heeft:
+
+```cpp pattern.h
+void setTimeOfStroke(float speed = 0) {
+    // In & Out have same time, so divide by 2
+    _timeOfStroke = 0.5 * speed;
+}
+```
+</Step>
+
+<Step title="Implementeer de nextTarget-functie">
+Dit is de kernfunctie die StrokeEngine na elke slag aanroept om de volgende bewegingsparameters te verkrijgen.
+
+```cpp pattern.h
+motionParameter nextTarget(unsigned int index) {
+    // Maximum speed of the trapezoidal motion
+    _nextMove.speed = int(1.5 * _stroke/_timeOfStroke);
+
+    // Acceleration to meet the profile
+    _nextMove.acceleration = int(3.0 * _nextMove.speed/_timeOfStroke);
+
+    // Odd stroke moves out
+    if (index % 2) {
+        _nextMove.stroke = _depth - _stroke;
+
+    // Even stroke moves in
+    } else {
+        _nextMove.stroke = _depth;
+    }
+
+    _index = index;
+    return _nextMove;
+}
+```
+
+<Info>
+De parameter `index` begint bij 0 wanneer het patroon voor het eerst wordt aangeroepen en wordt na elke streek met 1 verhoogd. Gebruik dit om patronen te creëren die in de loop van de tijd variëren.
+</Info>
+</Step>
+
+<Step title="Voeg foutopsporingsuitvoer toe">
+Kapsel `Serial.print()`-instructies in met preprocessor-richtlijnen, zodat ze kunnen worden omgeschakeld:
+
+```cpp pattern.h
+#ifdef DEBUG_PATTERN
+    Serial.println("TimeOfInStroke: " + String(_timeOfInStroke));
+    Serial.println("TimeOfOutStroke: " + String(_timeOfOutStroke));
+#endif
+```
+</Step>
+
+<Step title="Registreer het patroon">
+Voeg een exemplaar van uw patroonklasse toe aan de `patternTable[]`-array onderaan het bestand:
+
+```cpp pattern.h
+static Pattern *patternTable[] = {
+    new SimpleStroke("Simple Stroke"),
+    new TeasingPounding("Teasing or Pounding"),
+    new YourNewPattern("Your Pattern Name")  // Add your pattern here
+};
+```
+</Step>
+</Steps>
+
+## Patroonvereisten
+
+### Diepte- en slaggrenzen
+
+<Warning>
+Patronen moeten slagposities retourneren binnen het interval `[0, stroke]`. StrokeEngine bewaakt alle geretourneerde `motionParameter`-waarden en kapt posities buiten `[depth - stroke, depth]` af om letsel te voorkomen.
+</Warning>
+
+Diepte- en slagwaarden die zijn ingesteld in StrokeEngine zijn axiomatische grenzen. Uw patroon definieert de envelop die het gebruikt binnen deze limieten. Dezelfde veiligheidsbeperkingen zijn van toepassing op de snelheid via `timeOfStroke`.
+
+### Sierlijke parameterwijzigingen
+
+Uw patroon moet parameterwijzigingen correct verwerken. Wanneer de diepte- of slagwaarden tijdens het gebruik veranderen, moet het patroon:
+
+- Blijf te allen tijde binnen het interval `[depth, depth - stroke]`
+- Voer overdrachtsbewegingen uit met dezelfde snelheid als gewone zetten
+- Vermijd grillig gedrag
+
+<Tip>
+Test uw patroon grondig op parameterwijzigingen, vooral op diepte- en slagwijzigingen waarvoor mogelijk extra slagafstanden nodig zijn.
+</Tip>
+
+### Met behulp van de indexparameter
+
+De parameter `index` biedt belangrijke statusinformatie:
+
+- **Reset naar 0** wanneer `StrokeEngine.setPattern(int)` of `StrokeEngine.startMotion()` wordt aangeroepen
+- **Verhogingen** na elke succesvol uitgevoerde zet
+- **Het vergelijken van `index == _index`** bepaalt of dit een update is van de huidige streek en niet een nieuwe streek
+
+Sla de laatste index op in `_index` voordat u terugkeert naar de track-slagstatus in tijdsvariërende patronen.
+
+### Pauzes implementeren
+
+Patronen kunnen pauzes tussen streken invoegen. Wanneer de doelpositie is bereikt, vraagt ​​StrokeEngine om de paar milliseconden naar nieuwe bewegingsopdrachten.
+
+Om een ​​pauze te implementeren, retourneert u `_nextMove.skip = true` vanuit uw `nextTarget()`-functie. StrokeEngine zal later opnieuw peilen in plaats van een nieuwe beweging te starten.
+
+De basisklasse `Pattern` biedt drie hulpfuncties voor pauzebeheer:
+
+| Functie | Beschrijving |
+|----------|-------------|
+| `_startDelay()` | Start de vertragingstimer |
+| `_updateDelay(int delayInMillis)` | Stelt de pauzeduur in milliseconden in (kan op elk moment worden bijgewerkt) |
+| `_isStillDelayed()` | Retourneert `true` als de geplande tijd niet is bereikt |
+
+<Note>
+Als een slag te laat is, wordt deze onmiddellijk uitgevoerd. Zie het Stop'n'Go-patroon voor een voorbeeldimplementatie.
+</Note>
+
+## Bijdragende patronen
+
+Nadat u uw patroon grondig hebt getest, dient u een pull-aanvraag in met uw bijgewerkte [pattern.h](https://github.com/theelims/StrokeEngine/blob/main/src/pattern.h)-bestand.

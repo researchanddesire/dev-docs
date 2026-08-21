@@ -1,6 +1,6 @@
 ---
-title: PostHog observability
-description: Preserve the R+D Dashboard telemetry, identity, privacy, and release contracts.
+title: "PostHog observability"
+description: "Preserve the R+D Dashboard telemetry, identity, privacy, and release contracts."
 ---
 
 # PostHog observability
@@ -12,7 +12,7 @@ project.
 
 ## Deployment configuration
 
-Web, admin, and Kinky Makers deployments use:
+Web, Admin, all documentation, and Kinky Makers deployments use:
 
 - `NEXT_PUBLIC_POSTHOG_KEY`
 - `NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com`
@@ -20,6 +20,10 @@ Web, admin, and Kinky Makers deployments use:
 - `POSTHOG_API_KEY` as an optional server-only personal key with only the
   source-map upload permissions it needs. Without it, the deployment succeeds
   but skips source-map upload.
+
+Documentation deployments also require the release track's
+`NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` so the
+shared dashboard session can resolve the numeric `User.id`.
 
 Native EAS environments require `EXPO_PUBLIC_POSTHOG_KEY`,
 `EXPO_PUBLIC_POSTHOG_HOST`, and `EXPO_PUBLIC_APP_ENV`. Native source maps and
@@ -36,7 +40,7 @@ variable.
 
 ## Identity contract
 
-- RAD web, native, admin, and server events identify a signed-in person with
+- RAD web, docs, native, admin, and server events identify a signed-in person with
   the decimal application `User.id`, serialized as a string.
 - Kinky Makers uses `km:<Supabase auth UUID>` until it shares the RAD profile
   model. The prefix prevents accidental identity merges.
@@ -56,8 +60,13 @@ version, and deployment identifiers when available. Failed server requests also
 attach route, method, request ID, and `traceparent`.
 
 Do not send request bodies, access tokens, email addresses, intimate content,
-prompts, raw MAC addresses, or device credentials. Keep replay inputs masked.
-Kinky Makers masks all rendered text, and admin replay remains disabled.
+prompts or responses, search text, local file content, raw MAC addresses, or
+device credentials. Docs replay masks inputs and blocks device panels. Admin
+replay is structure-only: it masks text, inputs, and attributes and blocks
+records, messages, queries, images, video, and canvas. Both surfaces suppress
+console and network recording locally. Query strings and fragments are removed
+from event and replay URLs. The parent-domain analytics preference provides the
+visitor opt-out across canonical browser surfaces.
 
 ## Release verification
 

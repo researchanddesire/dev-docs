@@ -1,0 +1,209 @@
+---
+title: "Configuratiereferentie"
+description: "Begrijp en pas de OSSM-firmwareconfiguratieparameters aan voor uw specifieke build"
+---
+
+De OSSM-firmware gebruikt een reeks configuratieconstanten die bewegingslimieten, hardware-eigenschappen en gebruikersvoorkeuren definiëren. Deze referentie documenteert alle configureerbare parameters en hoe u deze kunt wijzigen voor aangepaste builds.
+
+<Warning>
+Het onjuist wijzigen van configuratiewaarden kan uw hardware beschadigen of een onveilige werking veroorzaken. Wijzig waarden alleen als u de gevolgen ervan begrijpt en uw hardwarespecificaties hebt geverifieerd.
+</Warning>
+
+## Configuratie van bewegingssysteem
+
+Deze parameters bepalen hoe de OSSM beweegt en zijn te vinden in `src/constants/Config.h` onder de naamruimte `Config::Driver`.
+
+### Snelheid en acceleratie
+
+| Parameter | Standaard | Eenheid | Beschrijving |
+|-----------|---------|------|-------------|
+| `maxSpeedMmPerSecond` | 900.0 | mm/sec | Maximale lineaire snelheid van de actuator |
+| `maxAcceleration` | 10000.0 | mm/s² | Maximale acceleratie-/deceleratiesnelheid |
+
+<Info>
+Deze limieten gelden voor alle bedrijfsmodi. De daadwerkelijk behaalde snelheid is afhankelijk van uw motor, voeding en mechanische opstelling.
+</Info>
+
+### Motorconfiguratie
+
+| Parameter | Standaard | Eenheid | Beschrijving |
+|-----------|---------|------|-------------|
+| `motorStepPerRevolution` | 800.0 | stappen/omw | Motorstappen per volledige omwenteling |
+| `pulleyToothCount` | 20.0 | tanden | Aantal tanden op de aandrijfpoelie |
+| `beltPitchMm` | 2.0 | mm | Afstand tussen riemtanden (GT2 standaard) |
+
+Deze waarden worden gecombineerd om `stepsPerMM` te berekenen:
+
+```cpp
+stepsPerMM = motorStepPerRevolution / (pulleyToothCount * beltPitchMm)
+// Default: 800 / (20 * 2) = 20 steps/mm
+```
+
+<Tip>
+Als u andere hardware gebruikt (bijvoorbeeld een poelie met 16 tanden of een GT3-riem), moet u deze waarden bijwerken zodat ze overeenkomen. Onjuiste waarden zorgen ervoor dat de firmware posities verkeerd berekent.
+</Tip>
+
+### Beroertelimieten
+
+| Parameter | Standaard | Eenheid | Beschrijving |
+|-----------|---------|------|-------------|
+| `maxStrokeSteps` | 500.0 | mm | Maximaal bruikbare slaglengte |
+| `minStrokeLengthMm` | 50.0 | mm | Minimale slag om de homing-validatie te doorstaan |
+
+<Note>
+`maxStrokeSteps` definieert de absolute maximale slag. Stel dit in op uw raillengte minus de lineaire blokhouder (75 mm op standaard OSSM) minus een veiligheidsmarge van 20 mm.
+</Note>
+
+### Homing-configuratie
+
+| Parameter | Standaard | Eenheid | Beschrijving |
+|-----------|---------|------|-------------|
+| `sensorlessCurrentLimit` | 1.5 | % | Huidige drempel die het einde van de reis aangeeft |
+
+De OSSM maakt gebruik van sensorloze homing: hij detecteert wanneer de actuator het einde van de slag bereikt door de motorstroom te monitoren. Wanneer de stroom deze drempel overschrijdt, weet de firmware dat de actuator een fysieke stop heeft bereikt.
+
+## Geavanceerde configuratie
+
+Deze parameters verfijnen het gedrag van de firmware en zijn te vinden in `Config::Advanced`.
+
+| Parameter | Standaard | Eenheid | Beschrijving |
+|-----------|---------|------|-------------|
+| `strokeZeroOffsetMm` | 6.0 | mm | Bufferafstand vanaf de fysieke thuispositie |
+| `commandDeadZonePercentage` | 1.0 | % | Potentiometer dode zone om ruis te voorkomen |
+| `accelerationScaling` | 100.0 | - | Beïnvloedt de agressiviteit van bewegingen bij eenvoudige penetratie |
+
+<AccordionGroup>
+<Accordion title="slagZeroOffsetMm">
+Na de startpositie trekt de actuator zich over deze afstand terug van de fysieke eindstop. Dit voorkomt dat de actuator tijdens normaal bedrijf herhaaldelijk de eindstop raakt.
+</Accordion>
+
+<Accordion title="commandoDeadZonePercentage">
+Analoge potentiometers kunnen luidruchtige metingen produceren die bijna nul zijn. Deze dode zone zorgt ervoor dat de snelheidsknop als "nul" wordt geregistreerd wanneer deze volledig tegen de klok in wordt gedraaid, zelfs als de elektrische waarde iets boven 0% ligt.
+</Accordion>
+
+<Accordion title="versnellingSchaal">
+In de modus Eenvoudige penetratie wordt de versnelling als volgt berekend:
+```cpp
+acceleration = maxSpeedMmPerSecond * speed * speed / accelerationScaling
+```
+Hogere waarden produceren zachtere acceleratiecurven.
+</Accordion>
+</AccordionGroup>
+
+## Gebruikersconfiguratie
+
+Gebruikersvoorkeuren worden gedefinieerd in `src/constants/UserConfig.h`.
+
+### Taal
+
+```cpp
+static LanguageStruct language = enUs;  // or 'fr' for French
+```
+
+Beschikbare talen:
+- `enUs` — Engels (VS)
+- `fr` — Frans
+
+<Note>
+Taalselectie vereist momenteel het opnieuw compileren van de firmware. Er is een runtime-taalkiezer gepland voor toekomstige releases.
+</Note>
+
+### Weergave-eenheden
+
+```cpp
+static bool displayMetric = true;
+```
+
+Bij `true` worden afstanden weergegeven in meters. Bij `false` worden afstanden weergegeven in voet.
+
+## Pindefinities
+
+Hardwarepinnen worden gedefinieerd in `src/constants/Pins.h`. Wijzig deze als u aangepaste hardware bouwt.
+
+### Weergavepinnen
+
+| Pin | Standaard GPIO | Beschrijving |
+|-----|--------------|-------------|
+| `oledReset` | -1 | OLED-resetpin (-1 indien gedeeld met bordreset) |
+| `ledPin` | 25 | RGB LED-datapin (WS2812B) |
+
+### Stuurprogrammapinnen
+
+| Pin | Standaard GPIO | Beschrijving |
+|-----|--------------|-------------|
+| `motorStepPin` | 14 | Stepper/servo STEP-signaal |
+| `motorDirectionPin` | 27 | Stepper/servo DIR-signaal |
+| `motorEnablePin` | 26 | Stapper/servo ENA-signaal |
+| `currentSensorPin` | 36 | Analoge stroomdetectie-ingang |
+| `stopPin` | 19 | Noodstopschakelaar (optioneel) |
+| `limitSwitchPin` | 12 | Ingang eindschakelaar (optioneel) |
+
+### Pinnen op afstand
+
+| Pin | Standaard GPIO | Beschrijving |
+|-----|--------------|-------------|
+| `speedPotPin` | 34 | Toerentalpotentiometer analoge ingang |
+| `encoderSwitch` | 35 | Encoderknopingang |
+| `encoderA` | 18 | Encoderkanaal A |
+| `encoderB` | 5 | Encoderkanaal B |
+| `displayData` | 21 | I2C SDA voor OLED |
+| `displayClock` | 19 | I2C SCL voor OLED |
+
+### GPIO-uitbreidingspinnen
+
+Deze pinnen zijn beschikbaar voor accessoires via [BLE GPIO control](/ossm/software/communication/gpio):
+
+| Logische pin | GPIO | Beschrijving |
+|-------------|------|-------------|
+| Pin 1 | GPIO2 | Uitvoer voor algemeen gebruik |
+| Pin 2 | GPIO15 | Uitvoer voor algemeen gebruik |
+| Pin 3 | GPIO22 | Uitvoer voor algemeen gebruik |
+| Pin 4 | GPIO33 | Uitvoer voor algemeen gebruik |
+
+## Configuratie wijzigen
+
+<Steps>
+<Step title="Kloon de repository">
+Als u dat nog niet heeft gedaan, kloon dan de OSSM-firmwarerepository:
+
+```bash
+git clone https://github.com/KinkyMakers/OSSM-hardware.git
+cd OSSM-hardware/Software
+```
+</Step>
+
+<Step title="Configuratiebestanden bewerken">
+Open het relevante configuratiebestand in uw editor:
+
+- `src/constants/Config.h` — Beweging en geavanceerde parameters
+- `src/constants/UserConfig.h` — Gebruikersvoorkeuren
+- `src/constants/Pins.h` — Hardware-pintoewijzingen
+</Step>
+
+<Step title="Herbouwen en uploaden">
+Gebruik PlatformIO om de gewijzigde firmware te compileren en te uploaden:
+
+1. Klik op de knop **Build** om de compilatie van uw wijzigingen te verifiëren
+2. Klik op **Upload** om de nieuwe firmware te flashen
+
+<Check>
+Na het uploaden zal de OSSM opnieuw opstarten en uw nieuwe configuratie gebruiken.
+</Check>
+</Step>
+</Steps>
+
+<Warning>
+Test configuratiewijzigingen altijd zorgvuldig. Begin met lage snelheden en controleer of de homing succesvol is voltooid voordat u normaal gaat werken.
+</Warning>
+
+## Gerelateerde pagina's
+
+<CardGroup cols={2}>
+<Card title="PlatformIO-installatie" icon="wrench" href="/ossm/software/getting-started/platformio">
+  Stel uw ontwikkelomgeving in om firmware te wijzigen en te uploaden.
+</Card>
+
+<Card title="Veiligheidsvoorzieningen" icon="shield" href="/ossm/software/getting-started/safety-features">
+  Begrijp hoe configuratiewaarden veiligheidssystemen beïnvloeden.
+</Card>
+</CardGroup>

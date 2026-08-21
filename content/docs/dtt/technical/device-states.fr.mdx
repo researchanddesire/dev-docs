@@ -1,0 +1,160 @@
+---
+title: "États et écrans de l'appareil"
+description: "Comprendre les écrans et les états affichés par votre home trainer pendant le fonctionnement"
+---
+
+Votre Deepthroat Trainer passe par différents états pendant son fonctionnement, chacun avec son propre écran d'affichage. Comprendre ces états vous aide à naviguer dans l'appareil et à résoudre tout problème.
+
+## Séquence de démarrage
+
+Lorsque vous allumez votre home trainer, il passe par ces états :
+
+### Écran de bienvenue
+- Affiche votre **ID d'entraîneur** (code alphanumérique à 5 caractères)
+- Affiche l'état de la connexion Wi-Fi
+- **Timeout** : 15 secondes avant l'avance automatique
+
+<Info>
+Notez votre identifiant de formateur : vous en aurez besoin pour associer l'appareil à votre compte de tableau de bord.
+</Info>
+
+### Vérifications préalables au vol
+Après l'écran d'accueil, l'appareil exécute des vérifications du système :
+- Vérifie la connexion Wi-Fi
+- Vérifie si l'appareil est couplé
+- Recherche les mises à jour disponibles
+
+L'écran affiche "Préparation..." pendant que ces vérifications sont terminées.
+
+## Configuration Wi-Fi
+
+### Écran de configuration Wi-Fi
+Affiché lors de l'entrée en mode de configuration Wi-Fi :
+- Affiche un code QR pour une connexion facile
+- Affiche « Se connecter à « Configuration du formateur » »
+- **Entrer via** : appuyez longuement pendant l'écran d'accueil
+
+<Tip>
+Le portail de configuration WiFi a un délai d'attente de 400 secondes. S'il expire, l'appareil redémarrera.
+</Tip>
+
+## État de couplage
+
+Si votre appareil n'est pas associé à un compte de tableau de bord :
+- Affiche un code QR reliant aux paramètres du tableau de bord
+- Affiche « Associez-moi pour plus de paramètres et de plaisir ! »
+- Appuyez sur le bouton pour ignorer et continuer hors ligne
+
+## Mettre à jour l'état
+
+Lorsqu'une mise à jour du micrologiciel est disponible :
+- Affiche "Mise à jour" avec un indicateur de progression
+- Affiche « Merci d'avoir attendu ! Vous êtes presque prêt à jouer. »
+- L'appareil redémarrera automatiquement après la mise à jour
+
+<Warning>
+N'éteignez pas l'appareil pendant une mise à jour. Attendez qu'il soit terminé et redémarrez automatiquement.
+</Warning>
+
+## Jouer les états de flux
+
+### Écrans de pré-session
+
+| Écran | Description |
+|--------|-------------|
+| **Vérification en amont** | « Préparation » – vérifie la connectivité et les paramètres |
+| **Récupérer les paramètres** | "Je récupère vos paramètres depuis le tableau de bord." |
+| **Charger les paramètres** | "Vous êtes hors ligne, vos notes ne seront peut-être pas enregistrées." (mode hors ligne) |
+| **Mauvais bilan de santé** | Erreur E-DTT-1 — voir le guide de dépannage <a href="https://docs.researchanddesire.com/dtt/troubleshooting"></a> |
+
+### Écrans d'étalonnage
+
+| Écran | Description |
+|--------|-------------|
+| **Calibrage min** | Capturez la position minimale (la plus proche) – appuyez sur le bouton lorsque vous êtes prêt |
+| **Calibrage maximum** | Capturez la position maximale (repos) – appuyez sur le bouton lorsque vous êtes prêt |
+
+<Note>
+L'étalonnage capture 100 échantillons à chaque position pour plus de précision. Restez stable tout en appuyant sur le bouton.
+</Note>
+
+### Détails de la séance
+
+Avant le début de la formation, des écrans d'informations s'affichent :
+
+| Écran | Contenu | Temps mort |
+|--------|---------|---------|
+| **Détails de la séance** | Nom de la session, nombre total de segments | 10 secondes |
+| **Détails du jouet** | Nom et paramètres du jouet attribué | 10 secondes |
+| **Détails du segment** | Nom et paramètres du segment actuel | 10 secondes |
+
+<Tip>
+En mode mains libres (Ultra), ces écrans avancent automatiquement. Sinon, appuyez sur le bouton pour continuer.
+</Tip>
+
+### Écrans de formation
+
+| Écran | Description |
+|--------|-------------|
+| **Compte à rebours** | "À partir de 3... 2... 1... Bonne chance !" |
+| **Entraînement actif** | Affichage en temps réel indiquant la position, la cible et la progression |
+| **Grade** | Votre score et vos commentaires sur vos performances (délai d'attente : 30 secondes) |
+
+### Écrans réussite/échec (si activés)
+
+| Écran | Description | Temps mort |
+|--------|-------------|---------|
+| **Échoué** | Affiche « Échec » avec le nombre de tentatives (par exemple, « Tentative 1/3 ») | Appuyez pour réessayer |
+| **Trois coups** | "VOUS ÉCHEC - 3 tentatives infructueuses" : redémarrage de la session | 5 secondes |
+
+### Séance terminée
+
+| Écran | Description |
+|--------|-------------|
+| **Page finale** | "Bien joué ! Vous avez terminé la séance." (délai d'attente : 10 secondes) |
+
+La LED devient magenta sur la dernière page pour célébrer la fin.
+
+## États d'erreur
+
+| Erreur | Contenu de l'écran |
+|-------|----------------|
+| **E-TNT-1** | "Pas d'Internet. Vérifiez le pare-feu et le routeur." |
+| **Erreur de segment** | En-tête "ERREUR" avec option de réinitialisation |
+
+Consultez le guide <a href="https://docs.researchanddesire.com/dtt/troubleshooting">Error Codes</a> pour un dépannage détaillé.
+
+## Présentation du diagramme d'état
+
+```
+Power On → Welcome → Preflight → [Update if available]
+                              → [Pairing if needed]
+                              → Play Preflight → Fetch/Load Settings
+                                              → Calibration (if needed)
+                                              → Session Details
+                                              → Countdown → Training
+                                              → Grade → [Next Segment or Final]
+```
+
+## Actions des boutons par état
+
+| État | Appui court | Appui long |
+|-------|-------------|------------|
+| Accueillir | Démarrer le contrôle en amont | Entrez dans la configuration Wi-Fi |
+| Détails de la séance | Écran suivant | Passer à la formation |
+| Détails du segment | Démarrer le segment | Passer à la formation |
+| Grade | Segment suivant | — |
+| Échoué | Réessayer le segment | — |
+| Final | Rejouer | — |
+
+## Guides associés
+
+<CardGroup cols={2}>
+<Card title="Contrôles des boutons" icon="hand-pointer" href="https://docs.researchanddesire.com/dtt/get-started">
+Guide complet des interactions avec les boutons.
+</Card>
+
+<Card title="Codes d'erreur" icon="triangle-exclamation" href="https://docs.researchanddesire.com/dtt/troubleshooting">
+Résoudre les messages d'erreur.
+</Card>
+</CardGroup>

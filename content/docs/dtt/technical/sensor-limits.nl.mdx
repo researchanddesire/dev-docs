@@ -1,0 +1,113 @@
+---
+title: "Sensorspecificaties"
+description: "Technische grenzen en mogelijkheden van de afstandssensor"
+---
+
+De Deepthroat Trainer maakt gebruik van een ultrasone afstandssensor om de positie van het speelgoed in realtime te meten. Als u de mogelijkheden en limieten van de sensor begrijpt, krijgt u de meest nauwkeurige trainingsresultaten.
+
+## Sensorbereik
+
+| Specificatie | Waarde |
+|---------------|-------|
+| **Maximaal bereik** | 22,5 cm (ongeveer 9 inch) |
+| **Dode zone** | 1,7 cm (ongeveer 0,67 inch) |
+| **Effectief bruikbaar bereik** | 20,8 cm (ongeveer 8,2 inch) |
+| **Minimale slaglengte** | 0,8 cm (ongeveer 0,3 inch) |
+
+<Info>
+De dode zone is het gebied dat zich het dichtst bij de sensor bevindt en waar positieveranderingen niet nauwkeurig kunnen worden gedetecteerd. Objecten binnen deze zone worden mogelijk niet correct geregistreerd.
+</Info>
+
+## Hoe de sensor werkt
+
+De afstandssensor bemonstert voortdurend uw positie en verwerkt de gegevens om vloeiende, nauwkeurige metingen te verkrijgen:
+
+- **Samplefrequentie**: Er wordt een gemiddelde van 40 samples genomen om ruis te verminderen
+- **Snelheidsberekening**: Gebaseerd op positieveranderingen in de loop van de tijd
+- **Richtingsdetectie**: houdt bij of u naar de sensor toe of van de sensor af beweegt
+
+<Note>
+De sensor maakt gebruik van een circulaire buffer van recente meetwaarden. Het kan even duren voordat plotselinge, schokkerige bewegingen nauwkeurig worden geregistreerd terwijl de buffer wordt bijgewerkt.
+</Note>
+
+## Positiemeting
+
+Posities worden gemeten in centimeters vanaf de sensor:
+
+- **Startpositie**: Meestal de "rust"-positie, verder van de sensor
+- **Eindpositie**: de doeldiepte, dichter bij de sensor
+- **Doelvenster**: het acceptabele bereik rond de doelpositie
+
+Voor trainingsnauwkeurigheid worden de posities beperkt tot geldige bereiken:
+- Minimaal detecteerbare positie: 1,7 cm (dode zonegrens)
+- Maximaal detecteerbare positie: 22,5 cm
+
+## Kalibratie
+
+Kalibratie omvat twee sleutelposities:
+
+1. **Minimale positie**: de dichtstbijzijnde comfortabele diepte (gemiddeld 100 monsters)
+2. **Maximumpositie**: de rust-/startpositie (gemiddeld 100 monsters)
+
+<Tip>
+Voor de beste resultaten moet u hem tijdens de kalibratie stabiel houden. De trainer legt op elke positie 100 monsters vast om nauwkeurige metingen te garanderen.
+</Tip>
+
+### Speelgoedkalibratie versus apparaatkalibratie
+
+- **Apparaatkalibratie**: Stelt het algehele sensorbereik voor uw installatie in
+- **Speelgoedkalibratie**: Opgeslagen in de cloud, onthoudt instellingen voor specifiek speelgoed
+
+Bij gebruik van cloudkalibratie (Software 2.0+) worden kalibratiegegevens per speeltje opgeslagen en tussen sessies gesynchroniseerd.
+
+## Beperkingen
+
+### Dode zone
+Voorwerpen binnen een afstand van 1,7 cm van de sensor kunnen niet nauwkeurig worden gemeten. Trainingssegmenten worden automatisch aangepast om deze limiet te respecteren.
+
+### Maximaal bereik
+De sensor kan geen posities verder dan 22,5 cm detecteren. Als uw opstelling langere afstanden vereist, overweeg dan om de trainer te herpositioneren.
+
+### Minimale slag
+Zeer kleine bewegingen (minder dan 0,8 cm) worden mogelijk niet als afzonderlijke slagen geregistreerd. Dit zorgt ervoor dat de trainer microbewegingen niet als opzettelijke acties beschouwt.
+
+### Omgevingsfactoren
+
+<Warning>
+De sensor kan worden beïnvloed door:
+- Reflecterende oppervlakken nabij het detectiegebied
+- Zeer zachte of geluidsabsorberende materialen
+- Extreme temperaturen
+</Warning>
+
+## Problemen oplossen
+
+<AccordionGroup>
+<Accordion title="Sensormetingen lijken onnauwkeurig">
+- Kalibreer het apparaat opnieuw
+- Zorg ervoor dat het speelgoed goed in het pad van de sensor is geplaatst
+- Controleer of niets het detectiegebied blokkeert
+</Accordion>
+
+<Accordion title="Positiesprongen of stotteringen">
+- Dit kan gebeuren nabij de grens van de dode zone
+- Probeer uw segmentparameters aan te passen om extreme bereiken te vermijden
+- Zorg ervoor dat het speelgoed soepel beweegt zonder te wiebelen
+</Accordion>
+
+<Accordion title="Kleine bewegingen worden niet gedetecteerd">
+Bewegingen kleiner dan 0,8 cm worden mogelijk niet geregistreerd. Dit is zo ontworpen om valse metingen door trillingen of kleine aanpassingen te voorkomen.
+</Accordion>
+</AccordionGroup>
+
+## Gerelateerde handleidingen
+
+<CardGroup cols={2}>
+<Card title="LED-feedback" icon="lightbulb" href="https://docs.researchanddesire.com/dtt/troubleshooting">
+Hoe LED-kleuren uw positiestatus aangeven.
+</Card>
+
+<Card title="Kalibratie" icon="sliders" href="/dtt/technical/calibration">
+Stapsgewijze handleiding voor het kalibreren van uw trainer.
+</Card>
+</CardGroup>

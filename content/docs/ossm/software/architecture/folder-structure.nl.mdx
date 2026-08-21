@@ -1,0 +1,323 @@
+---
+title: "Mappenstructuur"
+description: "Inzicht in de broncodeorganisatie van de OSSM-firmware"
+---
+
+# Mappenstructuur
+
+De OSSM-firmware volgt een modulaire, op functies gebaseerde architectuur. Elke functie bevindt zich in een eigen naamruimtemap, waardoor de codebase gemakkelijker te navigeren en te onderhouden is.
+
+<Info>
+Blader door de broncode op GitHub: [Software/bron/](https://github.com/KinkyMakers/OSSM-hardware/tree/main/Software/src)
+</Info>
+
+## Overzicht
+
+<Tree>
+  <Tree.Folder name="Software" defaultOpen>
+    <Tree.Folder name="include">
+      <Tree.Folder name="boost">
+        <Tree.File name="sml.hpp" />
+      </Tree.Folder>
+    </Tree.Folder>
+    <Tree.Folder name="lib">
+      <Tree.Folder name="StrokeEngine" />
+    </Tree.Folder>
+    <Tree.Folder name="src" defaultOpen>
+      <Tree.File name="main.cpp" />
+      <Tree.Folder name="ossm" />
+      <Tree.Folder name="services" />
+      <Tree.Folder name="components" />
+      <Tree.Folder name="constants" />
+      <Tree.Folder name="structs" />
+      <Tree.Folder name="utils" />
+      <Tree.Folder name="extensions" />
+    </Tree.Folder>
+    <Tree.Folder name="test" />
+    <Tree.File name="platformio.ini" />
+  </Tree.Folder>
+</Tree>
+
+| Map | Doel |
+|--------|---------|
+| `include/boost/` | Bibliotheken met alleen headers (statusmachine Boost.SML) |
+| `lib/StrokeEngine/` | Bewegingspatroonbibliotheek (gemodificeerd) |
+| `src/` | Belangrijkste broncode |
+| `test/` | Eenheidstests |
+
+## Ontwerpfilosofie
+
+De firmware maakt gebruik van een **functiegebaseerde organisatie** waar gerelateerde code samenleeft:
+
+- **Naamruimten over klassen** - Functies zijn georganiseerd als naamruimtefuncties in plaats van als klassenmethoden
+- **Gezamenlijke bestanden** - De header, implementatie en gerelateerde code van elke functie bevinden zich in dezelfde map
+- **Algemene statusstructuren** - Gedeelde status wordt beheerd via speciale statusstructuren in plaats van via klasseleden
+- **Staatloze modules** - Functiefuncties werken op basis van de globale status, waardoor ze gemakkelijker te testen en te redeneren zijn
+
+<Note>
+De klasse `OSSM` in `ossm/OSSM.h` blijft behouden voor achterwaartse compatibiliteit met de verwerking van BLE-opdrachten. Nieuwe functies moeten gebruik maken van staatloze naamruimtefuncties.
+</Note>
+
+## Kerntoepassing (`src/ossm/`)
+
+De map `ossm/` bevat de kernapplicatielogica, geordend op functie.
+
+<Tree>
+  <Tree.Folder name="ossm" defaultOpen>
+    <Tree.File name="Events.h" />
+    <Tree.File name="OSSM.h" />
+    <Tree.File name="OSSM.cpp" />
+    <Tree.Folder name="state" />
+    <Tree.Folder name="pages" />
+    <Tree.Folder name="homing" />
+    <Tree.Folder name="menu" />
+    <Tree.Folder name="simple_penetration" />
+    <Tree.Folder name="stroke_engine" />
+    <Tree.Folder name="pattern_controls" />
+    <Tree.Folder name="play_controls" />
+  </Tree.Folder>
+</Tree>
+
+| Map | Doel |
+|--------|---------|
+| `state/` | Architectuur van staatsmachines |
+| `pages/` | UI-schermen |
+| `homing/` | Homing-reeks |
+| `menu/` | Menunavigatie |
+| `simple_penetration/` | Eenvoudige penetratiemodus |
+| `stroke_engine/` | Slagmotormodus |
+| `pattern_controls/` | Patroonselectie-UI |
+| `play_controls/` | Bediening voor afspelen/pauzeren/snelheid |
+
+### Staatsmachine (`ossm/state/`)
+
+De componenten van de staatsmachine zijn gescheiden voor duidelijkheid en testbaarheid.
+
+| Bestand | Doel |
+|------|---------|
+| [`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h) | Overgangstabeldefinitie met behulp van Boost.SML |
+| [`actions.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h) / `actions.cpp` | Statusovergangsacties (display-updates, motorbesturing) |
+| [`guards.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h) / `guards.cpp` | Voorwaardelijke controles op overgangen |
+| `state.h` / `state.cpp` | Initialisatie van de staatsmachine en globale instantie |
+
+**Staatsstructuren** beheren verschillende aspecten van de applicatie:
+
+| Bestand | Doel |
+|------|---------|
+| `session.h` | Huidige sessie (starttijd, aantal slagen, afstand) |
+| `settings.h` | Gebruikersinstellingen (snelheid, slag, gevoel, diepte, patroon) |
+| `calibration.h` | Homing-status (sensoroffset, slagstappen, homed-status) |
+| `motion.h` | Bewegingsdoelen (positie, snelheid, tijd) |
+| `menu.h` | Huidige menuselectie |
+| `ble.h` | Bluetooth-verbindingsstatus |
+| `error.h` | Foutmeldingen |
+
+<Tip>
+Zie [Architectuur van staatsmachines](/ossm/software/architecture/state-machine) voor meer informatie over hoe de statusmachine werkt.
+</Tip>
+
+### UI-pagina's (`ossm/pages/`)
+
+Elk scherm in de gebruikersinterface heeft zijn eigen module.
+
+| Module | Beschrijving |
+|--------|-------------|
+| `hello.h` | Opstartscherm met geanimeerde logo's |
+| `preflight.h` | Veiligheidscontrolescherm 'Verlaag snelheid om te starten' |
+| `error.h` | Foutweergave met helpoptie |
+| `update.h` | OTA-updateschermen (controleren, bijwerken, geen update) |
+| `wifi.h` | WiFi-configuratieportaal |
+| `help.h` | Hulp- en ondersteuningsinformatie |
+
+### Bedrijfsmodi
+
+Elke bedrijfsmodus is een op zichzelf staande module met zijn bewegingsbesturingslogica.
+
+| Module | Beschrijving |
+|--------|-------------|
+| `simple_penetration/` | Basisbeweging heen en weer met gecontroleerde snelheid |
+| `stroke_engine/` | Complexe patronen met behulp van de StrokeEngine-bibliotheek |
+
+### Beheer gebruikersinterfaces
+
+| Module | Beschrijving |
+|--------|-------------|
+| `menu/` | Navigatie en weergave in het hoofdmenu |
+| `pattern_controls/` | Patroonselectie-interface voor de Stroke Engine-modus |
+| `play_controls/` | Bediening voor snelheid, slag, diepte en sensatie |
+
+### Functiemodules
+
+| Module | Beschrijving |
+|--------|-------------|
+| `homing/` | Startvolgorde (voorwaartse scan, achterwaartse scan, kalibratie) |
+
+## Hardwareservices (`src/services/`)
+
+De map `services/` biedt hardware-abstractielagen.
+
+<Tree>
+  <Tree.Folder name="services" defaultOpen>
+    <Tree.File name="stepper.h" />
+    <Tree.File name="stepper.cpp" />
+    <Tree.File name="display.h" />
+    <Tree.File name="display.cpp" />
+    <Tree.File name="encoder.h" />
+    <Tree.File name="encoder.cpp" />
+    <Tree.File name="led.h" />
+    <Tree.File name="led.cpp" />
+    <Tree.File name="board.h" />
+    <Tree.File name="board.cpp" />
+    <Tree.File name="tasks.h" />
+    <Tree.File name="tasks.cpp" />
+    <Tree.File name="wm.h" />
+    <Tree.File name="wm.cpp" />
+    <Tree.Folder name="communication" defaultOpen>
+      <Tree.File name="nimble.h" />
+      <Tree.File name="nimble.cpp" />
+      <Tree.File name="queue.h" />
+      <Tree.File name="queue.cpp" />
+      <Tree.File name="command.hpp" />
+      <Tree.File name="state.hpp" />
+      <Tree.File name="patterns.hpp" />
+      <Tree.File name="gpio.hpp" />
+      <Tree.File name="wifi.hpp" />
+      <Tree.File name="config.hpp" />
+    </Tree.Folder>
+  </Tree.Folder>
+</Tree>
+
+| Bestand | Doel |
+|------|---------|
+| `stepper.h/.cpp` | Motorbesturing (FastAccelStepper) |
+| `display.h/.cpp` | OLED-display (U8g2) |
+| `encoder.h/.cpp` | Ingang voor roterende encoder |
+| `led.h/.cpp` | RGB LED-statusindicatie |
+| `board.h/.cpp` | Initialisatie van het bord |
+| `tasks.h/.cpp` | FreeRTOS-taakbeheer |
+| `wm.h/.cpp` | WiFi-manager |
+| `communication/` | BLE- en WiFi-communicatie |
+
+<Info>
+Zie [BLE-communicatie](/ossm/software/communication/ble) voor details over het BLE-protocol.
+</Info>
+
+## Constanten (`src/constants/`)
+
+Configuratiewaarden en opsommingen worden gecentraliseerd in de map `constants/`.
+
+<Tree>
+  <Tree.Folder name="constants" defaultOpen>
+    <Tree.File name="Config.h" />
+    <Tree.File name="Pins.h" />
+    <Tree.File name="Menu.h" />
+    <Tree.File name="Version.h" />
+    <Tree.File name="UserConfig.h" />
+    <Tree.File name="Images.h" />
+    <Tree.File name="LogTags.h" />
+    <Tree.Folder name="copy">
+      <Tree.File name="en-us.h" />
+      <Tree.File name="fr.h" />
+    </Tree.Folder>
+  </Tree.Folder>
+</Tree>
+
+| Bestand | Doel |
+|------|---------|
+| `Config.h` | Systeemconfiguratie (snelheden, limieten, time-outs) |
+| `Pins.h` | GPIO-pindefinities |
+| `Menu.h` | Menuoptie enum |
+| `Version.h` | Informatie over de firmwareversie |
+| `UserConfig.h` | Door de gebruiker configureerbare instellingen |
+| `Images.h` | Bitmap-items weergeven |
+| `LogTags.h` | ESP-IDF-logboektags |
+| `copy/` | Gelokaliseerde tekenreeksen |
+
+<Tip>
+Zie [Configuratie](/ossm/software/getting-started/configuration) voor configuratieopties.
+</Tip>
+
+## Hulpprogramma's (`src/utils/`)
+
+Helperfuncties en klassen die in de hele codebase worden gebruikt.
+
+<Tree>
+  <Tree.Folder name="utils" defaultOpen>
+    <Tree.File name="StateLogger.h" />
+    <Tree.File name="RecursiveMutex.h" />
+    <Tree.File name="StrokeEngineHelper.h" />
+    <Tree.File name="format.h" />
+    <Tree.File name="analog.h" />
+    <Tree.File name="update.h" />
+    <Tree.File name="ble.h" />
+  </Tree.Folder>
+</Tree>
+
+| Bestand | Doel |
+|------|---------|
+| `StateLogger.h` | Registreert statusmachineovergangen voor foutopsporing |
+| `RecursiveMutex.h` | Draadveilige mutex-wikkelaar voor ESP32 |
+| `StrokeEngineHelper.h` | StrokeEngine-integratiehulpprogramma's |
+| `format.h` | Hulpmiddelen voor het formatteren van tekenreeksen |
+| `analog.h` | Middeling en verwerking van analoge ingangen |
+| `update.h` | OTA-updatehulpprogramma's |
+| `ble.h` | BLE-helperfuncties |
+
+## Gegevensstructuren (`src/structs/`)
+
+Gedeelde gegevenstypen die in modules worden gebruikt.
+
+<Tree>
+  <Tree.Folder name="structs" defaultOpen>
+    <Tree.File name="SettingPercents.h" />
+    <Tree.File name="LanguageStruct.h" />
+    <Tree.File name="Points.h" />
+  </Tree.Folder>
+</Tree>
+
+| Bestand | Doel |
+|------|---------|
+| `SettingPercents.h` | Gebruikersinstellingen als percentages (0-100) |
+| `LanguageStruct.h` | Taalconfiguratie |
+| `Points.h` | Coördinaat- en puntstructuren |
+
+## Bibliotheken
+
+### Boost.SML (`include/boost/sml.hpp`)
+
+[Boost.SML](https://boost-ext.github.io/sml/) is een statusmachinebibliotheek met alleen headers. Het is rechtstreeks in het project opgenomen voor versiestabiliteit.
+
+### Slagmotor (`lib/StrokeEngine/`)
+
+Een aangepaste versie van [theelims/StrokeEngine](https://github.com/theelims/StrokeEngine) die bewegingspatronen genereert. De bibliotheek wordt geleverd en aangepast aan OSSM-specifieke vereisten.
+
+## Configuratie bouwen
+
+Het `platformio.ini`-bestand definieert de build-omgevingen:
+
+| Omgeving | Doel |
+|-------------|---------|
+| `development` | Lokale ontwikkeling met logboekregistratie voor foutopsporing |
+| `staging` | Testen vóór de release |
+| `production` | Release-builds met optimalisaties |
+| `test` | Configuratie van eenheidstest |
+
+## Verder lezen
+
+<CardGroup cols={2}>
+<Card title="Staatsmachine" icon="diagram-project" href="/ossm/software/architecture/state-machine">
+  Duik diep in de Boost.SML-statusmachine-architectuur.
+</Card>
+
+<Card title="Configuratie" icon="sliders" href="/ossm/software/getting-started/configuration">
+  Pas bewegingsparameters, pinnen en instellingen aan.
+</Card>
+
+<Card title="Weergaveservice" icon="display" href="/ossm/software/display/display-service">
+  Meer informatie over de thread-safe display-API.
+</Card>
+
+<Card title="BLE-communicatie" icon="bluetooth" href="/ossm/software/communication/ble">
+  Begrijp het Bluetooth-protocol en de kenmerken.
+</Card>
+</CardGroup>

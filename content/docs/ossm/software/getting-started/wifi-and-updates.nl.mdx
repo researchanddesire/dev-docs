@@ -1,0 +1,238 @@
+---
+title: "WiFi en updates"
+description: "Configureer WiFi-connectiviteit en installeer draadloze firmware-updates op uw OSSM"
+---
+
+De OSSM ondersteunt WiFi-connectiviteit voor over-the-air (OTA) firmware-updates. In deze handleiding wordt uitgelegd hoe u uw OSSM op uw thuisnetwerk kunt aansluiten en kunt controleren op updates.
+
+## WiFi-installatie
+
+### WiFi-installatie starten
+
+<Steps>
+<Step title="Navigeer naar WiFi-instellingen">
+Blader vanuit het hoofdmenu naar **WiFi-instellingen** en druk op de encoder om deze te selecteren.
+</Step>
+
+<Step title="Bekijk aansluitinstructies">
+Het display toont:
+
+- Koptekst 'WiFi-installatie'
+- Instructies om verbinding te maken met 'OSSM Setup'
+- Een QR-code voor snelle verbinding
+
+De QR-code codeert: `WIFI:S:OSSM Setup;T:nopass;;`
+</Step>
+
+<Step title="Maak verbinding met het OSSM-toegangspunt">
+Op uw telefoon of computer:
+
+1. Open WiFi-instellingen
+2. Zoek naar een netwerk met de naam **OSSM Setup**
+3. Verbinden (geen wachtwoord vereist)
+
+<Tip>
+Scan de QR-code met de camera van uw telefoon voor verbinding met één tik op ondersteunde apparaten.
+</Tip>
+</Step>
+
+<Step title="Configureer uw thuisnetwerk">
+Na verbinding te hebben gemaakt met het OSSM-toegangspunt:
+
+1. Een captive portal zou automatisch moeten openen
+2. Als dit niet het geval is, opent u een browser en navigeert u naar `192.168.4.1`
+3. Selecteer uw WiFi-thuisnetwerk uit de lijst
+4. Voer uw WiFi-wachtwoord in
+5. Klik op **Opslaan**
+
+De OSSM zal proberen verbinding te maken met uw thuisnetwerk.
+</Step>
+
+<Step title="Sluit de WiFi-installatie af">
+Druk op de encoder of selecteer **Herstart** om de WiFi-installatiemodus te verlaten. De OSSM zal opnieuw opstarten en verbinding maken met uw geconfigureerde netwerk.
+</Step>
+</Steps>
+
+### Verbinding verifiëren
+
+Na het opnieuw opstarten zal de OSSM proberen verbinding te maken met uw geconfigureerde WiFi-netwerk. U kunt de verbinding verifiëren door:
+
+1. Selecteer **Update** in het hoofdmenu
+2. Als WiFi is verbonden, wordt 'Controleren op updates...' weergegeven.
+3. Als er geen wifi-verbinding is, wordt u doorgestuurd naar de wifi-instellingen
+
+<Note>
+De OSSM geeft zijn IP-adres niet op het scherm weer. Voor geavanceerd netwerken kunt u dit vinden in de DHCP-clientlijst van uw router of gebruik maken van netwerkscantools.
+</Note>
+
+### WiFi-instellingen wissen
+
+Verbinding maken met een ander netwerk of verbindingsproblemen oplossen:
+
+1. Selecteer **WiFi-instellingen** in het menu
+2. De vorige netwerkconfiguratie wordt overschreven wanneer u nieuwe instellingen opslaat
+3. U kunt ook de firmware opnieuw flashen om alle instellingen te wissen
+
+## Updates via de ether
+
+De OSSM kan firmware-updates rechtstreeks via WiFi downloaden en installeren, zonder verbinding te maken met een computer.
+
+### Vereisten
+
+- Actieve WiFi-verbinding (geconfigureerd via WiFi Setup)
+- Internettoegang vanaf uw netwerk
+- Voldoende batterij/stroom tijdens het updateproces
+
+### Controleren op updates
+
+<Steps>
+<Step title="Navigeer naar Bijwerken">
+Blader vanuit het hoofdmenu naar **Update** en druk op de encoder.
+</Step>
+
+<Step title="Wacht op versiecontrole">
+Op het display wordt "Checking for update..." weergegeven terwijl de OSSM contact maakt met de updateserver.
+
+De firmware stuurt zijn huidige versie (`SW_VERSION`) naar de server, die antwoordt of er een update beschikbaar is.
+</Step>
+
+<Step title="Resultaat beoordelen">
+Je ziet een van de twee schermen:
+
+**Geen update beschikbaar:**
+- Bericht "Geen update beschikbaar".
+- Druk op de encoder om terug te keren naar het menu
+
+**Update beschikbaar:**
+- Bericht "OSSM bijwerken...".
+- Het bijwerken begint automatisch
+</Step>
+</Steps>
+
+### Tijdens de update
+
+<Warning>
+Schakel uw OSSM niet uit en koppel deze niet los tijdens een update. Dit kan de firmware beschadigen en handmatig herstel vereisen.
+</Warning>
+
+Het updateproces:
+
+1. Downloadt de nieuwe firmware binair (~1-2 MB)
+2. Controleert de downloadintegriteit
+3. Schrijft de firmware naar het flashgeheugen
+4. Start het apparaat automatisch opnieuw op
+
+Op het display verschijnt: "Update is bezig. Dit kan tot 60 seconden duren."
+
+### Na de update
+
+De OSSM start automatisch opnieuw op na een succesvolle update. Het zal:
+
+1. Start op met de nieuwe firmware
+2. Voer de thuisvolgorde uit
+3. Keer terug naar het hoofdmenu
+
+<Check>
+Uw instellingen en WiFi-configuratie blijven behouden tijdens updates.
+</Check>
+
+### Kanalen bijwerken
+
+De OSSM-firmware ondersteunt meerdere updatekanalen:
+
+| Kanaal | URL | Beschrijving |
+|---------|-----|-------------|
+| Productie | `d2g4f7zewm360.cloudfront.net` | Stabiele releases voor algemeen gebruik |
+| Ontwikkeling | `d2oq8yqnezqh3r.cloudfront.net` | Pre-releaseversies om te testen |
+
+<Note>
+Het updatekanaal wordt bepaald tijdens het compileren. Productiefirmware controleert de productieserver; ontwikkelingsfirmware controleert de ontwikkelingsserver.
+</Note>
+
+## Problemen oplossen
+
+<AccordionGroup>
+<Accordion title="Kan het OSSM-installatienetwerk niet vinden">
+- Zorg ervoor dat u zich in de WiFi-installatiemodus bevindt (het scherm toont de QR-code)
+- Ga dichter bij de OSSM staan
+- Probeer de wifi-lijst van uw apparaat te vernieuwen
+- Start de OSSM opnieuw en probeer het opnieuw
+</Accordion>
+
+<Accordion title="Captive portal verschijnt niet">
+- Open handmatig een browser en navigeer naar `192.168.4.1`
+- Schakel tijdelijk mobiele data op uw telefoon uit
+- Probeer een ander apparaat
+</Accordion>
+
+<Accordion title="WiFi maakt geen verbinding met het thuisnetwerk">
+- Controleer of uw WiFi-wachtwoord correct is
+- Zorg ervoor dat uw netwerk 2,4 GHz is (ESP32 ondersteunt 5 GHz niet)
+- Controleer of uw router nieuwe apparaten toestaat
+- Probeer de OSSM dichter bij uw router te plaatsen
+</Accordion>
+
+<Accordion title="Updatecontrole mislukt">
+- Controleer of WiFi is verbonden (probeer eerst WiFi-installatie)
+- Controleer uw internetverbinding
+- De updateserver is mogelijk tijdelijk niet beschikbaar
+- Probeer het over een paar minuten opnieuw
+</Accordion>
+
+<Accordion title="Het downloaden van de update mislukt of er treedt een time-out op">
+- Zorg voor een stabiel WiFi-signaal tijdens de update
+- Ga indien nodig dichter bij uw router staan
+- Controleer of uw internetverbinding werkt
+- Probeer het opnieuw met een nieuwe stroomaansluiting
+</Accordion>
+
+<Accordion title="OSSM start niet op na de update">
+Dit komt zelden voor, maar kan gebeuren als de update werd onderbroken. Herstelopties:
+
+1. Probeer power cycling (de stekker uit het stopcontact halen en weer aansluiten)
+2. Als het apparaat niet opstart, moet u opnieuw flashen via USB met behulp van [PlatformIO](/ossm/software/getting-started/platformio)
+</Accordion>
+</AccordionGroup>
+
+## Technische details
+
+### Servercommunicatie bijwerken
+
+De OSSM stuurt een POST-verzoek naar de updateserver met:
+
+```json
+{
+  "ossmSwVersion": "x.y.z"
+}
+```
+
+De server antwoordt met:
+
+```json
+{
+  "response": {
+    "needUpdate": true
+  }
+}
+```
+
+Als `needUpdate` `true` is, downloadt de firmware het binaire bestand van de firmwaredistributieserver.
+
+### Firmware binaire locaties
+
+| Kanaal | Binaire URL |
+|---------|------------|
+| Productie | `d2sy3zdr3r1gt5.cloudfront.net/firmware.bin` |
+| Ontwikkeling | `d2sy3zdr3r1gt5.cloudfront.net/firmware-dev.bin` |
+
+## Gerelateerde pagina's
+
+<CardGroup cols={2}>
+<Card title="PlatformIO-installatie" icon="wrench" href="/ossm/software/getting-started/platformio">
+  Handmatige firmware-updates via USB voor ontwikkeling of herstel.
+</Card>
+
+<Card title="BLE-protocol" icon="bluetooth" href="/ossm/software/communication/ble">
+  Bedien uw OSSM draadloos via Bluetooth in plaats van WiFi.
+</Card>
+</CardGroup>

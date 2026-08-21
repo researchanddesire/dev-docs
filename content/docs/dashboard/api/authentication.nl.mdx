@@ -1,0 +1,112 @@
+---
+title: "Authenticatie"
+description: "Maak en beheer API-tokens om uw verzoeken te verifiëren"
+---
+
+Voor alle API-aanvragen is een geldig API-token vereist dat wordt doorgegeven in de `Authorization`-header. Tokens zijn JWT's die zijn ondertekend met de identiteit van uw account, dus alle gegevenstoegang respecteert automatisch uw accountrechten.
+
+<Info>
+  Voor het maken van API-tokens is een **Ultra**-abonnement vereist. Als je er geen hebt
+  toch, bezoek [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription) om te upgraden.
+</Info>
+
+## Een token maken
+
+<Steps>
+  <Step title="Navigeer naar API-sleutels">
+    Ga naar **Instellingen > API-sleutels** in de zijbalk van het dashboard.
+  </Step>
+
+<Step title="Klik op Token maken">
+  Klik op de knop **Token maken** en geef uw token een beschrijvende naam
+  (bijvoorbeeld "Home Assistant-integratie" of "Python-script").
+</Step>
+
+  <Step title="Kopieer uw token">
+    Uw token wordt precies één keer weergegeven. Kopieer het en bewaar het veilig.
+
+    <Warning>
+    U kunt dit token niet meer zien. Als u deze kwijtraakt, moet u een nieuwe maken.
+    </Warning>
+
+  </Step>
+</Steps>
+
+## Uw token gebruiken
+
+Neem het token op als een Bearer-token in de `Authorization`-header:
+
+<RequestExample>
+```bash cURL
+curl -X GET \
+  https://dashboard.researchanddesire.com/api/v1/users \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+```python Python
+import requests
+
+headers = {"Authorization": "Bearer YOUR_API_TOKEN"}
+response = requests.get(
+    "https://dashboard.researchanddesire.com/api/v1/users",
+    headers=headers,
+)
+data = response.json()
+```
+
+```javascript JavaScript
+const response = await fetch(
+  "https://dashboard.researchanddesire.com/api/v1/users",
+  {
+    headers: { Authorization: "Bearer YOUR_API_TOKEN" },
+  },
+);
+const data = await response.json();
+```
+
+</RequestExample>
+
+## Tokens beheren
+
+### Tokens bekijken
+
+De instellingenpagina **API Keys** toont al uw actieve tokens met:
+
+- **Naam** — het label dat je hebt toegewezen
+- **Aangemaakt** — toen het token werd aangemaakt
+- **Laatst gebruikt** — de laatste keer dat het token werd gebruikt om een ​​verzoek in te dienen
+
+### Tokens intrekken
+
+Klik op het prullenbakpictogram naast een token om het in te trekken. De intrekking vindt onmiddellijk plaats: alle verzoeken die dat token gebruiken, zullen onmiddellijk `401 Unauthorized`-antwoorden ontvangen.
+
+<Tip> Tokens periodiek intrekken en opnieuw maken als best practice op het gebied van beveiliging. </Tip>
+
+### Tokenlimieten
+
+Je kunt maximaal **5 actieve tokens** tegelijk hebben. Als je meer nodig hebt, trek dan eerst een ongebruikt token in.
+
+## Foutreacties
+
+| Status | Betekenis                                                      |
+| ------ | ------------------------------------------------------------ |
+| `401`  | Ontbrekende, ongeldige, verlopen of ingetrokken token                  |
+| `403`  | Token is geldig, maar u heeft geen toestemming voor deze actie |
+| `404`  | Bron niet gevonden (of niet toegankelijk met uw rechten) |
+
+<ResponseExample>
+```json 401 Unauthorized
+{
+  "ok": false,
+  "error": "Missing or invalid Authorization header"
+}
+```
+
+```json 401 Token Revoked
+{
+  "ok": false,
+  "error": "Token has been revoked"
+}
+```
+
+</ResponseExample>

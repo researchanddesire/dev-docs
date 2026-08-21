@@ -1,0 +1,166 @@
+---
+title: „Softwareübersicht“
+description: „Firmware-Architektur und Entwicklungsleitfaden für die drahtlose RADR-Fernbedienung“
+---
+
+Dieser Abschnitt behandelt die RADR-Firmware, einschließlich Architektur, Entwicklungseinrichtung und wie man die Codebasis ändert oder dazu beiträgt.
+
+## Firmware-Übersicht
+
+RADR läuft auf einem ESP32-S3-Mikrocontroller mit benutzerdefinierter Firmware, die in C++ unter Verwendung des Arduino-Frameworks und PlatformIO geschrieben wurde.
+
+| Komponente | Technologie |
+|-----------|------------|
+| MCU | ESP32-S3 mit PSRAM |
+| Rahmen | Arduino für ESP32 |
+| Build-System | PlattformIO |
+| Sprache | C++ |
+| Bibliothek anzeigen | TFT_eSPI |
+| BLE-Stack | Flink |
+
+## Firmware-Version
+
+| Komponente | Version |
+|-----------|---------|
+| Hauptversion | 1 |
+| Nebenversion | 0 |
+| Patch-Version | 24 |
+| Vollversion | 1.0.24 |
+
+<Info>
+Suchen Sie regelmäßig nach Firmware-Updates, um auf neue Funktionen und Geräteunterstützung zuzugreifen.
+</Info>
+
+## Quellcode
+
+Die vollständige Firmware-Quelle ist auf GitHub verfügbar:
+
+<Card title="RADR-Firmware" icon="code" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Software">
+Durchsuchen Sie den Quellcode und die Dokumentation.
+</Card>
+
+## Architekturübersicht
+
+### Hauptkomponenten
+
+| Komponente | Zweck |
+|-----------|---------|
+| Zustandsmaschine | Verwaltet Bildschirmstatus und Navigationsfluss |
+| Gerätemanager | Verwaltet die Erkennung und Verbindung von Bluetooth-Geräten |
+| Anzeigetreiber | Rendert die Benutzeroberfläche mithilfe von TFT_eSPI mit Canvas-Pufferung |
+| Eingabehandler | Verarbeitet Encoder-, Tasten- und Bumper-Eingaben |
+| Feedback-System | Steuert LEDs, Summer und Vibration |
+| Geräteregistrierung | Ordnet Bluetooth-UUIDs Gerätetypen zu |
+
+### Schlüsseldienste
+
+```
+├── BluetoothService    # BLE scanning and connection
+├── DisplayService      # Screen rendering
+├── InputService        # Encoder and button handling
+├── FeedbackService     # LED, buzzer, vibration
+├── DeviceService       # Connected device control
+├── WiFiService         # WiFi and OTA updates
+└── StorageService      # LittleFS configuration
+```
+
+## Entwicklungsumgebung
+
+### Voraussetzungen
+
+- [Visual Studio-Code](https://code.visualstudio.com/)
+- [PlatformIO-Erweiterung](https://platformio.org/install/ide?install=vscode)
+- USB-C-Kabel zum Flashen
+
+### Erste Schritte
+
+<Steps>
+<Step title="Klonen Sie das Repository">
+```bash
+git clone https://github.com/researchanddesire/radr-wireless-remote.git
+cd radr-wireless-remote/Software
+```
+</Step>
+
+<Step title="Im VS-Code öffnen">
+Öffnen Sie den Ordner `Software` in VS Code. PlatformIO erkennt die Projektkonfiguration automatisch.
+</Step>
+
+<Step title="Erstellen Sie die Firmware">
+Klicken Sie auf die Schaltfläche „PlatformIO Build“ oder führen Sie Folgendes aus:
+```bash
+pio run
+```
+</Step>
+
+<Step title="Flash zum Gerät">
+Verbinden Sie RADR über USB-C und klicken Sie auf „Hochladen“ oder führen Sie Folgendes aus:
+```bash
+pio run --target upload
+```
+</Step>
+</Steps>
+
+## Hauptmerkmale
+
+### Leinwandbasiertes Rendering
+
+RADR verwendet doppelt gepuffertes Canvas-Rendering für reibungslose Anzeigeaktualisierungen:
+
+- Vollbild-Sprites verhindern ein Flackern
+- Teilweise Aktualisierungen für leistungskritische Bereiche
+- Konsistente UI-Aktualisierungsrate von 60 Bildern pro Sekunde
+
+### Zustandsmaschinenarchitektur
+
+Die Benutzeroberfläche verwendet eine hierarchische Zustandsmaschine:
+
+- Klare Übergänge zwischen Bildschirmen
+- Isolierte Statuslogik für jeden Bildschirm
+- Ereignisgesteuerte Eingabeverarbeitung
+
+### Geräteregistrierung
+
+RADR unterstützt mehrere Gerätetypen über eine zweistufige Registrierung:
+
+| Registrierung | Beschreibung |
+|----------|-------------|
+| Eingebaut | Unterstützung für fest codierte R+D-Geräte (OSSM) |
+| Dynamisch | JSON-basierte Buttplug.io-Gerätedefinitionen |
+
+Die dynamische Registrierung (`registry.json`) kann über Firmware-Updates aktualisiert werden, um neue Geräteunterstützung ohne Codeänderungen hinzuzufügen.
+
+## Konfigurationsdateien
+
+| Datei | Zweck |
+|------|---------|
+| `platformio.ini` | Erstellen Sie Konfigurationen und Abhängigkeiten |
+| `src/config.h` | Definitionen und Konstanten der Hardware-Pins |
+| `data/registry.json` | Buttplug.io-Geräte-UUID-Zuordnungen |
+
+## Technische Referenz
+
+<CardGroup cols={2}>
+<Card title="Web-Flasher" icon="bolt" href="/radr/software/ota-updates/introduction">
+Flash-Firmware mit dem webbasierten Tool.
+</Card>
+
+<Card title="BLE-Kommunikation" icon="bluetooth" href="/radr/software/communication/ble">
+Details zum Bluetooth-Protokoll und zur Gerätekommunikation.
+</Card>
+</CardGroup>
+
+## Mitwirken
+
+Lesen Sie [Beitragsrichtlinien](https://github.com/researchanddesire/radr-wireless-remote/blob/main/CONTRIBUTING.md), bevor Sie eine Änderung für den Zweig `main` einreichen.
+
+### Codestil
+
+- Befolgen Sie die vorhandene Codeformatierung
+- Verwenden Sie beschreibende Variablen- und Funktionsnamen
+- Dokumentieren Sie öffentliche Funktionen und komplexe Logik
+- Testen Sie Änderungen auf der tatsächlichen Hardware, bevor Sie sie einreichen
+
+## Lizenz
+
+Die RADR-Firmware wird unter der **CERN Open Hardware License Version 2 – Strongly Reciprocal (CERN-OHL-S v2)** veröffentlicht. Weitere Informationen finden Sie im Repository [Lizenz](https://github.com/researchanddesire/radr-wireless-remote/blob/main/LICENSE).
