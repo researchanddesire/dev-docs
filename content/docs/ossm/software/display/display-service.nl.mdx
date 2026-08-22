@@ -1,11 +1,11 @@
 ---
 title: "Weergaveservice"
-description: "Gebruik de thread-safe weergaveservice om naar de 128×64 SSD1306 OLED met U8G2 te tekenen"
+description: "Gebruik de threadveilige weergaveservice om op het 128×64 SSD1306 OLED-scherm met U8G2 te tekenen"
 ---
 
 ## Overzicht
 
-De weergaveservice is een wereldwijde, draadveilige verpakking rond de U8G2-driver voor een 128×64 SSD1306 OLED. U gebruikt het om tekst en afbeeldingen van elke taak weer te geven zonder flikkering of scheuren. Een FreeRTOS mutex garandeert exclusieve toegang terwijl je tekent; helperfuncties zorgen voor het opruimen van regio's, gedeeltelijk vernieuwen, knippen en tekstcaching.
+De weergaveservice is een globale, threadveilige wrapper rond de U8G2-driver voor een 128×64 SSD1306 OLED. U gebruikt deze om tekst en grafische elementen vanuit elke taak weer te geven zonder flikkering of beeldscheuren. Een FreeRTOS-mutex garandeert exclusieve toegang terwijl u tekent; helperfuncties zorgen voor het wissen van regio's, gedeeltelijk vernieuwen, knippen en tekstcaching.
 
 <Info>
 Deze pagina documenteert de ontwikkelaars-API op firmwareniveau die op onze apparaten wordt gebruikt. Voor gebruikersgericht weergavegedrag (bijvoorbeeld het verbergen van de schermen voor de resterende tijd of de apparaatstatus), zie de gerelateerde pagina's aan het einde.
@@ -15,15 +15,15 @@ Deze pagina documenteert de ontwikkelaars-API op firmwareniveau die op onze appa
 
 - ESP32 met hardware I2C beschikbaar
 - U8G2-bibliotheek geïntegreerd in uw firmware-build
-- FreeRTOS (voor het display mutex)
-- Pinnen geconfigureerd voor SDA/SCL in de `Pins.h` van je bord
+- FreeRTOS (voor de displaymutex)
+- Pinnen geconfigureerd voor SDA/SCL in de `Pins.h` van uw bord
 
 ## Hardwareconfiguratie
 
-| Eigendom | Waarde |
+| Eigenschap | Waarde |
 |---|---|
-| Weergave | SSD1306 OLED |
-| Oplossing | 128×64 pixels |
+| Display | SSD1306 OLED |
+| Resolutie | 128×64 pixels |
 | Interface | I2C (hardware) |
 | Rotatie | U8G2_R0 (0°) |
 | I2C-adres | 0x3C |
@@ -38,7 +38,7 @@ Sommige U8G2-constructeurs verwachten het 8-bits I2C-adres. Als dat zo is, geef 
 Het scherm wordt behandeld als een raster van cellen van 8×8 pixels:
 
 - Raster: 8 rijen × 16 kolommen
-- Herkomst: (0,0) linksboven
+- Oorsprong: (0,0) linksboven
 - Celgrootte: 8×8 pixels
 
 ### Regio's
@@ -52,7 +52,7 @@ Het scherm wordt behandeld als een raster van cellen van 8×8 pixels:
 <Accordion title="Paginagebied (rijen 1–6)">
 - 6 rijen hoog (48 px)
 - 16 cellen breed (128 px)
-- Alle hoofdinhoud zou hier moeten worden weergegeven
+- Alle hoofdinhoud moet hier worden weergegeven
 </Accordion>
 
 <Accordion title="Voettekst (rij 7)">
@@ -62,12 +62,12 @@ Het scherm wordt behandeld als een raster van cellen van 8×8 pixels:
 </AccordionGroup>
 
 <Tip>
-U8G2-tekst-API's gebruiken de basislijn voor `y`. Voor lettertypen van 8 pixels hoog begint u de eerste tekstregel bij `y = 8` en voegt u vervolgens de opstijging/lijnhoogte van het lettertype toe voor de daaropvolgende regels.
+U8G2-tekst-API's gebruiken de basislijn voor `y`. Voor lettertypen van 8 pixels hoog begint u de eerste tekstregel bij `y = 8` en voegt u vervolgens de stamhoogte/lijnhoogte van het lettertype toe voor de daaropvolgende regels.
 </Tip>
 
-## Draadveiligheid
+## Threadveiligheid
 
-De weergaveservice stelt een FreeRTOS-mutex bloot. Vergrendel altijd voordat u tekent en ontgrendel wanneer u klaar bent.
+De weergaveservice biedt een FreeRTOS-mutex. Vergrendel deze altijd voordat u tekent en ontgrendel de mutex wanneer u klaar bent.
 
 ```cpp display_mutex.h
 #pragma once
@@ -78,7 +78,7 @@ extern SemaphoreHandle_t displayMutex;
 ```
 
 <Warning>
-Als u de mutex niet loslaat, worden alle andere taken waarvoor het display nodig is, geblokkeerd. Koppel een succesvolle `xSemaphoreTake` altijd aan `xSemaphoreGive` in een `finally`-stijl pad.
+Als u de mutex niet vrijgeeft, worden alle andere taken die het display nodig hebben geblokkeerd. Koppel een geslaagde `xSemaphoreTake` altijd aan `xSemaphoreGive` in een pad in `finally`-stijl.
 </Warning>
 
 ### Basisgebruikspatroon
@@ -114,8 +114,8 @@ Na initialisatie moet het scherm leeg zijn en van achteren verlicht zijn, en `di
 </Check>
 </Step>
 
-<Step title="Controleer tekening">
-Render één regel tekst in het paginagebied.
+<Step title="Tekenen controleren">
+Teken één regel tekst in het paginagebied.
 
 ```cpp sanity_check.cpp
 if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
@@ -129,9 +129,9 @@ if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
 </Step>
 </Steps>
 
-## Hulpjes bij het opruimen
+## Wishelpers
 
-Maak op efficiënte wijze alleen duidelijk wat u van plan bent opnieuw te tekenen. Alle helpers gebruiken een interne `updateDisplayArea()` om een ​​gedeeltelijke vernieuwing van de getroffen regio uit te voeren.
+Wis efficiënt alleen wat u opnieuw wilt tekenen. Alle helpers gebruiken intern `updateDisplayArea()` om de getroffen regio gedeeltelijk te vernieuwen.
 
 | Functie | Beschrijving | Regio gewist |
 |---|---|---|
@@ -153,17 +153,17 @@ void clearPage(bool includeFooter = false, bool includeHeader = false);
 `clearPage()` stelt een uitknipvenster in om te voorkomen dat inhoud in de kop- of voettekst terechtkomt.
 </Note>
 
-## Helpers vernieuwen
+## Vernieuwingshelpers
 
 Roep een vernieuwingshelper op nadat u een regio hebt gewijzigd. Deze voeren minimale updates uit op het display.
 
 | Functie | Beschrijving | Regio bijgewerkt |
 |---|---|---|
-| `refreshHeader()` | Duwt koptekst | Rij 0, cellen 0–12 |
-| `refreshIcons()` | Duwt pictogramgebied | Rij 0, cellen 13–15 |
-| `refreshFooter()` | Duwt voettekst | Rij 7, cellen 0–14 |
-| `refreshTimeout()` | Duwt op de time-outindicator | Rij 7, cel 15 |
-| `refreshPage(includeFooter=false, includeHeader=false)` | Pusht de hoofdinhoud; optionele kop-/voettekst | Rijen 1–6 (plus kop-/voettekst indien gevraagd) |
+| `refreshHeader()` | Werkt de koptekst bij | Rij 0, cellen 0–12 |
+| `refreshIcons()` | Werkt het pictogramgebied bij | Rij 0, cellen 13–15 |
+| `refreshFooter()` | Werkt de voettekst bij | Rij 7, cellen 0–14 |
+| `refreshTimeout()` | Werkt de time-outindicator bij | Rij 7, cel 15 |
+| `refreshPage(includeFooter=false, includeHeader=false)` | Werkt de hoofdinhoud bij; optionele kop-/voettekst | Rijen 1–6 (plus kop-/voettekst indien gevraagd) |
 
 ```cpp refresh_helpers.h
 void refreshHeader();
@@ -173,11 +173,11 @@ void refreshTimeout();
 void refreshPage(bool includeFooter = false, bool includeHeader = false);
 ```
 
-## Inhoudelijke helpers
+## Inhoudhelpers
 
 ### `setHeader()`
 
-Stelt de koptekst in. De service gebruikt hoofdletters en slaat de laatste waarde op in de cache om onnodig opnieuw tekenen te voorkomen.
+Stelt de koptekst in. De service zet de laatste waarde om in hoofdletters en slaat deze op in de cache om onnodig opnieuw tekenen te voorkomen.
 
 ```cpp header.h
 void setHeader(String &text);
@@ -207,20 +207,20 @@ int drawWrappedText(int x, int y, const String &text, bool center = false);
 ```
 
 <ParamField path="x" type="int" required>
-Beginnende x-coördinaat in pixels.
+Begincoördinaat x in pixels.
 </ParamField>
 <ParamField path="y" type="int" required>
-Startbasislijn y-coördinaat in pixels.
+Begin-y-coördinaat van de basislijn in pixels.
 </ParamField>
 <ParamField path="text" type="String" required>
 Tekst om weer te geven. Ondersteunt letterlijke `\n` voor regeleinden.
 </ParamField>
 <ParamField path="center" type="bool" default="false">
-Centreer elke omwikkelde lijn binnen het paginagebied wanneer `true`.
+Centreer elke omgebroken regel binnen het paginagebied wanneer `true` is.
 </ParamField>
 
 <ResponseField name="return" type="int" required>
-Aantal getekende lijnen.
+Aantal getekende regels.
 </ResponseField>
 
 ## Algemene patronen
@@ -241,7 +241,7 @@ if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
 Dit patroon maakt alleen het paginagebied leeg, tekent nieuwe inhoud en voert een gedeeltelijke vernieuwing uit voor snelheid.
 </Check>
 
-### Update alleen de koptekst
+### Werk alleen de koptekst bij
 
 ```cpp update_header.cpp
 if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
@@ -252,7 +252,7 @@ if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
 }
 ```
 
-### Teken omwikkelde, gecentreerde tekst
+### Teken gecentreerde tekst met automatische regelafbreking
 
 ```cpp wrapped_text.cpp
 if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
@@ -267,8 +267,8 @@ if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
 ## Richtlijnen tekenen
 
 <Steps>
-<Step title="Vergrendel de mutex voor elke tekenreeks">
-Wikkel tekenen en vernieuwen in een kritieke sectie bewaakt door `displayMutex`.
+<Step title="Vergrendel de mutex voor elke tekenbewerking">
+Plaats teken- en vernieuwingsbewerkingen in een door `displayMutex` bewaakte kritieke sectie.
 
 ```cpp lock_and_draw.cpp
 if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
@@ -278,7 +278,7 @@ if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
 ```
 </Step>
 
-<Step title="Geef de voorkeur aan regiohelpers boven volledige ontruimingen">
+<Step title="Geef de voorkeur aan regiohelpers boven volledig wissen">
 Minimaliseer busverkeer en flikkering met behulp van `clear*()`- en `refresh*()`-helpers.
 
 <CodeGroup>
@@ -301,7 +301,7 @@ Houd de inhoud binnen:
 - Kop: rij 0, cellen 0–12
 - Pictogrammen: rij 0, cellen 13–15
 - Pagina: rijen 1–6
-- Voettekst: rij 7, cellen 0–14; time-out op cel 15
+- Voettekst: rij 7, cellen 0–14; time-outindicator in cel 15
 
 Gebruik `clearPage()` om pagina-inhoud weg te knippen van de kop-/voettekst.
 </Step>
@@ -310,10 +310,10 @@ Gebruik `clearPage()` om pagina-inhoud weg te knippen van de kop-/voettekst.
 | Gebied | Aanbevolen lettertype |
 |---|---|
 | Koptekst/voettekst | `u8g2_font_spleen5x8_mu` |
-| Pagina-inhoud | Kies voor leesbaarheid; pas de regelafstand aan op basis van lettertypestatistieken |
+| Pagina-inhoud | Kies voor leesbaarheid; pas de regelafstand aan op basis van lettertypemetriek |
 
 <Note>
-Houd rekening met de stijging van het lettertype en de totale lijnhoogte bij het berekenen van de `y`-verschuivingen tussen lijnen.
+Houd rekening met de stamhoogte van het lettertype en de totale lijnhoogte bij het berekenen van de `y`-verschuivingen tussen regels.
 </Note>
 </Step>
 </Steps>
@@ -322,27 +322,27 @@ Houd rekening met de stijging van het lettertype en de totale lijnhoogte bij het
 
 - Bij gedeeltelijke updates worden alleen de regio's opnieuw getekend die u hebt gewijzigd
 - Tekstcaching vermijdt onnodige teken-/vernieuwingscycli
-- Door te knippen blijft het tekenen binnen het beoogde gebied en wordt de overschrijding verminderd
-- Mutex-bewaakte sequenties voorkomen dat mid-frame scheuren over taken heen
+- Door te knippen blijft het tekenen binnen het beoogde gebied en wordt overtekenen beperkt
+- Door mutex beveiligde reeksen voorkomen beeldscheuren midden in een frame tussen taken
 
 ## Problemen oplossen
 
 <AccordionGroup>
-<Accordion title="Er verschijnt niets na init">
+<Accordion title="Er verschijnt niets na initialisatie">
 - Bevestig dat `initDisplay()` één keer wordt aangeroepen
 - Controleer het I2C-adres (probeer `0x3C` en `0x3C << 1`, afhankelijk van de constructor)
-- Zorg ervoor dat SDA/SCL overeenkomt met de `Pins.h` van uw bord
+- Zorg ervoor dat SDA/SCL overeenkomen met de `Pins.h` van uw bord
 </Accordion>
 
 <Accordion title="Display-updates zijn traag of flikkeren">
-- Gebruik het wissen/verfrissen van regio's in plaats van het wissen van volledige buffers
-- Verzamel uw tekeningen in één mutex-beveiligd blok
-- Vermijd onnodige lettertypewijzigingen tussen draw-oproepen
+- Wis en vernieuw regio's in plaats van volledige buffers te wissen
+- Bundel uw tekenbewerkingen in één door de mutex beschermd blok
+- Vermijd onnodige lettertypewijzigingen tussen tekenaanroepen
 </Accordion>
 
 <Accordion title="Tekst lijkt verticaal verkeerd uitgelijnd">
 - Onthoud dat U8G2 een basislijn gebruikt voor `y`
-- Begin de eerste lettertyperegel van 8 px op `y = 8` of bereken vanaf de lettertype-opstijging
+- Begin de eerste lettertyperegel van 8 px op `y = 8` of bereken vanaf de stamhoogte van het lettertype
 </Accordion>
 
 <Accordion title="Deadlock of geblokkeerde taken">
@@ -356,7 +356,7 @@ Houd rekening met de stijging van het lettertype en de totale lijnhoogte bij het
 | Afhankelijkheid | Doel |
 |---|---|
 | U8G2 | SSD1306-rendering en lettertypeverwerking |
-| GratisRTOS | Mutex voor draadveiligheid |
+| FreeRTOS | Mutex voor threadveiligheid |
 | ESP32 HAL | Hardware-I2C-interface |
 | `Pins.h` | Definities van bordpins voor SDA/SCL |
 
@@ -367,8 +367,8 @@ Houd rekening met de stijging van het lettertype en de totale lijnhoogte bij het
 Hoe de gebruikersinterface de resterende tijd verbergt op apparaten, dashboards en meldingen.
 </Card>
 
-<Card title="Weergavestroom voor noodontgrendeling" icon="alert-triangle" href="https://docs.researchanddesire.com/lockbox/emergency-unlock">
-Schermstroom en gevolgen van het activeren van Noodontgrendeling op het apparaat.
+<Card title="Weergaveverloop voor noodontgrendeling" icon="alert-triangle" href="https://docs.researchanddesire.com/lockbox/emergency-unlock">
+Schermverloop en gevolgen van het activeren van Noodontgrendeling op het apparaat.
 </Card>
 
 <Card title="Ondersteuningsmatrix voor apparaten" icon="list" href="https://docs.researchanddesire.com/radr/supported-devices">

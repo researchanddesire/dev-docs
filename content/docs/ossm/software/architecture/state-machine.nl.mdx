@@ -1,15 +1,15 @@
 ---
-title: "Staatsmachine"
-description: "Inzicht in de architectuur van de OSSM-firmwarestatusmachine"
+title: "Toestandsmachine"
+description: "Inzicht in de architectuur van de toestandsmachine in de OSSM-firmware"
 ---
 
-# Architectuur van staatsmachines
+# Architectuur van de toestandsmachine
 
-De OSSM-firmware gebruikt een declaratieve statusmachine om het gedrag van het apparaat te beheren. Dit zorgt voor voorspelbare overgangen tussen bedrijfsmodi en voorkomt ongeldige toestanden die onverwacht gedrag zouden kunnen veroorzaken.
+De OSSM-firmware gebruikt een declaratieve toestandsmachine om het gedrag van het apparaat te beheren. Dit zorgt voor voorspelbare overgangen tussen bedieningsmodi en voorkomt ongeldige toestanden die onverwacht gedrag kunnen veroorzaken.
 
-## Staatsdiagram
+## Toestandsdiagram
 
-Het volgende diagram toont alle toestanden en overgangen in de OSSM-statusmachine:
+Het volgende diagram toont alle toestanden en overgangen in de OSSM-toestandsmachine:
 
 <MermaidControls />
 
@@ -105,7 +105,7 @@ stateDiagram-v2
 
 ## Ontwerpoverzicht
 
-De statusmachine wordt geïmplementeerd met behulp van [Boost.SML](https://boost-ext.github.io/sml/) (State Machine Language), een C++14-bibliotheek met alleen headers die een domeinspecifieke taal biedt voor het definiëren van statusmachines.
+De toestandsmachine wordt geïmplementeerd met [Boost.SML](https://boost-ext.github.io/sml/) (State Machine Language), een C++14-bibliotheek die alleen uit headers bestaat en een domeinspecifieke taal biedt voor het definiëren van toestandsmachines.
 
 ### Waarom Boost.SML?
 
@@ -114,7 +114,7 @@ Boost.SML werd gekozen voor OSSM omdat het het volgende biedt:
 - **Verificatie tijdens compilatie** - Ongeldige overgangen worden gedetecteerd tijdens het compileren, niet tijdens de runtime
 - **Geen runtime-overhead** - Prestaties gelijkwaardig aan handgeschreven switch/case
 - **Declaratieve syntaxis** - De transitietabel leest als documentatie
-- **Thread safety** - Ingebouwde ondersteuning voor gelijktijdige toegang via beleid
+- **Threadveiligheid** - Ingebouwde ondersteuning voor gelijktijdige toegang via beleidsregels
 - **Kleine footprint** - Eén header, ~2000 regels code, geen afhankelijkheden
 
 ### Syntaxis van overgangstabel
@@ -131,29 +131,29 @@ Bijvoorbeeld:
 "menu.idle"_s + buttonPress[(isOption(Menu::SimplePenetration))] = "simplePenetration"_s
 ```
 
-Dit luidt als volgt: "Wanneer de status `menu.idle` zich bevindt en er een `buttonPress`-gebeurtenis plaatsvindt, gaat de status over naar `simplePenetration` als de guard `isOption(Menu::SimplePenetration)` waar retourneert."
+Dit betekent: wanneer de toestand `menu.idle` actief is en er een `buttonPress`-gebeurtenis optreedt, gaat de toestand over naar `simplePenetration` als de guard `isOption(Menu::SimplePenetration)` `true` retourneert.
 
 <Info>
 Voor een volledige tutorial over de syntaxis van transitietabellen, zie [Boost.SML-zelfstudie](https://boost-ext.github.io/sml/tutorial.html).
 </Info>
 
-## Evenementen
+## Gebeurtenissen
 
-Gebeurtenissen veroorzaken toestandsovergangen. Het zijn eenvoudige structuren die zijn gedefinieerd in `Events.h` en die overal in de codebase kunnen worden verzonden.
+Gebeurtenissen veroorzaken toestandsovergangen. Het zijn eenvoudige structuren die zijn gedefinieerd in `Events.h` en die vanuit elk deel van de codebase kunnen worden verzonden.
 
 | Evenement | Beschrijving | Typische bron |
 |-------|-------------|----------------|
-| `ButtonPress` | Enkele klik op de knop | Draaiende encoderknop |
+| `ButtonPress` | Enkele klik op de knop | Knop van de draai-encoder |
 | `LongPress` | Knop gedurende langere tijd vastgehouden | Encoderknop (vastgehouden) |
-| `DoublePress` | Twee snelle klikken op de knop | Draaiende encoderknop |
-| `Done` | Asynchrone bewerking voltooid | Thuistaak, preflightcontrole |
-| `Error` | Operatie mislukt | Mislukte thuiskomst, beroerte te kort |
+| `DoublePress` | Twee snelle klikken op de knop | Knop van de draai-encoder |
+| `Done` | Asynchrone bewerking voltooid | Homing-taak, preflightcontrole |
+| `Error` | Bewerking mislukt | Mislukte homing, slag te kort |
 | `EmergencyStop` | Onmiddellijke stopzetting vereist | Veiligheidssystemen |
-| `Home` | Vraag de thuisvolgorde aan | Externe opdracht |
+| `Home` | Homingsequentie aanvragen | Externe opdracht |
 
-### Gebeurtenissen verzenden
+### Gebeurtenissen dispatchen
 
-Gebeurtenissen worden verzonden met behulp van de globale `stateMachine`-instantie:
+Gebeurtenissen worden met behulp van de globale `stateMachine`-instantie gedispatcht:
 
 ```cpp
 #include "ossm/state/state.h"
@@ -163,29 +163,29 @@ stateMachine->process_event(ButtonPress{});
 stateMachine->process_event(Done{});
 ```
 
-De statusmachine wordt geïnitialiseerd bij het opstarten in [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp) en weergegeven als een globale aanwijzer.
+De toestandsmachine wordt bij het opstarten geïnitialiseerd in [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp) en als globale pointer beschikbaar gesteld.
 
 <Tip>
-Gebeurtenissen worden gedefinieerd als lege structuren. Het type zelf draagt ​​de betekenis: er is geen gegevenspayload nodig.
+Gebeurtenissen worden gedefinieerd als lege structuren. Het type zelf draagt de betekenis: er is geen gegevenspayload nodig.
 </Tip>
 
-## Bewakers
+## Guards
 
-Bewakers zijn voorwaardelijke controles die bepalen of er een transitie moet plaatsvinden. Ze retourneren `true` om de overgang mogelijk te maken of `false` om deze te blokkeren.
+Guards zijn voorwaardelijke controles die bepalen of een overgang moet plaatsvinden. Ze retourneren `true` om de overgang toe te staan of `false` om deze te blokkeren.
 
-| Bewaker | Beschrijving | Retourneert `true` wanneer... |
+| Guard | Beschrijving | Retourneert `true` wanneer ... |
 |-------|-------------|------------------------|
-| `isOnline` | Controleer WiFi-verbinding | Apparaat is verbonden met WiFi |
-| `isUpdateAvailable` | Controleer op firmware-updates | Server meldt dat er een nieuwere versie beschikbaar is |
-| `isStrokeTooShort` | Valideer het homing-resultaat | De gemeten slag ligt onder de minimumdrempel |
-| `isOption(Menu)` | Controleer het geselecteerde menu-item | De huidige menuselectie komt overeen met de opgegeven optie |
-| `isPreflightSafe` | Valideer de positie van de snelheidsknop | Toerentalpotentiometer bevindt zich in de dode zone (veilig starten) |
-| `isFirstHomed` | Eenmalige eerste thuiscontrole | Dit is de eerste succesvolle thuiskomst sinds het opstarten |
-| `isNotHomed` | Controleer de thuisstatus | Het apparaat is niet gehomed of de homing is ongeldig gemaakt |
+| `isOnline` | WiFi-verbinding controleren | Het apparaat met WiFi is verbonden |
+| `isUpdateAvailable` | Op firmware-updates controleren | De server meldt dat een nieuwere versie beschikbaar is |
+| `isStrokeTooShort` | Het homing-resultaat valideren | De gemeten slag onder de minimumdrempel ligt |
+| `isOption(Menu)` | Het geselecteerde menu-item controleren | De huidige menuselectie overeenkomt met de opgegeven optie |
+| `isPreflightSafe` | De positie van de snelheidsknop valideren | De snelheidspotentiometer zich in de dode zone bevindt (veilig starten) |
+| `isFirstHomed` | Eenmalige controle van de eerste homing | Dit de eerste geslaagde homing sinds het opstarten is |
+| `isNotHomed` | De homingstatus controleren | Het apparaat niet is gehomed of de homing ongeldig is gemaakt |
 
-### Implementatie van bewakers
+### Implementatie van Guards
 
-Bewakers worden gedefinieerd als `constexpr` lambdas in de [`guards`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h)-naamruimte. Ze roepen forward-declared implementatiefuncties aan om de header lichtgewicht te houden:
+Guards worden gedefinieerd als `constexpr`-lambdas in de naamruimte [`guards`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h). Ze roepen vooruit gedeclareerde implementatiefuncties aan om de header licht te houden:
 
 ```cpp
 // In guards.h - forward declaration
@@ -204,64 +204,64 @@ namespace guards {
 }
 ```
 
-De feitelijke logica zit in `guards.cpp`, waardoor de compileertijden snel blijven en implementatiewijzigingen mogelijk zijn zonder de transitietabel opnieuw te compileren.
+De feitelijke logica zit in `guards.cpp`, waardoor de compileertijden kort blijven en implementatiewijzigingen mogelijk zijn zonder de transitietabel opnieuw te compileren.
 
 <Info>
-Zie de [Boost.SML Guards-documentatie](https://boost-ext.github.io/sml/user-guide.html#guards) voor meer informatie over bewakingspatronen.
+Zie de [Boost.SML Guards-documentatie](https://boost-ext.github.io/sml/user-guide.html#guards) voor meer informatie over guard-patronen.
 </Info>
 
 ## Acties
 
-Acties zijn functies die worden uitgevoerd tijdens statusovergangen. Ze veroorzaken bijwerkingen zoals het updaten van het display, het starten van motoren of het resetten van instellingen.
+Acties zijn functies die tijdens toestandsovergangen worden uitgevoerd. Ze veroorzaken bijwerkingen zoals het bijwerken van het display, het starten van motoren of het resetten van instellingen.
 
-### Acties weergeven
+### Weergaveacties
 
 | Actie | Beschrijving |
 |--------|-------------|
 | `drawHello` | Welkomst-/opstartscherm weergeven |
-| `(drawMenu)` | Geef het hoofdmenu weer |
-| `drawPlayControls` | Toon snelheids-/slag-/dieptecontroles |
-| `drawPatternControls` | Toon patroonselectie-UI |
-| `drawPreflight` | Toon de waarschuwing "snelheid verlagen om te starten". |
+| `(drawMenu)` | Het hoofdmenu weergeven |
+| `drawPlayControls` | Snelheids-/slag-/dieptebediening weergeven |
+| `drawPatternControls` | Patroonselectie-UI weergeven |
+| `drawPreflight` | De waarschuwing "snelheid verlagen om te starten" weergeven |
 | `drawHelp` | Help-/ondersteuningsinformatie weergeven |
-| `drawWiFi` | Toon het WiFi-configuratiescherm |
-| `drawUpdate` | Toon het scherm "controleren op updates". |
-| `drawNoUpdate` | Toon het bericht "firmware is up-to-date". |
-| `drawUpdating` | Updatevoortgang tonen |
-| `drawError` | Foutstatus met bericht weergeven |
+| `drawWiFi` | Het WiFi-configuratiescherm weergeven |
+| `drawUpdate` | Het scherm "controleren op updates" weergeven |
+| `drawNoUpdate` | Het bericht "firmware is up-to-date" weergeven |
+| `drawUpdating` | Updatevoortgang weergeven |
+| `drawError` | Fouttoestand met bericht weergeven |
 
 ### Bewegingsacties
 
 | Actie | Beschrijving |
 |--------|-------------|
-| `startHoming` | Begin met de homing-reeks |
-| `clearHoming` | Reset de variabelen van de thuisstatus |
-| `startSimplePenetration` | Start de taak in de modus Eenvoudige penetratie |
-| `startStrokeEngine` | Start de taak in de Stroke Engine-modus |
-| `startStreaming` | Start de streamingmodustaak |
-| `emergencyStop` | Motor geforceerd stoppen en uitgangen uitschakelen |
+| `startHoming` | De homingsequentie starten |
+| `clearHoming` | Variabelen van de homingtoestand resetten |
+| `startSimplePenetration` | De taak in de modus Simple Penetration starten |
+| `startStrokeEngine` | De taak in de modus Stroke Engine starten |
+| `startStreaming` | De taak in de modus Streaming starten |
+| `emergencyStop` | De motor geforceerd stoppen en de uitgangen uitschakelen |
 
-### Instellingen Acties
+### Instellingsacties
 
 | Actie | Beschrijving |
 |--------|-------------|
-| `resetSettingsStrokeEngine` | Initialiseer standaardwaarden voor Stroke Engine (snelheid=0, slag=50, diepte=10, sensatie=50) |
-| `resetSettingsSimplePen` | Initialiseer standaardinstellingen voor eenvoudige penetratie (snelheid=0, streek=0, diepte=50) |
-| `incrementControl` | Blader door de controleparameters (slag → diepte → sensatie) |
-| `setHomed` | Markeer het apparaat als succesvol gehomed |
-| `setNotHomed` | Herplaatsing ongeldig maken (vereist herplaatsing vóór het spelen) |
+| `resetSettingsStrokeEngine` | Standaardwaarden voor Stroke Engine initialiseren (snelheid=0, slag=50, diepte=10, sensatie=50) |
+| `resetSettingsSimplePen` | Standaardwaarden voor Simple Penetration initialiseren (snelheid=0, slag=0, diepte=50) |
+| `incrementControl` | De bedieningsparameters doorlopen (slag → diepte → sensatie) |
+| `setHomed` | Het apparaat als succesvol gehomed markeren |
+| `setNotHomed` | Homing ongeldig maken (opnieuw homen vereist voordat een bewegingsmodus kan worden gestart) |
 
 ### Systeemacties
 
 | Actie | Beschrijving |
 |--------|-------------|
-| `restart` | Start de ESP32 opnieuw op |
-| `resetWiFi` | Wis opgeslagen WiFi-inloggegevens |
-| `updateOSSM` | Download en installeer de firmware-update |
+| `restart` | De ESP32 opnieuw starten |
+| `resetWiFi` | Opgeslagen WiFi-inloggegevens wissen |
+| `updateOSSM` | De firmware-update downloaden en installeren |
 
 ### Actie-implementatie
 
-Acties worden gedefinieerd als `constexpr` lambdas in de [`actions`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h)-naamruimte. Net als bewakers delegeren ze naar voren verklaarde implementatiefuncties:
+Acties worden gedefinieerd als `constexpr`-lambdas in de naamruimte [`actions`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h). Net als Guards delegeren ze naar vooruit gedeclareerde implementatiefuncties:
 
 ```cpp
 // In actions.h - forward declarations
@@ -288,32 +288,32 @@ void ossmDrawHello() {
 }
 ```
 
-Dit patroon houdt de statusmachine losgekoppeld van specifieke implementaties en maakt het mogelijk dat featuremodules onafhankelijk worden ontwikkeld.
+Dit patroon houdt de toestandsmachine losgekoppeld van specifieke implementaties en maakt het mogelijk dat functiemodules onafhankelijk worden ontwikkeld.
 
 <Warning>
-Acties mogen de rode draad niet blokkeren. Langdurige bewerkingen zouden in plaats daarvan FreeRTOS-taken moeten voortbrengen.
+Acties mogen de hoofdthread niet blokkeren. Langdurige bewerkingen moeten in plaats daarvan FreeRTOS-taken starten.
 </Warning>
 
 <Info>
 Zie de [Documentatie over Boost.SML-acties](https://boost-ext.github.io/sml/user-guide.html#actions) voor meer informatie over actiepatronen.
 </Info>
 
-## Draadveiligheid
+## Threadveiligheid
 
-De OSSM-statusmachine is geconfigureerd met thread-safe beleid om gebeurtenissen van meerdere FreeRTOS-taken af ​​te handelen:
+De OSSM-toestandsmachine is geconfigureerd met threadveilige beleidsregels om gebeurtenissen van meerdere FreeRTOS-taken af te handelen:
 
 ```cpp
 sml::sm<OSSMStateMachine, sml::thread_safe<ESP32RecursiveMutex>, sml::logger<StateLogger>>
 ```
 
-Hierbij wordt gebruik gemaakt van een recursieve mutex om statusovergangen te beschermen, waardoor een veilige gebeurtenisverzending mogelijk wordt gemaakt vanuit:
+Hierbij wordt een recursieve mutex gebruikt om toestandsovergangen te beschermen, zodat gebeurtenissen veilig vanuit de volgende contexten kunnen worden gedispatcht:
 
 - De hoofdlus
 - Knop-interrupt-handlers
 - BLE-opdrachthandlers
 - Achtergrondtaken
 
-De statusmachine wordt geïnitialiseerd in [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp):
+De toestandsmachine wordt geïnitialiseerd in [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp):
 
 ```cpp
 // Global state machine instance
@@ -326,30 +326,30 @@ void initStateMachine() {
 ```
 
 <Info>
-Zie de [Documentatie over Boost.SML-beleid](https://boost-ext.github.io/sml/user-guide.html#policies) voor meer informatie over het beleid inzake draadveiligheid.
+Zie de [documentatie over Boost.SML-beleidsregels](https://boost-ext.github.io/sml/user-guide.html#policies) voor meer informatie over threadveiligheidsbeleid.
 </Info>
 
-## Staatsregistratie
+## Toestandslogging
 
-De firmware bevat een `StateLogger` die alle statusovergangen registreert voor foutopsporing:
+De firmware bevat een `StateLogger` die alle toestandsovergangen registreert voor foutopsporing:
 
 ```cpp
 sml::logger<StateLogger>
 ```
 
-Deze voert transitie-informatie uit via ESP-IDF-logboekregistratie, waardoor het gemakkelijk wordt om het gedrag van de statusmachine tijdens de ontwikkeling te traceren.
+Dit geeft transitie-informatie door via ESP-IDF-logging, waardoor het gedrag van de toestandsmachine tijdens de ontwikkeling eenvoudig kan worden gevolgd.
 
 ## Architectuurnotities
 
 De toestandsmachine volgt een **ontkoppelde modulaire architectuur**:
 
-- **State machine-definitie** ([`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h)) bevat alleen de overgangstabel
-- **Acties en bewakers** zijn `constexpr`-lambda's die delegeren aan implementatiefuncties
-- **Featuremodules** (zoals `pages::`, `simple_penetration::`, `stroke_engine::`) bevatten de daadwerkelijke logica
-- **Algemene statusstructuren** beheren de applicatiestatus in plaats van klasseleden
+- **Definitie van de toestandsmachine** ([`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h)) bevat alleen de overgangstabel
+- **Acties en Guards** zijn `constexpr`-lambda's die delegeren aan implementatiefuncties
+- **Functiemodules** (zoals `pages::`, `simple_penetration::`, `stroke_engine::`) bevatten de daadwerkelijke logica
+- **Globale toestandsstructuren** beheren de applicatietoestand in plaats van klasseleden
 
 <Note>
-De klasse `OSSM` in `ossm/OSSM.h` blijft behouden voor achterwaartse compatibiliteit met de verwerking van BLE-opdrachten. Nieuwe functies moeten gebruik maken van staatloze naamruimtefuncties die werken op basis van de globale status.
+De klasse `OSSM` in `ossm/OSSM.h` blijft behouden voor achterwaartse compatibiliteit met de verwerking van BLE-opdrachten. Nieuwe functies moeten gebruik maken van staatloze naamruimtefuncties die werken op basis van de globale toestand.
 </Note>
 
 Zie [Mappenstructuur](/ossm/software/architecture/folder-structure) voor een compleet overzicht van de broncodeorganisatie.
@@ -362,14 +362,14 @@ Zie [Mappenstructuur](/ossm/software/architecture/folder-structure) voor een com
 </Card>
 
 <Card title="Boost.SML-zelfstudie" icon="graduation-cap" href="https://boost-ext.github.io/sml/tutorial.html">
-  Stapsgewijze handleiding voor het bouwen van statusmachines met Boost.SML.
+  Stapsgewijze handleiding voor het bouwen van toestandsmachines met Boost.SML.
 </Card>
 
 <Card title="Boost.SML-gebruikershandleiding" icon="book" href="https://boost-ext.github.io/sml/user-guide.html">
   Volledige referentie voor alle Boost.SML-functies.
 </Card>
 
-<Card title="Bedrijfsmodi" icon="play" href="/ossm/software/getting-started/operating-modes">
+<Card title="Bedieningsmodi" icon="play" href="/ossm/software/getting-started/operating-modes">
   Meer informatie over de modi Simple Penetration, Stroke Engine en Streaming.
 </Card>
 </CardGroup>

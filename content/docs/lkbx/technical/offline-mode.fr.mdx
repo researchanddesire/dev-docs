@@ -3,207 +3,207 @@ title: "Mode hors ligne"
 description: "Comment fonctionne votre Chastity Lockbox lorsqu'elle n'est pas connectée au WiFi ou au tableau de bord"
 ---
 
-Votre Chastity Lockbox est conçue pour fonctionner à la fois en ligne et hors ligne. Ce guide explique ce qui fonctionne sans WiFi, ce qui nécessite une connectivité et comment l'appareil gère les transitions entre les états en ligne et hors ligne.
+Votre Chastity Lockbox est conçue pour fonctionner à la fois en ligne et hors ligne. Ce guide explique ce qui fonctionne sans WiFi, ce qui nécessite une connexion et comment l'appareil gère les transitions entre les états en ligne et hors ligne.
 
 ## Ce qui fonctionne hors ligne
 
-Ces fonctionnalités fonctionnent entièrement sans aucune connexion Internet :
+Ces fonctionnalités fonctionnent entièrement sans connexion Internet :
 
-| Fonctionnalité | Comportement hors ligne |
+| Fonctionnalité | Fonctionnement hors ligne |
 |---------|-----------------|
-| Serrures temporisées | Le compte à rebours continue localement |
-| Mécanisme de verrouillage/déverrouillage | Le verrouillage physique s'enclenche et se libère |
-| Navigation dans les menus | Tous les menus accessibles |
-| Contrôles des boutons | Fonctionnalité complète |
-| Modes veille | Travail de sommeil automatique et manuel |
+| Verrouillages temporisés | Le minuteur continue son compte à rebours localement |
+| Mécanisme de verrouillage/déverrouillage | Le verrou physique se verrouille et se déverrouille |
+| Navigation dans les menus | Tous les menus sont accessibles |
+| Commandes des boutons | Fonctionnalité complète |
+| Modes de veille | Les modes de veille automatiques et manuels fonctionnent |
 | Déverrouillage d'urgence | Peut être utilisé localement (si activé) |
-| Persistance de l'état | L'état de verrouillage survit aux redémarrages |
+| Persistance de l'état | L'état du verrouillage est conservé après les redémarrages |
 
 <Tip>
-Si vous allez quelque part sans WiFi, votre serrure continuera à fonctionner. Le minuteur s'exécute sur l'appareil lui-même et non sur un serveur.
+Si vous vous rendez dans un endroit sans WiFi, votre verrou continuera de fonctionner. Le minuteur fonctionne sur l'appareil lui-même, et non sur un serveur.
 </Tip>
 
 ## Ce qui nécessite le WiFi
 
-Ces fonctionnalités nécessitent une connexion WiFi active :
+Ces fonctionnalités nécessitent une connexion WiFi active :
 
 | Fonctionnalité | Pourquoi le WiFi est nécessaire |
 |---------|-------------------|
-| Couplage | L'appareil doit s'enregistrer auprès du serveur de tableau de bord |
+| Couplage | L'appareil doit s'enregistrer auprès du serveur du tableau de bord |
 | Mises à jour du micrologiciel | Téléchargements depuis le serveur de mise à jour |
 | Synchronisation du tableau de bord | Reçoit les commandes du détenteur de clé |
-| Synchronisation de l'heure | Obtient l'heure précise du serveur NTP |
+| Synchronisation de l'heure | Obtient l'heure exacte du serveur NTP |
 | Journalisation des activités | Envoie les événements au tableau de bord |
 | Vote public | Reçoit les mises à jour des votes |
-| Déverrouillage du porte-clés | Commandes de déverrouillage à distance |
+| Déverrouillage par le détenteur de clé | Commandes de déverrouillage à distance |
 
-## Affichage de l'heure en mode hors connexion
+## Affichage de l'heure hors ligne
 
-Lorsque votre appareil n'est pas connecté au WiFi et n'a pas synchronisé l'heure, l'écran de verrouillage affiche :
+Lorsque votre appareil n'est pas connecté au WiFi et n'a pas synchronisé l'heure, l'écran de verrouillage affiche :
 
-> "Connectez le Wi-Fi pour voir le temps restant"
+> "Connect Wi-Fi to see time remaining"
 
 <Warning>
-Sans synchronisation de l'heure, l'appareil ne peut pas afficher le temps restant avec précision. Cependant, la minuterie de verrouillage elle-même fonctionne toujours correctement en fonction de la durée configurée.
+Sans synchronisation de l'heure, l'appareil ne peut pas afficher avec précision le temps restant. Cependant, le minuteur de verrouillage lui-même fonctionne toujours correctement selon la durée configurée.
 </Warning>
 
-### Pourquoi cela arrive
+### Pourquoi cela se produit
 
-L'appareil doit connaître l'heure actuelle pour calculer le « temps restant ». Sans synchronisation NTP :
+L'appareil doit connaître l'heure actuelle pour calculer « time remaining ». Sans synchronisation NTP :
 - L'appareil connaît la durée du verrouillage
-- L'appareil ne sait pas quelle heure il est maintenant
-- Par conséquent, il ne peut pas calculer le temps restant
+- L'appareil ne sait pas quelle heure il est
+- Il ne peut donc pas calculer « time remaining »
 
-Une fois le WiFi connecté et l'heure synchronisée, l'affichage se met à jour pour afficher le temps restant précis.
+Une fois le WiFi connecté et l'heure synchronisée, l'affichage indique le temps restant avec précision.
 
-## Mode de jeu local
+## Mode « local play »
 
-Lorsque vous démarrez un verrouillage directement sur l'appareil (et non depuis le tableau de bord), celui-ci fonctionne en mode "local play" :
+Lorsque vous démarrez un verrouillage directement sur l'appareil, et non depuis le tableau de bord, celui-ci fonctionne en mode « local play » :
 
-### Caractéristiques du jeu local
+### Caractéristiques du mode « local play »
 
 - La durée du verrouillage est stockée localement sur l'appareil
-- La minuterie fonctionne indépendamment du serveur
-- Aucune implication du détenteur de clé requise
-- Le verrouillage se termine à l'expiration du délai
+- Le minuteur fonctionne indépendamment du serveur
+- Le détenteur de clé n'a pas besoin d'intervenir
+- Le verrouillage prend fin à l'expiration du minuteur
 
-### Verrous du tableau de bord
+### Verrouillages du tableau de bord
 
-Lorsqu'un verrouillage est lancé depuis le tableau de bord :
+Lorsqu'un verrouillage est démarré depuis le tableau de bord :
 
-- Synchronisation des paramètres avec l'appareil via WiFi
-- Les horaires de pause sont reçus
+- Les paramètres sont synchronisés avec l'appareil via WiFi
+- Les calendriers de pause sont reçus
 - Le déverrouillage d'urgence peut être désactivé à distance
-- Le détenteur de la clé peut modifier le verrouillage à distance
+- Le détenteur de clé peut modifier le verrouillage à distance
 
 <Info>
-Les verrous locaux (démarrés sur l'appareil) ne peuvent pas être modifiés à partir du tableau de bord. Les verrous du tableau de bord peuvent être modifiés par votre détenteur de clé même lorsque vous êtes hors ligne : les modifications sont synchronisées lorsque vous vous reconnectez.
+Les verrouillages locaux (démarrés sur l'appareil) ne peuvent pas être modifiés depuis le tableau de bord. Les verrouillages du tableau de bord peuvent être modifiés par votre détenteur de clé même hors ligne : les changements sont synchronisés lorsque vous vous reconnectez.
 </Info>
 
 ## Persistance de l'état
 
-Votre appareil conserve son état pendant :
+Votre appareil conserve son état après :
 
-- Redémarre
-- Cycles d'alimentation
-- Déconnexions Wi-Fi
-- Sommeil profond
+- Les redémarrages
+- Les cycles d'alimentation
+- Les déconnexions du WiFi
+- Deep sleep
 
-Les données suivantes persistent :
+Les données suivantes sont conservées :
 
 | Données | Stockage |
 |------|---------|
-| État de verrouillage (verrouillé/déverrouillé) | Mémoire non volatile |
+| État du verrouillage (verrouillé/déverrouillé) | Mémoire non volatile |
 | Heure de fin du verrouillage | Mémoire non volatile |
 | Paramètres de session | Mémoire non volatile |
 | Identifiants WiFi | Mémoire non volatile |
 | Données d'étalonnage | Mémoire non volatile |
 
 <Note>
-Même si votre appareil perd complètement son alimentation, il reviendra à son état verrouillé une fois allumé.
+Même si votre appareil perd complètement son alimentation, il revient à l'état verrouillé lorsqu'il est rallumé.
 </Note>
 
-## Comportement de reconnexion WiFi
+## Comportement de reconnexion au WiFi
 
-Lorsque le WiFi se déconnecte pendant le fonctionnement :
+Lorsque la connexion WiFi est interrompue pendant le fonctionnement :
 
-1. **Immédiat** : l'appareil continue de fonctionner normalement
-2. **Toutes les 30 secondes** : tentative de reconnexion automatique
-3. **À la reconnexion** : synchronise l'état avec le tableau de bord
+1. **Immédiatement** : l'appareil continue de fonctionner normalement
+2. **Toutes les 30 secondes** : tentative de reconnexion automatique
+3. **À la reconnexion** : l'état est synchronisé avec le tableau de bord
 
-### Configuration manuelle du Wi-Fi
+### Configuration manuelle du WiFi
 
-Vous pouvez reconfigurer le WiFi à tout moment via :
-- Menu principal → Paramètres → Paramètres WiFi
-- Menu de verrouillage → Paramètres WiFi (lorsque verrouillé)
+Vous pouvez reconfigurer le WiFi à tout moment via :
+- Main Menu → Settings → WiFi Settings
+- Lock Menu → WiFi Settings (while locked)
 
-Cela ouvre le portail de configuration sans affecter votre état de verrouillage.
+Le portail de configuration s'ouvre sans modifier l'état de votre verrouillage.
 
 ## Scénarios hors ligne
 
-### Scénario 1 : le Wi-Fi tombe en panne pendant le verrouillage
+### Scénario 1 : le WiFi tombe en panne pendant un verrouillage
 
-- La minuterie de verrouillage continue normalement
-- L'indicateur « Connexion » s'affiche sur la barre d'état
-- Tentatives de reconnexion automatique toutes les 30 secondes
-- Le verrouillage se déverrouille à l'expiration de la minuterie (pas de WiFi nécessaire)
+- Le minuteur de verrouillage continue normalement
+- L'indicateur "Connecting" s'affiche dans la barre d'état
+- Des tentatives de reconnexion automatique ont lieu toutes les 30 secondes
+- Le verrou se déverrouille à l'expiration du minuteur (WiFi non requis)
 
-### Scénario 2 : Démarrage du verrouillage sans WiFi
+### Scénario 2 : démarrer un verrouillage sans WiFi
 
-- Accédez au menu Verrouiller
-- Régler la durée avec l'encodeur
-- Appuyez sur Entrée pour confirmer
-- Le verrouillage s'enclenche localement
-- L'affichage de l'heure indique « Connectez le Wi-Fi pour voir le temps restant »
-- Le compte à rebours est toujours correct
+- Accédez à "Lock" dans le menu
+- Réglez la durée avec l'encodeur
+- Appuyez sur "Enter" pour confirmer
+- Le verrouillage s'active localement
+- L'affichage de l'heure indique "Connect Wi-Fi to see time remaining"
+- Le minuteur continue de compter à rebours correctement
 
-### Scénario 3 : Voyager vers un endroit sans WiFi
+### Scénario 3 : se rendre dans un endroit sans WiFi
 
 - L'appareil fonctionne normalement
 - Le tableau de bord ne peut pas envoyer de commandes
-- Déverrouillage d'urgence local toujours disponible (si activé)
-- Au retour au WiFi, l'état se synchronise automatiquement
+- Le déverrouillage d'urgence local reste disponible (si activé)
+- Au retour sur le WiFi, l'état se synchronise automatiquement
 
-### Scénario 4 : Le sommeil profond déconnecte le WiFi
+### Scénario 4 : Deep sleep déconnecte le WiFi
 
-- Le WiFi se déconnecte en veille profonde (économie d'énergie)
-- État de verrouillage inchangé
+- Le WiFi se déconnecte pendant Deep sleep (économie d'énergie)
+- L'état du verrouillage reste inchangé
 - Au réveil, le WiFi se reconnecte automatiquement
-- Commandes de tableau de bord en attente reçues
+- Les commandes du tableau de bord en attente sont reçues
 
-## Détails de synchronisation du tableau de bord
+## Détails de la synchronisation du tableau de bord
 
-Lorsqu'il est en ligne, votre appareil se synchronise périodiquement avec le tableau de bord :
+Lorsqu'il est en ligne, votre appareil se synchronise périodiquement avec le tableau de bord :
 
 ### Sortant (appareil → tableau de bord)
 
 - Modifications de l'état du verrouillage
 - Pressions sur les boutons
-- Lectures du capteur
+- Relevés des capteurs
 - Utilisation du déverrouillage d'urgence
-- Moment de pause
+- Timing des pauses
 
 ### Entrant (tableau de bord → appareil)
 
 - Commandes de verrouillage
-- Déverrouiller les commandes
-- Mises à jour des horaires de pause
+- Commandes de déverrouillage
+- Mises à jour du calendrier de pause
 - Modifications des paramètres de session
 - Préférences d'affichage de l'heure
 
 <Info>
-La synchronisation s'effectue via MQTT pour une réactivité en temps réel. Les commandes arrivent généralement en quelques secondes lorsqu'elles sont en ligne.
+La synchronisation s'effectue via MQTT pour une réactivité en temps réel. Les commandes arrivent généralement en quelques secondes lorsque l'appareil est en ligne.
 </Info>
 
-## Dépannage des problèmes hors ligne
+## Résoudre les problèmes hors ligne
 
 <AccordionGroup>
 <Accordion title="Le temps restant ne s'affiche pas">
-Connectez-vous au WiFi pour synchroniser l'heure. Le verrou est toujours en cours d'exécution : vous ne pouvez tout simplement pas voir le compte à rebours jusqu'à ce que l'heure soit synchronisée.
+Connectez-vous au WiFi pour synchroniser l'heure. Le verrouillage est toujours en cours : vous ne pouvez simplement pas voir le compte à rebours avant la synchronisation de l'heure.
 </Accordion>
 
 <Accordion title="Impossible de recevoir les commandes du détenteur de clé">
 Votre appareil doit être en ligne pour recevoir les commandes du tableau de bord. Vérifiez l'état de la connexion WiFi dans la barre d'état.
 </Accordion>
 
-<Accordion title="Le verrouillage est terminé mais le tableau de bord est toujours affiché verrouillé">
-Le tableau de bord se met à jour lorsque votre appareil se reconnecte. Connectez-vous au WiFi et le statut sera synchronisé.
+<Accordion title="Le verrouillage est terminé, mais le tableau de bord l'affiche toujours comme verrouillé">
+Le tableau de bord se met à jour lorsque votre appareil se reconnecte. Connectez-vous au WiFi pour synchroniser l'état.
 </Accordion>
 
-<Accordion title="Le WiFi ne se reconnectera pas automatiquement">
-Accédez à Paramètres → Paramètres WiFi pour vous reconnecter manuellement. Votre état de verrouillage n’est pas affecté.
+<Accordion title="Le WiFi ne se reconnecte pas automatiquement">
+Accédez à Settings → WiFi Settings pour vous reconnecter manuellement. L'état de votre verrouillage reste inchangé.
 </Accordion>
 </AccordionGroup>
 
 ## Guides associés
 
 <CardGroup cols={2}>
-<Card title="Configuration Wi-Fi" icon="wifi" href="https://docs.researchanddesire.com/lockbox/get-started">
+<Card title="Configuration WiFi" icon="wifi" href="https://docs.researchanddesire.com/lockbox/get-started">
 Comment connecter votre appareil au WiFi.
 </Card>
 
 <Card title="Mode veille" icon="moon" href="../device-states/sleep-mode">
-Comment le sommeil affecte la connectivité WiFi.
+Comment le mode veille affecte la connectivité WiFi.
 </Card>
 
 <Card title="Symboles d'état" icon="display" href="../using/symbols">

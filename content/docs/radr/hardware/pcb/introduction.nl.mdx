@@ -5,14 +5,14 @@ description: "Technische documentatie voor de RADR-hoofdprintplaat (OSSM Wireles
 
 In dit gedeelte wordt het RADR-hoofd-PCB-ontwerp besproken, inclusief schema's, componentspecificaties en productiebestanden.
 
-## Bordoverzicht
+## Overzicht van de printplaat
 
 | Specificatie | Waarde |
 |---------------|-------|
-| Naam van het bord | OSSM Draadloos |
+| Boardnaam | OSSM Wireless |
 | Versie | v0.4 |
 | Microcontroller | ESP32-S3 met PSRAM |
-| Ontwerpsoftware | Altium-ontwerper |
+| Ontwerpsoftware | Altium Designer |
 | Aantal lagen | 2 (geschat) |
 
 De RADR-PCB integreert alle elektronica die nodig is voor een zelfstandige draadloze afstandsbediening, inclusief de microcontroller, displayinterface, energiebeheer, gebruikersinvoer en feedbacksystemen.
@@ -29,37 +29,37 @@ De RADR-PCB integreert alle elektronica die nodig is voor een zelfstandige draad
 |-----------|-------|
 | MCU | ESP32-S3 |
 | Geheugen | Inclusief PSRAM |
-| Draadloze | WiFi + Bluetooth-LE |
-| Bedrijfsspanning | 3,3V |
+| Draadloos | WiFi + Bluetooth LE |
+| Bedrijfsspanning | 3.3V |
 
 De ESP32-S3 biedt:
 - Dual-core Xtensa LX7-processor
 - Geïntegreerde Bluetooth Low Energy voor apparaatcommunicatie
-- Voldoende GPIO voor alle in-, uitgangen en randapparatuur
+- Voldoende GPIO voor alle in- en uitgangen en randapparatuur
 - Energiezuinige slaapmodi voor batterijbesparing
 
 ### Energiebeheer
 
 | Onderdeel | Functie |
 |-----------|----------|
-| USB-C-connector | 5V laadingang |
-| IC opladen | LiPo-batterij opladen |
-| MAX17048 | Brandstofmeter (accubewaking) |
-| LDO/regulator | 3,3 V systeemvermogen |
+| USB-C-connector | 5V-laadingang |
+| Laad-IC | LiPo-batterij opladen |
+| MAX17048 | Laadtoestandsmeter (accubewaking) |
+| LDO/regelaar | 3.3V systeemvermogen |
 
 Het voedingssysteem ondersteunt:
 - USB-C opladen (5V-ingang)
 - LED-indicator voor hardware-opladen
-- Nauwkeurig batterijpercentage via I²C-brandstofmeter
-- Diepe slaapstroom < 100 μA
+- Nauwkeurig batterijpercentage via een I²C-laadtoestandsmeter
+- Stroom in diepe slaap < 100μA
 
 ### Weergave-interface
 
 | Parameter | Waarde |
 |-----------|-------|
-| Weergavetype | TFT-LCD |
-| Oplossing | 320 x 240 pixels |
-| Kleurdiepte | 16-bits (RGB565) |
+| Displaytype | TFT LCD |
+| Resolutie | 320 x 240 pixels |
+| Kleurdiepte | 16-bit (RGB565) |
 | Interface | SPI |
 | Achtergrondverlichting | PWM-gestuurd |
 
@@ -67,13 +67,13 @@ Het voedingssysteem ondersteunt:
 
 | Invoer | Type | GPIO |
 |-------|------|------|
-| Linker encoder | Roterend + Duwen | GPIO10, 11 |
-| Rechter encoder | Roterend + Duwen | GPIO 42, 41 |
-| Linker schouder | Tijdelijke schakelaar | GPIO48 |
-| Rechter schouder | Tijdelijke schakelaar | GPIO1 |
-| Links onder het scherm | Tijdelijke schakelaar | GPIO38 |
-| Midden onder het scherm | Tijdelijke schakelaar | GPIO39 |
-| Rechts onder het scherm | Tijdelijke schakelaar | GPIO40 |
+| Linker encoder | Roterend + indrukken | GPIO 10, 11 |
+| Rechter encoder | Roterend + indrukken | GPIO 42, 41 |
+| Linkerschouder | Momentschakelaar | GPIO 48 |
+| Rechterschouder | Momentschakelaar | GPIO 1 |
+| Links onder het scherm | Momentschakelaar | GPIO 38 |
+| Midden onder het scherm | Momentschakelaar | GPIO 39 |
+| Rechts onder het scherm | Momentschakelaar | GPIO 40 |
 
 <Note>
 De getoonde GPIO-toewijzingen gelden voor v0.4-kaarten met PSRAM. Eerdere v1.x-kaarten gebruiken verschillende pinnen voor de linker encoder (GPIO 35, 36) en LED's (GPIO 37).
@@ -83,8 +83,8 @@ De getoonde GPIO-toewijzingen gelden voor v0.4-kaarten met PSRAM. Eerdere v1.x-k
 
 | Onderdeel | Type | GPIO |
 |-----------|------|------|
-| Status-LED's | WS2812B RGB (x3) | GPIO12 |
-| Zoemer | Piëzo-elektrisch | GPIO2 |
+| Status-LED's | WS2812B RGB (x3) | GPIO 12 |
+| Zoemer | Piëzo-elektrisch | GPIO 2 |
 | Trillingsmotor | ERM-motor | GPIO 47 |
 
 ### Uitbreiding
@@ -100,33 +100,33 @@ Het schema is onderverdeeld in functionele blokken:
 
 | Sectie | Beschrijving |
 |---------|-------------|
-| Stroom | USB-C-ingang, laadcircuit, spanningsregeling |
+| Voeding | USB-C-ingang, laadcircuit, spanningsregeling |
 | MCU | ESP32-S3, kristal, reset, opstartselectie |
-| Weergave | TFT LCD-connector, driver voor achtergrondverlichting |
+| Display | TFT LCD-connector, driver voor achtergrondverlichting |
 | Ingangen | Roterende encoders, knoppen, pull-up/pull-down-weerstanden |
 | Feedback | LED-datalijn, zoemerdriver, motordriver |
-| Batterij | MAX17048 brandstofmeter, batterijconnector |
-| Uitbreiding | QWIIC-connector, programmeerkop |
+| Batterij | MAX17048 laadtoestandsmeter, batterijconnector |
+| Uitbreiding | QWIIC-connector, programmeerheader |
 
 ## Overwegingen bij PCB-indeling
 
 ### Componentplaatsing
 
-- **MCU** centraal gepositioneerd voor gebalanceerde trace-routing
+- **MCU** centraal gepositioneerd voor gebalanceerde printspoorroutering
 - **USB-C**-connector aan de rand van het bord voor toegankelijkheid
-- **Displayconnector** gericht op lintkabelgeleiding naar behuizing
-- **Batterijconnector** gepositioneerd voor plaatsing van de interne batterij
-- **QWIIC connector** toegankelijk voor uitbreidingsmodules
+- **Display**-connector gericht op lintkabelgeleiding naar de behuizing
+- **Batterij**-connector gepositioneerd voor plaatsing van de interne batterij
+- **QWIIC**-connector toegankelijk voor uitbreidingsmodules
 
 ### Antenne-overwegingen
 
 De ESP32-S3 maakt gebruik van een geïntegreerde PCB-antenne of externe antenne (versieafhankelijk). Het antennegebied moet vrijgehouden worden van:
-- Grondvlakken direct eronder
+- Massavlakken direct eronder
 - Nabijheid van metalen behuizing
 - Hoogfrequente schakelsignalen
 
 <Warning>
-Plaats geen componenten en routeer geen sporen in de antennebeschermingszone. Dit verslechtert de draadloze prestaties aanzienlijk.
+Plaats geen componenten en routeer geen sporen in de antennebeschermingszone. Dit verslechtert de WiFi-prestaties aanzienlijk.
 </Warning>
 
 ## Ontwerpbestanden
@@ -135,10 +135,10 @@ Alle ontwerpbestanden zijn beschikbaar in de GitHub-repository:
 
 | Bestand | Formaat | Beschrijving |
 |------|--------|-------------|
-| PCB - OSSM Wireless v0.4.pcbdoc | Altium-ontwerper | PCB-indeling met koper, zeefdruk, boorbestanden |
-| Schematisch - OSSM Wireless V0.4.schdoc | Altium-ontwerper | Volledige schematische opname |
-| RADR-schema - OSSM Wireless V0.4.pdf | Pdf | Afdrukbare schematische referentie |
-| RADR BOM - OSSM Draadloos - v0.4 - S3.xlsx | Excel | Stuklijst met onderdeelnummers |
+| PCB - OSSM Wireless v0.4.pcbdoc | Altium Designer | PCB-indeling met koper, zeefdruk, boorbestanden |
+| Schematic - OSSM Wireless V0.4.schdoc | Altium Designer | Volledig schema |
+| RADR Schematic - OSSM Wireless V0.4.pdf | PDF | Afdrukbaar schema ter referentie |
+| RADR BOM - OSSM Wireless - v0.4 - S3.xlsx | Excel | Stuklijst met onderdeelnummers |
 | RADR PCB render.png | PNG | 3D render van geassembleerd bord |
 
 <Card title="Ontwerpbestanden downloaden" icon="download" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Hardware/Electronics">
@@ -154,13 +154,13 @@ Aanbevolen specificaties voor bestellen:
 | Parameter | Waarde |
 |-----------|-------|
 | Lagen | 2 |
-| Dikte | 1,6 mm |
+| Dikte | 1.6mm |
 | Oppervlakteafwerking | HASL of ENIG |
-| Koperen gewicht | 1oz |
-| Soldeer masker | Elke kleur |
+| Kopergewicht | 1oz |
+| Soldeermasker | Elke kleur |
 | Zeefdruk | Wit |
 
-### Montage opties
+### Montageopties
 
 | Methode | Aanbevolen voor |
 |--------|-----------------|
@@ -168,7 +168,7 @@ Aanbevolen specificaties voor bestellen:
 | PCBA-service | Productiehoeveelheden |
 
 <Tip>
-Diensten zoals JLCPCB en PCBWay bieden gecombineerde PCB-fabricage en -assemblage. Upload de Gerbers en stuklijst voor een kant-en-klare oplossing.
+Diensten zoals JLCPCB en PCBWay bieden gecombineerde PCB-fabricage en -assemblage. Upload de Gerbers en de stuklijst voor een kant-en-klare oplossing.
 </Tip>
 
 ### Kritieke componenten
@@ -197,14 +197,14 @@ Versie v0.4 maakt gebruik van de ESP32-S3-variant. Het achtervoegsel "S3" in de 
 <AccordionGroup>
 <Accordion title="Bord gaat niet aan">
 - Controleer de USB-C-verbinding en kabel
-- Controleer de uitgang van de 3,3V-regelaar
+- Controleer de uitgang van de 3.3V-regelaar
 - Controleer op kortsluiting in de stroomrails
 - Zorg ervoor dat de batterij is aangesloten en opgeladen
 </Accordion>
 
 <Accordion title="Scherm werkt niet">
 - Controleer de lintkabelverbinding
-- Controleer SPI-signalen met oscilloscoop
+- Controleer SPI-signalen met een oscilloscoop
 - Bevestig het PWM-signaal van de achtergrondverlichting
 - Test de voedingsrails van het display
 </Accordion>
@@ -226,7 +226,7 @@ Versie v0.4 maakt gebruik van de ESP32-S3-variant. Het achtervoegsel "S3" in de 
 <Accordion title="Knoppen reageren niet">
 - Controleer de pull-up/pull-down-weerstanden
 - Controleer GPIO-toewijzingen in de firmware
-- Test de continuïteit van knop tot MCU
+- Test de continuïteit tussen de knop en de MCU
 - Controleer op koude soldeerverbindingen
 </Accordion>
 </AccordionGroup>

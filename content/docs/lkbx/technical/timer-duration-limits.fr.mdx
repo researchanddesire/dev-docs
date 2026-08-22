@@ -12,17 +12,17 @@ Lorsque vous définissez un verrouillage temporisé sur votre Chastity Lockbox, 
 | 30 secondes | 1000 ans |
 
 <Info>
-La minuterie utilise une précision à la milliseconde en interne, prenant en charge une synchronisation extrêmement précise pour toute durée comprise dans cette plage.
+La minuterie utilise une précision à la milliseconde en interne, permettant un chronométrage extrêmement précis pour toute durée comprise dans cette plage.
 </Info>
 
 ## Régler la durée
 
-Lorsque vous sélectionnez **Verrouiller** dans le menu principal, l'écran de configuration de la minuterie apparaît :
+Lorsque vous sélectionnez **Lock** dans le menu principal, l'écran de configuration de la minuterie apparaît :
 
 1. **Faites pivoter l'encodeur** pour régler la durée
 2. Un indicateur d'arc visuel indique votre position dans la plage actuelle de l'unité.
 3. La durée s'affiche dans un format lisible par l'homme (par exemple, « 10 minutes », « 3 jours »)
-4. **Appuyez sur Entrée** pour confirmer et démarrer le verrouillage
+4. **Appuyez sur Enter** pour confirmer et démarrer le verrouillage
 
 ### Valeur de départ par défaut
 
@@ -36,7 +36,7 @@ L'encodeur correspond à différentes unités de temps en fonction de la valeur 
 
 | Gamme | Incrément | Exemples de valeurs |
 |-------|-----------|----------------|
-| 30 à 120 secondes | 1 seconde | 30, 31, 32... 120 |
+| 30 à 120 secondes | 1 seconde | 30 s, 31 s, 32 s ... 120 s |
 
 ### Minutes (1 à 120 minutes)
 
@@ -75,7 +75,7 @@ L'encodeur correspond à différentes unités de temps en fonction de la valeur 
 | 1 à 1000 ans | 1 an | 1 an, 2 ans... 1000 ans |
 
 <Warning>
-Les durées extrêmement longues sont techniquement prises en charge mais ne sont pas recommandées. Pensez à utiliser le mode **Lock Forever** avec contrôle par titulaire de clé pour les verrous indéfinis au lieu de définir des minuteries sur plusieurs années.
+Les durées extrêmement longues sont techniquement prises en charge mais ne sont pas recommandées. Pensez à utiliser le mode **Lock Forever** avec le contrôle d’un détenteur de clé pour les verrous indéfinis au lieu de définir des minuteries sur plusieurs années.
 </Warning>
 
 ## Indicateur visuel d'arc
@@ -88,7 +88,7 @@ L'écran du minuteur affiche un arc semi-circulaire qui indique votre position d
 
 L'arc se réinitialise lorsque vous passez à une nouvelle plage d'unités (par exemple, de minutes à heures).
 
-## Accélération du codeur
+## Accélération de l'encodeur
 
 L'encodeur a l'accélération activée pour la configuration de la minuterie :
 
@@ -105,11 +105,11 @@ En interne, les durées sont stockées en millisecondes à l'aide de ces convers
 
 | Unité | Millisecondes |
 |------|--------------|
-| 1 seconde | 1,000 |
-| 1 minute | 60,000 |
-| 1 heure | 3,600,000 |
-| 1 jour | 86,400,000 |
-| 1 semaine | 604,800,000 |
+| 1 seconde | 1 000 |
+| 1 minute | 60 000 |
+| 1 heure | 3 600 000 |
+| 1 jour | 86 400 000 |
+| 1 semaine | 604 800 000 |
 | 1 mois | 2 629 746 000 (~30,44 jours) |
 | 1 an | 31 556 952 000 (~365,24 jours) |
 
@@ -125,7 +125,7 @@ L'affichage du minuteur s'adapte en fonction de la durée :
 |----------|---------------|
 | Moins d'1 heure | MM:SS (par exemple, "05:30") |
 | 1 à 24 heures | Xh MM:SS (par exemple, "2h 30:00") |
-| 1 à 30 jours | Xd Xh MM:SS (par exemple, "3j 5h 30:00") |
+| 1 à 30 jours | Xd Xh MM:SS (par exemple, "3d 5h 30:00") |
 | Plus de 30 jours | Simplifié (par exemple, « 2 mois ») |
 
 ## Minuteries du tableau de bord et des appareils
@@ -147,11 +147,11 @@ Les verrous créés à partir du tableau de bord sont reçus par votre appareil 
 Découvrez comment démarrer votre premier verrouillage.
 </Card>
 
-<Card title="Mode verrouillage permanent" icon="infinity" href="../device-states/permalock">
+<Card title="Mode Permalock" icon="infinity" href="../device-states/permalock">
 Verrous indéfinis sans limite de temps.
 </Card>
 
-<Card title="Contrôles des boutons" icon="hand-pointer" href="./button-controls">
+<Card title="Commandes du bouton" icon="hand-pointer" href="./button-controls">
 Comment utiliser l'encodeur pour la sélection de la minuterie.
 </Card>
 

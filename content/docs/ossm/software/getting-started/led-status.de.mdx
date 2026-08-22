@@ -7,21 +7,21 @@ Die RGB-LED an Pin 25 bietet visuelle Rückmeldung über den aktuellen Zustand I
 
 ## Statuspriorität verstehen
 
-Die LED zeigt je nach aktuellem Betriebszustand unterschiedliche Muster an. Maschinenoperationen haben immer Vorrang vor BLE-Statusanzeigen.
+Die LED zeigt je nach aktuellem Betriebszustand unterschiedliche Muster an. Maschinenabläufe haben immer Vorrang vor BLE-Statusanzeigen.
 
 | Priorität | Zustand | LED-Muster |
 |----------|-------|-------------|
-| Höchste | Heimkehr | Tiefvioletter Atemeffekt |
-| Untere | BLE-Status | Variiert je nach Verbindungsstatus |
+| Höchste | Referenzfahrt | Tiefvioletter Atemeffekt |
+| Niedriger | BLE-Status | Variiert je nach Verbindungsstatus |
 
 ## Maschinenstatusmuster
 
 <AccordionGroup>
 <Accordion title="Referenzfahrt läuft">
-Wenn sich Ihr OSSM auf die Zielposition begibt, zeigt die LED einen **tiefvioletten Atemeffekt** mit einem sanften Pulsmuster. Dies wird so lange fortgesetzt, bis die Referenzfahrt abgeschlossen ist oder fehlschlägt.
+Wenn Ihr OSSM eine Referenzfahrt durchführt, zeigt die LED einen **dunkelvioletten Atemeffekt** mit einem sanften Pulsmuster. Dies wird so lange fortgesetzt, bis die Referenzfahrt abgeschlossen ist oder fehlschlägt.
 
 <Info>
-Der Homing-Indikator hat Vorrang vor allen BLE-Statusmustern. Sie werden keine BLE-Statusänderungen sehen, bis die Referenzfahrt abgeschlossen ist.
+Die Referenzfahrtanzeige hat Vorrang vor allen BLE-Statusmustern. Sie werden keine BLE-Statusänderungen sehen, bis die Referenzfahrt abgeschlossen ist.
 </Info>
 </Accordion>
 </AccordionGroup>
@@ -29,12 +29,12 @@ Der Homing-Indikator hat Vorrang vor allen BLE-Statusmustern. Sie werden keine B
 ## BLE-Verbindungsstatusmuster
 
 <AccordionGroup>
-<Accordion title="Werbung (Verbindungssuche)">
+<Accordion title="Advertising (Suche nach Verbindungen)">
 Wenn Ihr OSSM nach einer Bluetooth-Verbindung sucht:
 
 1. **Regenbogeneffekt** wird 1 Sekunde lang angezeigt
-2. **Schnelles Atmen blau** folgt mit schnellem Pulsieren (10-fache normale Geschwindigkeit)
-3. **Auto-Dim** wird nach 30 Sekunden aktiviert und reduziert die Helligkeit durch sanftes Pulsieren auf ~12 %
+2. **Schnelles blaues Pulsieren** folgt mit schnellem Pulsieren (10-fache Normalgeschwindigkeit)
+3. **Automatisches Dimmen** wird nach 30 Sekunden aktiviert und reduziert die Helligkeit mit sanftem Pulsieren auf ~12 %
 
 <Tip>
 Die automatische Dimmfunktion reduziert visuelle Ablenkung, wenn Sie eine Kabelfernbedienung anstelle von Bluetooth verwenden. Die LED bleibt sichtbar, stört aber auch bei längeren Sitzungen nicht.
@@ -45,7 +45,7 @@ Die automatische Dimmfunktion reduziert visuelle Ablenkung, wenn Sie eine Kabelf
 Wenn ein Gerät über Bluetooth eine Verbindung herstellt:
 
 1. **Regenbogeneffekt** wird 1 Sekunde lang angezeigt, um die Verbindung zu bestätigen
-2. **Die blaue LED wird abgeblendet**, bis die Helligkeit gedimmt ist (~12 % Helligkeit) und bleibt gedimmt
+2. **Die blaue LED wird auf eine geringe Helligkeit gedimmt** (~12 % Helligkeit) und bleibt gedimmt
 3. **Kommunikationsimpulse** erscheinen als leichte Helligkeitserhöhungen während der Datenübertragung
 
 </Accordion>
@@ -56,21 +56,21 @@ Wenn keine Bluetooth-Verbindung besteht:
 - **LED erlischt** vollständig
 
 <Note>
-Ein getrennter Zustand unterscheidet sich von Werbung. Wenn Sie das OSSM einschalten, beginnt es sofort mit der Werbung, sodass Sie das blaue Atemmuster sehen und nicht kein Licht.
+Ein getrennter Zustand unterscheidet sich von Advertising. Wenn Sie das OSSM einschalten, beginnt es sofort mit dem Advertising, sodass Sie das blaue Atemmuster statt eines ausgeschalteten Lichts sehen.
 </Note>
 </Accordion>
 </AccordionGroup>
 
 ## Kommunikationsanzeige
 
-Wenn BLE angeschlossen ist und die LED gedimmt ist, sehen Sie kurze Helligkeitsimpulse während:
+Wenn BLE verbunden ist und die LED gedimmt ist, sehen Sie kurze Helligkeitsimpulse während:
 
 - **Empfangen von Befehlen** von Ihrem angeschlossenen Gerät
 - **Senden von Antworten** zurück an das Gerät
 - **Statusaktualisierungen** an das Gerät übertragen
 
 <Info>
-Der Kommunikationsimpuls ist subtil – ein 100-ms-Fade mit minimaler Helligkeitszunahme. Dies gibt Feedback, ohne während der Bedienung abzulenken.
+Der Kommunikationsimpuls ist subtil – ein 100-ms-Übergang mit minimaler Helligkeitszunahme. Dies gibt Feedback, ohne während der Bedienung abzulenken.
 </Info>
 
 ## Farben der Statusanzeige
@@ -80,13 +80,13 @@ Die Firmware definiert Standardfarben für verschiedene Maschinenzustände. Dies
 | Status | Farbe | Beschreibung |
 |--------|-------|-------------|
 | Leerlauf | Blau | Standardzustand beim Warten |
-| Läuft | Grün | Aktive Bewegung im Gange |
+| Betrieb | Grün | Aktive Bewegung im Gange |
 | Fehler | Rot | Fehlerbedingung erkannt |
-| Heimkehr | Gelb | Homing-Sequenz aktiv |
-| Verbinden | Lila | BLE-Verbindung läuft |
+| Referenzfahrt | Gelb | Referenzfahrtsequenz aktiv |
+| Verbindung wird hergestellt | Lila | BLE-Verbindung läuft |
 
 <Note>
-Derzeit wird während des Maschinenbetriebs nur der Homing-Status (tiefviolettes Atmen) aktiv angezeigt. Andere Statusfarben sind für die zukünftige Verwendung oder benutzerdefinierte Firmware-Implementierungen definiert.
+Derzeit wird während des Maschinenbetriebs nur der Referenzfahrtstatus (dunkelviolettes Pulsieren) aktiv angezeigt. Andere Statusfarben sind für die zukünftige Verwendung oder benutzerdefinierte Firmware-Implementierungen definiert.
 </Note>
 
 ## Technische Referenz
@@ -95,7 +95,7 @@ Derzeit wird während des Maschinenbetriebs nur der Homing-Status (tiefviolettes
 <Accordion title="Konfigurationskonstanten">
 | Konstante | Wert | Beschreibung |
 |----------|-------|-------------|
-| `ADVERTISING_TIMEOUT` | 30 Sekunden | Zeit bis die Werbung automatisch ausgeblendet wird |
+| `ADVERTISING_TIMEOUT` | 30 Sekunden | Zeit bis zum automatischen Dimmen des Advertisings |
 | Gedimmte Helligkeit | ~12% | Helligkeitsstufe bei bestehender Verbindung oder nach Zeitüberschreitung |
 | Kommunikationsimpuls | 100 ms | Dauer der Datenübertragungsanzeige |
 </Accordion>
@@ -106,7 +106,7 @@ Derzeit wird während des Maschinenbetriebs nur der Homing-Status (tiefviolettes
 | `showBLEAdvertisingDimmed()` | Zeigt sanftes Pulsieren bei reduzierter Helligkeit |
 
 <Note>
-Das Werbe-Timeout wird automatisch zurückgesetzt, wenn sich der BLE-Verbindungsstatus ändert (Verbindungs- oder Trennungsereignisse).
+Das Advertising-Timeout wird automatisch zurückgesetzt, wenn sich der BLE-Verbindungsstatus ändert (Verbindungs- oder Trennungsereignisse).
 </Note>
 </Accordion>
 </AccordionGroup>

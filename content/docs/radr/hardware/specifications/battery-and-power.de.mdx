@@ -1,6 +1,6 @@
 ---
-title: „Batterie und Strom“
-description: „Batterieüberwachung, Laden und Energiemanagement für RADR“
+title: "Batterie und Strom"
+description: "Batterieüberwachung, Laden und Energiemanagement für RADR"
 ---
 
 In diesem Handbuch werden das Batteriesystem, die Lade- und Energieverwaltungsfunktionen von RADR behandelt.
@@ -12,31 +12,31 @@ RADR verwendet eine Lithiumbatterie mit intelligenter Überwachung:
 | Komponente | Beschreibung |
 |-----------|-------------|
 | Akku-Typ | Lithium-Polymer (LiPo) |
-| Tankanzeige-IC | MAX17048 |
+| Ladezustandsmesser-IC | MAX17048 |
 | Ladeanschluss | USB-C |
 | Ladeanzeige | Hardware-LED |
 
-### MAX17048 Kraftstoffanzeige
+### MAX17048-Ladezustandsmesser
 
-Der MAX17048 ist ein Präzisions-Kraftstoffmessgerät, das Folgendes bietet:
+Der MAX17048 ist ein präziser Ladezustandsmesser und bietet:
 
-- **Batterieprozentsatz** – Genaue Ladezustandsanzeige (0–100 %).
+- **Batteriestand in Prozent** – Genaue Ladezustandsanzeige (0–100%)
 - **Batteriespannung** – Spannungsmessung in Echtzeit
 - **Warnungen bei niedrigem Batteriestand** – Programmierbare Schwellenwertbenachrichtigungen
 
 <Info>
-Die Ladezustandsanzeige verwendet proprietäre Algorithmen, um die verbleibende Batterielebensdauer genau abzuschätzen und dabei Faktoren wie Temperatur und Entladerate auszugleichen.
+Die Batteriestandsanzeige verwendet proprietäre Algorithmen, um die verbleibende Akkulaufzeit genau abzuschätzen und dabei Faktoren wie Temperatur und Entladerate auszugleichen.
 </Info>
 
 ## Batterieanzeige
 
 Der Batteriestatus wird in der Statusleiste oben auf dem Bildschirm angezeigt:
 
-| Ebene | Ungefähre Reichweite |
+| Ladestand | Ungefährer Bereich |
 |-------|-------------------|
 | Voll | 90–100% |
 | Hoch | 60–89% |
-| Medium | 30–59% |
+| Mittel | 30–59% |
 | Niedrig | 10–29% |
 | Kritisch | 0–9% |
 
@@ -74,16 +74,16 @@ RADR verlässt sich auf die Hardware-Lade-LED und nicht auf eine softwarebasiert
 ### Ladetipps
 
 <Tip>
-Für den schnellsten Ladevorgang verwenden Sie ein USB-Ladegerät mit einer Nennleistung von 5 V/1 A oder höher.
+Für den schnellsten Ladevorgang verwenden Sie ein USB-Ladegerät, das für 5V/1A oder mehr ausgelegt ist.
 </Tip>
 
 <Tip>
 Sie können RADR während des Ladevorgangs verwenden, der Ladevorgang kann jedoch bei aktiver Nutzung länger dauern.
 </Tip>
 
-## Machtstaaten
+## Energiezustände
 
-RADR hat mehrere Leistungszustände:
+RADR hat mehrere Energiezustände:
 
 ### Aktiv (verbunden)
 
@@ -95,7 +95,7 @@ RADR hat mehrere Leistungszustände:
 ### Aktiv (Leerlauf)
 
 - Display an, Hintergrundbeleuchtung aktiv
-- Bluetooth-Scannen oder im Menü
+- Bluetooth scannt oder das Menü ist geöffnet
 - LEDs im Leerlaufmuster
 - Mittlerer Stromverbrauch
 
@@ -105,7 +105,7 @@ RADR hat mehrere Leistungszustände:
 - Bluetooth deaktiviert
 - LEDs aus
 - Sehr geringer Stromverbrauch
-- GPIO-Wake aktiviert
+- GPIO-Aufweckfunktion aktiviert
 
 ### Ausschalten
 
@@ -118,39 +118,39 @@ RADR hat mehrere Leistungszustände:
 Der Tiefschlaf ermöglicht erhebliche Energieeinsparungen, wenn Sie RADR nicht verwenden, aber später schnell darauf zugreifen möchten.
 
 <Info>
-Technisch gesehen verwendet RADR intern den „leichten Schlaf“-Modus und nicht den echten Tiefschlaf. Dies sorgt für eine zuverlässigere Tastenaktivierung bei gleichzeitig sehr geringem Stromverbrauch. Das Benutzererlebnis ist dasselbe: Das Gerät scheint ausgeschaltet zu sein, bis eine Taste gedrückt wird.
+Technisch gesehen verwendet RADR intern den „Light Sleep“-Modus und nicht den echten Tiefschlaf. Dies sorgt für eine zuverlässigere Tastenaktivierung bei gleichzeitig sehr geringem Stromverbrauch. Das Benutzererlebnis ist dasselbe: Das Gerät scheint ausgeschaltet zu sein, bis eine Taste gedrückt wird.
 </Info>
 
 ### In den Schlafmodus wechseln
 
-1. Wählen Sie im Hauptmenü **Schlaf**
+1. Wählen Sie im Hauptmenü **Sleep**
 2. RADR führt die Abschaltsequenz aus:
-   - Trennt alle angeschlossenen Geräte
-   - Spielt den Shutdown-Summerton ab
+   - Trennt die Verbindung zu allen verbundenen Geräten
+   - Spielt den Ausschalt-Summerton ab
    - Schaltet die Hintergrundbeleuchtung des Displays aus
-   - Löscht alle LEDs
+   - Schaltet alle LEDs aus
    - Geht in den Tiefschlaf
 
-### Wake-Quellen
+### Aufweckquellen
 
 Die folgenden Tasten können RADR aus dem Tiefschlaf wecken:
 
 | Taste | GPIO |
 |--------|------|
-| Unter-Bildschirm-Mitte | GPIO 39 |
+| Mitte unter dem Bildschirm | GPIO 39 |
 | Unter dem Bildschirm links | GPIO 38 |
 | Unter dem Bildschirm rechts | GPIO 40 |
 
 Drücken Sie eine dieser Tasten, um RADR zu aktivieren. Das Gerät führt einen vollständigen Neustart durch.
 
-### Schlafen vs. Ausschalten
+### Schlafmodus und Ausschalten
 
-| Besonderheit | Schlafmodus | Ausschalten |
+| Merkmal | Schlafmodus | Ausschalten |
 |---------|------------|-----------|
 | Stromverbrauch | Sehr niedrig | Keiner |
-| Wachzeit | ~2 Sekunden | ~5 Sekunden |
-| Wake-Methode | Knopfdruck | Netzschalter |
-| Zustand erhalten | NEIN | NEIN |
+| Aufwachzeit | ~2 Sekunden | ~5 Sekunden |
+| Aufweckmethode | Aufwecken per Taste | Netzschalter |
+| Zustand erhalten | Nein | Nein |
 | Anwendungsfall | Zwischen den Sitzungen | Lagerung |
 
 <Tip>
@@ -161,29 +161,29 @@ Verwenden Sie während Sitzungen mit Pausen den Schlafmodus. Für längere Lager
 
 ### Maximierung der Batterielebensdauer
 
-1. **Ruhemodus verwenden** – Versetzen Sie RADR in Pausen in den Ruhezustand, anstatt es im Leerlauf zu lassen
+1. **Schlafmodus verwenden** – Versetzen Sie RADR in Pausen in den Schlafmodus, anstatt es im Leerlauf zu lassen
 2. **Geringere Helligkeit** – Die Hintergrundbeleuchtung des Displays ist ein erheblicher Stromverbraucher
 3. **Trennen Sie die Verbindung, wenn Sie fertig sind** – Aktive Bluetooth-Verbindungen verbrauchen mehr Strom
-4. **Für Speicher ausschalten** – Verwenden Sie den physischen Schalter für erweiterten Speicher
+4. **Für die Lagerung ausschalten** – Verwenden Sie den physischen Schalter für längere Lagerung
 
 ### Überwachung des Batteriezustands
 
-- Überprüfen Sie den Batterieprozentsatz regelmäßig in der Statusleiste
+- Überprüfen Sie den Batteriestand in Prozent regelmäßig in der Statusleiste
 - Laden Sie das Gerät vor den Sitzungen auf, um Unterbrechungen während der Sitzung zu vermeiden
 - Lassen Sie den Akku nicht häufig vollständig entladen
 
-### Best Practices für das Laden
+### Bewährte Ladeverfahren
 
 - Verwenden Sie hochwertige USB-C-Kabel
 - Laden Sie bei gemäßigten Temperaturen (extreme Hitze/Kälte vermeiden)
-- Jedes Standard-USB-Ladegerät funktioniert (5 V).
+- Jedes Standard-USB-Ladegerät funktioniert (5V).
 - Vor dem ersten Gebrauch vollständig aufladen
 
 ## Spezifikationen
 
 | Parameter | Wert |
 |-----------|-------|
-| Betriebsspannung | 3,3 V (geregelt) |
+| Betriebsspannung | 3.3V (geregelt) |
 | Ladespannung | 5V USB |
 | Tiefschlafstrom | < 100μA |
 | Aktiver Strom | Variiert je nach Aktivität |
@@ -191,8 +191,8 @@ Verwenden Sie während Sitzungen mit Pausen den Schlafmodus. Für längere Lager
 ## Fehlerbehebung
 
 <AccordionGroup>
-<Accordion title="Der Batterieprozentsatz scheint ungenau zu sein">
-- Nach längerer Lagerung muss die Kraftstoffanzeige möglicherweise kalibriert werden
+<Accordion title="Der Batteriestand in Prozent scheint ungenau zu sein">
+- Nach längerer Lagerung muss der Ladezustandsmesser möglicherweise kalibriert werden
 - Laden Sie das Gerät vollständig auf und entladen Sie es dann einmal vollständig, um es neu zu kalibrieren
 - Die Batteriewerte stabilisieren sich nach einigen Ladezyklen
 </Accordion>
@@ -205,13 +205,13 @@ Verwenden Sie während Sitzungen mit Pausen den Schlafmodus. Für längere Lager
 </Accordion>
 
 <Accordion title="Der Akku ist schnell leer">
-- Überprüfen Sie, ob Sie RADR im Aktiv-/Ruhezustand belassen
+- Überprüfen Sie, ob Sie RADR im Aktiv-/Leerlaufzustand belassen
 - Verwenden Sie den Schlafmodus, wenn Sie ein Gerät nicht aktiv steuern
 - Aktive Bluetooth-Verbindungen verbrauchen mehr Strom
 - Ältere Akkus haben möglicherweise eine geringere Kapazität
 </Accordion>
 
-<Accordion title="Werde nicht aus dem Schlaf aufwachen">
+<Accordion title="RADR wacht nicht aus dem Schlafmodus auf">
 - Halten Sie eine Taste unter dem Bildschirm 2–3 Sekunden lang gedrückt
 - Versuchen Sie es mit dem Netzschalter, wenn die Tasten nicht reagieren
 - Stellen Sie sicher, dass der Akku nicht vollständig leer ist

@@ -49,13 +49,13 @@ Parcourez le code source sur GitHub : [Software/src/](https://github.com/KinkyM
 
 Le micrologiciel utilise une **organisation basée sur les fonctionnalités** où le code associé cohabite :
 
-- **Espaces de noms sur classes** - Les fonctionnalités sont organisées en fonctions d'espace de noms plutôt qu'en méthodes de classe
+- **Espaces de noms plutôt que classes** - Les fonctionnalités sont organisées en fonctions d'espace de noms plutôt qu'en méthodes de classe
 - **Fichiers colocalisés** : l'en-tête, l'implémentation et le code associé de chaque fonctionnalité se trouvent dans le même dossier.
-- ** Structures d'état globales ** - L'état partagé est géré via des structures d'état dédiées plutôt que par des membres de classe
-- **Modules sans état** - Les fonctions de fonctionnalités fonctionnent sur l'état global, ce qui les rend plus faciles à tester et à raisonner.
+- **Structures d'état globales** - L'état partagé est géré via des structures d'état dédiées plutôt que par des membres de classe
+- **Modules sans état** - Les fonctions de chaque fonctionnalité travaillent sur l'état global, ce qui les rend plus faciles à tester et à comprendre.
 
 <Note>
-La classe `OSSM` dans `ossm/OSSM.h` est conservée pour des raisons de compatibilité descendante avec la gestion des commandes BLE. Les nouvelles fonctionnalités doivent utiliser des fonctions d'espace de noms sans état.
+La classe `OSSM` dans `ossm/OSSM.h` est conservée pour des raisons de rétrocompatibilité avec la gestion des commandes BLE. Les nouvelles fonctionnalités doivent utiliser des fonctions d'espace de noms sans état.
 </Note>
 
 ## Application principale (`src/ossm/`)
@@ -85,15 +85,15 @@ Le dossier `ossm/` contient la logique d'application principale, organisée par 
 | `homing/` | Séquence de référence |
 | `menu/` | Navigation dans les menus |
 | `simple_penetration/` | Mode de pénétration simple |
-| `stroke_engine/` | Mode moteur de course |
-| `pattern_controls/` | Interface utilisateur de sélection de modèle |
+| `stroke_engine/` | Mode StrokeEngine |
+| `pattern_controls/` | Interface utilisateur de sélection de motif |
 | `play_controls/` | Commandes lecture/pause/vitesse |
 
 ### Machine à états (`ossm/state/`)
 
 Les composants de la machine à états sont séparés pour plus de clarté et de testabilité.
 
-| Déposer | But |
+| Fichier | But |
 |------|---------|
 | [`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h) | Définition de la table de transition à l'aide de Boost.SML |
 | [`actions.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h) / `actions.cpp` | Actions de transition d'état (mises à jour de l'affichage, contrôle du moteur) |
@@ -102,18 +102,18 @@ Les composants de la machine à états sont séparés pour plus de clarté et de
 
 Les **structures d'état** gèrent différents aspects de l'application :
 
-| Déposer | But |
+| Fichier | But |
 |------|---------|
-| `session.h` | Session en cours (heure de début, nombre de coups, distance) |
+| `session.h` | Session en cours (heure de début, nombre de courses, distance) |
 | `settings.h` | Paramètres utilisateur (vitesse, course, sensation, profondeur, motif) |
-| `calibration.h` | État de référence (décalage du capteur, étapes de course, statut de référence) |
+| `calibration.h` | État de référence (décalage du capteur, pas par course, statut de référence) |
 | `motion.h` | Cibles de mouvement (position, vitesse, temps) |
 | `menu.h` | Sélection de menu actuelle |
 | `ble.h` | État de la connexion Bluetooth |
 | `error.h` | Messages d'erreur |
 
 <Tip>
-Pour plus de détails sur le fonctionnement de la machine à états, voir [State Machine Architecture](/ossm/software/architecture/state-machine).
+Pour plus de détails sur le fonctionnement de la machine à états, voir [Architecture de la machine à états](/ossm/software/architecture/state-machine).
 </Tip>
 
 ### Pages d'interface utilisateur (`ossm/pages/`)
@@ -138,12 +138,12 @@ Chaque mode de fonctionnement est un module autonome avec sa logique de contrôl
 | `simple_penetration/` | Mouvement de base de va-et-vient à vitesse contrôlée |
 | `stroke_engine/` | Modèles complexes utilisant la bibliothèque StrokeEngine |
 
-### Contrôler les interfaces utilisateur
+### Interfaces de contrôle
 
 | Module | Description |
 |--------|-------------|
 | `menu/` | Navigation et rendu dans le menu principal |
-| `pattern_controls/` | Interface de sélection de motif pour le mode Stroke Engine |
+| `pattern_controls/` | Interface de sélection de motif pour le mode StrokeEngine |
 | `play_controls/` | Contrôles de vitesse, de course, de profondeur et de sensation |
 
 ### Modules de fonctionnalités
@@ -187,19 +187,19 @@ Le dossier `services/` fournit des couches d'abstraction matérielle.
   </Tree.Folder>
 </Tree>
 
-| Déposer | But |
+| Fichier | But |
 |------|---------|
 | `stepper.h/.cpp` | Contrôle du moteur (FastAccelStepper) |
 | `display.h/.cpp` | Écran OLED (U8g2) |
 | `encoder.h/.cpp` | Entrée du codeur rotatif |
-| `led.h/.cpp` | Indication d'état des LED RVB |
+| `led.h/.cpp` | Indication d'état de la LED RGB |
 | `board.h/.cpp` | Initialisation de la carte |
 | `tasks.h/.cpp` | Gestion des tâches FreeRTOS |
 | `wm.h/.cpp` | Gestionnaire Wi-Fi |
 | `communication/` | Communication BLE et WiFi |
 
 <Info>
-Pour plus de détails sur le protocole BLE, voir [BLE Communication](/ossm/software/communication/ble).
+Pour plus de détails sur le protocole BLE, voir [Communication BLE](/ossm/software/communication/ble).
 </Info>
 
 ## Constantes (`src/constants/`)
@@ -222,14 +222,14 @@ Les valeurs de configuration et les énumérations sont centralisées dans le do
   </Tree.Folder>
 </Tree>
 
-| Déposer | But |
+| Fichier | But |
 |------|---------|
 | `Config.h` | Configuration du système (vitesses, limites, délais d'attente) |
 | `Pins.h` | Définitions des broches GPIO |
 | `Menu.h` | Énumération des options de menu |
 | `Version.h` | Informations sur la version du micrologiciel |
 | `UserConfig.h` | Paramètres configurables par l'utilisateur |
-| `Images.h` | Afficher les ressources bitmap |
+| `Images.h` | Ressources bitmap pour l'affichage |
 | `LogTags.h` | Balises de journalisation ESP-IDF |
 | `copy/` | Chaînes localisées |
 
@@ -253,13 +253,13 @@ Fonctions et classes d'assistance utilisées dans toute la base de code.
   </Tree.Folder>
 </Tree>
 
-| Déposer | But |
+| Fichier | But |
 |------|---------|
-| `StateLogger.h` | Enregistre les transitions de la machine d'état pour le débogage |
-| `RecursiveMutex.h` | Wrapper mutex thread-safe pour ESP32 |
+| `StateLogger.h` | Enregistre les transitions de la machine à états pour le débogage |
+| `RecursiveMutex.h` | Wrapper de mutex thread-safe pour ESP32 |
 | `StrokeEngineHelper.h` | Utilitaires d'intégration StrokeEngine |
 | `format.h` | Aides au formatage de chaînes |
-| `analog.h` | Moyenne et traitement des entrées analogiques |
+| `analog.h` | Moyennage et traitement des entrées analogiques |
 | `update.h` | Utilitaires de mise à jour OTA |
 | `ble.h` | Fonctions d'assistance BLE |
 
@@ -275,7 +275,7 @@ Types de données partagés utilisés entre les modules.
   </Tree.Folder>
 </Tree>
 
-| Déposer | But |
+| Fichier | But |
 |------|---------|
 | `SettingPercents.h` | Paramètres utilisateur sous forme de pourcentages (0-100) |
 | `LanguageStruct.h` | Configuration de la langue |
@@ -285,20 +285,20 @@ Types de données partagés utilisés entre les modules.
 
 ### Boost.SML (`include/boost/sml.hpp`)
 
-[Boost.SML](https://boost-ext.github.io/sml/) est une bibliothèque de machines d'état uniquement en-tête. Il est inclus directement dans le projet pour la stabilité des versions.
+[Boost.SML](https://boost-ext.github.io/sml/) est une bibliothèque de machine à états composée uniquement d'en-têtes. Elle est incluse directement dans le projet pour la stabilité des versions.
 
-### Moteur de course (`lib/StrokeEngine/`)
+### StrokeEngine (`lib/StrokeEngine/`)
 
-Une version modifiée de [theelims/StrokeEngine](https://github.com/theelims/StrokeEngine) qui génère des modèles de mouvement. La bibliothèque est vendue et personnalisée pour les exigences spécifiques à OSSM.
+Une version modifiée de [theelims/StrokeEngine](https://github.com/theelims/StrokeEngine) qui génère des motifs de mouvement. La bibliothèque est fournie et personnalisée pour les exigences spécifiques à OSSM.
 
 ## Configuration de construction
 
-Le fichier `platformio.ini` définit les environnements de build :
+Le fichier `platformio.ini` définit les environnements de compilation :
 
 | Environnement | But |
 |-------------|---------|
 | `development` | Développement local avec journalisation de débogage |
-| `staging` | Tests préliminaires |
+| `staging` | Tests avant publication |
 | `production` | Versions de publication avec optimisations |
 | `test` | Configuration des tests unitaires |
 
@@ -306,11 +306,11 @@ Le fichier `platformio.ini` définit les environnements de build :
 
 <CardGroup cols={2}>
 <Card title="Machine à états" icon="diagram-project" href="/ossm/software/architecture/state-machine">
-  Plongez en profondeur dans l’architecture de la machine à états Boost.SML.
+  Découvrez en détail l’architecture de la machine à états Boost.SML.
 </Card>
 
 <Card title="Configuration" icon="sliders" href="/ossm/software/getting-started/configuration">
-  Personnalisez les paramètres de mouvement, les broches et les paramètres.
+  Personnalisez les paramètres de mouvement, les broches et les réglages.
 </Card>
 
 <Card title="Service d'affichage" icon="display" href="/ossm/software/display/display-service">
@@ -318,6 +318,6 @@ Le fichier `platformio.ini` définit les environnements de build :
 </Card>
 
 <Card title="Communication BLE" icon="bluetooth" href="/ossm/software/communication/ble">
-  Comprendre le protocole et les caractéristiques Bluetooth.
+  Comprenez le protocole et les caractéristiques Bluetooth.
 </Card>
 </CardGroup>

@@ -1,6 +1,6 @@
 ---
-title: "Retour d'expérience et indicateurs"
-description: "Couleurs des LED, sons du buzzer et modèles de vibration pour RADR"
+title: "Retour d’information et indicateurs"
+description: "Couleurs des LED, sons du buzzer et motifs de vibration pour RADR"
 ---
 
 RADR fournit un retour visuel, audio et haptique pour communiquer l'état de l'appareil sans que vous ayez à regarder l'écran.
@@ -11,47 +11,47 @@ RADR dispose de trois LED RVB (WS2812B) positionnées autour de l'appareil :
 
 | Position | Emplacement | Objectif principal |
 |----------|----------|-----------------|
-| LED 0 | Encodeur gauche | Indicateur de mode vitesse |
+| LED 0 | Encodeur gauche | Indicateur du mode Speed |
 | LED 1 | Milieu | État de connexion/lecture |
-| DEL 2 | Encodeur droit | Indicateur de mode actif |
+| LED 2 | Encodeur droit | Indicateur de mode actif |
 
 ### Couleurs et significations des LED
 
 #### États du système
 
-| État | DIRIGÉ | Couleur | Valeur HSV | Luminosité |
+| État | LED | Couleur | Valeur HSV | Luminosité |
 |-------|-----|-------|-----------|------------|
-| Recherche/numérisation | Tous | Bleu | 150 | 255 (pulsé) |
-| Inactif (Menu principal) | Tous | Blanc doux | 180 | 50 |
+| Recherche/balayage | Toutes | Bleu | 150 | 255 (pulsé) |
+| Inactif (Menu principal) | Toutes | Blanc doux | 180 | 50 |
 | Appareil connecté | Milieu | Blanc | — | 50 |
 | En pause/arrêté | Milieu | Rouge | — | 255 |
 
 #### Modes de contrôle OSSM
 
-Lors du contrôle d'un OSSM, les LED de l'encodeur indiquent le mode actif :
+Lors du contrôle d'un OSSM, les LED des encodeurs indiquent le mode actif :
 
-| Mode | DIRIGÉ | Couleur | Description |
+| Mode | LED | Couleur | Description |
 |------|-----|-------|-------------|
-| Vitesse | Gauche | Violet | Toujours actif (la vitesse est toujours contrôlée par l'encodeur gauche) |
-| Profondeur | Droite | Corail/Rouge | L'encodeur droit ajuste la profondeur |
-| Sensation | Droite | Bleu | L'encodeur droit ajuste la sensation |
-| Accident vasculaire cérébral | Droite | Vert | L'encodeur droit ajuste la course |
+| Speed | Gauche | Violet | Toujours actif (la vitesse est toujours contrôlée par l’encodeur gauche) |
+| Depth | Droite | Corail/Rouge | L’encodeur droit ajuste la profondeur |
+| Sensation | Droite | Bleu | L’encodeur droit ajuste Sensation |
+| Stroke | Droite | Vert | L’encodeur droit ajuste Stroke |
 
-### Modèles de comportement des LED
+### Motifs de comportement des LED
 
-| Modèle | Signification |
+| Motif | Signification |
 |---------|---------|
-| Solide | État statique (connecté, en pause, etc.) |
-| Pulsation | Analyse active ou recherche |
-| Flash rapide | Commentaires en cas de pression sur un bouton ou de changement de mode |
+| Allumage fixe | État statique (connecté, en pause, etc.) |
+| Pulsation | Balayage ou recherche en cours |
+| Flash rapide | Retour lors de l’appui sur un bouton ou d’un changement de mode |
 
-## Modèles de sonnerie
+## Motifs sonores du buzzer
 
 RADR utilise un buzzer piézoélectrique (GPIO 2) pour fournir un retour audio pour les événements clés.
 
 ### Son de démarrage
 
-**Modèle :** Séquence ascendante de 4 notes
+**Motif :** Séquence ascendante de 4 notes
 
 | Note | Fréquence | Durée |
 |------|-----------|----------|
@@ -64,7 +64,7 @@ Joué lorsque RADR s'allume.
 
 ### Son d'arrêt
 
-**Modèle :** Séquence décroissante de 4 notes
+**Motif :** Séquence décroissante de 4 notes
 
 | Note | Fréquence | Durée |
 |------|-----------|----------|
@@ -77,7 +77,7 @@ Joué lors du passage en mode veille.
 
 ### Appareil connecté
 
-**Modèle :** Séquence ascendante de 3 notes
+**Motif :** Séquence ascendante de 3 notes
 
 | Note | Fréquence | Durée |
 |------|-----------|----------|
@@ -89,7 +89,7 @@ Joué lors de la connexion réussie à un appareil.
 
 ### Appareil déconnecté
 
-**Modèle :** Séquence décroissante de 3 notes
+**Motif :** Séquence décroissante de 3 notes
 
 | Note | Fréquence | Durée |
 |------|-----------|----------|
@@ -101,19 +101,19 @@ Joué lorsqu'un appareil se déconnecte.
 
 ### En pause
 
-**Modèle :** Double bip
+**Motif :** Double bip
 
 | Note | Fréquence | Durée |
 |------|-----------|----------|
 | 1 | 800 Hz | 150 ms |
-| Écart | — | 100 ms |
+| Pause | — | 100 ms |
 | 2 | 800 Hz | 150 ms |
 
 Joué lors d'une pause de lecture.
 
 ### Lecture/Reprise
 
-**Motif :** Ascendant bicolore
+**Motif :** Séquence ascendante de deux tons
 
 | Note | Fréquence | Durée |
 |------|-----------|----------|
@@ -124,37 +124,37 @@ Joué lors de la reprise de la lecture.
 
 ### Pièce Mario (œuf de Pâques)
 
-**Modèle :** Son de pièce classique
+**Motif :** Son de pièce classique
 
 | Note | Fréquence | Durée |
 |------|-----------|----------|
 | 1 | 2637 Hz (E7) | 80 ms |
 | 2 | 3136 Hz (G7) | 300 ms |
 
-Commentaires spéciaux pour certaines interactions.
+Retour spécial pour certaines interactions.
 
-## Retour de vibrations
+## Retour haptique
 
-RADR comprend un moteur de vibration (GPIO 47) pour le retour haptique. Les modèles de vibrations reflètent généralement les modèles de buzzer, fournissant un retour tactile qui fonctionne sans son.
+RADR comprend un moteur de vibration (GPIO 47) pour le retour haptique. Les motifs de vibration reflètent généralement les motifs sonores du buzzer et fournissent un retour tactile qui fonctionne sans son.
 
-### Cas d'utilisation des vibrations
+### Applications des vibrations
 
 | Événement | Vibration |
 |-------|-----------|
-| Appuyez sur le bouton | Pouls court |
+| Pression sur un bouton | Impulsion courte |
 | Changement de mode | Vibration rapide |
 | Connexion | Double vibration |
-| Pause/Arrêter | Forte vibration |
+| Pause/arrêt | Forte vibration |
 
-### Horaires des modèles de vibrations
+### Temporisations des motifs de vibration
 
-| Modèle | Description | Durées d'impulsion (ms) |
+| Motif | Description | Durées d'impulsion (ms) |
 |---------|-------------|---------------------|
-| Impulsion unique | Commentaires rapides | 50 |
-| Double impulsion | Commentaires de confirmation | 50, pause 200, 50 |
+| Impulsion unique | Retour rapide | 50 |
+| Double impulsion | Retour de confirmation | 50, pause 200, 50 |
 | Triple impulsion | Forte confirmation | 10, pause 50, 20, pause 50, 30 |
 | Impulsion d'erreur | Indication d'erreur longue | 500 |
-| Fermer | Impulsions descendantes | 150, 100, 100, 100 |
+| Arrêt | Impulsions descendantes | 150, 100, 100, 100 |
 | Appareil connecté | Impulsions ascendantes | 100, 100, 150 |
 | Appareil déconnecté | Impulsions descendantes | 150, 100, 100 |
 | En pause | Double impulsion | 150, 150 |
@@ -181,10 +181,10 @@ L'écran du RADR utilise une palette de couleurs cohérente :
 
 | Mode | Code couleur | Nom de la couleur |
 |------|------------|------------|
-| Vitesse | 0x5013 | Violet Royal |
-| Profondeur | 0xE186 | Corail chaud |
+| Speed | 0x5013 | Violet royal |
+| Depth | 0xE186 | Corail chaud |
 | Sensation | 0x3C9F | Bleu océan |
-| Accident vasculaire cérébral | 0x4E8A | Vert forêt |
+| Stroke | 0x4E8A | Vert forêt |
 
 ### Couleurs d'état
 
@@ -195,25 +195,25 @@ L'écran du RADR utilise une palette de couleurs cohérente :
 | Désactivé | Gris foncé |
 | Sélectionné/mis en surbrillance | Couleurs d'accentuation |
 
-## Calendrier des commentaires
+## Temporisation du retour
 
 | Événement | Temps de réponse |
 |-------|---------------|
-| Appuyez sur le bouton | < 10 ms |
+| Pression sur un bouton | < 10 ms |
 | Changement d'encodeur | < 10 ms |
 | Changement de mode | < 50 ms |
 | Changement de couleur des LED | < 20 ms |
 
-## Conseils pour utiliser les commentaires
+## Conseils pour utiliser les retours
 
 <Tip>
-Apprenez les sons du buzzer pour faire fonctionner RADR sans regarder. Le son connecté (ascendant) par rapport au son déconnecté (descendant) indique clairement l'état.
+Apprenez les sons du buzzer pour faire fonctionner RADR sans regarder. Le son de connexion (ascendant), par opposition au son de déconnexion (descendant), indique clairement l'état.
 </Tip>
 
 <Tip>
-La LED de gauche (violet pour la vitesse) et la LED de droite (couleur du mode) vous indiquent en un coup d'œil quel paramètre chaque encodeur contrôle.
+La LED de gauche (violette pour la vitesse) et la LED de droite (couleur du mode) vous indiquent en un coup d’œil quel paramètre chaque encodeur contrôle.
 </Tip>
 
 <Tip>
-La LED rouge du milieu signifie toujours en pause ou arrêté. Le blanc signifie actif et prêt.
+La LED rouge du milieu signifie toujours que l’appareil est en pause ou arrêté. Le blanc signifie qu’il est actif et prêt.
 </Tip>

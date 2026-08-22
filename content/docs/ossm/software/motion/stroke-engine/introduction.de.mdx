@@ -3,13 +3,13 @@ title: "StrokeEngine-Bibliothek"
 description: "Erstellen Sie vielseitige Hubbewegungen mit Schritt- oder Servomotoren auf ESP32 für Heimwerkermaschinen mit linearem Positionsantrieb."
 ---
 
-StrokeEngine ist eine Bibliothek zum Erstellen verschiedener Hubbewegungen mit Schritt- oder Servomotoren auf einem ESP32. Sie können es mit jeder Heimwerkermaschine verwenden, die über einen linearen Positionsantrieb verfügt, der von einem Schritt- oder Servomotor angetrieben wird.
+StrokeEngine ist eine Bibliothek zum Erstellen verschiedener Hubbewegungen mit Schritt- oder Servomotoren auf einem ESP32. Sie können sie mit jeder Heimwerkermaschine verwenden, die über einen linearen Positionsantrieb verfügt, der von einem Schritt- oder Servomotor angetrieben wird.
 
 <CardGroup cols={2}>
-  <Card title="FuckIO-Beispiel" icon="code" href="https://github.com/theelims/FuckIO">
+  <Card title="FuckIO Example" icon="code" href="https://github.com/theelims/FuckIO">
     Referenzimplementierung mit StrokeEngine
   </Card>
-  <Card title="OSSM-Projekt" icon="gear" href="https://github.com/KinkyMakers/OSSM-hardware">
+  <Card title="OSSM Project" icon="gear" href="https://github.com/KinkyMakers/OSSM-hardware">
     Beliebte Open-Source-Implementierung von Kinky Makers
   </Card>
 </CardGroup>
@@ -27,40 +27,40 @@ Wenn Sie diese Konzepte verstehen, können Sie StrokeEngine schneller nutzen.
 Die Maschine verwendet ein internes Koordinatensystem, das reale metrische Einheiten in Encoder-/Schrittschritte umwandelt. Diese Abstraktion funktioniert mit allen Maschinengrößen, unabhängig vom gewählten Motor.
 
 <Frame caption="StrokeEngine-Koordinatensystem, das den physischen Weg, Sperrgrenzen und Hubparameter anzeigt">
-  <img src="./_images/coordinates.svg" alt="Koordinatensystemdiagramm, das die Beziehung zwischen den Parametern „PhysicalTravel“, „KeepoutBoundary“, „Tiefe“ und „Hub“ zeigt" />
+  <img src="./_images/coordinates.svg" alt="Koordinatensystemdiagramm, das die Beziehung zwischen physicalTravel, keepoutBoundary, depth und stroke zeigt" />
 </Frame>
 
 **Wichtige Koordinatenkonzepte:**
 
 | Begriff | Beschreibung |
 |------|-------------|
-| **physischeReisen** | Die echte physische Reise von einem harten Endpunkt zum anderen |
-| **keepoutBoundary** | Auf jeder Seite wird der Sicherheitsabstand abgezogen, um Unfälle zu verhindern |
-| **_reisen** | Arbeitsabstand: `physicalTravel - (2 * keepoutBoundary)` |
-| **Heim** | Position bei `-keepoutBoundary` (typischerweise hinten) |
-| **MIN = 0** | Nullposition, `keepoutBoundary` auswärts |
-| **Tiefe** | Der weiteste Punkt, an dem die Maschine ausfährt (zur Laufzeit einstellbar) |
-| **Schlaganfall** | Der Arbeitsabstand einer Streichbewegung (zur Laufzeit einstellbar) |
+| **physicalTravel** | Der tatsächliche physische Weg von einem harten Endanschlag zum anderen |
+| **keepoutBoundary** | Auf jeder Seite wird der Sicherheitsabstand abgezogen, um Kollisionen zu verhindern |
+| **_travel** | Arbeitsabstand: `physicalTravel - (2 * keepoutBoundary)` |
+| **Home** | Position bei `-keepoutBoundary` (typischerweise hinten) |
+| **MIN = 0** | Nullposition, `keepoutBoundary` vom Home entfernt |
+| **Depth** | Der weiteste Punkt, an den die Maschine ausfährt (zur Laufzeit einstellbar) |
+| **Stroke** | Der Arbeitsabstand einer Hubbewegung (zur Laufzeit einstellbar) |
 
 <Note>
-Stellen Sie sich **Stroke** als die Amplitude und **Tiefe** als einen dazu addierten linearen Offset vor. Die positive Bewegungsrichtung ist nach vorne (zum Körper hin).
+Stellen Sie sich **Stroke** als die Amplitude und **Depth** als einen dazu addierten linearen Offset vor. Die positive Bewegungsrichtung ist nach vorne (zum Körper hin).
 </Note>
 
 ### Muster
 
-StrokeEngine verwendet einen Mustergenerator, um eine Vielzahl von Empfindungen zu erzeugen. Mithilfe trapezförmiger Bewegungsprofile passen Muster Parameter wie Geschwindigkeit, Hub und Tiefe Bewegung für Bewegung dynamisch an.
+StrokeEngine verwendet einen Mustergenerator, um eine Vielzahl von Empfindungen zu erzeugen. Mithilfe trapezförmiger Bewegungsprofile passen Muster Parameter wie speed, stroke und depth Bewegung für Bewegung dynamisch an.
 
 Jedes Muster akzeptiert vier Parameter:
-- **Tiefe** – Maximaler Erweiterungspunkt
-- **Schlaganfall** – Bewegungsamplitude
-- **Geschwindigkeit** – Zyklen pro Minute
-- **Sensation** – Beliebiger Modifikator für Musterverhalten (-100 bis 100)
+- **depth** – Maximale Ausfahrposition
+- **stroke** – Bewegungsamplitude
+- **speed** – Zyklen pro Minute
+- **sensation** – Beliebiger Modifikator für Musterverhalten (-100 bis 100)
 
 <Info>
-Ausführliche Beschreibungen der verfügbaren Muster und Anweisungen zum Erstellen eigener Muster finden Sie im [Musterdokumentation](/ossm/software/motion/stroke-engine/pattern).
+Ausführliche Beschreibungen der verfügbaren Muster und Anweisungen zum Erstellen eigener Muster finden Sie in der [Musterdokumentation](/ossm/software/motion/stroke-engine/pattern).
 </Info>
 
-### Anmutige Fehlerbehandlung
+### Fehlerbehandlung ohne Unterbrechung
 
 StrokeEngine verarbeitet ungültige Parameter ordnungsgemäß, ohne den Betrieb zu unterbrechen:
 
@@ -69,9 +69,9 @@ StrokeEngine verarbeitet ungültige Parameter ordnungsgemäß, ohne den Betrieb 
 - Musterbefehle, die die Maschinengrenzen überschreiten, führen zu verkürzten Hüben oder angepassten Rampen
 - Die Bewegung wird über die gesamte Distanz abgeschlossen, kann jedoch etwas länger dauern als erwartet
 
-### Aktualisierungen der Parameter während des Hubs
+### Parameteraktualisierungen während des Hubs
 
-Sie können die Parameter für Tiefe, Strich, Geschwindigkeit und Muster während des Strichs aktualisieren, um ein reaktionsschnelles, flüssiges Benutzererlebnis zu gewährleisten. Integrierte Sicherheitsvorrichtungen sorgen dafür, dass die Maschine jederzeit innerhalb der Grenzen bleibt.
+Sie können die Parameter für Depth, Stroke, speed und pattern während des Hubs aktualisieren, um ein reaktionsschnelles, flüssiges Benutzererlebnis zu gewährleisten. Integrierte Sicherheitsvorrichtungen sorgen dafür, dass die Maschine jederzeit innerhalb der Grenzen bleibt.
 
 ### Zustandsmaschine
 
@@ -95,9 +95,9 @@ stateDiagram-v2
 
 | Zustand | Beschreibung |
 |-------|-------------|
-| **UNDEFINIERT** | Ausgangszustand vor der Referenzfahrt. Der Motor ist deaktiviert und die Position ist unbekannt. |
-| **BEREIT** | Referenzfahrt abgeschlossen. Maschine akzeptiert Bewegungsbefehle. |
-| **MUSTER** | Der Mustergenerator führt zyklische Bewegungen aus. |
+| **UNDEFINED** | Ausgangszustand vor dem Homing. Der Motor ist deaktiviert und die Position ist unbekannt. |
+| **READY** | Homing abgeschlossen. Die Maschine akzeptiert Bewegungsbefehle. |
+| **PATTERN** | Der Mustergenerator führt zyklische Bewegungen aus. |
 | **SETUPDEPTH** | Der Motor folgt der Tiefenposition für eine interaktive Anpassung. |
 
 ## Verwendung
@@ -157,7 +157,7 @@ static machineGeometry strokingMachine = {
 ```
   </Step>
 
-  <Step title="Referenzfahrt konfigurieren">
+  <Step title="Homing konfigurieren">
     Richten Sie die Eigenschaften des Endschalters ein:
 
 ```cpp main.cpp
@@ -173,7 +173,7 @@ StrokeEngine Stroker;
   </Step>
 
   <Step title="In setup() initialisieren">
-    Rufen Sie die Initialisierungsfunktionen auf und warten Sie, bis die Referenzfahrt abgeschlossen ist:
+    Rufen Sie die Initialisierungsfunktionen auf und warten Sie, bis das Homing abgeschlossen ist:
 
 ```cpp main.cpp
 void setup() {
@@ -191,18 +191,18 @@ void setup() {
 ```
 
 <Check>
-Wenn `getState()` `READY` zurückgibt, ist die Maschine referenziert und bereit für Bewegungsbefehle.
+Wenn `getState()` `READY` zurückgibt, ist das Homing abgeschlossen und die Maschine bereit für Bewegungsbefehle.
 </Check>
   </Step>
 </Steps>
 
-### Manuelle Referenzfahrt (kein Endschalter)
+### Manuelles Homing (kein Endschalter)
 
 <Warning>
-Manuelles Referenzieren ist gefährlich. Der Aufruf von `thisIsHome()`, wenn Sie sich nicht am physischen Endanschlag befinden, führt zu einem falschen Koordinatensystem, was zu einem Absturz führt, der Ihre Maschine beschädigen könnte.
+Manuelles Homing ist gefährlich. Wenn sich die Maschine nicht am physischen Endanschlag befindet, führt der Aufruf von `thisIsHome()` zu einem falschen Koordinatensystem und dadurch zu einer mechanischen Kollision, die Ihre Maschine beschädigen könnte.
 </Warning>
 
-Wenn Ihre Maschine keinen Referenzschalter hat, können Sie die manuelle Referenzierung verwenden:
+Wenn Ihre Maschine keinen Homing-Schalter hat, können Sie manuelles Homing verwenden:
 
 1. Bewegen Sie die Maschine physisch bis zum hinteren Endanschlag
 2. Rufen Sie `Stroker.thisIsHome()` auf
@@ -211,7 +211,7 @@ Wenn Ihre Maschine keinen Referenzschalter hat, können Sie die manuelle Referen
 Stroker.thisIsHome();
 ```
 
-Dadurch wird der Fahrer aktiviert, die aktuelle Position als `-keepoutBoundary` festgelegt und langsam auf Position 0 gefahren.
+Dadurch wird der Treiber aktiviert, die aktuelle Position als `-keepoutBoundary` festgelegt und langsam auf Position 0 gefahren.
 
 ### Verfügbare Muster abrufen
 
@@ -241,12 +241,12 @@ String getPatternJSON() {
 
 | Funktion | Beschreibung |
 |----------|-------------|
-| `Stroker.startPattern()` | Starten Sie die musterbasierte Streichbewegung |
+| `Stroker.startPattern()` | Startet die musterbasierte Hubbewegung |
 | `Stroker.stopMotion()` | Sofort mit maximaler Verzögerung anhalten |
 
 ### Positionsbefehle
 
-Bewegen Sie sich zu Einrichtungszwecken an ein beliebiges Ende der Maschine:
+Bewegen Sie die Maschine zu Einrichtungszwecken an ein beliebiges Ende:
 
 ```cpp
 Stroker.moveToMin();        // Move to rear (home) position
@@ -270,15 +270,15 @@ Stroker.setupDepth(10.0);       // Specify speed
 Aktualisieren Sie die Tiefenposition mit `Stroker.setDepth(float)` und lesen Sie den aktuellen Wert mit `Stroker.getDepth()`.
 
 <Tip>
-**Ausgefallener Modus:** Rufen Sie `Stroker.setupDepth(10.0, true)` auf, um Tiefe und Strich interaktiv anzupassen. Der Sensationsschieberegler wird dem Intervall `[depth-stroke, depth]` zugeordnet:
+**Fancy Mode:** Rufen Sie `Stroker.setupDepth(10.0, true)` auf, um depth und stroke interaktiv anzupassen. Der Sensationsschieberegler wird dem Intervall `[depth-stroke, depth]` zugeordnet:
 - `sensation = 100` – Passt die Tiefenposition an
 - `sensation = -100` – Passt die Hubposition an
-- `sensation = 0` – Positionen am Hubmittelpunkt
+- `sensation = 0` – Positioniert am Hubmittelpunkt
 </Tip>
 
 ### Parameterfunktionen
 
-Parameter jederzeit aktualisieren. Die Werte werden automatisch auf die Maschinengrenzen beschränkt:
+Aktualisieren Sie die Parameter jederzeit. Die Werte werden automatisch auf die Maschinengrenzen beschränkt:
 
 ```cpp
 // Setter functions
@@ -290,7 +290,7 @@ Stroker.setPattern(int index, bool applyNow);      // 0 to getNumberOfPattern()-
 ```
 
 <Info>
-Setzen Sie `applyNow` auf `true`, um Änderungen sofort in der Mitte des Hubs anzuwenden. Andernfalls werden die Änderungen wirksam, nachdem der aktuelle Strich abgeschlossen ist.
+Setzen Sie `applyNow` auf `true`, um Änderungen sofort in der Mitte des Hubs anzuwenden. Andernfalls werden die Änderungen wirksam, nachdem der aktuelle Hub abgeschlossen ist.
 </Info>
 
 Lesen Sie die tatsächlich von StrokeEngine verwendeten eingeschränkten Werte zurück:

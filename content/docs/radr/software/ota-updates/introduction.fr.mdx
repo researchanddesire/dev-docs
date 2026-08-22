@@ -1,9 +1,9 @@
 ---
 title: "Système de mise à jour OTA"
-description: "Documentation technique pour l'architecture de mise à jour en direct RADR"
+description: "Documentation technique pour l'architecture des mises à jour OTA de RADR"
 ---
 
-Ce document décrit le système de mise à jour par liaison radio (OTA) utilisé par la télécommande sans fil Research And Desire (RADR), y compris la chaîne de mise à jour, le flux de la machine d'état et les composants qui sont mis à jour.
+Ce document décrit le système de mise à jour par liaison radio (OTA) utilisé par la télécommande sans fil Research And Desire Wireless Remote (RADR), y compris la chaîne de mise à jour, le flux de la machine à états et les composants mis à jour.
 
 ## Aperçu
 
@@ -14,9 +14,9 @@ RADR utilise un système de mise à jour OTA en deux parties :
 | **Micrologiciel** | Binaire de l'application ESP32 | `firmware.bin` |
 | **Système de fichiers** | Partition LittleFS contenant le registre des périphériques et les spécifications du protocole | `littlefs.bin` |
 
-La mise à jour du système de fichiers est particulièrement importante pour la prise en charge des appareils : elle contient le registre Buttplug.io qui mappe les UUID du service Bluetooth aux configurations de l'appareil. Cela permet d'ajouter la prise en charge de nouveaux appareils sans nécessiter de modifications du micrologiciel.
+La mise à jour du système de fichiers est particulièrement importante pour la prise en charge des appareils : elle contient le registre Buttplug.io qui associe les UUID de service Bluetooth aux configurations des appareils. Cela permet d'ajouter la prise en charge de nouveaux appareils sans modifier le micrologiciel.
 
-## Mettre à jour l'architecture
+## Architecture des mises à jour OTA
 
 ```mermaid
 flowchart TB
@@ -38,19 +38,19 @@ flowchart TB
 
 ### Serveur de mise à jour
 
-Les mises à jour sont servies à partir de Supabase Storage. L'URL du serveur est définie dans `platformio.ini` :
+Les mises à jour sont fournies par Supabase Storage. L'URL du serveur est définie dans `platformio.ini` :
 
 ```ini
 UPDATE_SERVER_URL="https://acjajruwevyyatztbkdf.supabase.co/storage/v1/object/public/radr-firmware"
 ```
 
-Les URL binaires suivent le modèle :
+Les URL des binaires suivent le modèle :
 - Micrologiciel : `{UPDATE_SERVER_URL}/master/firmware.bin`
 - Système de fichiers : `{UPDATE_SERVER_URL}/master/littlefs.bin`
 
-## Flux de machine à états
+## Flux de la machine à états
 
-Les mises à jour sont gérées par la machine à états RADR. Le flux de mise à jour est déclenché à partir du menu Paramètres.
+Les mises à jour sont gérées par la machine à états RADR. Le flux de mise à jour est déclenché depuis le menu **Settings**.
 
 ```mermaid
 flowchart TD
@@ -74,27 +74,27 @@ flowchart TD
 
 | Depuis | À | Condition |
 |------|-----|-----------|
-| `settings_menu` | `update` | L'utilisateur sélectionne "Mettre à jour l'appareil" + WiFi connecté |
-| `settings_menu` | `update.wifi` | L'utilisateur sélectionne "Mettre à jour l'appareil" + WiFi non connecté |
+| `settings_menu` | `update` | L'utilisateur sélectionne "Update Device" + WiFi connecté |
+| `settings_menu` | `update.wifi` | L'utilisateur sélectionne "Update Device" + WiFi non connecté |
 | `update.wifi` | `update` | Connexion WiFi établie |
-| `update` | `update.filesystem` | La garde `hasFilesystemUpdate` renvoie vrai |
-| `update` | `update.software` | La garde `hasSoftwareUpdate` renvoie vrai (pas de mise à jour du système de fichiers) |
+| `update` | `update.filesystem` | La garde `hasFilesystemUpdate` renvoie true |
+| `update` | `update.software` | La garde `hasSoftwareUpdate` renvoie true (pas de mise à jour du système de fichiers) |
 | `update` | `update.done` | Aucune mise à jour disponible |
 | `update.filesystem` | `update.software` | Mise à jour du système de fichiers terminée + mise à jour du logiciel disponible |
 | `update.filesystem` | `restart` | Mise à jour du système de fichiers terminée, aucune mise à jour logicielle |
-| `update.software` | `restart` | Mise à jour du logiciel terminée (redémarre toujours) |
-| `update.done` | `restart` | L'utilisateur reconnaît |
+| `update.software` | `restart` | Mise à jour du logiciel terminée (l'appareil redémarre toujours) |
+| `update.done` | `restart` | L'utilisateur confirme |
 
 ## Ce qui est mis à jour
 
 ### Mise à jour du micrologiciel
 
-La mise à jour du firmware remplace le binaire de l'application ESP32. Cela comprend :
+La mise à jour du micrologiciel remplace le binaire de l'application ESP32. Cela comprend :
 
 - Logique d'application de base
 - Interface utilisateur et code d'affichage
-- Pile Bluetooth et communication entre appareils
-- Machine d'état et navigation
+- Pile Bluetooth et communication avec les appareils
+- Machine à états et navigation
 - Gestion des entrées (encodeurs, boutons, bumpers)
 
 **Mise en œuvre :** `updateSoftwareTask()` dans `src/tasks/update.cpp`
@@ -115,10 +115,10 @@ La mise à jour du micrologiciel redémarre automatiquement l'appareil en cas de
 
 La mise à jour du système de fichiers remplace la partition LittleFS, qui contient :
 
-| Déposer | But |
+| Fichier | But |
 |------|---------|
-| `/registry.json` | Mappe les UUID du service BLE aux fichiers de spécifications de protocole |
-| `/protocols/*.json` | Fichiers de configuration de l'appareil Buttplug.io v4 |
+| `/registry.json` | Associe les UUID de service BLE aux fichiers de spécifications de protocole |
+| `/protocols/*.json` | Fichiers de configuration des appareils Buttplug.io v4 |
 
 **Mise en œuvre :** `updateFilesystemTask()` dans `src/tasks/update.cpp`
 
@@ -154,7 +154,7 @@ Le registre est chargé au démarrage par `initRegistry()` dans `src/devices/reg
 
 1. Les appareils codés en dur sont enregistrés en premier (par exemple, OSSM)
 2. `/registry.json` est lu depuis LittleFS
-3. Chaque UUID de service est mappé à un `ButtplugIODeviceFactory`
+3. Chaque UUID de service est associé à un `ButtplugIODeviceFactory`
 4. Les spécifications du protocole sont chargées à la demande lorsque les appareils sont découverts
 
 ## Disponibilité des mises à jour
@@ -173,26 +173,26 @@ bool hasSoftwareUpdate(const State &state, const Event &event) {
 
 Ces drapeaux sont contrôlés par :
 
-| Drapeau | Définir quand |
+| Drapeau | Défini lorsque |
 |------|----------|
 | `isSoftwareUpdateAvailable` | Indicateur de compilation `FORCE_UPDATE` ou le serveur indique une mise à jour |
 | `isFilesystemUpdateAvailable` | Indicateur de compilation `FORCE_UPDATE` ou le serveur indique une mise à jour |
 
 <Warning>
-L'implémentation actuelle dispose d'un TODO pour la vérification automatique des mises à jour. Actuellement, les mises à jour sont déclenchées manuellement et la disponibilité doit être définie via des indicateurs de compilation ou des mécanismes externes.
+L'implémentation actuelle comporte un TODO pour la vérification automatique des mises à jour. Actuellement, les mises à jour sont déclenchées manuellement et la disponibilité doit être définie via des indicateurs de compilation ou des mécanismes externes.
 </Warning>
 
 ## Fichiers sources clés
 
-| Déposer | But |
+| Fichier | But |
 |------|---------|
-| `src/tasks/update.cpp` | Implémentations de tâches de mise à jour (`updateSoftwareTask`, `updateFilesystemTask`) |
-| `src/tasks/update.h` | Mettre à jour les déclarations de tâches et les indicateurs de disponibilité |
-| `src/state/machine.h` | Définition de machine à états avec états de mise à jour |
-| `src/state/guards.hpp` | Fonctions de protection pour la disponibilité des mises à jour |
+| `src/tasks/update.cpp` | Implémentations des tâches de mise à jour (`updateSoftwareTask`, `updateFilesystemTask`) |
+| `src/tasks/update.h` | Déclarations des tâches et indicateurs de disponibilité |
+| `src/state/machine.h` | Définition de la machine à états avec les états de mise à jour |
+| `src/state/guards.hpp` | Fonctions de garde pour la disponibilité des mises à jour |
 | `src/devices/registry.cpp` | Initialisation du registre à partir de LittleFS |
-| `data/registry.json` | UUID du service aux mappages de spécifications de protocole |
-| `data/protocols/*.json` | Spécifications de l'appareil Buttplug.io v4 |
+| `data/registry.json` | Associations entre UUID de service et spécifications de protocole |
+| `data/protocols/*.json` | Spécifications des appareils Buttplug.io v4 |
 
 ## Notes de développement
 
@@ -207,28 +207,28 @@ build_flags =
 
 Cela définit `isSoftwareUpdateAvailable` et `isFilesystemUpdateAvailable` sur `true`.
 
-### Mises à jour du système de fichiers local
+### Mises à jour locales du système de fichiers
 
-Lors du développement local, utilisez la fonctionnalité « Télécharger le système de fichiers » de PlatformIO :
+Lors du développement local, utilisez la fonctionnalité « Upload Filesystem » de PlatformIO :
 
 ```bash
 pio run --target uploadfs
 ```
 
-Cela télécharge le contenu du répertoire `data/` sur la partition LittleFS.
+Cela téléverse le contenu du répertoire `data/` sur la partition LittleFS.
 
 <Warning>
-"Upload Filesystem" efface la partition LittleFS existante avant l'écriture. Toutes les modifications d'exécution seront perdues.
+"Upload Filesystem" efface la partition LittleFS existante avant l'écriture. Toutes les modifications effectuées pendant l'exécution seront perdues.
 </Warning>
 
 ## Documentation connexe
 
 <CardGroup cols={2}>
 <Card title="Registre des appareils" icon="database" href="/radr/software/device-registry/introduction">
-Comment RADR découvre et crée des instances de périphérique à partir des UUID du service BLE.
+Comment RADR découvre et crée des instances de périphérique à partir des UUID de service BLE.
 </Card>
 
-<Card title="Flasheur Web" icon="bolt" href="/radr/software/ota-updates/introduction">
-Flashage manuel du firmware via le navigateur.
+<Card title="Web Flasher" icon="bolt" href="/radr/software/ota-updates/introduction">
+Flashage manuel du micrologiciel via le navigateur.
 </Card>
 </CardGroup>

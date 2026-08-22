@@ -1,6 +1,6 @@
 ---
 title: "Hochspannungsfehler"
-description: "So beheben Sie das Problem mit dem Ausfall des DC-DC-Wandlers auf OSSM-Boards der frühen Version 2, wenn Netzteile mit 30 V+ verwendet werden."
+description: "So beheben Sie das Problem mit dem Ausfall des DC-DC-Wandlers auf frühen OSSM-Boards der Rev 2 bei Verwendung von Netzteilen mit 30 V+."
 ---
 
 ## Betroffene Boards
@@ -11,49 +11,49 @@ Dieses Problem betrifft **Rev 2-Boards mit der Bestellnummer #1214 oder niedrige
 
 ## Problem
 
-Wenn Sie ein Netzteil mit 30 V oder mehr an die Platine anschließen, **ohne dass ein Motor angeschlossen ist**, zerstört eine kurze Spannungsspitze (ca. 1 Mikrosekunde) den DC-DC-Wandler.
+Wenn Sie ein Netzteil mit 30 V oder mehr an die Platine anschließen, **ohne dass ein Motor angeschlossen ist**, zerstört eine kurze Spannungsspitze (etwa 1 Mikrosekunde) den DC-DC-Wandler.
 
 <Note>
 Dieses Problem tritt **nicht** auf, wenn Sie:
-- Verwenden Sie ein Standard-24-V-Netzteil
-- Schließen Sie vor dem Einschalten einen Motor an die Platine an
+- ein Standard-24-V-Netzteil verwenden
+- vor dem Einschalten einen Motor an die Platine anschließen
 </Note>
 
 ## Lösung
 
-Fügen Sie eine <Tooltip tip="Transient Voltage Suppression - a component that clamps voltage spikes to protect sensitive electronics">TVS-Diode</Tooltip> hinzu, um die Eingangsspitze auf eine Spannung zu begrenzen, die der DC-DC-Wandler tolerieren kann.
+Fügen Sie eine <Tooltip tip="Transient Voltage Suppression – eine Komponente, die Spannungsspitzen begrenzt, um empfindliche Elektronik zu schützen">TVS-Diode</Tooltip> hinzu, um die Eingangsspitze auf eine für den DC-DC-Wandler tolerierbare Spannung zu begrenzen.
 
-### Erforderlicher Teil
+### Erforderliches Bauteil
 
 | Teilenummer | Beschreibung | Ungefähre Kosten |
 |-------------|-------------|------------------|
-| [1,5KE51CA](https://www.digikey.ca/en/products/detail/littelfuse-inc/1-5KE51CA/688036) | TVS-Diode | ~1 USD |
+| [1.5KE51CA](https://www.digikey.ca/en/products/detail/littelfuse-inc/1-5KE51CA/688036) | TVS-Diode | ~$1 USD |
 
 ### Installationsschritte
 
 <Steps>
-<Step title="Bereiten Sie die Diode vor">
-Biegen Sie die Anschlüsse der 1,5KE51CA-Diode so, dass sie dem Abstand der Lötpads auf Ihrer Platine entsprechen.
+<Step title="Diode vorbereiten">
+Biegen Sie die Anschlüsse der 1.5KE51CA-Diode so, dass sie dem Abstand der Lötpads auf Ihrer Platine entsprechen.
 </Step>
 
-<Step title="Schneiden Sie den nahegelegenen Stift ab">
-Schneiden Sie den im Bild unten markierten Stift ab, um sicherzustellen, dass er nach der Installation das Diodenkabel nicht berührt.
+<Step title="Benachbarten Pin kürzen">
+Kürzen Sie den im Bild unten markierten Pin, damit er den Anschlussdraht der Diode nach der Installation nicht berührt.
 
 <Warning>
-Das Überspringen dieses Schritts kann zu einem Kurzschluss zwischen dem Pin und dem Diodenkabel führen.
+Wenn Sie diesen Schritt überspringen, kann ein Kurzschluss zwischen dem Pin und dem Anschlussdraht der Diode entstehen.
 </Warning>
 </Step>
 
-<Step title="Löten Sie die Diode">
-Löten Sie die Diode direkt auf die Platine, wie im Referenzbild unten gezeigt.
+<Step title="Diode löten">
+Löten Sie die Diode wie im Referenzbild unten gezeigt direkt auf die Platine.
 
 <Check>
-Stellen Sie sicher, dass die Diodenleitungen über gute Lötverbindungen verfügen und dass keine Leitungen unbeabsichtigte Pads oder Komponenten berühren.
+Überprüfen Sie, dass die Anschlussdrähte der Diode gute Lötstellen haben und kein Anschlussdraht unbeabsichtigte Pads oder Komponenten berührt.
 </Check>
 </Step>
 </Steps>
 
 {/* TODO: Add installation reference image */}
-{/* <Frame caption="Die Installation der TVS-Dioden zeigt die richtige Platzierung der Leitungen">
-<img src="/ossm/images/ossm/hardware/tvs-diode-install.png" alt="Die TVS-Diode ist auf die OSSM-Platine gelötet, wobei der abgeschnittene Stift sichtbar ist" />
+{/* <Frame caption="Installation der TVS-Diode mit korrekter Platzierung der Anschlüsse">
+<img src="/ossm/images/ossm/hardware/tvs-diode-install.png" alt="Auf die OSSM-Platine gelötete TVS-Diode mit sichtbarem gekürztem Pin" />
 </Frame> */}

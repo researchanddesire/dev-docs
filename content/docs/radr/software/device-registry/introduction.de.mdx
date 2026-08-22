@@ -1,9 +1,9 @@
 ---
-title: „Geräteregistrierung“
-description: „Wie RADR Geräteinstanzen aus BLE-Dienst-UUIDs erkennt und erstellt“
+title: "Geräteregistrierung"
+description: "Wie RADR Geräteinstanzen aus BLE-Dienst-UUIDs erkennt und erstellt"
 ---
 
-Die Geräteregistrierung ist das Kernsystem, das die UUIDs des Bluetooth Low Energy (BLE)-Dienstes den Gerätefabriken zuordnet. Wenn RADR nach Geräten sucht, verwendet es Dienst-UUIDs, um zu bestimmen, welche Factory die Geräteinstanz erstellen soll.
+Die Geräteregistrierung ist das Kernsystem, das die UUIDs der Bluetooth-Low-Energy-(BLE-)Dienste den Gerätefabriken zuordnet. Wenn RADR nach Geräten sucht, verwendet es Dienst-UUIDs, um zu bestimmen, welche Factory die Geräteinstanz erstellen soll.
 
 ## Architekturübersicht
 
@@ -11,8 +11,8 @@ RADR verwendet ein zweistufiges Registrierungssystem:
 
 | Stufe | Beschreibung | Beispiel |
 |------|-------------|---------|
-| Hartcodiert | Geräte werden direkt im Code bei benutzerdefinierten Fabriken registriert | OSSM |
-| Dynamisch | Geräte, die von `registry.json` mithilfe der ButtplugIO-Factory geladen wurden | Lovense, Satisfyer, Kiiroo |
+| Fest codiert | Geräte, die direkt im Code mit benutzerdefinierten Factorys registriert sind | OSSM |
+| Dynamisch | Geräte, die mithilfe der ButtplugIO-Factory aus `registry.json` geladen werden | Lovense, Satisfyer, Kiiroo |
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -29,17 +29,17 @@ RADR verwendet ein zweistufiges Registrierungssystem:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-Die Registrierung wird einmalig beim Gerätestart über `initRegistry()` gefüllt.
+Die Registrierung wird beim Start des Geräts einmalig über `initRegistry()` gefüllt.
 
 ## Registrierungsstruktur
 
-Die Registrierung ist eine globale Karte, die Dienst-UUIDs mit Factory-Funktionen verknüpft:
+Die Registrierung ist eine globale Map, die Dienst-UUIDs mit Factory-Funktionen verknüpft:
 
 ```cpp
 std::unordered_map<std::string, DeviceFactory> registry;
 ```
 
-Wobei `DeviceFactory` definiert ist als:
+Dabei ist `DeviceFactory` wie folgt definiert:
 
 ```cpp
 typedef Device *(*DeviceFactory)(const NimBLEAdvertisedDevice *advertisedDevice);
@@ -52,9 +52,9 @@ typedef Device *(*DeviceFactory)(const NimBLEAdvertisedDevice *advertisedDevice)
 | `initRegistry()` | Füllt die Registrierung mit fest codierten und dynamischen Geräten |
 | `getDeviceFactory()` | Sucht eine Factory anhand der Dienst-UUID |
 
-## Hartcodierte Geräte
+## Fest codierte Geräte
 
-Hartcodierte Geräte werden direkt in `initRegistry()` bei einer Lambda-Factory registriert. Dieser Ansatz wird für Geräte mit benutzerdefinierten Protokollen verwendet, die eine spezielle Handhabung erfordern.
+Fest codierte Geräte werden direkt in `initRegistry()` mit einer Lambda-Factory registriert. Dieser Ansatz wird für Geräte mit benutzerdefinierten Protokollen verwendet, die eine spezielle Verarbeitung erfordern.
 
 ### OSSM-Beispiel
 
@@ -66,23 +66,23 @@ registry.emplace(
     });
 ```
 
-Das OSSM verwendet ein benutzerdefiniertes BLE-Protokoll mit mehreren Eigenschaften für Geschwindigkeit, Tiefe, Gefühl und Schlagkontrolle. Dies erfordert eine dedizierte Geräteklasse anstelle der generischen ButtplugIO-Implementierung.
+OSSM verwendet ein benutzerdefiniertes BLE-Protokoll mit mehreren Characteristics zur Steuerung von Geschwindigkeit, Tiefe, Sensation und Hub. Daher ist eine eigene Geräteklasse statt der generischen ButtplugIO-Implementierung erforderlich.
 
-### Wann sollte die festcodierte Registrierung verwendet werden?
+### Wann sollte die fest codierte Registrierung verwendet werden?
 
 Verwenden Sie die fest codierte Registrierung, wenn:
 
-- Das Gerät verwendet ein benutzerdefiniertes Protokoll, das nicht von Buttplug.io abgedeckt wird
+- Das Gerät verwendet ein benutzerdefiniertes Protokoll, das nicht von Buttplug.io unterstützt wird
 - Sie benötigen eine spezielle Benutzeroberfläche oder Steuerlogik
-- Das Gerät erfordert eine einzigartige charakteristische Handhabung
+- Das Gerät erfordert eine spezielle Verarbeitung der Characteristics
 
 ## Dynamische Geräte (ButtplugIO)
 
-Dynamische Geräte werden aus der Datei `data/registry.json` im Dateisystem geladen. Dies ermöglicht das Hinzufügen von Unterstützung für neue Geräte, ohne den Code zu ändern.
+Dynamische Geräte werden aus der Datei `data/registry.json` im Dateisystem geladen. Dadurch kann Unterstützung für neue Geräte hinzugefügt werden, ohne den Code zu ändern.
 
-### Registry.json-Struktur
+### `registry.json`-Struktur
 
-Die Registrierung ordnet Dienst-UUIDs Arrays von Protokollspezifikationsdateien zu:
+Die Registrierung ordnet Dienst-UUIDs Arrays mit Protokollspezifikationsdateien zu:
 
 ```json
 {
@@ -92,18 +92,18 @@ Die Registrierung ordnet Dienst-UUIDs Arrays von Protokollspezifikationsdateien 
 }
 ```
 
-Jeder Eintrag ordnet eine BLE-Dienst-UUID (Schlüssel) einer oder mehreren Protokollspezifikationsdateien (Wertarray) zu.
+Jeder Eintrag ordnet eine BLE-Dienst-UUID (Schlüssel) einer oder mehreren Protokollspezifikationsdateien (Wertearray) zu.
 
-### Fabrikfluss
+### Ablauf der Factory
 
-Wenn ein Gerät mit einer registrierten Dienst-UUID entdeckt wird:
+Wenn ein Gerät mit einer registrierten Dienst-UUID erkannt wird:
 
 1. `ButtplugIODeviceFactory` liest `registry.json` von LittleFS
 2. Ruft die Liste der Spezifikationsdateien für die Dienst-UUID ab
 3. Für jede Spezifikationsdatei:
    - Lädt und analysiert die JSON-Konfiguration
-   - Gleicht den angekündigten Gerätenamen mit `communication[0].btle.names`-Mustern ab
-   - Extrahiert TX/RX-Merkmale für die Dienst-UUID
+   - Vergleicht den beworbenen Gerätenamen mit den Mustern in `communication[0].btle.names`
+   - Extrahiert die TX/RX-Characteristics für die Dienst-UUID
 4. Erstellt eine `LovenseDevice`-Instanz mit der passenden Konfiguration
 
 ### Protokollspezifikationsdateiformat
@@ -142,7 +142,7 @@ Spezifikationsdateien folgen dem Buttplug.io v4-Format:
 | `defaults` | Standardgerätename und Funktionssatz |
 | `configurations` | Gerätespezifische Varianten und Identifikatoren |
 | `communication[].btle.names` | Gerätenamenmuster (unterstützt den Platzhalter `*`) |
-| `communication[].btle.services` | TX/RX-charakteristische UUIDs pro Dienst |
+| `communication[].btle.services` | TX/RX-Characteristic-UUIDs pro Dienst |
 
 ## Geräteerkennungsablauf
 
@@ -155,19 +155,19 @@ Spezifikationsdateien folgen dem Buttplug.io v4-Format:
 ```
 
 1. **Scan**: RADR sucht nach BLE-Geräten
-2. **UUID extrahieren**: Ruft die UUID des angekündigten Dienstes ab
+2. **UUID extrahieren**: Ruft die UUID des beworbenen Dienstes ab
 3. **Registrierungssuche**: `getDeviceFactory(serviceUUID)` findet die Fabrik
-4. **Gerät erstellen**: Factory instanziiert die entsprechende Geräteklasse
+4. **Gerät erstellen**: Die Factory instanziiert die entsprechende Geräteklasse
 
 ## Unterstützung für neue Geräte hinzufügen
 
-### Option A: Dynamisch (Buttplug.io Registry)
+### Option A: Dynamisch (Buttplug.io-Registry)
 
 Für Geräte, die mit dem Buttplug.io-Protokoll kompatibel sind:
 
 <Steps>
 <Step title="Besorgen Sie sich die Spezifikationsdatei oder erstellen Sie sie">
-Holen Sie sich die Buttplug.io v4-Protokollspezifikation für das Gerät. Diese sind im [Konfigurations-Repository für Buttplug-Geräte](https://github.com/buttplugio/buttplug) verfügbar.
+Holen Sie sich die Buttplug.io-v4-Protokollspezifikation für das Gerät. Diese ist im [Konfigurations-Repository für Buttplug-Geräte](https://github.com/buttplugio/buttplug) verfügbar.
 </Step>
 
 <Step title="Spezifikationsdatei zu Protokollen hinzufügen">
@@ -177,7 +177,7 @@ data/protocols/your-device.json
 ```
 </Step>
 
-<Step title="Registry.json aktualisieren">
+<Step title="registry.json aktualisieren">
 Fügen Sie die Dienst-UUID-Zuordnung zu `data/registry.json` hinzu:
 ```json
 {
@@ -191,7 +191,7 @@ Verwenden Sie PlatformIO, um das Dateisystem auf das Gerät hochzuladen.
 </Step>
 </Steps>
 
-### Option B: Hartcodiert (benutzerdefiniertes Protokoll)
+### Option B: Fest codiert (benutzerdefiniertes Protokoll)
 
 Für Geräte, die eine benutzerdefinierte Protokollverarbeitung erfordern:
 
@@ -204,8 +204,8 @@ Erstellen Sie eine neue Geräteklasse in `src/devices/`, die die Basisklasse `De
 Implementieren Sie `getServiceUUID()`, `getName()` und jede gerätespezifische Steuerlogik.
 </Step>
 
-<Step title="Registrieren Sie sich in initRegistry">
-Registrierungscode in `initRegistry()` hinzufügen:
+<Step title="In initRegistry registrieren">
+Fügen Sie Registrierungscode in `initRegistry()` hinzu:
 ```cpp
 registry.emplace(
     YOUR_SERVICE_UUID,
@@ -215,7 +215,7 @@ registry.emplace(
 ```
 </Step>
 
-<Step title="Firmware neu erstellen">
+<Step title="Firmware neu kompilieren">
 Kompilieren und flashen Sie die aktualisierte Firmware.
 </Step>
 </Steps>
@@ -224,14 +224,14 @@ Kompilieren und flashen Sie die aktualisierte Firmware.
 
 ### Aktualisieren der Registrierung (Entwicklung)
 
-Wenn Sie lokal entwickeln, verwenden Sie die Funktion „Dateisystem hochladen“ von PlatformIO, um das Verzeichnis `data/` auf LittleFS zu flashen:
+Wenn Sie lokal entwickeln, verwenden Sie die Funktion „Upload Filesystem“ von PlatformIO, um das Verzeichnis `data/` auf LittleFS zu flashen:
 
 1. Ändern Sie `data/registry.json` oder fügen Sie Spezifikationsdateien zu `data/protocols/` hinzu
-2. Klicken Sie in VS Code mit PlatformIO auf **Dateisystem hochladen** (oder führen Sie `pio run --target uploadfs` aus).
+2. Klicken Sie in VS Code mit PlatformIO auf **Upload Filesystem** (oder führen Sie `pio run --target uploadfs` aus).
 3. Das Gerät verwendet beim nächsten Start die aktualisierte Registrierung
 
 <Warning>
-„Dateisystem hochladen“ löscht die vorhandene LittleFS-Partition vor dem Schreiben. Alle Laufzeitänderungen gehen verloren.
+"Upload Filesystem" löscht die vorhandene LittleFS-Partition vor dem Schreiben. Alle Laufzeitänderungen gehen verloren.
 </Warning>
 
 ### Aktualisieren der Registrierung (Produktion)
@@ -242,12 +242,12 @@ OTA-Registrierungsaktualisierungen sind eine ausstehende Funktion. Derzeit ist f
 
 Der geplante Workflow für Produktionsgeräte:
 
-1. Navigieren Sie auf dem Gerät zu **Einstellungen > Nach Updates suchen**
+1. Navigieren Sie auf dem Gerät zu **Settings > Look for updates**
 2. RADR sucht nach Registrierungsaktualisierungen vom Server
 3. Aktualisierte `registry.json`- und Protokolldateien werden OTA heruntergeladen
 4. Die Unterstützung neuer Geräte ist ohne ein vollständiges Firmware-Update verfügbar
 
-## Schlüsselquelldateien
+## Wichtige Quelldateien
 
 | Datei | Zweck |
 |------|---------|
@@ -255,8 +255,8 @@ Der geplante Workflow für Produktionsgeräte:
 | `src/devices/registry.cpp` | Implementierung und Initialisierung der Registrierung |
 | `src/devices/buttplugio/buttplugIOFactory.cpp` | Dynamische Gerätefabrik |
 | `src/devices/device.h` | Basisgeräteklasse |
-| `data/registry.json` | Dienst-UUID für Spezifikationsdateizuordnungen |
-| `data/protocols/*.json` | Technische Daten des Buttplug.io v4-Geräts |
+| `data/registry.json` | Dienst-UUID-Zuordnungen zu Spezifikationsdateien |
+| `data/protocols/*.json` | Buttplug.io-v4-Gerätespezifikationen |
 
 ## Weiterführende Literatur
 

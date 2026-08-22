@@ -1,9 +1,9 @@
 ---
-title: „Softwareübersicht“
-description: „Firmware-Architektur und Entwicklungsleitfaden für die drahtlose RADR-Fernbedienung“
+title: "Softwareübersicht"
+description: "Firmware-Architektur und Entwicklungsleitfaden für die drahtlose RADR-Fernbedienung"
 ---
 
-Dieser Abschnitt behandelt die RADR-Firmware, einschließlich Architektur, Entwicklungseinrichtung und wie man die Codebasis ändert oder dazu beiträgt.
+Dieser Abschnitt behandelt die RADR-Firmware, einschließlich ihrer Architektur, der Entwicklungsumgebung sowie der Frage, wie Sie die Codebasis ändern oder dazu beitragen können.
 
 ## Firmware-Übersicht
 
@@ -12,11 +12,11 @@ RADR läuft auf einem ESP32-S3-Mikrocontroller mit benutzerdefinierter Firmware,
 | Komponente | Technologie |
 |-----------|------------|
 | MCU | ESP32-S3 mit PSRAM |
-| Rahmen | Arduino für ESP32 |
-| Build-System | PlattformIO |
+| Framework | Arduino für ESP32 |
+| Build-System | PlatformIO |
 | Sprache | C++ |
-| Bibliothek anzeigen | TFT_eSPI |
-| BLE-Stack | Flink |
+| Displaybibliothek | TFT_eSPI |
+| BLE-Stack | NimBLE |
 
 ## Firmware-Version
 
@@ -33,9 +33,9 @@ Suchen Sie regelmäßig nach Firmware-Updates, um auf neue Funktionen und Gerät
 
 ## Quellcode
 
-Die vollständige Firmware-Quelle ist auf GitHub verfügbar:
+Der vollständige Firmware-Quellcode ist auf GitHub verfügbar:
 
-<Card title="RADR-Firmware" icon="code" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Software">
+<Card title="RADR Firmware" icon="code" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Software">
 Durchsuchen Sie den Quellcode und die Dokumentation.
 </Card>
 
@@ -45,14 +45,14 @@ Durchsuchen Sie den Quellcode und die Dokumentation.
 
 | Komponente | Zweck |
 |-----------|---------|
-| Zustandsmaschine | Verwaltet Bildschirmstatus und Navigationsfluss |
+| Zustandsmaschine | Verwaltet Bildschirmzustände und den Navigationsfluss |
 | Gerätemanager | Verwaltet die Erkennung und Verbindung von Bluetooth-Geräten |
-| Anzeigetreiber | Rendert die Benutzeroberfläche mithilfe von TFT_eSPI mit Canvas-Pufferung |
-| Eingabehandler | Verarbeitet Encoder-, Tasten- und Bumper-Eingaben |
+| Displaytreiber | Rendert die Benutzeroberfläche mit TFT_eSPI und Canvas-Pufferung |
+| Eingabeverarbeitung | Verarbeitet Eingaben von Encoder, Tasten und Bumper |
 | Feedback-System | Steuert LEDs, Summer und Vibration |
 | Geräteregistrierung | Ordnet Bluetooth-UUIDs Gerätetypen zu |
 
-### Schlüsseldienste
+### Kerndienste
 
 ```
 ├── BluetoothService    # BLE scanning and connection
@@ -68,7 +68,7 @@ Durchsuchen Sie den Quellcode und die Dokumentation.
 
 ### Voraussetzungen
 
-- [Visual Studio-Code](https://code.visualstudio.com/)
+- [Visual Studio Code](https://code.visualstudio.com/)
 - [PlatformIO-Erweiterung](https://platformio.org/install/ide?install=vscode)
 - USB-C-Kabel zum Flashen
 
@@ -82,19 +82,19 @@ cd radr-wireless-remote/Software
 ```
 </Step>
 
-<Step title="Im VS-Code öffnen">
+<Step title="In VS Code öffnen">
 Öffnen Sie den Ordner `Software` in VS Code. PlatformIO erkennt die Projektkonfiguration automatisch.
 </Step>
 
-<Step title="Erstellen Sie die Firmware">
+<Step title="Kompilieren Sie die Firmware">
 Klicken Sie auf die Schaltfläche „PlatformIO Build“ oder führen Sie Folgendes aus:
 ```bash
 pio run
 ```
 </Step>
 
-<Step title="Flash zum Gerät">
-Verbinden Sie RADR über USB-C und klicken Sie auf „Hochladen“ oder führen Sie Folgendes aus:
+<Step title="Auf das Gerät flashen">
+Verbinden Sie RADR über USB-C und klicken Sie auf „Upload“ oder führen Sie Folgendes aus:
 ```bash
 pio run --target upload
 ```
@@ -103,7 +103,7 @@ pio run --target upload
 
 ## Hauptmerkmale
 
-### Leinwandbasiertes Rendering
+### Canvas-basiertes Rendering
 
 RADR verwendet doppelt gepuffertes Canvas-Rendering für reibungslose Anzeigeaktualisierungen:
 
@@ -116,7 +116,7 @@ RADR verwendet doppelt gepuffertes Canvas-Rendering für reibungslose Anzeigeakt
 Die Benutzeroberfläche verwendet eine hierarchische Zustandsmaschine:
 
 - Klare Übergänge zwischen Bildschirmen
-- Isolierte Statuslogik für jeden Bildschirm
+- Isolierte Zustandslogik für jeden Bildschirm
 - Ereignisgesteuerte Eingabeverarbeitung
 
 ### Geräteregistrierung
@@ -134,15 +134,15 @@ Die dynamische Registrierung (`registry.json`) kann über Firmware-Updates aktua
 
 | Datei | Zweck |
 |------|---------|
-| `platformio.ini` | Erstellen Sie Konfigurationen und Abhängigkeiten |
+| `platformio.ini` | Build-Konfiguration und Abhängigkeiten |
 | `src/config.h` | Definitionen und Konstanten der Hardware-Pins |
 | `data/registry.json` | Buttplug.io-Geräte-UUID-Zuordnungen |
 
 ## Technische Referenz
 
 <CardGroup cols={2}>
-<Card title="Web-Flasher" icon="bolt" href="/radr/software/ota-updates/introduction">
-Flash-Firmware mit dem webbasierten Tool.
+<Card title="Web Flasher" icon="bolt" href="/radr/software/ota-updates/introduction">
+Flashen Sie die Firmware mit dem webbasierten Tool.
 </Card>
 
 <Card title="BLE-Kommunikation" icon="bluetooth" href="/radr/software/communication/ble">
@@ -152,7 +152,7 @@ Details zum Bluetooth-Protokoll und zur Gerätekommunikation.
 
 ## Mitwirken
 
-Lesen Sie [Beitragsrichtlinien](https://github.com/researchanddesire/radr-wireless-remote/blob/main/CONTRIBUTING.md), bevor Sie eine Änderung für den Zweig `main` einreichen.
+Lesen Sie die [Beitragsrichtlinien](https://github.com/researchanddesire/radr-wireless-remote/blob/main/CONTRIBUTING.md), bevor Sie eine Änderung am `main`-Zweig einreichen.
 
 ### Codestil
 
@@ -163,4 +163,4 @@ Lesen Sie [Beitragsrichtlinien](https://github.com/researchanddesire/radr-wirele
 
 ## Lizenz
 
-Die RADR-Firmware wird unter der **CERN Open Hardware License Version 2 – Strongly Reciprocal (CERN-OHL-S v2)** veröffentlicht. Weitere Informationen finden Sie im Repository [Lizenz](https://github.com/researchanddesire/radr-wireless-remote/blob/main/LICENSE).
+Die RADR-Firmware wird unter der **CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S v2)** veröffentlicht. Weitere Informationen finden Sie in der [Lizenzdatei](https://github.com/researchanddesire/radr-wireless-remote/blob/main/LICENSE).

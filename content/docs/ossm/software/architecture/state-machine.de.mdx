@@ -1,9 +1,9 @@
 ---
 title: "Zustandsmaschine"
-description: "Verstehen der OSSM-Firmware-Zustandsmaschinenarchitektur"
+description: "Architektur der Zustandsmaschine der OSSM-Firmware verstehen"
 ---
 
-# Zustandsmaschinenarchitektur
+# Architektur der Zustandsmaschine
 
 Die OSSM-Firmware verwendet eine deklarative Zustandsmaschine, um das Geräteverhalten zu verwalten. Dies gewährleistet vorhersehbare Übergänge zwischen den Betriebsmodi und verhindert ungültige Zustände, die zu unerwartetem Verhalten führen könnten.
 
@@ -105,14 +105,14 @@ stateDiagram-v2
 
 ## Designübersicht
 
-Die Zustandsmaschine wird mithilfe von [Boost.SML](https://boost-ext.github.io/sml/) (State Machine Language) implementiert, einer reinen Header-C++14-Bibliothek, die eine domänenspezifische Sprache zum Definieren von Zustandsmaschinen bereitstellt.
+Die Zustandsmaschine wird mithilfe von [Boost.SML](https://boost-ext.github.io/sml/) (State Machine Language) implementiert, einer C++14-Bibliothek, die ausschließlich aus Headern besteht und eine domänenspezifische Sprache zum Definieren von Zustandsmaschinen bereitstellt.
 
 ### Warum Boost.SML?
 
 Boost.SML wurde für OSSM ausgewählt, weil es Folgendes bietet:
 
 - **Überprüfung zur Kompilierungszeit** – Ungültige Übergänge werden zur Kompilierungszeit und nicht zur Laufzeit abgefangen
-- **Kein Laufzeit-Overhead** – Leistung entspricht handgeschriebenem Schalter/Gehäuse
+- **Kein Laufzeit-Overhead** – Leistung entspricht handgeschriebener `switch/case`-Logik
 - **Deklarative Syntax** – Die Übergangstabelle liest sich wie eine Dokumentation
 - **Thread-Sicherheit** – Integrierte Unterstützung für gleichzeitigen Zugriff über Richtlinien
 - **Geringer Platzbedarf** – Einzelner Header, ca. 2000 Codezeilen, keine Abhängigkeiten
@@ -131,29 +131,29 @@ Zum Beispiel:
 "menu.idle"_s + buttonPress[(isOption(Menu::SimplePenetration))] = "simplePenetration"_s
 ```
 
-Dies lautet wie folgt: „Wenn im `menu.idle`-Status ein `buttonPress`-Ereignis auftritt und der Guard `isOption(Menu::SimplePenetration)` „true“ zurückgibt, wird in den `simplePenetration`-Status übergegangen.“
+Dies bedeutet: Wenn im Zustand `menu.idle` ein `buttonPress`-Ereignis auftritt und der Guard `isOption(Menu::SimplePenetration)` `true` zurückgibt, wird in den Zustand `simplePenetration` gewechselt.
 
 <Info>
 Eine vollständige Anleitung zur Übergangstabellensyntax finden Sie im [Boost.SML-Tutorial](https://boost-ext.github.io/sml/tutorial.html).
 </Info>
 
-## Veranstaltungen
+## Ereignisse
 
-Ereignisse lösen Zustandsübergänge aus. Es handelt sich um einfache Strukturen, die in `Events.h` definiert sind und von überall in der Codebasis versendet werden können.
+Ereignisse lösen Zustandsübergänge aus. Es handelt sich um einfache Strukturen, die in `Events.h` definiert sind und von überall in der Codebasis ausgelöst werden können.
 
 | Ereignis | Beschreibung | Typische Quelle |
 |-------|-------------|----------------|
 | `ButtonPress` | Ein Klick auf eine einzelne Taste | Drehgeber-Taste |
 | `LongPress` | Taste für längere Zeit gedrückt gehalten | Drehgebertaste (gehalten) |
 | `DoublePress` | Zwei schnelle Tastenklicks | Drehgeber-Taste |
-| `Done` | Asynchroner Vorgang abgeschlossen | Homing-Aufgabe, Preflight-Check |
-| `Error` | Der Vorgang ist fehlgeschlagen | Referenzierungsfehler, Hub zu kurz |
+| `Done` | Asynchroner Vorgang abgeschlossen | Homing-Aufgabe, Preflight-Prüfung |
+| `Error` | Der Vorgang ist fehlgeschlagen | Homing-Fehler, Hub zu kurz |
 | `EmergencyStop` | Sofortiger Stopp erforderlich | Sicherheitssysteme |
-| `Home` | Referenzfahrtsequenz anfordern | Externer Befehl |
+| `Home` | Homing-Sequenz anfordern | Externer Befehl |
 
-### Versenden von Ereignissen
+### Ereignisse auslösen
 
-Ereignisse werden mithilfe der globalen `stateMachine`-Instanz versendet:
+Ereignisse werden mithilfe der globalen `stateMachine`-Instanz ausgelöst:
 
 ```cpp
 #include "ossm/state/state.h"
@@ -166,24 +166,24 @@ stateMachine->process_event(Done{});
 Die Zustandsmaschine wird beim Start in [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp) initialisiert und als globaler Zeiger bereitgestellt.
 
 <Tip>
-Ereignisse werden als leere Strukturen definiert. Der Typ selbst trägt die Bedeutung – es sind keine Datennutzdaten erforderlich.
+Ereignisse werden als leere Strukturen definiert. Der Typ selbst trägt die Bedeutung – es sind keine Nutzdaten erforderlich.
 </Tip>
 
-## Wachen
+## Guards
 
 Guards sind bedingte Prüfungen, die bestimmen, ob ein Übergang stattfinden soll. Sie geben `true` zurück, um den Übergang zuzulassen, oder `false`, um ihn zu blockieren.
 
-| Bewachen | Beschreibung | Gibt `true` zurück, wenn... |
+| Guard | Beschreibung | Gibt `true` zurück, wenn ... |
 |-------|-------------|------------------------|
-| `isOnline` | Überprüfen Sie die WLAN-Verbindung | Das Gerät ist mit WLAN verbunden |
-| `isUpdateAvailable` | Suchen Sie nach Firmware-Updates | Der Server meldet, dass eine neuere Version verfügbar ist |
-| `isStrokeTooShort` | Referenzierungsergebnis validieren | Der gemessene Hub liegt unter dem Mindestschwellenwert |
-| `isOption(Menu)` | Ausgewählten Menüpunkt prüfen | Die aktuelle Menüauswahl entspricht der angegebenen Option |
-| `isPreflightSafe` | Überprüfen Sie die Position des Geschwindigkeitsreglers | Geschwindigkeitspotentiometer befindet sich im toten Bereich (sicherer Start) |
-| `isFirstHomed` | Einmalige Erstprüfung der Referenzierung | Dies ist die erste erfolgreiche Referenzfahrt seit dem Booten |
-| `isNotHomed` | Überprüfen Sie den Homing-Status | Das Gerät wurde nicht referenziert oder die Referenzierung wurde ungültig |
+| `isOnline` | WiFi-Verbindung prüfen | Das Gerät mit WiFi verbunden ist |
+| `isUpdateAvailable` | Auf Firmware-Updates prüfen | Der Server eine neuere verfügbare Version meldet |
+| `isStrokeTooShort` | Homing-Ergebnis validieren | Der gemessene Hub unter dem Mindestschwellenwert liegt |
+| `isOption(Menu)` | Ausgewählten Menüpunkt prüfen | Die aktuelle Menüauswahl der angegebenen Option entspricht |
+| `isPreflightSafe` | Position des Geschwindigkeitsreglers prüfen | Das Geschwindigkeitspotentiometer im toten Bereich liegt (sicherer Start) |
+| `isFirstHomed` | Einmalige Prüfung des ersten Homings | Dies das erste erfolgreiche Homing seit dem Booten ist |
+| `isNotHomed` | Homing-Status prüfen | Das Gerät nicht gehomt wurde oder das Homing ungültig gemacht wurde |
 
-### Guard-Implementierung
+### Implementierung von Guards
 
 Guards werden als `constexpr`-Lambdas im [`guards`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h)-Namespace definiert. Sie rufen vorwärts deklarierte Implementierungsfunktionen auf, um den Header schlank zu halten:
 
@@ -207,24 +207,24 @@ namespace guards {
 Die eigentliche Logik befindet sich in `guards.cpp`, wodurch die Kompilierungszeiten kurz bleiben und Implementierungsänderungen möglich sind, ohne dass die Übergangstabelle neu kompiliert werden muss.
 
 <Info>
-Weitere Informationen zu Schutzmustern finden Sie im [Boost.SML Guards-Dokumentation](https://boost-ext.github.io/sml/user-guide.html#guards).
+Weitere Informationen zu Guard-Mustern finden Sie in der [Boost.SML-Guard-Dokumentation](https://boost-ext.github.io/sml/user-guide.html#guards).
 </Info>
 
 ## Aktionen
 
 Aktionen sind Funktionen, die bei Zustandsübergängen ausgeführt werden. Sie führen zu Nebeneffekten wie der Aktualisierung der Anzeige, dem Starten von Motoren oder dem Zurücksetzen von Einstellungen.
 
-### Aktionen anzeigen
+### Anzeigeaktionen
 
 | Aktion | Beschreibung |
 |--------|-------------|
 | `drawHello` | Begrüßungs-/Startbildschirm anzeigen |
-| `(drawMenu)` | Rendern Sie das Hauptmenü |
+| `(drawMenu)` | Hauptmenü rendern |
 | `drawPlayControls` | Geschwindigkeits-/Hub-/Tiefensteuerung anzeigen |
 | `drawPatternControls` | Musterauswahl-Benutzeroberfläche anzeigen |
 | `drawPreflight` | Warnung „Geschwindigkeit zum Starten reduzieren“ anzeigen |
 | `drawHelp` | Hilfe-/Supportinformationen anzeigen |
-| `drawWiFi` | WLAN-Konfigurationsbildschirm anzeigen |
+| `drawWiFi` | WiFi-Konfigurationsbildschirm anzeigen |
 | `drawUpdate` | Bildschirm „Nach Updates suchen“ anzeigen |
 | `drawNoUpdate` | Meldung „Firmware ist aktuell“ anzeigen |
 | `drawUpdating` | Update-Fortschritt anzeigen |
@@ -234,32 +234,32 @@ Aktionen sind Funktionen, die bei Zustandsübergängen ausgeführt werden. Sie f
 
 | Aktion | Beschreibung |
 |--------|-------------|
-| `startHoming` | Beginnen Sie mit der Homing-Sequenz |
+| `startHoming` | Homing-Sequenz starten |
 | `clearHoming` | Referenzierungsstatusvariablen zurücksetzen |
-| `startSimplePenetration` | Starten Sie die Aufgabe „Einfache Penetration“. |
-| `startStrokeEngine` | Starten Sie die Aufgabe im Stroke Engine-Modus |
-| `startStreaming` | Starten Sie die Aufgabe „Streaming-Modus“. |
-| `emergencyStop` | Stoppen Sie den Motor und deaktivieren Sie die Ausgänge |
+| `startSimplePenetration` | Aufgabe im Modus Simple Penetration starten |
+| `startStrokeEngine` | Aufgabe im Modus Stroke Engine starten |
+| `startStreaming` | Aufgabe im Modus Streaming starten |
+| `emergencyStop` | Motor zwangsweise stoppen und Ausgänge deaktivieren |
 
 ### Einstellungen-Aktionen
 
 | Aktion | Beschreibung |
 |--------|-------------|
 | `resetSettingsStrokeEngine` | Standardwerte für Stroke Engine initialisieren (Geschwindigkeit=0, Hub=50, Tiefe=10, Empfindung=50) |
-| `resetSettingsSimplePen` | Initialisieren Sie die Standardeinstellungen für die einfache Penetration (Geschwindigkeit=0, Schlaganfall=0, Tiefe=50). |
-| `incrementControl` | Durchlaufen Sie die Steuerparameter (Hub → Tiefe → Empfindung) |
-| `setHomed` | Markieren Sie das Gerät als erfolgreich referenziert |
-| `setNotHomed` | Referenzfahrt ungültig machen (erfordert erneute Referenzfahrt vor dem Spiel) |
+| `resetSettingsSimplePen` | Standardwerte für Simple Penetration initialisieren (Geschwindigkeit=0, Hub=0, Tiefe=50) |
+| `incrementControl` | Steuerparameter durchlaufen (Hub → Tiefe → Empfindung) |
+| `setHomed` | Gerät als erfolgreich gehomt markieren |
+| `setNotHomed` | Homing ungültig machen (vor der Wiedergabe ist ein erneutes Homing erforderlich) |
 
 ### Systemaktionen
 
 | Aktion | Beschreibung |
 |--------|-------------|
-| `restart` | Starten Sie den ESP32 neu |
-| `resetWiFi` | Gespeicherte WLAN-Anmeldeinformationen löschen |
-| `updateOSSM` | Laden Sie das Firmware-Update herunter und installieren Sie es |
+| `restart` | ESP32 neu starten |
+| `resetWiFi` | Gespeicherte WiFi-Anmeldeinformationen löschen |
+| `updateOSSM` | Firmware-Update herunterladen und installieren |
 
-### Aktionsumsetzung
+### Implementierung von Aktionen
 
 Aktionen werden als `constexpr`-Lambdas im [`actions`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h)-Namespace definiert. Wie Guards delegieren sie an vorwärts deklarierte Implementierungsfunktionen:
 
@@ -291,25 +291,25 @@ void ossmDrawHello() {
 Dieses Muster hält die Zustandsmaschine von bestimmten Implementierungen entkoppelt und ermöglicht die unabhängige Entwicklung von Funktionsmodulen.
 
 <Warning>
-Aktionen dürfen den Hauptthread nicht blockieren. Lang laufende Vorgänge sollten stattdessen FreeRTOS-Aufgaben erzeugen.
+Aktionen dürfen den Hauptthread nicht blockieren. Lang laufende Vorgänge sollten stattdessen FreeRTOS-Aufgaben starten.
 </Warning>
 
 <Info>
-Weitere Informationen zu Aktionsmustern finden Sie im [Dokumentation zu Boost.SML-Aktionen](https://boost-ext.github.io/sml/user-guide.html#actions).
+Weitere Informationen zu Aktionsmustern finden Sie in der [Dokumentation zu Boost.SML-Aktionen](https://boost-ext.github.io/sml/user-guide.html#actions).
 </Info>
 
 ## Thread-Sicherheit
 
-Die OSSM-Zustandsmaschine ist mit Thread-sicheren Richtlinien konfiguriert, um Ereignisse von mehreren FreeRTOS-Aufgaben zu verarbeiten:
+Die OSSM-Zustandsmaschine ist mit Thread-Sicherheitsrichtlinien konfiguriert, um Ereignisse aus mehreren FreeRTOS-Aufgaben zu verarbeiten:
 
 ```cpp
 sml::sm<OSSMStateMachine, sml::thread_safe<ESP32RecursiveMutex>, sml::logger<StateLogger>>
 ```
 
-Dabei wird ein rekursiver Mutex verwendet, um Zustandsübergänge zu schützen und eine sichere Ereignisverteilung zu ermöglichen von:
+Dabei wird ein rekursiver Mutex verwendet, um Zustandsübergänge zu schützen und eine sichere Ereignisverteilung aus folgenden Kontexten zu ermöglichen:
 
-- Die Hauptschleife
-- Button-Interrupt-Handler
+- Hauptschleife
+- Tasten-Interrupt-Handler
 - BLE-Befehlshandler
 - Hintergrundaufgaben
 
@@ -326,7 +326,7 @@ void initStateMachine() {
 ```
 
 <Info>
-Weitere Informationen zu Thread-Sicherheitsrichtlinien finden Sie im [Dokumentation der Boost.SML-Richtlinien](https://boost-ext.github.io/sml/user-guide.html#policies).
+Weitere Informationen zu Thread-Sicherheitsrichtlinien finden Sie in der [Dokumentation zu Boost.SML-Policies](https://boost-ext.github.io/sml/user-guide.html#policies).
 </Info>
 
 ## Zustandsprotokollierung
@@ -344,12 +344,12 @@ Dadurch werden Übergangsinformationen über die ESP-IDF-Protokollierung ausgege
 Die Zustandsmaschine folgt einer **entkoppelten modularen Architektur**:
 
 - **Zustandsmaschinendefinition** ([`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h)) enthält nur die Übergangstabelle
-- **Aktionen und Wächter** sind `constexpr`-Lambdas, die an Implementierungsfunktionen delegieren
+- **Aktionen und Guards** sind `constexpr`-Lambdas, die an Implementierungsfunktionen delegieren
 - **Funktionsmodule** (wie `pages::`, `simple_penetration::`, `stroke_engine::`) enthalten die eigentliche Logik
 - **Globale Zustandsstrukturen** verwalten den Anwendungsstatus anstelle von Klassenmitgliedern
 
 <Note>
-Die `OSSM`-Klasse in `ossm/OSSM.h` wird aus Gründen der Abwärtskompatibilität mit der BLE-Befehlsverarbeitung beibehalten. Neue Funktionen sollten zustandslose Namespace-Funktionen verwenden, die auf dem globalen Status basieren.
+Die `OSSM`-Klasse in `ossm/OSSM.h` wird aus Gründen der Abwärtskompatibilität mit der BLE-Befehlsverarbeitung beibehalten. Neue Funktionen sollten zustandslose Namespace-Funktionen verwenden, die auf dem globalen Zustand basieren.
 </Note>
 
 Eine vollständige Übersicht über die Quellcodeorganisation finden Sie unter [Ordnerstruktur](/ossm/software/architecture/folder-structure).

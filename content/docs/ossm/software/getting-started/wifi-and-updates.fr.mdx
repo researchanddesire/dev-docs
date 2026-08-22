@@ -1,38 +1,38 @@
 ---
 title: "WiFi et mises à jour"
-description: "Configurez la connectivité WiFi et installez les mises à jour du micrologiciel en direct sur votre OSSM"
+description: "Configurez la connectivité WiFi et installez les mises à jour OTA du micrologiciel sur votre OSSM"
 ---
 
-L'OSSM prend en charge la connectivité WiFi pour les mises à jour du micrologiciel par liaison radio (OTA). Ce guide explique comment connecter votre OSSM à votre réseau domestique et vérifier les mises à jour.
+L'OSSM prend en charge la connectivité WiFi pour les mises à jour OTA du micrologiciel. Ce guide explique comment connecter votre OSSM à votre réseau domestique et vérifier les mises à jour.
 
-## Configuration Wi-Fi
+## Configuration WiFi
 
-### Démarrage de la configuration Wi-Fi
+### Démarrage de la configuration WiFi
 
 <Steps>
-<Step title="Accédez à la configuration WiFi">
-Dans le menu principal, faites défiler jusqu'à **Configuration WiFi** et appuyez sur l'encodeur pour le sélectionner.
+<Step title="Accédez à WiFi Setup">
+Dans le menu principal, faites défiler jusqu'à **WiFi Setup** et appuyez sur l'encodeur pour le sélectionner.
 </Step>
 
 <Step title="Afficher les instructions de connexion">
 L'écran affiche :
 
-- En-tête « Configuration WiFi »
-- Instructions pour se connecter à « Configuration OSSM »
+- En-tête "WiFi Setup"
+- Instructions pour se connecter à "OSSM Setup"
 - Un QR code pour une connexion rapide
 
-Le code QR code : `WIFI:S:OSSM Setup;T:nopass;;`
+Le code QR encode : `WIFI:S:OSSM Setup;T:nopass;;`
 </Step>
 
 <Step title="Connectez-vous au point d'accès OSSM">
 Sur votre téléphone ou ordinateur :
 
-1. Ouvrir les paramètres Wi-Fi
+1. Ouvrez les paramètres WiFi
 2. Recherchez un réseau nommé **OSSM Setup**
 3. Connectez-vous (aucun mot de passe requis)
 
 <Tip>
-Scannez le code QR avec l'appareil photo de votre téléphone pour une connexion en un seul clic sur les appareils pris en charge.
+Scannez le code QR avec l'appareil photo de votre téléphone pour une connexion d’un simple appui sur les appareils pris en charge.
 </Tip>
 </Step>
 
@@ -40,40 +40,40 @@ Scannez le code QR avec l'appareil photo de votre téléphone pour une connexion
 Après vous être connecté au point d'accès OSSM :
 
 1. Un portail captif devrait s'ouvrir automatiquement
-2. Sinon, ouvrez un navigateur et accédez à `192.168.4.1`.
+2. Sinon, ouvrez un navigateur et accédez à `192.168.4.1`
 3. Sélectionnez votre réseau WiFi domestique dans la liste
 4. Entrez votre mot de passe WiFi
-5. Cliquez sur **Enregistrer**
+5. Cliquez sur **Save**
 
 L'OSSM tentera de se connecter à votre réseau domestique.
 </Step>
 
 <Step title="Quitter la configuration WiFi">
-Appuyez sur l'encodeur ou sélectionnez **Redémarrer** pour quitter le mode de configuration WiFi. L'OSSM redémarrera et se connectera à votre réseau configuré.
+Appuyez sur l'encodeur ou sélectionnez **Restart** pour quitter le mode de configuration WiFi. L'OSSM redémarrera et se connectera à votre réseau configuré.
 </Step>
 </Steps>
 
 ### Vérification de la connexion
 
-Après le redémarrage, l'OSSM tentera de se connecter à votre réseau WiFi configuré. Vous pouvez vérifier la connexion en :
+Après le redémarrage, l'OSSM tentera de se connecter à votre réseau WiFi configuré. Vous pouvez vérifier la connexion comme suit :
 
-1. Sélection de **Mise à jour** dans le menu principal
-2. Si le WiFi est connecté, vous verrez "Vérification des mises à jour..."
-3. Si le WiFi n'est pas connecté, vous serez redirigé vers la configuration WiFi
+1. Sélectionnez **Update** dans le menu principal
+2. Si le WiFi est connecté, vous verrez "Checking for update..."
+3. Si le WiFi n'est pas connecté, vous serez redirigé vers WiFi Setup
 
 <Note>
-L'OSSM n'affiche pas son adresse IP à l'écran. Pour une mise en réseau avancée, vous pouvez le trouver dans la liste des clients DHCP de votre routeur ou utiliser des outils d'analyse réseau.
+L'OSSM n'affiche pas son adresse IP à l'écran. Pour une mise en réseau avancée, vous pouvez la trouver dans la liste des clients DHCP de votre routeur ou utiliser des outils d'analyse réseau.
 </Note>
 
-### Effacement des paramètres Wi-Fi
+### Effacement des paramètres WiFi
 
 Pour vous connecter à un autre réseau ou résoudre les problèmes de connexion :
 
-1. Sélectionnez **Configuration WiFi** dans le menu
+1. Sélectionnez **WiFi Setup** dans le menu
 2. La configuration réseau précédente sera écrasée lorsque vous enregistrerez de nouveaux paramètres
-3. Vous pouvez également reflasher le firmware pour effacer tous les paramètres
+3. Vous pouvez également reflasher le micrologiciel pour effacer tous les paramètres
 
-## Mises à jour en direct
+## Mises à jour OTA
 
 L'OSSM peut télécharger et installer les mises à jour du micrologiciel directement via WiFi, sans se connecter à un ordinateur.
 
@@ -81,30 +81,30 @@ L'OSSM peut télécharger et installer les mises à jour du micrologiciel direct
 
 - Connexion WiFi active (configurée via WiFi Setup)
 - Accès Internet depuis votre réseau
-- Batterie/puissance suffisante pendant le processus de mise à jour
+- Alimentation électrique suffisante pendant la mise à jour
 
 ### Vérification des mises à jour
 
 <Steps>
-<Step title="Accédez à Mettre à jour">
-Dans le menu principal, faites défiler jusqu'à **Mise à jour** et appuyez sur l'encodeur.
+<Step title="Accédez à Update">
+Dans le menu principal, faites défiler jusqu'à **Update** et appuyez sur l'encodeur.
 </Step>
 
 <Step title="Attendez la vérification de la version">
-L'écran affiche "Vérification de la mise à jour..." pendant que l'OSSM contacte le serveur de mise à jour.
+L'écran affiche "Checking for update..." pendant que l'OSSM contacte le serveur de mise à jour.
 
-Le micrologiciel envoie sa version actuelle (`SW_VERSION`) au serveur, qui répond si une mise à jour est disponible.
+Le micrologiciel envoie sa version actuelle (`SW_VERSION`) au serveur, qui indique si une mise à jour est disponible.
 </Step>
 
-<Step title="Résultat de l'examen">
+<Step title="Consulter le résultat">
 Vous verrez l'un des deux écrans :
 
 **Aucune mise à jour disponible :**
-- Message « Aucune mise à jour disponible »
+- Message "No Update Available"
 - Appuyez sur l'encodeur pour revenir au menu
 
 **Mise à jour disponible :**
-- Message "Mise à jour d'OSSM..."
+- Message "Updating OSSM..."
 - La mise à jour démarre automatiquement
 </Step>
 </Steps>
@@ -117,44 +117,44 @@ N'éteignez pas et ne déconnectez pas votre OSSM pendant une mise à jour. Cela
 
 Le processus de mise à jour :
 
-1. Télécharge le nouveau binaire du firmware (~ 1-2 Mo)
+1. Télécharge le nouveau fichier binaire du micrologiciel (~1-2 MB)
 2. Vérifie l'intégrité du téléchargement
-3. Écrit le firmware dans la mémoire flash
+3. Écrit le micrologiciel dans la mémoire flash
 4. Redémarre automatiquement l'appareil
 
-L'écran affiche : "La mise à jour est en cours. Cela peut prendre jusqu'à 60 s."
+L'écran affiche : "Update is in progress. This may take up to 60s."
 
 ### Après la mise à jour
 
-L'OSSM redémarre automatiquement après une mise à jour réussie. Ce sera:
+L'OSSM redémarre automatiquement après une mise à jour réussie. Il va :
 
-1. Démarrez avec le nouveau firmware
-2. Effectuer la séquence de référence
-3. Retour au menu principal
+1. démarrer avec le nouveau micrologiciel
+2. effectuer la séquence de référencement
+3. revenir au menu principal
 
 <Check>
-Vos paramètres et votre configuration WiFi sont conservés lors des mises à jour.
+Vos paramètres et votre configuration WiFi sont conservés après les mises à jour.
 </Check>
 
-### Mettre à jour les chaînes
+### Canaux de mise à jour
 
-Le firmware OSSM prend en charge plusieurs canaux de mise à jour :
+Le micrologiciel OSSM prend en charge plusieurs canaux de mise à jour :
 
 | Canal | URL | Description |
 |---------|-----|-------------|
 | Production | `d2g4f7zewm360.cloudfront.net` | Versions stables pour un usage général |
-| Développement | `d2oq8yqnezqh3r.cloudfront.net` | Versions préliminaires pour les tests |
+| Development | `d2oq8yqnezqh3r.cloudfront.net` | Versions préliminaires pour les tests |
 
 <Note>
-Le canal de mise à jour est déterminé au moment de la compilation. Le micrologiciel de production vérifie le serveur de production ; le micrologiciel de développement vérifie le serveur de développement.
+Le canal de mise à jour est déterminé au moment de la compilation. Le micrologiciel Production vérifie le serveur Production ; le micrologiciel Development vérifie le serveur Development.
 </Note>
 
 ## Dépannage
 
 <AccordionGroup>
-<Accordion title="Impossible de trouver le réseau de configuration OSSM">
-- Assurez-vous que vous êtes en mode de configuration WiFi (l'écran affiche le code QR)
-- Se rapprocher de l'OSSM
+<Accordion title="Impossible de trouver le réseau OSSM Setup">
+- Assurez-vous que vous êtes en mode WiFi Setup (l'écran affiche le code QR)
+- Rapprochez-vous de l'OSSM
 - Essayez d'actualiser la liste WiFi de votre appareil
 - Redémarrez l'OSSM et réessayez
 </Accordion>
@@ -173,30 +173,30 @@ Le canal de mise à jour est déterminé au moment de la compilation. Le microlo
 </Accordion>
 
 <Accordion title="La vérification de la mise à jour échoue">
-- Vérifiez que le WiFi est connecté (essayez d'abord la configuration WiFi)
+- Vérifiez que le WiFi est connecté (essayez d'abord WiFi Setup)
 - Vérifiez votre connexion Internet
 - Le serveur de mise à jour peut être temporairement indisponible
 - Réessayez dans quelques minutes
 </Accordion>
 
-<Accordion title="Le téléchargement de la mise à jour échoue ou expire">
-- Assurer un signal WiFi stable pendant la mise à jour
+<Accordion title="Le téléchargement de la mise à jour échoue ou dépasse le délai d’attente">
+- Assurez un signal WiFi stable pendant la mise à jour
 - Rapprochez-vous de votre routeur si nécessaire
 - Vérifiez que votre connexion Internet fonctionne
-- Réessayez avec une nouvelle connexion électrique
+- Réessayez après avoir rebranché l’alimentation
 </Accordion>
 
-<Accordion title="OSSM ne démarre pas après la mise à jour">
+<Accordion title="L’OSSM ne démarre pas après la mise à jour">
 Ceci est rare mais peut arriver si la mise à jour a été interrompue. Options de récupération :
 
-1. Essayez de redémarrer (débrancher et rebrancher l'alimentation)
+1. Effectuez un cycle d’alimentation (débranchez puis rebranchez l’alimentation)
 2. Si l'appareil ne démarre pas, vous devrez reflasher via USB en utilisant [PlatformIO](/ossm/software/getting-started/platformio)
 </Accordion>
 </AccordionGroup>
 
 ## Détails techniques
 
-### Mettre à jour la communication du serveur
+### Communication avec le serveur de mise à jour
 
 L'OSSM envoie une requête POST au serveur de mise à jour avec :
 
@@ -218,21 +218,21 @@ Le serveur répond par :
 
 Si `needUpdate` est `true`, le micrologiciel télécharge le binaire à partir du serveur de distribution du micrologiciel.
 
-### Emplacements binaires du micrologiciel
+### Emplacements des binaires du micrologiciel
 
-| Canal | URL binaire |
+| Canal | URL du binaire |
 |---------|------------|
 | Production | `d2sy3zdr3r1gt5.cloudfront.net/firmware.bin` |
-| Développement | `d2sy3zdr3r1gt5.cloudfront.net/firmware-dev.bin` |
+| Development | `d2sy3zdr3r1gt5.cloudfront.net/firmware-dev.bin` |
 
 ## Pages connexes
 
 <CardGroup cols={2}>
-<Card title="Configuration de PlatformIO" icon="wrench" href="/ossm/software/getting-started/platformio">
+<Card title="PlatformIO Setup" icon="wrench" href="/ossm/software/getting-started/platformio">
   Mises à jour manuelles du micrologiciel via USB pour le développement ou la récupération.
 </Card>
 
-<Card title="Protocole BLE" icon="bluetooth" href="/ossm/software/communication/ble">
+<Card title="BLE Protocol" icon="bluetooth" href="/ossm/software/communication/ble">
   Contrôlez votre OSSM sans fil via Bluetooth au lieu du WiFi.
 </Card>
 </CardGroup>

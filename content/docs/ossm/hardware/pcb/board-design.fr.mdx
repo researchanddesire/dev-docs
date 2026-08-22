@@ -1,230 +1,230 @@
 ---
 title: "Conception et câblage de la carte"
-description: "Schémas de câblage et brochage GPIO pour le PCB OSSM officiel et configurations alternatives"
+description: "Schémas de câblage et brochages GPIO pour le PCB OSSM officiel et les configurations alternatives"
 ---
 
-Ce guide vous montre comment connecter le PCB OSSM officiel et comment câbler des configurations alternatives à l'aide d'un ESP32, d'un changement de niveau et de pilotes de moteur courants.
+Ce guide explique comment connecter le PCB OSSM officiel et comment câbler des configurations alternatives à l'aide d'un ESP32, d'une conversion de niveau et de pilotes de moteur courants.
 
-## Conditions préalables
+## Prérequis
 
-Avant de commencer, assurez-vous d'avoir :
+Avant de commencer, assurez-vous de disposer des éléments suivants :
 
 - Une carte de développement ESP32 (ESP32‑DevKitC ou compatible)
-- Un pilote de moteur qui accepte les entrées pas/direction
+- Un pilote de moteur qui accepte les entrées Step/Direction
 - Une alimentation dimensionnée pour votre moteur et votre pilote
-- Outils de base : pince à dénuder, petit jeu de tournevis, multimètre
+- Des outils de base : pince à dénuder, petit jeu de tournevis, multimètre
 
 <Note>
-La plupart des cartes ESP32 utilisent une logique 3,3 V. À des vitesses plus élevées, cela peut entraîner des pas manqués avec les pilotes logiques 5V. Utilisez un levier de niveau pour convertir le pas/la direction/l'activation en 5 V pour un fonctionnement fiable.
+La plupart des cartes ESP32 utilisent une logique 3,3 V. À vitesse élevée, cela peut provoquer des pas manqués avec des pilotes en logique 5 V. Utilisez un convertisseur de niveau pour convertir Step/Direction/Enable en 5 V afin d'assurer un fonctionnement fiable.
 </Note>
 
 ### Composants de prototypage (pour un câblage personnalisé)
 
-Si vous effectuez un câblage sans le PCB officiel, vous aurez généralement besoin de :
+Si vous câblez le montage sans le PCB officiel, vous aurez généralement besoin des éléments suivants :
 
-- Décaleur de niveau logique (3,3 V → 5 V, 4+ canaux)
-- Planche à pain ou carte proto sans soudure
-- Pulls Dupont (mâle↔mâle et mâle↔femelle)
-- Rail 5 V pour le côté haut du levier de niveau (souvent disponible auprès de votre pilote ou d'un régulateur séparé)
+- Un convertisseur de niveau logique (3,3 V → 5 V, au moins 4 canaux)
+- Une plaque d'essai sans soudure ou une carte de prototypage
+- Des cavaliers Dupont (mâle↔mâle et mâle↔femelle)
+- Un rail 5 V pour le côté haut du convertisseur de niveau (souvent disponible sur votre pilote ou auprès d'un régulateur séparé)
 
 <Tip>
-Gardez le câblage du signal court et bien rangé. Acheminez le pas/la direction/l'activation loin du moteur et des câbles d'alimentation pour minimiser le bruit.
+Gardez le câblage des signaux court et ordonné. Éloignez les lignes Step/Direction/Enable des câbles du moteur et d'alimentation afin de limiter les parasites.
 </Tip>
 
 ## Câblage officiel OSSM
 
-Le PCB OSSM de référence comprend un changement de niveau et des en-têtes standardisés. Il s’agit de l’approche recommandée pour la plupart des builds.
+Le PCB OSSM de référence intègre une conversion de niveau et des connecteurs standardisés. Il s'agit de l'approche recommandée pour la plupart des montages.
 
-### Disposition du tableau de référence
+### Disposition de la carte de référence
 
-<Frame caption="Carte de référence OSSM (version 1) - vue avant montrant le placement des composants">
-  <img src="./_images/150361448-80e9fdaf-4a8c-4054-a920-6eab9aa68678.webp" alt="Carte de référence OSSM version 1 montrant la prise ESP32, les sélecteurs de niveau et les connecteurs JST" />
+<Frame caption="Carte de référence OSSM (version 1) – vue avant montrant le placement des composants">
+  <img src="./_images/150361448-80e9fdaf-4a8c-4054-a920-6eab9aa68678.webp" alt="Carte de référence OSSM version 1 montrant le support ESP32, les convertisseurs de niveau et les connecteurs JST" />
 </Frame>
 
-### Schéma de connexion PCB
+### Schéma de connexion du PCB
 
-<Frame caption="Schéma de connexion montrant le pilote de moteur et les connexions des périphériques">
-  <img src="./_images/150355658-2ab2c53f-8da0-41ce-ad61-cfe9965b9ab2.webp" alt="Schéma de connexion du PCB OSSM avec sortie du pilote de moteur étiquetée, entrée du codeur et connexions d'alimentation" />
+<Frame caption="Schéma de connexion montrant les connexions du pilote de moteur et des périphériques">
+  <img src="./_images/150355658-2ab2c53f-8da0-41ce-ad61-cfe9965b9ab2.webp" alt="Schéma de connexion du PCB OSSM avec sortie du pilote de moteur, entrée d'encodeur et connexions d'alimentation étiquetées" />
 </Frame>
 
-### Brochage GPIO ESP32 (par défaut)
+### Brochage GPIO de l'ESP32 (par défaut)
 
-Voici les mappages de micrologiciel par défaut pour le PCB OSSM :
+Voici les affectations par défaut du micrologiciel pour le PCB OSSM :
 
 | Signal      | Broche GPIO | Fonction                                      |
-|-------------|----------|-----------------------------------------------|
-| Étape        | GPIO14  | Sortie d'impulsion pas à pas vers le pilote de moteur             |
-| Direction   | GPIO27  | Signal de direction vers le conducteur du moteur              |
-| Activer      | GPIO26  | Activer/désactiver le pilote de moteur                   |
-| Encodeur A   | GPIO36  | Codeur en quadrature canal A (entrée uniquement)     |
-| Encodeur B   | GPIO39  | Canal B du codeur en quadrature (entrée uniquement)     |
+|-------------|-------------|-----------------------------------------------|
+| Step        | GPIO 14     | Sortie d'impulsions Step vers le pilote       |
+| Direction   | GPIO 27     | Signal Direction vers le pilote               |
+| Enable      | GPIO 26     | Activer/désactiver le pilote de moteur        |
+| Encoder A   | GPIO 36     | Canal A de l'encodeur en quadrature (entrée uniquement) |
+| Encoder B   | GPIO 39     | Canal B de l'encodeur en quadrature (entrée uniquement) |
 
-<Frame caption="Brochage GPIO ESP32 montrant le routage du signal de commande">
-  <img src="./_images/152600401-80b986ea-6f5b-480d-ba74-5b5001079c1b.webp" alt="Schéma de brochage GPIO OSSM montrant l'étape, la direction et les broches d'activation sur l'ESP32" />
+<Frame caption="Brochage GPIO de l'ESP32 montrant le routage des signaux de commande">
+  <img src="./_images/152600401-80b986ea-6f5b-480d-ba74-5b5001079c1b.webp" alt="Schéma de brochage GPIO OSSM montrant les broches Step, Direction et Enable sur l'ESP32" />
 </Frame>
 
-<Frame caption="Emplacements des en-têtes JST avec étiquettes de broches pour une identification facile">
-  <img src="./_images/226189433-db28dfc6-22ac-4fdb-8b45-afe0c3fa9a7b.webp" alt="Emplacements de l'en-tête du connecteur JST sur le PCB OSSM montrant la sortie du moteur, l'entrée de l'encodeur et les connexions auxiliaires" />
+<Frame caption="Emplacements des connecteurs JST avec étiquettes de broches pour une identification facile">
+  <img src="./_images/226189433-db28dfc6-22ac-4fdb-8b45-afe0c3fa9a7b.webp" alt="Emplacements des connecteurs JST sur le PCB OSSM montrant la sortie moteur, l'entrée d'encodeur et les connexions auxiliaires" />
 </Frame>
 
 <Info>
-Le micrologiciel peut remapper les broches si nécessaire. Si vous modifiez le câblage, mettez à jour la configuration de votre micrologiciel en conséquence.
+Le micrologiciel peut réaffecter les broches si nécessaire. Si vous modifiez le câblage, mettez à jour la configuration du micrologiciel en conséquence.
 </Info>
 
 ## Configurations de câblage alternatives
 
 <Info>
-Les configurations suivantes sont des modèles d'intégration validés. Les révisions matérielles peuvent nécessiter différentes affectations de broches, vérifiez donc les spécifications applicables de la carte, du pilote et du moteur.
+Les configurations suivantes sont des schémas d'intégration validés. Les révisions matérielles peuvent nécessiter des affectations de broches différentes ; vérifiez donc les spécifications de la carte, du pilote et du moteur concernés.
 </Info>
 
 ### Pilote pas à pas TB6600
 
-Utilisez-le lorsque vous pilotez un moteur pas à pas avec un pilote externe de type TB6600.
+Utilisez cette configuration pour piloter un moteur pas à pas avec un pilote externe de type TB6600.
 
 <Steps>
-  <Step title="Connectez la puissance et les phases du moteur">
-    Câblez l'alimentation du moteur (généralement 24 V) aux TB6600 DC+ et DC-. Connectez les phases du moteur à A+, A‑, B+, B‑ selon le schéma de câblage du moteur.
+  <Step title="Connecter l'alimentation et les phases du moteur">
+    Reliez l'alimentation du moteur (généralement 24 V) à DC+ et DC‑ du TB6600. Connectez les phases du moteur à A+, A‑, B+ et B‑ conformément à son schéma de câblage.
 
     <Warning>
-    Ne branchez jamais de moteurs pas à pas à chaud. Coupez l’alimentation avant de modifier le câblage du moteur.
+    Ne branchez jamais un moteur pas à pas sous tension. Coupez l'alimentation avant de modifier le câblage du moteur.
     </Warning>
   </Step>
-  <Step title="Signaux de commande filaires (via un décaleur de niveau)">
-    Connectez les signaux ESP32 via le levier de niveau 3,3 V → 5 V aux entrées du pilote :
+  <Step title="Câbler les signaux de commande via le convertisseur de niveau">
+    Connectez les signaux de l'ESP32 aux entrées du pilote via le convertisseur de niveau 3,3 V→5 V :
 
-    - Étape (GPIO 14) → PUL+
+    - Step (GPIO 14) → PUL+
     - Direction (GPIO 27) → DIR+
-    - Activer (GPIO 26, si utilisé) → ENA+
-    - GND (ESP32/changeur de niveau) → PUL‑, DIR‑, ENA‑
+    - Enable (GPIO 26, si utilisé) → ENA+
+    - GND (ESP32/convertisseur de niveau) → PUL‑, DIR‑, ENA‑
 
     <Check>
-    Tous les motifs sont communs entre l'ESP32, le levier de niveau et le conducteur.
+    L'ESP32, le convertisseur de niveau et le pilote doivent partager la même masse.
     </Check>
   </Step>
   <Step title="Régler les commutateurs DIP">
-    Configurez la limite de courant en fonction de votre moteur et choisissez un réglage de micropas adapté à votre mécanique. Commencez de manière conservatrice, puis affinez pendant les tests.
+    Configurez la limite de courant en fonction de votre moteur et choisissez un réglage de micropas adapté à votre mécanique. Commencez prudemment, puis affinez le réglage pendant les tests.
   </Step>
 </Steps>
 
-<Frame caption="Schéma de câblage du pilote pas à pas TB6600 avec contrôleur OSSM">
-  <img src="./_images/159145946-a9960bba-c9bc-4717-b3b4-5b5c34b4a3d2.webp" alt="Schéma de connexion montrant les sorties de signal du PCB OSSM câblées via un levier de niveau aux entrées du pilote de moteur pas à pas TB6600" />
+<Frame caption="Schéma de câblage d'un pilote pas à pas TB6600 avec contrôleur OSSM">
+  <img src="./_images/159145946-a9960bba-c9bc-4717-b3b4-5b5c34b4a3d2.webp" alt="Schéma de connexion montrant les sorties de signaux du PCB OSSM reliées via un convertisseur de niveau aux entrées du pilote pas à pas TB6600" />
 </Frame>
 
-### Servomoteur avec driver intégré (iHSV57, 42AIM30, etc.)
+### Servomoteur à pilote intégré (iHSV57, 42AIM30, etc.)
 
-De nombreux servos intégrés acceptent le pas/la direction/l'activation, tout comme un pilote pas à pas.
+De nombreux servomoteurs à pilote intégré acceptent Step/Direction/Enable, comme un pilote pas à pas.
 
-<Frame caption="Configuration du câblage du servomoteur montrant l'interface pas/direction">
-  <img src="./_images/783876cf-f5bf-4708-9b4f-bd89723713f9.webp" alt="Schéma de câblage pour la connexion du servomoteur en boucle fermée au contrôleur OSSM via l'interface pas/direction" />
+<Frame caption="Configuration du câblage d'un servomoteur avec interface Step/Direction">
+  <img src="./_images/783876cf-f5bf-4708-9b4f-bd89723713f9.webp" alt="Schéma de câblage pour connecter un servomoteur en boucle fermée au contrôleur OSSM via une interface Step/Direction" />
 </Frame>
 
 <Tip>
-Certains servos intégrés acceptent directement la logique 3,3 V ; d'autres nécessitent 5V. Vérifiez la documentation de votre servo – vous pourrez peut-être omettre le levier de niveau.
+Certains servomoteurs à pilote intégré acceptent directement une logique 3,3 V ; d'autres nécessitent 5 V. Consultez la documentation de votre servomoteur : vous pourrez peut-être supprimer le convertisseur de niveau.
 </Tip>
 
-### Options supplémentaires de pilote pas à pas
+### Autres options de pilotes pas à pas
 
-Pour plus de conceptions et de schémas archivés, consultez les archives matérielles du référentiel :
+Pour découvrir d'autres conceptions et schémas archivés, consultez les archives matérielles du dépôt :
 
 ```
 /ossm/hardware/PCB Files/Archive/
 ```
 
-## Meilleures pratiques en matière d'alimentation et de mise à la terre
+## Bonnes pratiques pour l'alimentation et la mise à la terre
 
-- Utilisez une masse à point unique (étoile) entre l'ESP32, le levier de niveau et le pilote
-- Gardez les pistes/directions/activations courtes ; évitez de les faire fonctionner parallèlement à la puissance du moteur
-- Torsadez chaque paire de phases du moteur (A+/A‑ et B+/B‑) pour réduire les EMI
-- Fournit un soulagement de traction pour tous les connecteurs afin d'éviter les défauts intermittents
-- Si les longueurs sont longues, envisagez un câble blindé pour les signaux de commande et connectez le blindage au châssis/à la terre à une seule extrémité.
+- Utilisez une masse en étoile à point unique entre l'ESP32, le convertisseur de niveau et le pilote.
+- Gardez les conducteurs Step/Direction/Enable courts et évitez de les faire passer parallèlement aux câbles d'alimentation du moteur.
+- Torsadez chaque paire de phases du moteur (A+/A‑ et B+/B‑) afin de réduire les interférences électromagnétiques.
+- Prévoyez une retenue de câble pour tous les connecteurs afin d'éviter les défauts intermittents.
+- Si les liaisons sont longues, utilisez un câble blindé pour les signaux de commande et reliez le blindage au châssis ou à la terre à une seule extrémité.
 
-## Vérifier votre câblage
+## Vérifier le câblage
 
-Effectuez ces vérifications avant de mettre sous tension le pilote du moteur.
+Effectuez ces vérifications avant de mettre le pilote de moteur sous tension.
 
 <Steps>
-  <Step title="Continuité et mappage des broches">
-    Utilisez un multimètre pour confirmer que chaque signal passe de la bonne broche ESP32 à l'entrée du pilote.
+  <Step title="Continuité et brochage">
+    Utilisez un multimètre pour confirmer que chaque signal va de la bonne broche de l'ESP32 à l'entrée du pilote.
 
     <Check>
-    Étape, direction et activez chaque affichage de continuité depuis ESP32 → levier de niveau → pilote.
+    Step, Direction et Enable doivent chacun présenter une continuité de l'ESP32 au pilote en passant par le convertisseur de niveau.
     </Check>
   </Step>
-  <Step title="Isolation entre les signaux et la puissance">
-    Assurez-vous qu'il n'y a aucun court-circuit entre les lignes de signal adjacentes ou entre les rails de signal et d'alimentation.
+  <Step title="Isolation entre les signaux et l'alimentation">
+    Vérifiez l'absence de court-circuit entre les lignes de signal adjacentes et entre un signal et un rail d'alimentation.
 
     <Check>
-    Aucune continuité entre les broches voisines ou entre les signaux et DC+/DC‑.
+    Il ne doit y avoir aucune continuité entre les broches voisines ni entre les signaux et DC+/DC‑.
     </Check>
   </Step>
   <Step title="Polarité et tension d'alimentation">
-    Vérifiez la polarité et la tension d'alimentation aux bornes du pilote avant de connecter le moteur.
+    Vérifiez la polarité et la tension de l'alimentation aux bornes du pilote avant de connecter le moteur.
 
     <Warning>
-    Une polarité inversée peut endommager instantanément le pilote. Vérifiez à nouveau l’orientation DC+ et DC‑.
+    Une inversion de polarité peut endommager instantanément le pilote. Vérifiez à nouveau l'orientation de DC+ et DC‑.
     </Warning>
   </Step>
 </Steps>
 
 ## Liste de contrôle de la première mise sous tension
 
-- Avec le moteur déconnecté, alimentez le pilote et confirmez que les LED d'état semblent normales.
-- Connectez le moteur, puis commandez un mouvement à très basse vitesse
-- Vérifier les changements de direction sur commande
-- Si vous utilisez un encodeur, confirmez que les comptes changent en douceur dans une direction et inversent lorsque la direction change
+- Avec le moteur déconnecté, mettez le pilote sous tension et vérifiez que les LED d'état semblent normales.
+- Connectez le moteur, puis commandez un mouvement à très basse vitesse.
+- Vérifiez que la direction change lorsque vous le demandez.
+- Si vous utilisez un encodeur, vérifiez que les valeurs de comptage évoluent régulièrement dans un sens et s'inversent lorsque la direction change.
 
 <Check>
-Vous pouvez commander un mouvement à basse vitesse sans pas manqués, sans oscillation ou sans faute du conducteur.
+Vous pouvez commander un mouvement à basse vitesse sans pas manqués, oscillations ni défauts du pilote.
 </Check>
 
 ## Dépannage
 
 <AccordionGroup>
-  <Accordion title="Le moteur manque des pas à grande vitesse">
-    Cela indique généralement une inadéquation de niveau logique ou une mauvaise intégrité du signal.
+  <Accordion title="Le moteur perd des pas à grande vitesse">
+    Cela indique généralement un niveau logique inadapté ou une mauvaise intégrité du signal.
 
-    - Le levier de niveau est alimenté des deux côtés (3,3 V et 5 V)
-    - Les motifs sont communs entre l'ESP32, le levier de niveau et le conducteur
-    - Les fils de signal sont courts et éloignés de l'alimentation du moteur
+    - Le convertisseur de niveau est alimenté des deux côtés (3,3 V et 5 V).
+    - L'ESP32, le convertisseur de niveau et le pilote partagent la même masse.
+    - Les fils de signal sont courts et éloignés de l'alimentation du moteur.
 
     <Tip>
-    Si vous n'utilisez pas de levier de niveau, ajoutez-en un. Si tel est le cas, vérifiez l’alimentation 5 V sur les broches côté haut.
+    Si vous n'utilisez pas de convertisseur de niveau, ajoutez-en un. Si vous en utilisez un, vérifiez l'alimentation 5 V des broches du côté haut.
     </Tip>
   </Accordion>
 
   <Accordion title="Le moteur ne répond pas aux commandes">
-    Le conducteur ne reçoit peut-être pas de signaux de commande valides.
+    Le pilote ne reçoit peut-être pas de signaux de commande valides.
 
-    - Vérifiez la polarité de l'entrée d'activation ; de nombreux pilotes utilisent l'activation active-faible
-    - Confirmez que les broches de pas/direction correspondent à la configuration de votre micrologiciel
-    - Assurez-vous que le pilote dispose d’une alimentation adéquate (vérifiez les LED d’état)
+    - Vérifiez la polarité de l'entrée Enable ; de nombreux pilotes utilisent un Enable active-low.
+    - Confirmez que les broches Step/Direction correspondent à la configuration de votre micrologiciel.
+    - Vérifiez que le pilote est suffisamment alimenté (contrôlez les LED d'état).
 
     <Info>
-    Utilisez un analyseur logique ou un oscilloscope pour confirmer les impulsions de pas à l'entrée du pilote.
+    Utilisez un analyseur logique ou un oscilloscope pour confirmer la présence d'impulsions Step à l'entrée du pilote.
     </Info>
   </Accordion>
 
-  <Accordion title="Mouvement irrégulier ou instable">
-    Le bruit électrique ou l'instabilité de l'alimentation peuvent affecter le chemin de commande.
+  <Accordion title="Mouvement irrégulier ou saccadé">
+    Des parasites électriques ou une alimentation instable peuvent perturber le circuit de commande.
 
-    - Gardez les fils de signal séparés des câbles d'alimentation du moteur
-    - Vérifiez que l'alimentation du pilote reste conforme aux spécifications sous charge
-    - Ajouter un découplage local à proximité des entrées du pilote
+    - Séparez les fils de signal des câbles d'alimentation du moteur.
+    - Vérifiez que l'alimentation du pilote reste dans les limites spécifiées sous charge.
+    - Ajoutez un découplage local près des entrées du pilote.
 
     <Tip>
-    Ajoutez des condensateurs céramiques de 0,1 µF à proximité des entrées de commande du pilote (à la masse). Utilisez un câble blindé pour les longs trajets de signal.
+    Ajoutez des condensateurs céramiques de 0,1 µF près des entrées de commande du pilote (vers GND). Utilisez un câble blindé pour les longues liaisons de signal.
     </Tip>
   </Accordion>
 
   <Accordion title="Le moteur tourne dans le mauvais sens">
-    Le signal de direction est inversé par rapport à votre câblage.
+    Le signal Direction est inversé par rapport à votre câblage.
 
     <Info>
-    Inversez la polarité de direction au niveau du connecteur ou inversez la direction dans le micrologiciel en modifiant le paramètre `INVERT_DIRECTION`.
+    Inversez la polarité de la direction au niveau du connecteur, ou inversez la direction dans le micrologiciel en modifiant le paramètre `INVERT_DIRECTION`.
     </Info>
   </Accordion>
 </AccordionGroup>
 
 <Warning>
-Mettez toujours l'appareil hors tension et attendez que les condensateurs se déchargent avant de recâbler. Inverser la polarité ou court-circuiter les sorties peut endommager définitivement votre matériel.
+Mettez toujours le système hors tension et attendez que les condensateurs se déchargent avant de modifier le câblage. Une inversion de polarité ou un court-circuit des sorties peut endommager définitivement votre matériel.
 </Warning>

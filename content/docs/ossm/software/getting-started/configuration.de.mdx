@@ -28,11 +28,11 @@ Diese Grenzwerte gelten für alle Betriebsarten. Die tatsächlich erreichte Gesc
 
 | Parameter | Standard | Einheit | Beschreibung |
 |-----------|---------|------|-------------|
-| `motorStepPerRevolution` | 800.0 | Schritte/Umdrehung | Motorschritte pro voller Umdrehung |
-| `pulleyToothCount` | 20.0 | Zähne | Anzahl der Zähne der Antriebsscheibe |
+| `motorStepPerRevolution` | 800.0 | steps/rev | Motorschritte pro voller Umdrehung |
+| `pulleyToothCount` | 20.0 | teeth | Anzahl der Zähne der Antriebsscheibe |
 | `beltPitchMm` | 2.0 | mm | Abstand zwischen den Riemenzähnen (GT2-Standard) |
 
-Diese Werte ergeben zusammen die Berechnung von `stepsPerMM`:
+Diese Werte werden zur Berechnung von `stepsPerMM` kombiniert:
 
 ```cpp
 stepsPerMM = motorStepPerRevolution / (pulleyToothCount * beltPitchMm)
@@ -51,14 +51,14 @@ Wenn Sie andere Hardware verwenden (z. B. eine 16-Zahn-Riemenscheibe oder einen 
 | `minStrokeLengthMm` | 50.0 | mm | Mindesthub zum Bestehen der Homing-Validierung |
 
 <Note>
-`maxStrokeSteps` definiert den absoluten Maximalweg. Stellen Sie dies auf Ihre Schienenlänge abzüglich des linearen Blockhalters (75 mm bei Standard-OSSM) abzüglich einer Sicherheitsmarge von 20 mm ein.
+`maxStrokeSteps` definiert den absoluten Maximalweg. Verwenden Sie die Formel: maxStrokeSteps = Schienenlänge − Halter des Linearblocks (75 mm beim Standard-OSSM) − 20 mm Sicherheitsmarge.
 </Note>
 
 ### Homing-Konfiguration
 
 | Parameter | Standard | Einheit | Beschreibung |
 |-----------|---------|------|-------------|
-| `sensorlessCurrentLimit` | 1.5 | % | Aktueller Schwellenwert, der das Ende der Reise anzeigt |
+| `sensorlessCurrentLimit` | 1.5 | % | Stromschwellenwert, der das Ende des Hubs anzeigt |
 
 Das OSSM verwendet eine sensorlose Referenzfahrt – es erkennt, wann der Aktuator das Ende des Hubs erreicht, indem es den Motorstrom überwacht. Wenn der Strom diesen Schwellenwert überschreitet, weiß die Firmware, dass der Aktuator einen physischen Stopp erreicht hat.
 
@@ -69,20 +69,20 @@ Diese Parameter optimieren das Firmware-Verhalten und sind in `Config::Advanced`
 | Parameter | Standard | Einheit | Beschreibung |
 |-----------|---------|------|-------------|
 | `strokeZeroOffsetMm` | 6.0 | mm | Pufferabstand von der physischen Ausgangsposition |
-| `commandDeadZonePercentage` | 1.0 | % | Totzone des Potentiometers zur Vermeidung von Geräuschen |
-| `accelerationScaling` | 100.0 | - | Beeinflusst die Bewegungsaggressivität bei einfacher Penetration |
+| `commandDeadZonePercentage` | 1.0 | % | Totzone des Potentiometers zur Vermeidung von Messrauschen |
+| `accelerationScaling` | 100.0 | - | Beeinflusst die Bewegungsaggressivität in Simple Penetration |
 
 <AccordionGroup>
-<Accordion title="hubZeroOffsetMm">
+<Accordion title="strokeZeroOffsetMm">
 Nach der Referenzfahrt fährt der Antrieb um diesen Abstand vom physischen Endanschlag zurück. Dadurch wird verhindert, dass der Antrieb im Normalbetrieb wiederholt gegen den Endanschlag stößt.
 </Accordion>
 
 <Accordion title="commandDeadZonePercentage">
-Analoge Potentiometer können verrauschte Messwerte nahe Null erzeugen. Diese Totzone stellt sicher, dass der Geschwindigkeitsknopf bei vollständiger Drehung gegen den Uhrzeigersinn den Wert „Null“ anzeigt, selbst wenn der elektrische Messwert leicht über 0 % liegt.
+Analoge Potentiometer können Störsignale nahe Null erzeugen. Diese Totzone stellt sicher, dass der Geschwindigkeitsknopf bei vollständiger Drehung gegen den Uhrzeigersinn den Wert „Null“ anzeigt, selbst wenn der elektrische Messwert leicht über 0 % liegt.
 </Accordion>
 
-<Accordion title="BeschleunigungSkalierung">
-Im Modus „Einfache Penetration“ wird die Beschleunigung wie folgt berechnet:
+<Accordion title="accelerationScaling">
+Im Modus Simple Penetration wird die Beschleunigung wie folgt berechnet:
 ```cpp
 acceleration = maxSpeedMmPerSecond * speed * speed / accelerationScaling
 ```
@@ -120,18 +120,18 @@ Bei `true` werden Entfernungen in Metern angezeigt. Bei `false` werden Entfernun
 
 Hardware-Pins sind in `src/constants/Pins.h` definiert. Ändern Sie diese, wenn Sie benutzerdefinierte Hardware erstellen.
 
-### Pins anzeigen
+### Display-Pins
 
-| Stift | Standard-GPIO | Beschreibung |
+| Pin | Standard-GPIO | Beschreibung |
 |-----|--------------|-------------|
 | `oledReset` | -1 | OLED-Reset-Pin (-1, wenn mit Board-Reset geteilt) |
 | `ledPin` | 25 | RGB-LED-Datenpin (WS2812B) |
 
-### Treiberstifte
+### Treiber-Pins
 
-| Stift | Standard-GPIO | Beschreibung |
+| Pin | Standard-GPIO | Beschreibung |
 |-----|--------------|-------------|
-| `motorStepPin` | 14 | Schritt-/Servo-STEP-Signal |
+| `motorStepPin` | 14 | STEP-Signal des Schrittmotors/Servos |
 | `motorDirectionPin` | 27 | Schrittmotor-/Servo-DIR-Signal |
 | `motorEnablePin` | 26 | Schrittmotor-/Servo-ENA-Signal |
 | `currentSensorPin` | 36 | Analoger Strommesseingang |
@@ -140,10 +140,10 @@ Hardware-Pins sind in `src/constants/Pins.h` definiert. Ändern Sie diese, wenn 
 
 ### Remote-Pins
 
-| Stift | Standard-GPIO | Beschreibung |
+| Pin | Standard-GPIO | Beschreibung |
 |-----|--------------|-------------|
 | `speedPotPin` | 34 | Analoger Eingang des Geschwindigkeitspotentiometers |
-| `encoderSwitch` | 35 | Encoder-Tasteneingabe |
+| `encoderSwitch` | 35 | Encoder-Tasteneingang |
 | `encoderA` | 18 | Encoderkanal A |
 | `encoderB` | 5 | Encoderkanal B |
 | `displayData` | 21 | I2C SDA für OLED |
@@ -151,14 +151,14 @@ Hardware-Pins sind in `src/constants/Pins.h` definiert. Ändern Sie diese, wenn 
 
 ### GPIO-Erweiterungspins
 
-Diese Pins sind für Zubehör über [BLE GPIO-Steuerung](/ossm/software/communication/gpio) erhältlich:
+Diese Pins sind für Zubehör über [BLE GPIO-Steuerung](/ossm/software/communication/gpio) verfügbar:
 
 | Logischer Pin | GPIO | Beschreibung |
 |-------------|------|-------------|
-| Pin 1 | GPIO 2 | Allzweckausgabe |
-| Pin 2 | GPIO 15 | Allzweckausgabe |
-| Pin 3 | GPIO 22 | Allzweckausgabe |
-| Pin 4 | GPIO 33 | Allzweckausgabe |
+| Pin 1 | GPIO 2 | Allgemeiner Ausgang |
+| Pin 2 | GPIO 15 | Allgemeiner Ausgang |
+| Pin 3 | GPIO 22 | Allgemeiner Ausgang |
+| Pin 4 | GPIO 33 | Allgemeiner Ausgang |
 
 ## Konfiguration ändern
 
@@ -183,8 +183,8 @@ cd OSSM-hardware/Software
 <Step title="Neu erstellen und hochladen">
 Verwenden Sie PlatformIO, um die geänderte Firmware zu kompilieren und hochzuladen:
 
-1. Klicken Sie auf die Schaltfläche **Erstellen**, um die Kompilierung Ihrer Änderungen zu überprüfen
-2. Klicken Sie auf **Hochladen**, um die neue Firmware zu flashen
+1. Klicken Sie auf die Schaltfläche **Build**, um die Kompilierung Ihrer Änderungen zu überprüfen
+2. Klicken Sie auf **Upload**, um die neue Firmware zu flashen
 
 <Check>
 Nach dem Hochladen wird der OSSM neu gestartet und verwendet Ihre neue Konfiguration.

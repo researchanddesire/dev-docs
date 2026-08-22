@@ -6,10 +6,10 @@ description: "Créez des mouvements de course polyvalents avec des moteurs pas �
 StrokeEngine est une bibliothèque permettant de créer une variété de mouvements de course avec des moteurs pas à pas ou des servomoteurs sur un ESP32. Vous pouvez l'utiliser avec n'importe quelle machine de bricolage dotée d'un entraînement de position linéaire alimenté par un moteur pas à pas ou un servomoteur.
 
 <CardGroup cols={2}>
-  <Card title="Exemple de baiseIO" icon="code" href="https://github.com/theelims/FuckIO">
+  <Card title="FuckIO Example" icon="code" href="https://github.com/theelims/FuckIO">
     Implémentation de référence à l'aide de StrokeEngine
   </Card>
-  <Card title="Projet OSSM" icon="gear" href="https://github.com/KinkyMakers/OSSM-hardware">
+  <Card title="OSSM Project" icon="gear" href="https://github.com/KinkyMakers/OSSM-hardware">
     Implémentation open source populaire par Kinky Makers
   </Card>
 </CardGroup>
@@ -27,20 +27,20 @@ Comprendre ces concepts vous aide à être opérationnel plus rapidement avec St
 La machine utilise un système de coordonnées interne qui convertit les unités métriques du monde réel en étapes d'encodeur/pas à pas. Cette abstraction fonctionne avec toutes les tailles de machines, quel que soit le moteur que vous choisissez.
 
 <Frame caption="Système de coordonnées StrokeEngine affichant le déplacement physique, les limites d'interdiction et les paramètres de course">
-  <img src="./_images/coordinates.svg" alt="Diagramme du système de coordonnées montrant la relation entre les paramètres physicalTravel, keepoutBoundary, profondeur et trait" />
+  <img src="./_images/coordinates.svg" alt="Diagramme du système de coordonnées montrant la relation entre physicalTravel, keepoutBoundary, depth et stroke" />
 </Frame>
 
 **Concepts de coordonnées clés :**
 
 | Terme | Description |
 |------|-------------|
-| **Voyage physique** | Le véritable voyage physique d’une étape à l’autre |
-| **KeepoutBoundary** | Distance de sécurité soustraite de chaque côté pour éviter les accidents |
-| **_voyage** | Distance de travail : `physicalTravel - (2 * keepoutBoundary)` |
-| **Maison** | Position à `-keepoutBoundary` (généralement à l'arrière) |
-| **MIN = 0** | Position zéro, `keepoutBoundary` loin de chez soi |
-| **Profondeur** | Le point le plus éloigné où la machine s'étend (réglable au moment de l'exécution) |
-| **Accident vasculaire cérébral** | La distance de travail d'un mouvement de caresse (réglable au moment de l'exécution) |
+| **physicalTravel** | Le déplacement physique réel entre deux butées mécaniques |
+| **keepoutBoundary** | Distance de sécurité soustraite de chaque côté pour éviter les collisions |
+| **_travel** | Distance de travail : `physicalTravel - (2 * keepoutBoundary)` |
+| **Home** | Position à `-keepoutBoundary` (généralement à l'arrière) |
+| **MIN = 0** | Position zéro, à la distance `keepoutBoundary` du Home |
+| **Depth** | Le point le plus éloigné où la machine s'étend (réglable au moment de l'exécution) |
+| **Stroke** | La distance de travail d'un mouvement de course (réglable au moment de l'exécution) |
 
 <Note>
 Considérez **Stroke** comme l'amplitude et **Depth** comme un décalage linéaire qui y est ajouté. La direction positive du mouvement est vers l’avant (vers le corps).
@@ -48,19 +48,19 @@ Considérez **Stroke** comme l'amplitude et **Depth** comme un décalage linéai
 
 ### Motifs
 
-StrokeEngine utilise un générateur de motifs pour offrir une grande variété de sensations. Les modèles ajustent dynamiquement des paramètres tels que la vitesse, la course et la profondeur, mouvement par mouvement, à l'aide de profils de mouvement trapézoïdaux.
+StrokeEngine utilise un générateur de motifs pour offrir une grande variété de sensations. Les motifs ajustent dynamiquement des paramètres tels que speed, stroke et depth, mouvement par mouvement, à l'aide de profils de mouvement trapézoïdaux.
 
-Chaque modèle accepte quatre paramètres :
-- **profondeur** — Point d'extension maximal
-- **course** — Amplitude du mouvement
-- **vitesse** — Cycles par minute
-- **sensation** — Modificateur arbitraire pour le comportement du modèle (-100 à 100)
+Chaque motif accepte quatre paramètres :
+- **depth** — Point d'extension maximal
+- **stroke** — Amplitude du mouvement
+- **speed** — Cycles par minute
+- **sensation** — Modificateur librement réglable pour le comportement du motif (-100 à 100)
 
 <Info>
-Consultez la [Documentation des modèles](/ossm/software/motion/stroke-engine/pattern) pour des descriptions détaillées des modèles disponibles et des instructions pour créer les vôtres.
+Consultez la [documentation des motifs](/ossm/software/motion/stroke-engine/pattern) pour des descriptions détaillées des motifs disponibles et des instructions pour créer les vôtres.
 </Info>
 
-### Gestion gracieuse des erreurs
+### Gestion des erreurs sans interruption
 
 StrokeEngine gère les paramètres non valides avec élégance sans interrompre le fonctionnement :
 
@@ -69,11 +69,11 @@ StrokeEngine gère les paramètres non valides avec élégance sans interrompre 
 - Les commandes de motif qui dépassent les limites de la machine entraînent des courses raccourcies ou des rampes ajustées
 - Le mouvement s'effectue sur toute la distance, mais peut prendre un peu plus de temps que prévu
 
-### Mises à jour des paramètres à mi-course
+### Mise à jour des paramètres à mi-course
 
-Vous pouvez mettre à jour les paramètres de profondeur, de trait, de vitesse et de motif à mi-course pour une expérience utilisateur réactive et fluide. Des protections intégrées garantissent que la machine reste dans les limites à tout moment.
+Vous pouvez mettre à jour les paramètres depth, stroke, speed et motif à mi-course pour une expérience utilisateur réactive et fluide. Des protections intégrées garantissent que la machine reste dans les limites à tout moment.
 
-### Machine d'état
+### Machine à états
 
 Une machine à états finis interne gère les états de la machine :
 
@@ -95,12 +95,12 @@ stateDiagram-v2
 
 | État | Description |
 |-------|-------------|
-| **INDÉFINI** | État initial avant la prise d'origine. Le moteur est désactivé et la position est inconnue. |
-| **PRÊT** | Retour à destination terminé. La machine accepte les commandes de mouvement. |
-| **MODÈLE** | Le générateur de motifs exécute des mouvements cycliques. |
-| **PROFONDEUR DE CONFIGURATION** | Le moteur suit la position de profondeur pour un réglage interactif. |
+| **UNDEFINED** | État initial avant le homing. Le moteur est désactivé et la position est inconnue. |
+| **READY** | Homing terminé. La machine accepte les commandes de mouvement. |
+| **PATTERN** | Le générateur de motifs exécute des mouvements cycliques. |
+| **SETUPDEPTH** | Le moteur suit la position de depth pour un réglage interactif. |
 
-## Usage
+## Utilisation
 
 StrokeEngine fournit une API simple mais puissante. Spécifiez tous les paramètres d’entrée en unités métriques réelles.
 
@@ -108,7 +108,7 @@ StrokeEngine fournit une API simple mais puissante. Spécifiez tous les paramèt
 
 <Steps>
   <Step title="Définir les configurations des broches">
-    Configurez les broches de votre pilote de moteur et du commutateur de référence en option :
+    Configurez les broches de votre pilote de moteur et du commutateur de homing en option :
 
 ```cpp main.cpp
 #include <code>
@@ -157,7 +157,7 @@ static machineGeometry strokingMachine = {
 ```
   </Step>
 
-  <Step title="Configurer le référencement">
+  <Step title="Configurer le homing">
     Configurez les propriétés du commutateur de butée :
 
 ```cpp main.cpp
@@ -191,31 +191,31 @@ void setup() {
 ```
 
 <Check>
-Lorsque `getState()` renvoie `READY`, la machine est hébergée et prête à recevoir des commandes de mouvement.
+Lorsque `getState()` renvoie `READY`, le homing de la machine est terminé et elle est prête à recevoir des commandes de mouvement.
 </Check>
   </Step>
 </Steps>
 
-### Prise d'origine manuelle (pas de commutateur de butée)
+### Homing manuel (pas de commutateur de butée)
 
 <Warning>
-La prise en main manuelle est dangereuse. L'appel de `thisIsHome()` alors qu'il n'est pas à la butée physique provoque un système de coordonnées incorrect, entraînant un crash qui pourrait endommager votre machine.
+Le homing manuel est dangereux. Lorsque la machine n'est pas à la butée physique, l'appel de `thisIsHome()` provoque un système de coordonnées incorrect et une collision mécanique qui pourrait endommager votre machine.
 </Warning>
 
-Si votre machine ne dispose pas d'un commutateur de référencement, vous pouvez utiliser le référencement manuel :
+Si votre machine ne dispose pas d'un commutateur de homing, vous pouvez utiliser le homing manuel :
 
-1. Déplacer physiquement la machine jusqu'à la butée arrière
+1. Déplacez physiquement la machine jusqu'à la butée arrière
 2. Appelez `Stroker.thisIsHome()`
 
 ```cpp
 Stroker.thisIsHome();
 ```
 
-Cela active le conducteur, définit la position actuelle comme `-keepoutBoundary` et se déplace lentement vers la position 0.
+Cela active le pilote, définit la position actuelle comme `-keepoutBoundary` et se déplace lentement vers la position 0.
 
-### Récupérer les modèles disponibles
+### Récupérer les motifs disponibles
 
-Utilisez `getNumberOfPattern()` et `getPatternName()` pour énumérer les modèles disponibles :
+Utilisez `getNumberOfPattern()` et `getPatternName()` pour énumérer les motifs disponibles :
 
 ```cpp patterns.cpp
 String getPatternJSON() {
@@ -241,12 +241,12 @@ String getPatternJSON() {
 
 | Fonction | Description |
 |----------|-------------|
-| `Stroker.startPattern()` | Démarrez le mouvement de caresse basé sur un motif |
-| `Stroker.stopMotion()` | Arrêtez-vous immédiatement avec une décélération maximale |
+| `Stroker.startPattern()` | Démarrer le mouvement basé sur un motif |
+| `Stroker.stopMotion()` | Arrêter immédiatement avec une décélération maximale |
 
 ### Commandes de positionnement
 
-Déplacez-vous vers l'une des extrémités de la machine à des fins de configuration :
+Déplacez la machine vers l'une des extrémités à des fins de configuration :
 
 ```cpp
 Stroker.moveToMin();        // Move to rear (home) position
@@ -255,7 +255,7 @@ Stroker.moveToMax(10.0);    // Move at 10 mm/s (default speed)
 ```
 
 <Note>
-Ces fonctions peuvent être appelées à partir des états `PATTERN` ou `READY` et arrêter tout mouvement en cours. Ils renvoient `false` s’ils sont appelés dans un état non valide.
+Ces fonctions peuvent être appelées à partir des états `PATTERN` ou `READY` et arrêter tout mouvement en cours. Elles renvoient `false` si elles sont appelées dans un état non valide.
 </Note>
 
 ### Configuration interactive de la profondeur
@@ -270,10 +270,10 @@ Stroker.setupDepth(10.0);       // Specify speed
 Mettez à jour la position de profondeur avec `Stroker.setDepth(float)` et lisez la valeur actuelle avec `Stroker.getDepth()`.
 
 <Tip>
-**Mode fantaisie :** Appelez `Stroker.setupDepth(10.0, true)` pour régler la profondeur et la course de manière interactive. Le curseur de sensation correspond à l'intervalle `[depth-stroke, depth]` :
+**Fancy Mode :** Appelez `Stroker.setupDepth(10.0, true)` pour régler depth et stroke de manière interactive. Le curseur de sensation correspond à l'intervalle `[depth-stroke, depth]` :
 - `sensation = 100` — Ajuste la position en profondeur
-- `sensation = -100` — Ajuste la position de la course
-- `sensation = 0` — Positions au milieu de la course
+- `sensation = -100` — Ajuste la position de course
+- `sensation = 0` — Positionne au milieu de la course
 </Tip>
 
 ### Fonctions de paramètres
@@ -290,10 +290,10 @@ Stroker.setPattern(int index, bool applyNow);      // 0 to getNumberOfPattern()-
 ```
 
 <Info>
-Définissez `applyNow` sur `true` pour appliquer les modifications immédiatement à mi-course. Sinon, les modifications prendront effet une fois le trait en cours terminé.
+Définissez `applyNow` sur `true` pour appliquer les modifications immédiatement à mi-course. Sinon, les modifications prendront effet une fois la course en cours terminée.
 </Info>
 
-Relisez les valeurs contraintes réellement utilisées par StrokeEngine :
+Récupérez les valeurs contraintes réellement utilisées par StrokeEngine :
 
 ```cpp
 // Getter functions
@@ -306,9 +306,9 @@ int pattern = Stroker.getPattern();       // Pattern index
 
 ## Fonctionnalités avancées
 
-### Rappel de télémétrie
+### Callback de télémétrie
 
-Enregistrez un rappel pour recevoir des données de télémétrie pour chaque mouvement trapézoïdal :
+Enregistrez un callback pour recevoir des données de télémétrie pour chaque mouvement trapézoïdal :
 
 ```cpp
 void callbackTelemetry(float position, float speed, bool clipping) {

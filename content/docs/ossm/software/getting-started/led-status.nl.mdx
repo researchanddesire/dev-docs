@@ -1,27 +1,27 @@
 ---
-title: "RGB LED-statusindicatie"
-description: "Begrijp de RGB LED-patronen die de BLE-verbindingsstatus en machinebewerkingen op uw OSSM aangeven"
+title: "RGB-ledstatusindicatie"
+description: "Begrijp de RGB-ledpatronen die de BLE-verbindingsstatus en machinebewerkingen op uw OSSM aangeven"
 ---
 
-De RGB-LED op pin 25 geeft visuele feedback over de huidige status van uw OSSM. U kunt snel vaststellen of de machine bezig is met thuisgebruik, zoekt naar een Bluetooth-verbinding of actief communiceert met een aangesloten apparaat.
+De RGB-LED op pin 25 geeft visuele feedback over de huidige status van uw OSSM. U kunt snel vaststellen of de machine bezig is met homing, zoekt naar een Bluetooth-verbinding of actief communiceert met een aangesloten apparaat.
 
 ## Statusprioriteit begrijpen
 
-De LED geeft verschillende patronen weer op basis van de huidige operationele status. Machinebewerkingen hebben altijd voorrang op BLE-statusindicaties.
+De LED geeft verschillende patronen weer op basis van de huidige operationele status. Bewerkingen van de machine hebben altijd voorrang op BLE-statusindicaties.
 
-| Prioriteit | Staat | LED-patroon |
+| Prioriteit | Toestand | LED-patroon |
 |----------|-------|-------------|
-| Hoogste | Thuiskomen | Diep paars ademend effect |
+| Hoogste | Homing | Dieppaars ademhalingseffect |
 | Lager | BLE-status | Varieert per verbindingsstatus |
 
 ## Patronen van de machinestatus
 
 <AccordionGroup>
 <Accordion title="Homing bezig">
-Wanneer uw OSSM zich richt, geeft de LED een **dieppaars ademhalingseffect** weer met een vloeiend pulserend patroon. Dit gaat door totdat de homing is voltooid of mislukt.
+Wanneer uw OSSM bezig is met homing, geeft de LED een **dieppaars ademhalingseffect** weer met een vloeiend pulserend patroon. Dit gaat door totdat de homing is voltooid of mislukt.
 
 <Info>
-De homing-indicator heeft voorrang op alle BLE-statuspatronen. Je zult de BLE-statuswijzigingen pas zien als de homing is voltooid.
+De homing-indicator heeft voorrang op alle BLE-statuspatronen. U ziet de BLE-statuswijzigingen pas als de homing is voltooid.
 </Info>
 </Accordion>
 </AccordionGroup>
@@ -29,11 +29,11 @@ De homing-indicator heeft voorrang op alle BLE-statuspatronen. Je zult de BLE-st
 ## BLE-verbindingsstatuspatronen
 
 <AccordionGroup>
-<Accordion title="Adverteren (zoeken naar verbindingen)">
+<Accordion title="Advertising (zoeken naar verbindingen)">
 Wanneer uw OSSM zoekt naar een Bluetooth-verbinding:
 
 1. **Regenboogeffect** wordt 1 seconde weergegeven
-2. **Snelle ademhaling blauw** volgt met snelle pulsen (10x normale snelheid)
+2. Daarna volgt een **snel blauw ademhalingseffect** met snelle pulsen (10× de normale snelheid)
 3. **Automatisch dimmen** wordt na 30 seconden geactiveerd en vermindert de helderheid tot ~12% met zachte pulsen
 
 <Tip>
@@ -46,7 +46,7 @@ Wanneer een apparaat verbinding maakt via Bluetooth:
 
 1. **Regenboogeffect** wordt 1 seconde weergegeven om de verbinding te bevestigen
 2. **Blauwe LED vervaagt** tot een dimniveau (~12% helderheid) en blijft gedimd
-3. **Communicatiepulsen** verschijnen terwijl de subtiele helderheid toeneemt tijdens de gegevensoverdracht
+3. **Communicatiepulsen** verschijnen als subtiele helderheidstoenames tijdens de gegevensoverdracht
 
 </Accordion>
 
@@ -56,37 +56,37 @@ Wanneer er geen Bluetooth-verbinding bestaat:
 - **LED gaat volledig uit**
 
 <Note>
-Een niet-verbonden toestand verschilt van adverteren. Als u de OSSM inschakelt, begint deze onmiddellijk te adverteren, zodat u het blauwe ademhalingspatroon ziet in plaats van geen licht.
+Een niet-verbonden toestand verschilt van Advertising. Als u de OSSM inschakelt, begint deze onmiddellijk met Advertising, zodat u het blauwe ademhalingspatroon ziet in plaats van een uitgeschakelde LED.
 </Note>
 </Accordion>
 </AccordionGroup>
 
 ## Communicatie-indicatie
 
-Wanneer BLE is aangesloten en de LED gedimd is, zie je korte helderheidsimpulsen tijdens:
+Wanneer BLE is aangesloten en de LED gedimd is, ziet u korte helderheidsimpulsen tijdens:
 
 - **Opdrachten ontvangen** van uw aangesloten apparaat
 - **Reacties verzenden** terug naar het apparaat
 - **Statusupdates** verzonden naar het apparaat
 
 <Info>
-De communicatiepuls is subtiel: een fade van 100 ms met een minimale toename van de helderheid. Dit geeft feedback zonder afleidend te zijn tijdens de bediening.
+De communicatiepuls is subtiel: een overgang van 100 ms met een minimale toename van de helderheid. Dit geeft feedback zonder afleidend te zijn tijdens de bediening.
 </Info>
 
-## Kleuren statusindicatie
+## Kleuren van de statusindicatie
 
 De firmware definieert standaardkleuren voor verschillende machinestatussen. Deze worden gebruikt door statusindicatiefuncties en kunnen verschijnen in toekomstige firmware-updates.
 
 | Status | Kleur | Beschrijving |
 |--------|-------|-------------|
 | Inactief | Blauw | Standaardstatus tijdens wachten |
-| Rennen | Groente | Actieve beweging bezig |
+| Actief | Groen | Actieve beweging bezig |
 | Fout | Rood | Foutconditie gedetecteerd |
-| Thuiskomen | Geel | Thuisvolgorde actief |
-| Verbinden | Paars | BLE-verbinding wordt uitgevoerd |
+| Homing | Geel | Homingvolgorde actief |
+| Verbinden | Paars | BLE-verbinding wordt tot stand gebracht |
 
 <Note>
-Momenteel wordt alleen de homing-status (dieppaarse ademhaling) actief weergegeven tijdens machinebewerkingen. Andere statuskleuren zijn gedefinieerd voor toekomstig gebruik of aangepaste firmware-implementaties.
+Momenteel wordt alleen de homing-status (dieppaarse ademhaling) actief weergegeven tijdens de werking van de machine. Andere statuskleuren zijn gedefinieerd voor toekomstig gebruik of aangepaste firmware-implementaties.
 </Note>
 
 ## Technische referentie
@@ -95,9 +95,9 @@ Momenteel wordt alleen de homing-status (dieppaarse ademhaling) actief weergegev
 <Accordion title="Configuratieconstanten">
 | Constante | Waarde | Beschrijving |
 |----------|-------|-------------|
-| `ADVERTISING_TIMEOUT` | 30 seconden | Tijd voordat de reclame automatisch dimt |
+| `ADVERTISING_TIMEOUT` | 30 seconden | Tijd voordat Advertising automatisch dimt |
 | Gedimde helderheid | ~12% | Helderheidsniveau bij verbinding of na time-out |
-| Communicatie pols | 100ms | Indicatie duur van gegevensoverdracht |
+| Communicatiepuls | 100ms | Duur van de indicatie van gegevensoverdracht |
 </Accordion>
 
 <Accordion title="Belangrijkste functies">
@@ -106,7 +106,7 @@ Momenteel wordt alleen de homing-status (dieppaarse ademhaling) actief weergegev
 | `showBLEAdvertisingDimmed()` | Geeft zacht pulseren weer bij verminderde helderheid |
 
 <Note>
-De reclametime-out wordt automatisch gereset wanneer de BLE-verbindingsstatus verandert (verbinden of verbreken van gebeurtenissen).
+De Advertising-time-out wordt automatisch gereset wanneer de BLE-verbindingsstatus verandert (gebeurtenissen voor verbinden of verbreken).
 </Note>
 </Accordion>
 </AccordionGroup>

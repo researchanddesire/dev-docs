@@ -9,7 +9,7 @@ De OSSM-firmware gebruikt een reeks configuratieconstanten die bewegingslimieten
 Het onjuist wijzigen van configuratiewaarden kan uw hardware beschadigen of een onveilige werking veroorzaken. Wijzig waarden alleen als u de gevolgen ervan begrijpt en uw hardwarespecificaties hebt geverifieerd.
 </Warning>
 
-## Configuratie van bewegingssysteem
+## Configuratie van het bewegingssysteem
 
 Deze parameters bepalen hoe de OSSM beweegt en zijn te vinden in `src/constants/Config.h` onder de naamruimte `Config::Driver`.
 
@@ -17,8 +17,8 @@ Deze parameters bepalen hoe de OSSM beweegt en zijn te vinden in `src/constants/
 
 | Parameter | Standaard | Eenheid | Beschrijving |
 |-----------|---------|------|-------------|
-| `maxSpeedMmPerSecond` | 900.0 | mm/sec | Maximale lineaire snelheid van de actuator |
-| `maxAcceleration` | 10000.0 | mm/s² | Maximale acceleratie-/deceleratiesnelheid |
+| `maxSpeedMmPerSecond` | 900.0 | mm/s | Maximale lineaire snelheid van de actuator |
+| `maxAcceleration` | 10000.0 | mm/s² | Maximale acceleratie/deceleratie |
 
 <Info>
 Deze limieten gelden voor alle bedrijfsmodi. De daadwerkelijk behaalde snelheid is afhankelijk van uw motor, voeding en mechanische opstelling.
@@ -28,8 +28,8 @@ Deze limieten gelden voor alle bedrijfsmodi. De daadwerkelijk behaalde snelheid 
 
 | Parameter | Standaard | Eenheid | Beschrijving |
 |-----------|---------|------|-------------|
-| `motorStepPerRevolution` | 800.0 | stappen/omw | Motorstappen per volledige omwenteling |
-| `pulleyToothCount` | 20.0 | tanden | Aantal tanden op de aandrijfpoelie |
+| `motorStepPerRevolution` | 800.0 | steps/rev | Motorstappen per volledige omwenteling |
+| `pulleyToothCount` | 20.0 | teeth | Aantal tanden op de aandrijfpoelie |
 | `beltPitchMm` | 2.0 | mm | Afstand tussen riemtanden (GT2 standaard) |
 
 Deze waarden worden gecombineerd om `stepsPerMM` te berekenen:
@@ -43,7 +43,7 @@ stepsPerMM = motorStepPerRevolution / (pulleyToothCount * beltPitchMm)
 Als u andere hardware gebruikt (bijvoorbeeld een poelie met 16 tanden of een GT3-riem), moet u deze waarden bijwerken zodat ze overeenkomen. Onjuiste waarden zorgen ervoor dat de firmware posities verkeerd berekent.
 </Tip>
 
-### Beroertelimieten
+### Slaglimieten
 
 | Parameter | Standaard | Eenheid | Beschrijving |
 |-----------|---------|------|-------------|
@@ -58,7 +58,7 @@ Als u andere hardware gebruikt (bijvoorbeeld een poelie met 16 tanden of een GT3
 
 | Parameter | Standaard | Eenheid | Beschrijving |
 |-----------|---------|------|-------------|
-| `sensorlessCurrentLimit` | 1.5 | % | Huidige drempel die het einde van de reis aangeeft |
+| `sensorlessCurrentLimit` | 1.5 | % | Stroomdrempel die het einde van de slag aangeeft |
 
 De OSSM maakt gebruik van sensorloze homing: hij detecteert wanneer de actuator het einde van de slag bereikt door de motorstroom te monitoren. Wanneer de stroom deze drempel overschrijdt, weet de firmware dat de actuator een fysieke stop heeft bereikt.
 
@@ -69,20 +69,20 @@ Deze parameters verfijnen het gedrag van de firmware en zijn te vinden in `Confi
 | Parameter | Standaard | Eenheid | Beschrijving |
 |-----------|---------|------|-------------|
 | `strokeZeroOffsetMm` | 6.0 | mm | Bufferafstand vanaf de fysieke thuispositie |
-| `commandDeadZonePercentage` | 1.0 | % | Potentiometer dode zone om ruis te voorkomen |
-| `accelerationScaling` | 100.0 | - | Beïnvloedt de agressiviteit van bewegingen bij eenvoudige penetratie |
+| `commandDeadZonePercentage` | 1.0 | % | Dode zone van de potentiometer om meetruis te voorkomen |
+| `accelerationScaling` | 100.0 | - | Beïnvloedt de agressiviteit van bewegingen bij Simple Penetration |
 
 <AccordionGroup>
-<Accordion title="slagZeroOffsetMm">
-Na de startpositie trekt de actuator zich over deze afstand terug van de fysieke eindstop. Dit voorkomt dat de actuator tijdens normaal bedrijf herhaaldelijk de eindstop raakt.
+<Accordion title="strokeZeroOffsetMm">
+Na de homing trekt de actuator zich over deze afstand terug van de fysieke eindstop. Dit voorkomt dat de actuator tijdens normaal bedrijf herhaaldelijk de eindstop raakt.
 </Accordion>
 
-<Accordion title="commandoDeadZonePercentage">
-Analoge potentiometers kunnen luidruchtige metingen produceren die bijna nul zijn. Deze dode zone zorgt ervoor dat de snelheidsknop als "nul" wordt geregistreerd wanneer deze volledig tegen de klok in wordt gedraaid, zelfs als de elektrische waarde iets boven 0% ligt.
+<Accordion title="commandDeadZonePercentage">
+Analoge potentiometers kunnen ruisende metingen rond nul produceren. Deze dode zone zorgt ervoor dat de snelheidsknop als "nul" wordt geregistreerd wanneer deze volledig tegen de klok in wordt gedraaid, zelfs als de elektrische waarde iets boven 0% ligt.
 </Accordion>
 
-<Accordion title="versnellingSchaal">
-In de modus Eenvoudige penetratie wordt de versnelling als volgt berekend:
+<Accordion title="accelerationScaling">
+In de modus Simple Penetration wordt de versnelling als volgt berekend:
 ```cpp
 acceleration = maxSpeedMmPerSecond * speed * speed / accelerationScaling
 ```
@@ -127,22 +127,22 @@ Hardwarepinnen worden gedefinieerd in `src/constants/Pins.h`. Wijzig deze als u 
 | `oledReset` | -1 | OLED-resetpin (-1 indien gedeeld met bordreset) |
 | `ledPin` | 25 | RGB LED-datapin (WS2812B) |
 
-### Stuurprogrammapinnen
+### Driverpinnen
 
 | Pin | Standaard GPIO | Beschrijving |
 |-----|--------------|-------------|
 | `motorStepPin` | 14 | Stepper/servo STEP-signaal |
 | `motorDirectionPin` | 27 | Stepper/servo DIR-signaal |
-| `motorEnablePin` | 26 | Stapper/servo ENA-signaal |
+| `motorEnablePin` | 26 | Stepper/servo ENA-signaal |
 | `currentSensorPin` | 36 | Analoge stroomdetectie-ingang |
 | `stopPin` | 19 | Noodstopschakelaar (optioneel) |
 | `limitSwitchPin` | 12 | Ingang eindschakelaar (optioneel) |
 
-### Pinnen op afstand
+### Remote-pinnen
 
 | Pin | Standaard GPIO | Beschrijving |
 |-----|--------------|-------------|
-| `speedPotPin` | 34 | Toerentalpotentiometer analoge ingang |
+| `speedPotPin` | 34 | Analoge ingang van de snelheidspotentiometer |
 | `encoderSwitch` | 35 | Encoderknopingang |
 | `encoderA` | 18 | Encoderkanaal A |
 | `encoderB` | 5 | Encoderkanaal B |
@@ -151,14 +151,14 @@ Hardwarepinnen worden gedefinieerd in `src/constants/Pins.h`. Wijzig deze als u 
 
 ### GPIO-uitbreidingspinnen
 
-Deze pinnen zijn beschikbaar voor accessoires via [BLE GPIO control](/ossm/software/communication/gpio):
+Deze pinnen zijn beschikbaar voor accessoires via [BLE GPIO-besturing](/ossm/software/communication/gpio):
 
 | Logische pin | GPIO | Beschrijving |
 |-------------|------|-------------|
-| Pin 1 | GPIO2 | Uitvoer voor algemeen gebruik |
-| Pin 2 | GPIO15 | Uitvoer voor algemeen gebruik |
-| Pin 3 | GPIO22 | Uitvoer voor algemeen gebruik |
-| Pin 4 | GPIO33 | Uitvoer voor algemeen gebruik |
+| Pin 1 | GPIO 2 | Uitgang voor algemeen gebruik |
+| Pin 2 | GPIO 15 | Uitgang voor algemeen gebruik |
+| Pin 3 | GPIO 22 | Uitgang voor algemeen gebruik |
+| Pin 4 | GPIO 33 | Uitgang voor algemeen gebruik |
 
 ## Configuratie wijzigen
 
@@ -193,7 +193,7 @@ Na het uploaden zal de OSSM opnieuw opstarten en uw nieuwe configuratie gebruike
 </Steps>
 
 <Warning>
-Test configuratiewijzigingen altijd zorgvuldig. Begin met lage snelheden en controleer of de homing succesvol is voltooid voordat u normaal gaat werken.
+Test configuratiewijzigingen altijd zorgvuldig. Begin met lage snelheden en controleer of de homing succesvol is voltooid vóór normaal gebruik.
 </Warning>
 
 ## Gerelateerde pagina's

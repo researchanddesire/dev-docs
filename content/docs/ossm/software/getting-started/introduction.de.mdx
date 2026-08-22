@@ -13,7 +13,7 @@ Die OSSM-Firmware basiert auf vier Schlüsseltechnologien, die zusammenarbeiten,
 
 <AccordionGroup>
 <Accordion title="Zustandsmaschine – Boost SML" icon="diagram-project">
-[SML steigern](https://boost-ext.github.io/sml/) (State Machine Language) ist eine reine Header-C++-Bibliothek, die eine domänenspezifische Sprache zum Definieren von Zustandsmaschinen bereitstellt.
+[Boost SML](https://boost-ext.github.io/sml/) (State Machine Language) ist eine reine Header-C++-Bibliothek, die eine domänenspezifische Sprache zum Definieren von Zustandsmaschinen bereitstellt.
 
 **Warum wir es verwenden:**
 - Die Überprüfung der Zustandsmaschine zur Kompilierungszeit erkennt Fehler vor der Laufzeit
@@ -69,21 +69,21 @@ Richten Sie Ihre Entwicklungsumgebung ein, indem Sie die folgenden Schritte ausf
 
 Bevor Sie beginnen, stellen Sie sicher, dass Sie Folgendes haben:
 - Ein Computer mit Windows, macOS oder Linux
-- Git ist auf Ihrem System installiert
+- Auf Ihrem System installiertes Git
 - Eine Internetverbindung zum Herunterladen von Abhängigkeiten
 
 <Steps>
 <Step title="Installieren Sie VS Code und PlatformIO">
-Laden Sie [Visual Studio-Code](https://code.visualstudio.com/) herunter, installieren Sie es und fügen Sie dann die PlatformIO-Erweiterung hinzu.
+Laden Sie [Visual Studio Code](https://code.visualstudio.com/) herunter, installieren Sie es und fügen Sie dann die PlatformIO-Erweiterung hinzu.
 
-1. Öffnen Sie VS-Code
-2. Navigieren Sie zum Bedienfeld „Erweiterungen“ (Strg+Umschalt+X / Befehl+Umschalt+X).
-3. Suche nach „PlatformIO IDE“
+1. Öffnen Sie VS Code
+2. Navigieren Sie zum Bedienfeld „Erweiterungen“ (Ctrl+Shift+X / Cmd+Shift+X).
+3. Suchen Sie nach „PlatformIO IDE“
 4. Klicken Sie auf **Installieren** und warten Sie, bis die Installation abgeschlossen ist
 5. Starten Sie VS Code neu, wenn Sie dazu aufgefordert werden
 
 <Tip>
-Ausführliche Anweisungen zur PlatformIO-Einrichtung finden Sie in unserem [PlatformIO-Setup-Anleitung](/ossm/software/getting-started/platformio).
+Ausführliche Anweisungen zur PlatformIO-Einrichtung finden Sie in unserer [Anleitung zur PlatformIO-Einrichtung](/ossm/software/getting-started/platformio).
 </Tip>
 </Step>
 
@@ -105,7 +105,7 @@ cd OSSM-hardware/Software
 ```
 </Tab>
 
-<Tab title="GitHub-CLI">
+<Tab title="GitHub CLI">
 ```bash
 gh repo clone KinkyMakers/OSSM-hardware
 cd OSSM-hardware/Software
@@ -121,7 +121,7 @@ Wenn Sie vorhaben, Änderungen beizutragen, forken Sie zuerst das Repository und
 <Step title="Öffnen Sie das Projekt in VS Code">
 Starten Sie das Projekt mit PlatformIO.
 
-1. Öffnen Sie VS-Code
+1. Öffnen Sie VS Code
 2. Wählen Sie **Datei > Ordner öffnen**
 3. Navigieren Sie zum Verzeichnis `OSSM-hardware/Software`, das Sie gerade geklont haben
 4. Klicken Sie auf **Ordner auswählen** (oder **Öffnen** unter macOS).
@@ -154,15 +154,15 @@ Stellen Sie sicher, dass Sie den richtigen COM-Port auswählen, wenn Sie mehrere
 </Card>
 
 <Card title="Sicherheitsfunktionen" icon="shield" href="/ossm/software/getting-started/safety-features">
-  Verstehen Sie die Kontrollen vor dem Flug, die Sicherheitsabschaltung und den Notstopp.
+  Verstehen Sie die Vorabprüfungen, die Sicherheit bei Verbindungstrennung und den Notstopp.
 </Card>
 
 <Card title="Konfiguration" icon="sliders" href="/ossm/software/getting-started/configuration">
   Passen Sie Bewegungsparameter, Pins und Benutzereinstellungen an.
 </Card>
 
-<Card title="WLAN und Updates" icon="wifi" href="/ossm/software/getting-started/wifi-and-updates">
-  Konfigurieren Sie WLAN und installieren Sie Over-the-Air-Firmware-Updates.
+<Card title="WiFi und Updates" icon="wifi" href="/ossm/software/getting-started/wifi-and-updates">
+  Konfigurieren Sie WiFi und installieren Sie Over-the-Air-Firmware-Updates.
 </Card>
 
 <Card title="Ordnerstruktur" icon="folder-tree" href="/ossm/software/architecture/folder-structure">

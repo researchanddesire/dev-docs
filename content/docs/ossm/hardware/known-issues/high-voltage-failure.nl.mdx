@@ -11,49 +11,49 @@ Dit probleem heeft betrekking op **Rev 2-kaarten met bestelnummer #1214 of lager
 
 ## Probleem
 
-Wanneer u een voeding van 30 V of hoger op het bord aansluit **zonder dat er een motor is aangesloten**, vernietigt een korte spanningspiek (ongeveer 1 microseconde) de DC-DC-omzetter.
+Wanneer u een voeding van 30 V of hoger op de kaart aansluit **zonder dat er een motor is aangesloten**, vernietigt een korte spanningspiek (ongeveer 1 microseconde) de DC-DC-omzetter.
 
 <Note>
 Dit probleem doet zich **niet** voor als u:
-- Gebruik een standaard 24V-voeding
-- Zorg ervoor dat er een motor op het bord is aangesloten voordat u het apparaat inschakelt
+- een standaardvoeding van 24 V gebruikt
+- vóór het inschakelen een motor op de kaart aansluit
 </Note>
 
 ## Oplossing
 
-Voeg een <Tooltip tip="Transient Voltage Suppression - a component that clamps voltage spikes to protect sensitive electronics">TVS-diode</Tooltip> toe om de ingangspiek vast te zetten op een spanning die de DC-DC-omzetter kan verdragen.
+Voeg een <Tooltip tip="Transient Voltage Suppression – een component die spanningspieken afklemt om gevoelige elektronica te beschermen">TVS-diode</Tooltip> toe om de ingangspiek af te klemmen op een spanning die de DC-DC-omzetter kan verdragen.
 
 ### Vereist onderdeel
 
 | Onderdeelnummer | Beschrijving | Geschatte kosten |
 |-------------|-------------|------------------|
-| [1.5KE51CA](https://www.digikey.ca/en/products/detail/littelfuse-inc/1-5KE51CA/688036) | TVS-diode | ~ $ 1 USD |
+| [1.5KE51CA](https://www.digikey.ca/en/products/detail/littelfuse-inc/1-5KE51CA/688036) | TVS-diode | ~$1 USD |
 
 ### Installatiestappen
 
 <Steps>
 <Step title="Bereid de diode voor">
-Buig de draden van de 1.5KE51CA-diode zodat deze overeenkomen met de afstand tussen de soldeervlakken op uw bord.
+Buig de draden van de 1.5KE51CA-diode zodat deze overeenkomen met de afstand tussen de soldeerpads op uw kaart.
 </Step>
 
 <Step title="Knip de nabijgelegen pin af">
-Knip de pin gemarkeerd in de onderstaande afbeelding af om ervoor te zorgen dat deze na installatie geen contact maakt met de diodekabel.
+Knip de in de onderstaande afbeelding gemarkeerde pin af, zodat deze na installatie geen contact maakt met de draad van de diode.
 
 <Warning>
-Als u deze stap overslaat, kan er kortsluiting ontstaan ​​tussen de pin en de diodekabel.
+Als u deze stap overslaat, kan er kortsluiting ontstaan tussen de pin en de draad van de diode.
 </Warning>
 </Step>
 
 <Step title="Soldeer de diode">
-Soldeer de diode rechtstreeks op het bord, zoals weergegeven in de onderstaande referentieafbeelding.
+Soldeer de diode rechtstreeks op de kaart, zoals weergegeven in de onderstaande referentieafbeelding.
 
 <Check>
-Controleer of de diodedraden goede soldeerverbindingen hebben en dat er geen draden in aanraking komen met onbedoelde pads of componenten.
+Controleer of de draden van de diode goed zijn gesoldeerd en of geen draad onbedoeld contact maakt met pads of componenten.
 </Check>
 </Step>
 </Steps>
 
 {/* TODO: Add installation reference image */}
-{/* <Frame caption="TVS-diode-installatie toont de juiste plaatsing van de lead">
-<img src="/ossm/images/ossm/hardware/tvs-diode-install.png" alt="TVS-diode gesoldeerd op OSSM-bord met afgesneden pin zichtbaar" />
+{/* <Frame caption="Installatie van de TVS-diode met de juiste plaatsing van de aansluitingen">
+<img src="/ossm/images/ossm/hardware/tvs-diode-install.png" alt="TVS-diode op OSSM-kaart gesoldeerd met zichtbare afgeknipte pin" />
 </Frame> */}

@@ -1,21 +1,21 @@
 ---
 title: "UI-bibliotheek"
-description: "Pure renderingbibliotheek voor OSSM-weergaveschermen - tekstpagina's, tekenreeksen, pictogrammen en visuele tests"
+description: "Pure renderingbibliotheek voor OSSM-weergaveschermen — tekstpagina's, tekenreeksen, pictogrammen en visuele tests"
 ---
 
 ## Overzicht
 
-De `lib/ui`-bibliotheek is een **pure renderinglaag** die OSSM-schermen in een U8g2-buffer tekent. Het heeft geen hardwareafhankelijkheden, geen FreeRTOS, geen mutexen - er is een `u8g2_t*`-aanwijzer voor nodig en tekent pixels. Thread-veiligheid en weergave-I/O worden afgehandeld door de [display service](/ossm/software/display/display-service).
+De `lib/ui`-bibliotheek is een **pure renderinglaag** die OSSM-schermen in een U8g2-buffer tekent. Ze heeft geen hardwareafhankelijkheden, geen FreeRTOS en geen mutexen - ze heeft alleen een `u8g2_t*`-aanwijzer nodig en tekent pixels. Threadveiligheid en weergave-I/O worden afgehandeld door de [displayservice](/ossm/software/display/display-service).
 
-Deze scheiding betekent dat de bibliotheek op native (x86) kan draaien voor geautomatiseerd visueel testen zonder ESP32.
+Deze scheiding betekent dat de bibliotheek native op x86 kan draaien voor geautomatiseerd visueel testen zonder ESP32.
 
 **Afhankelijkheden:** U8g2, QRCode
 
 **Bron:** `Software/lib/ui/src/`
 
-## Tekstpagina
+## TextPage
 
-`TextPage` is de primaire structuur voor inhoudgestuurde schermen. Het omvat helppagina's, foutschermen, updatestatus, WiFi-installatie, koppelen - alles dat voornamelijk uit tekst bestaat met optionele QR-codes.
+`TextPage` is de primaire structuur voor inhoudgestuurde schermen. Ze omvat helppagina's, foutschermen, updatestatus, WiFi-configuratie, koppelen - alles wat voornamelijk uit tekst bestaat met optionele QR-codes.
 
 ```cpp
 struct TextPage {
@@ -36,25 +36,25 @@ Alle velden zijn optioneel. Stel alleen in wat u nodig heeft.
 | Veld | Type | Doel |
 |---|---|---|
 | `title` | `const char*` | Vetgedrukte tekst bovenaan, met een scheidingslijn eronder |
-| `subtitle` | `const char*` | Middelgrote of vetgedrukte tekst onder de titel; automatisch splitsen als het te breed is |
-| `body` | `const char*` | Woordomvattende tekst; ondersteunt `\n` regeleinden |
+| `subtitle` | `const char*` | Middelgrote of vetgedrukte tekst onder de titel; wordt automatisch gesplitst als deze te breed is |
+| `body` | `const char*` | Tekst met automatische regelafbreking; ondersteunt `\n` als regeleinde |
 | `bottomText` | `const char*` | Vastgemaakt aan de onderkant van het scherm (y=62) |
 | `qrUrl` | `const char*` | QR-code rechtsonder weergegeven; beperkt de tekstbreedte |
 | `qrVersion` | `uint8_t` | QR-versie (standaard 3) |
 | `qrScale` | `int` | QR-pixelschaal (standaard 2) |
-| `centerBody` | `bool` | Middentekst uitlijnen |
-| `scrollPercent` | `int` | Scroll-indicator weergeven (0–100); -1 om te verbergen |
+| `centerBody` | `bool` | De hoofdtekst centreren |
+| `scrollPercent` | `int` | Scrollindicator weergeven (0–100); -1 om te verbergen |
 
-### Bestelling weergeven
+### Rendervolgorde
 
 `drawTextPage()` rendert in deze volgorde:
 
 1. Het volledige scherm wissen (koptekst + pagina + voettekst)
 2. **QR-code** — rechterbenedenhoek, verkleint de beschikbare tekstbreedte
 3. **Titel** — vetgedrukt lettertype, gevolgd door een horizontale scheidingslijn
-4. **Ondertitel** — probeert eerst het medium lettertype; valt terug naar vet; splitst zich over twee lijnen als het nog te breed is
-5. **Body** — omwikkeld met `drawWrappedText()` als er een titel aanwezig is; gecentreerde titelstijl (`drawStr::title`) als body het enige veld is
-6. **Onderste tekst** — vastgesteld op y=62
+4. **Ondertitel** — probeert eerst het medium lettertype; valt terug naar vet; wordt over twee regels gesplitst als deze nog te breed is
+5. **Hoofdtekst** — met automatische regelafbreking via `drawWrappedText()` als er een titel aanwezig is; gecentreerde titelstijl (`drawStr::title`) als de hoofdtekst het enige veld is
+6. **Onderste tekst** — vast op y=62
 7. **Scrollindicator** — schuifbalk aan de rechterkant als `scrollPercent >= 0`
 
 ### Gebruik
@@ -73,18 +73,18 @@ ui::drawTextPage(&u8g2, page);
 
 ## Voorgedefinieerde pagina's
 
-`TextPages.h` definieert statische `TextPage`-instanties in de `ui::pages`-naamruimte. Deze referentiereeksen van `Strings.h`:
+`TextPages.h` definieert statische `TextPage`-instanties in de `ui::pages`-naamruimte. Deze verwijzen naar tekenreeksen uit `Strings.h`:
 
 | Pagina | Gebruikte velden |
 |---|---|
-| `helpPage` | titel, body, bottomText, qrUrl |
-| `updateCheckingPage` | lichaam |
+| `helpPage` | title, body, bottomText, qrUrl |
+| `updateCheckingPage` | body |
 | `noUpdatePage` | body, bottomText |
-| `updatingPage` | titel, lichaam |
-| `errorPage` | titel |
-| `wifiDisconnectedPage` | titel, body, bottomText, qrUrl |
-| `wifiConnectedPage` | titel, hoofdtekst, onderste tekst |
-| `pairingPage` | titel, lichaam |
+| `updatingPage` | title, body |
+| `errorPage` | title |
+| `wifiDisconnectedPage` | title, body, bottomText, qrUrl |
+| `wifiConnectedPage` | title, body, bottomText |
+| `pairingPage` | title, body |
 
 Voorbeelddefinitie:
 
@@ -97,16 +97,16 @@ static const TextPage helpPage = {
 };
 ```
 
-## Snaren
+## Tekenreeksen
 
-Alle UI-tekenreeksen bevinden zich in `Strings.h` onder de naamruimte `ui::strings`. Ze worden in flash opgeslagen met `PROGMEM`:
+Alle UI-tekenreeksen bevinden zich in `Strings.h` onder de naamruimte `ui::strings`. Ze worden met `PROGMEM` in flash opgeslagen:
 
 ```cpp
 static const char helpTitle[] PROGMEM = "Get Help";
 static const char helpBody[] PROGMEM = "On Discord,\nor GitHub";
 ```
 
-`Progmem.h` definieert `PROGMEM` als een no-op op niet-Arduino-platforms, dus strings compileren op zowel ESP32 als native testbuilds.
+`Progmem.h` definieert `PROGMEM` als een no-op op niet-Arduino-platforms, zodat tekenreeksen zowel op ESP32 als in native testbuilds worden gecompileerd.
 
 ### Categorieën
 
@@ -115,7 +115,7 @@ static const char helpBody[] PROGMEM = "On Discord,\nor GitHub";
 | Branding | `researchAndDesire`, `kinkyMakers` |
 | Algemene gebruikersinterface | `error`, `homing`, `idle`, `restart`, `settings`, `skip` |
 | Menu / modi | `simplePenetration`, `strokeEngine`, `streaming`, `pairing`, `update`, `wifi` |
-| Speelbediening | `speed`, `stroke`, `sensation`, `depth`, `buffer`, `accel`, `max` |
+| Bewegingsbediening | `speed`, `stroke`, `sensation`, `depth`, `buffer`, `accel`, `max` |
 | Waarschuwingen | `speedWarning`, `homingTookTooLong`, `strokeTooShort` |
 | Hulp | `helpTitle`, `helpBody`, `helpBottom`, `helpQr` |
 | Update | `updateChecking`, `noUpdateBody`, `updatingTitle`, `updatingBody` |
@@ -125,7 +125,7 @@ static const char helpBody[] PROGMEM = "On Discord,\nor GitHub";
 
 ### Patroonarrays
 
-Namen en beschrijvingen van slagmotorpatronen zijn geïndexeerde arrays:
+Namen en beschrijvingen van Stroke Engine-patronen zijn geïndexeerde arrays:
 
 ```cpp
 static const char* const strokeEngineNames[7] = {
@@ -143,7 +143,7 @@ static const char* const strokeEngineDescriptions[7] = {
 
 ### Menu-items
 
-`MenuItems.h` wijst `Menu::`-opsommingswaarden toe om tekenreeksen weer te geven:
+`MenuItems.h` wijst de `Menu::`-enumwaarden toe aan weergavetekenreeksen:
 
 ```cpp
 static const char* menuStrings[Menu::NUM_OPTIONS] = {
@@ -158,7 +158,7 @@ static const char* menuStrings[Menu::NUM_OPTIONS] = {
 
 ### Pictogrammen (lettertypeglyphs)
 
-Statuspictogrammen gebruiken het pictogramlettertype **Siji**. Glyphs worden gedefinieerd in `DisplayConstants.h`:
+Statuspictogrammen gebruiken het pictogramlettertype **Siji**. Glyphen worden gedefinieerd in `DisplayConstants.h`:
 
 ```cpp
 namespace IconGlyph {
@@ -172,13 +172,13 @@ namespace IconGlyph {
 }
 ```
 
-`drawHeaderIcons()` geeft de WiFi- en BLE-status weer in de rechterbovenhoek van het scherm. Foutstatussen leggen extra pixels (uitroeptekens) op de basisglyph.
+`drawHeaderIcons()` geeft de WiFi- en BLE-status weer in de rechterbovenhoek van het scherm. Foutstatussen leggen extra pixels (uitroeptekens) over het basispictogram heen.
 
 ### Logo's (XBM-bitmaps)
 
 Logo's zijn `PROGMEM` XBM byte-arrays in `Logos.h`:
 
-- `RDLogo` — Onderzoek en verlangen, 57x50 pixels
+- `RDLogo` — Research & Desire, 57x50 pixels
 - `KMLogo` — Kinky Makers, 50x50 pixels
 
 Ze worden getekend via de `LogoData`-structuur en `drawLogo()`:
@@ -191,9 +191,9 @@ struct LogoData {
 };
 ```
 
-### Hallo animatie
+### Hello-animatie
 
-`HelloAnimation.h` bevat vooraf berekende Y-positieframes voor de "OSSM" opstartanimatie. Elk frame specificeert Y-offsets per letter:
+`HelloAnimation.h` bevat frames met vooraf berekende Y-posities voor de "OSSM"-opstartanimatie. Elk frame specificeert Y-offsets per letter:
 
 ```cpp
 struct HelloFrame {
@@ -211,17 +211,17 @@ De volledige weergave-API (`ui.h`):
 |---|---|
 | `drawTextPage()` | Render een `TextPage`-structuur |
 | `drawMenu()` | Scrollbaar menu met selectiemarkering |
-| `drawPlayControls()` | Snelheids-/slag-/sensatiebalken voor speelmodi |
-| `drawPreflight()` | Veiligheidscontrole vóór het spelen (snelheidsknop op nul) |
-| `drawHeaderIcons()` | WiFi + BLE-statuspictogrammen |
+| `drawPlayControls()` | Snelheids-/slag-/sensatiebalken voor bedieningsmodi |
+| `drawPreflight()` | Veiligheidscontrole vóór beweging (snelheidsknop op nul) |
+| `drawHeaderIcons()` | WiFi- en BLE-statuspictogrammen |
 | `drawQR()` | Op zichzelf staande QR-code |
-| `drawHelloFrame()` | Enkelvoudig opstartanimatieframe |
+| `drawHelloFrame()` | Eén frame van de opstartanimatie |
 | `drawLogo()` | XBM-logo met titel |
 
 Helpernaamruimten in `DrawExtensions.h`:
 
 - `drawStr::centered()` — horizontaal gecentreerde tekst
-- `drawStr::multiLine()` - tekstomwikkelde tekst van meerdere regels met UTF-8-ondersteuning
+- `drawStr::multiLine()` — tekst met meerdere regels en automatische regelafbreking, met UTF-8-ondersteuning
 - `drawStr::title()` — vetgedrukte, gecentreerde tekst op een vaste positie
 - `drawShape::scroll()` — schuifbalkindicator
 - `drawShape::settingBar()` — gelabelde verticale balk met vulniveau
@@ -243,11 +243,11 @@ ImageMagick (`magick`) moet worden geïnstalleerd voor PNG-conversie. Zonder dit
 
 ### Hoe het werkt
 
-1. Tests creëren een U8g2 SSD1306 128x64-display met alleen software (geen hardware, geen I2C)
+1. Tests creëren een volledig softwarematig U8g2 SSD1306 128x64-display (geen hardware, no-op-I2C)
 2. Elke test roept `ui::draw*()`-functies op om in de buffer te renderen
 3. `savePBM()` schrijft de buffer als een PBM P4-bitmap
 4. Nadat alle tests zijn voltooid, converteert ImageMagick PBM naar PNG (omgekeerde kleuren, schaal van 400%)
-5. Hallo-animatieframes worden in een GIF gestikt
+5. Hello-animatieframes worden samengevoegd tot een GIF
 
 ### Uitvoerstructuur
 
@@ -275,11 +275,11 @@ test/test_display/_output/
 
 | Testbestand | Wat het omvat |
 |---|---|
-| `test_textpage.cpp` | TextPage-veldcombinaties, stresstests, QR, ondertiteloverloop, body-indeling |
-| `test_pages.cpp` | Alle vooraf gedefinieerde pagina's, beschrijvingen van slagmotorpatronen |
-| `test_scroll.cpp` | Schuifbalk bij grens- en rand-case-waarden |
+| `test_textpage.cpp` | TextPage-veldcombinaties, stresstests, QR, ondertiteloverloop, indeling van de hoofdtekst |
+| `test_pages.cpp` | Alle vooraf gedefinieerde pagina's, beschrijvingen van Stroke Engine-patronen |
+| `test_scroll.cpp` | Schuifbalk bij grenswaarden en randgevallen |
 | `test_header_icons.cpp` | Alle 20 WiFi × BLE-statuscombinaties |
 | `test_logos.cpp` | RD-logo, KM-logo |
-| `test_hello.cpp` | Alle hallo animatieframes, GIF-generatie |
-| `test_menu.cpp` | Menu met verschillende itemtellingen, lange tekst, inwikkeling |
-| `test_play_controls.cpp` | Preflight, eenvoudige/slagmotor/streaming afspeelbediening |
+| `test_hello.cpp` | Alle frames van de Hello-animatie, GIF-generatie |
+| `test_menu.cpp` | Menu met verschillende aantallen items, lange tekst en regelafbreking |
+| `test_play_controls.cpp` | Bediening voor Preflight, Simple Penetration, Stroke Engine en Streaming |

@@ -3,27 +3,27 @@ title: "PlatformIO-installatie"
 description: "Stel PlatformIO in VS Code in om OSSM-firmware betrouwbaar te compileren en te uploaden"
 ---
 
-OSSM is gebouwd met PlatformIO bovenop VS Code. Als je van de Arduino IDE komt, kan de transitie er in eerste instantie onbekend uitzien, maar je krijgt wel snellere builds, beter afhankelijkheidsbeheer en een consistente opzet voor alle bijdragers.
+OSSM wordt met PlatformIO in VS Code gebouwd. Als u van de Arduino IDE komt, kan de overgang er in eerste instantie onbekend uitzien, maar u krijgt wel snellere builds, beter afhankelijkheidsbeheer en een consistente opzet voor alle bijdragers.
 
 <Tip>
-PlatformIO beheert bibliotheken, toolchains en bouwomgevingen voor u. Eerdere OSSM-releases konden worden aangepast aan Arduino, maar het project is die aanpak ontgroeid. Learning PlatformIO kost minder tijd dan het opnieuw verpakken van OSSM voor Arduino bij elke release.
+PlatformIO beheert bibliotheken, toolchains en bouwomgevingen voor u. Eerdere OSSM-releases konden worden aangepast aan Arduino, maar het project is die aanpak ontgroeid. PlatformIO leren kost minder tijd dan OSSM voor Arduino opnieuw aanpassen bij elke release.
 </Tip>
 
 ## Waarom PlatformIO?
 
 - Meer tijd voor functies – minder tijd voor het worstelen met afhankelijkheden
-- Gemakkelijkere samenwerking – consistente ontwikkelomgeving voor elke bijdrager
+- Gemakkelijkere samenwerking – consistente ontwikkelomgeving voor alle bijdragers
 - Automatische afhankelijkheidsresolutie: bibliotheken worden opgehaald en vastgezet voor reproduceerbare builds
 - Code-intelligentie: automatisch aanvullen, linting en inline foutdetectie
 
 ## Vereisten
 
-- VS-code geïnstalleerd
-- USB-datakabel voor uw bord (alleen oplaadbare kabels kunnen niet worden geüpload)
-- Kaartstuurprogramma's geïnstalleerd indien vereist door uw besturingssysteem (bijv. CP210x of CH340)
+- VS Code geïnstalleerd
+- USB-datakabel voor uw board (kabels die alleen kunnen opladen werken niet voor uploads)
+- Boarddrivers geïnstalleerd indien vereist door uw besturingssysteem (bijv. CP210x of CH340)
 
 <Note>
-Het referentie OSSM-bord maakt gebruik van een ingebouwde <strong>Espressif ESP32 Dev Module</strong>.
+Het referentie-OSSM-board maakt gebruik van een ingebouwde <strong>Espressif ESP32 Dev Module</strong>.
 </Note>
 
 ## Installatie
@@ -33,7 +33,7 @@ Het referentie OSSM-bord maakt gebruik van een ingebouwde <strong>Espressif ESP3
 Installeer VS Code en voeg vervolgens de extensie "PlatformIO IDE" toe vanuit de VS Code Marketplace. Start na de installatie VS Code opnieuw op om PlatformIO te activeren.
 
 <Check>
-Je zou het PlatformIO-pictogram met een buitenaards hoofd in de activiteitenbalk aan de linkerkant moeten zien.
+U zou het PlatformIO-pictogram met een alienhoofd in de Activity Bar aan de linkerkant moeten zien.
 </Check>
 </Step>
 
@@ -53,7 +53,7 @@ Klik op het PlatformIO-pictogram om PlatformIO Home te openen.
 Selecteer vanuit PlatformIO Home "Open Project" en kies de OSSM-map die `platformio.ini` (kleine letters) bevat.
 
 <Frame>
-<img src="./_images/156352091-867148c0-e9bd-47fa-a4e9-7c99c8fce5b1.webp" alt="Open het Projectdialoogvenster in PlatformIO" />
+<img src="./_images/156352091-867148c0-e9bd-47fa-a4e9-7c99c8fce5b1.webp" alt="Dialoogvenster Open Project in PlatformIO" />
 </Frame>
 
 <Frame>
@@ -61,12 +61,12 @@ Selecteer vanuit PlatformIO Home "Open Project" en kies de OSSM-map die `platfor
 </Frame>
 
 <Check>
-De Verkenner zou `platformio.ini`, een `src/`-map en een `lib/`-map moeten tonen.
+De Explorer zou `platformio.ini`, een `src/`-map en een `lib/`-map moeten tonen.
 </Check>
 </Step>
 
 <Step title="Selecteer de juiste omgeving (indien van toepassing)">
-Als het project meerdere omgevingen in `platformio.ini` definieert (bijvoorbeeld verschillende borden of bouwopties), gebruik dan de omgevingskiezer in de VS Code Statusbalk (meestal gelabeld met de actieve omgeving) om degene te kiezen die bij jouw bord past.
+Als het project meerdere omgevingen in `platformio.ini` definieert (bijvoorbeeld verschillende boards of buildopties), gebruik dan de omgevingskiezer in de VS Code Status Bar (meestal gelabeld met de actieve omgeving) om de omgeving te kiezen die bij uw board past.
 
 <Note>
 Als er maar één omgeving is, selecteert PlatformIO deze automatisch.
@@ -82,14 +82,14 @@ Open `src/main.cpp` om de firmwarebron te bekijken.
 </Step>
 
 <Step title="Bouw en upload de firmware">
-Gebruik het pictogram ✓ (Build) om te compileren en het pictogram → (Uploaden) om het bord te laten knipperen. Deze bedieningselementen bevinden zich in de statusbalk onderaan VS Code.
+Gebruik het pictogram ✓ (Build) om te compileren en het pictogram → (Upload) om de firmware naar het board te flashen. Deze bedieningselementen bevinden zich in de Status Bar onderaan VS Code.
 
 <Frame>
 <img src="./_images/156352700-12fad91c-a8d2-48fa-97cc-ee088d0ff219.webp" alt="Compileer- en uploadknoppen in de statusbalk" />
 </Frame>
 
-- Bouw eerst om fouten lokaal op te sporen, of upload direct om in één stap te compileren en te flashen.
-- Zorg ervoor dat uw bord is aangesloten en dat de juiste seriële poort is geselecteerd.
+- Voer eerst een build uit om fouten lokaal op te sporen, of upload direct om in één stap te compileren en te flashen.
+- Zorg ervoor dat uw board is aangesloten en dat de juiste seriële poort is geselecteerd.
 
 <Check>
 Een succesvolle build eindigt met `SUCCESS` in de terminal. Bij een succesvolle upload wordt `Hash of data verified` of een soortgelijke bevestiging van de ESP32-uploader weergegeven.
@@ -97,21 +97,21 @@ Een succesvolle build eindigt met `SUCCESS` in de terminal. Bij een succesvolle 
 </Step>
 </Steps>
 
-## Veel voorkomende taken
+## Veelvoorkomende taken
 
-- Selecteer seriële poort: PlatformIO → Snelle toegang → "Selecteer seriële poort".
-- Seriële uitvoer bewaken: Klik op het stekkerpictogram (Monitor) in de statusbalk of voer `PlatformIO: Monitor` uit vanuit het opdrachtenpalet.
-- Schone build: voer `PlatformIO: Clean` uit om gecompileerde artefacten te verwijderen voordat u het opnieuw opbouwt.
+- Seriële poort selecteren: PlatformIO → Quick Access → "Select Serial Port".
+- Seriële uitvoer bewaken: klik op het stekkerpictogram (Monitor) in de Status Bar of voer `PlatformIO: Monitor` uit vanuit de Command Palette.
+- Build opschonen: voer `PlatformIO: Clean` uit om gecompileerde artefacten te verwijderen voordat u opnieuw bouwt.
 
 ## Problemen oplossen
 
 <AccordionGroup>
-<Accordion title="Uploaden mislukt of bord niet gedetecteerd">
-De meest voorkomende oorzaken zijn een onjuiste configuratie van de seriële poort of kaart.
+<Accordion title="Uploaden mislukt of board niet gedetecteerd">
+De meest voorkomende oorzaken zijn een onjuiste configuratie van de seriële poort of het board.
 
 ### Controleer uw seriële poort
 
-In Windows verschijnt het bord als `COMx`. Op macOS/Linux verschijnt het onder `/dev/tty.*` of `/dev/cu.*`.
+In Windows verschijnt het board als `COMx`. Op macOS/Linux verschijnt het onder `/dev/tty.*` of `/dev/cu.*`.
 
 Stel de poort in PlatformIO in:
 
@@ -120,16 +120,16 @@ Stel de poort in PlatformIO in:
 </Frame>
 
 <Tip>
-Als u geen poort ziet, probeer dan een andere USB-kabel, een andere USB-poort of installeer het juiste USB-naar-UART-stuurprogramma voor uw bord.
+Als u geen poort ziet, probeer dan een andere USB-kabel, een andere USB-poort of installeer het juiste USB-naar-UART-stuurprogramma voor uw board.
 </Tip>
 
 <Note>
-Het referentie-OSSM-borddoel is **Espressif ESP32 Dev Module**. Zorg ervoor dat uw `platformio.ini`-omgeving de juiste `board`-instelling voor ESP32 gebruikt.
+Voor het OSSM-referentiebord is het boarddoel **Espressif ESP32 Dev Module**. Zorg ervoor dat uw `platformio.ini`-omgeving de juiste `board`-instelling voor ESP32 gebruikt.
 </Note>
 </Accordion>
 
 <Accordion title="Het bouwen mislukt vanwege bibliotheek- of platformupdates">
-Een update van een platform of bibliotheek kan ingrijpende wijzigingen introduceren. Pin versies in `platformio.ini` om een ​​bekende goede configuratie te herstellen.
+Een update van een platform of bibliotheek kan incompatibele wijzigingen introduceren. Zet versies in `platformio.ini` vast om een bekende goede configuratie te herstellen.
 
 ```ini platformio.ini
 ; Example: pin the Espressif32 platform
@@ -142,15 +142,15 @@ Controleer altijd de releaseopmerkingen van het project voor de aanbevolen platf
 </Accordion>
 
 <Accordion title="Seriële monitor toont onzin">
-Dit duidt meestal op een mismatch in de baudrate.
+Dit duidt meestal op een verschil in baudrate.
 
 - Controleer `monitor_speed` in `platformio.ini` (bijvoorbeeld `115200`)
 - Zorg ervoor dat de firmware en de seriële monitor dezelfde baudsnelheid gebruiken
 </Accordion>
 
-<Accordion title="Vastgelopen bij het verbinden... tijdens het uploaden">
-- Houd de BOOT/EN-knoppen van het bord ingedrukt of tik erop, zoals vereist door uw ESP32-module
-- Druk op reset nadat het uploaden is voltooid als het bord niet automatisch opnieuw opstart
+<Accordion title="Vastgelopen bij ‘connecting…’ tijdens het uploaden">
+- Houd de BOOT/EN-knoppen van het board ingedrukt of tik erop, zoals vereist door uw ESP32-module
+- Druk op reset nadat het uploaden is voltooid als het board niet automatisch opnieuw opstart
 - Ontkoppel andere apps die mogelijk dezelfde seriële poort gebruiken
 </Accordion>
 </AccordionGroup>

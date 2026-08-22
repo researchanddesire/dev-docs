@@ -1,22 +1,22 @@
 ---
-title: „OTA-Update-System“
-description: „Technische Dokumentation für die RADR Over-the-Air-Update-Architektur“
+title: "OTA-Update-System"
+description: "Technische Dokumentation zur Over-the-Air-Update-Architektur von RADR"
 ---
 
-Dieses Dokument beschreibt das Over-the-Air (OTA)-Update-System, das von Research And Desire Wireless Remote (RADR) verwendet wird, einschließlich der Update-Kette, des Zustandsmaschinenflusses und der zu aktualisierenden Komponenten.
+Dieses Dokument beschreibt das Over-the-Air-(OTA-)Update-System des Research And Desire Wireless Remote (RADR), einschließlich der Update-Kette, des Ablaufs der Zustandsmaschine und der zu aktualisierenden Komponenten.
 
 ## Überblick
 
 RADR verwendet ein zweiteiliges OTA-Update-System:
 
-| Komponente | Beschreibung | Binär |
+| Komponente | Beschreibung | Binärdatei |
 |-----------|-------------|--------|
 | **Firmware** | ESP32-Anwendungsbinärdatei | `firmware.bin` |
 | **Dateisystem** | LittleFS-Partition mit Geräteregistrierung und Protokollspezifikationen | `littlefs.bin` |
 
 Das Dateisystem-Update ist besonders wichtig für die Geräteunterstützung – es enthält die Buttplug.io-Registrierung, die Bluetooth-Dienst-UUIDs den Gerätekonfigurationen zuordnet. Dies ermöglicht das Hinzufügen von Unterstützung für neue Geräte, ohne dass Firmware-Änderungen erforderlich sind.
 
-## Architektur aktualisieren
+## OTA-Update-Architektur
 
 ```mermaid
 flowchart TB
@@ -44,13 +44,13 @@ Updates werden von Supabase Storage bereitgestellt. Die Server-URL ist in `platf
 UPDATE_SERVER_URL="https://acjajruwevyyatztbkdf.supabase.co/storage/v1/object/public/radr-firmware"
 ```
 
-Binäre URLs folgen dem Muster:
+Binärdatei-URLs folgen diesem Muster:
 - Firmware: `{UPDATE_SERVER_URL}/master/firmware.bin`
 - Dateisystem: `{UPDATE_SERVER_URL}/master/littlefs.bin`
 
-## Zustandsmaschinenfluss
+## Ablauf der Zustandsmaschine
 
-Aktualisierungen werden von der RADR-Zustandsmaschine verwaltet. Der Aktualisierungsfluss wird über das Menü „Einstellungen“ ausgelöst.
+Aktualisierungen werden von der RADR-Zustandsmaschine verwaltet. Der Update-Ablauf wird über das Menü **Settings** ausgelöst.
 
 ```mermaid
 flowchart TD
@@ -70,15 +70,15 @@ flowchart TD
     UpdateDone --> Restart
 ```
 
-### Staatsübergänge
+### Zustandsübergänge
 
-| Aus | Zu | Zustand |
+| Von | Nach | Bedingung |
 |------|-----|-----------|
-| `settings_menu` | `update` | Der Benutzer wählt „Gerät aktualisieren“ + WLAN-Verbindung |
-| `settings_menu` | `update.wifi` | Der Benutzer wählt „Gerät aktualisieren“ + WLAN nicht verbunden |
-| `update.wifi` | `update` | WLAN-Verbindung hergestellt |
-| `update` | `update.filesystem` | `hasFilesystemUpdate` Guard gibt true zurück |
-| `update` | `update.software` | `hasSoftwareUpdate` Guard gibt „true“ zurück (keine Dateisystemaktualisierung) |
+| `settings_menu` | `update` | Der Benutzer wählt "Update Device" + WiFi verbunden |
+| `settings_menu` | `update.wifi` | Der Benutzer wählt "Update Device" + WiFi nicht verbunden |
+| `update.wifi` | `update` | WiFi-Verbindung hergestellt |
+| `update` | `update.filesystem` | Der `hasFilesystemUpdate`-Guard gibt true zurück |
+| `update` | `update.software` | Der `hasSoftwareUpdate`-Guard gibt true zurück (kein Dateisystem-Update) |
 | `update` | `update.done` | Keine Updates verfügbar |
 | `update.filesystem` | `update.software` | Dateisystem-Update abgeschlossen + Software-Update verfügbar |
 | `update.filesystem` | `restart` | Dateisystem-Update abgeschlossen, kein Software-Update |
@@ -89,7 +89,7 @@ flowchart TD
 
 ### Firmware-Update
 
-Das Firmware-Update ersetzt die ESP32-Anwendungsbinärdatei. Dazu gehört:
+Das Firmware-Update ersetzt die ESP32-Anwendungsbinärdatei. Dazu gehören:
 
 - Kernanwendungslogik
 - UI- und Anzeigecode
@@ -150,16 +150,16 @@ flowchart LR
     Init --> NewDevices[New devices supported]
 ```
 
-Die Registrierung wird beim Booten von `initRegistry()` in `src/devices/registry.cpp` geladen:
+Die Registrierung wird beim Gerätestart durch `initRegistry()` in `src/devices/registry.cpp` geladen:
 
-1. Hartcodierte Geräte werden zuerst registriert (z. B. OSSM)
+1. Fest codierte Geräte werden zuerst registriert (z. B. OSSM)
 2. `/registry.json` wird von LittleFS gelesen
 3. Jede Dienst-UUID ist einem `ButtplugIODeviceFactory` zugeordnet
 4. Protokollspezifikationen werden bei Bedarf geladen, wenn Geräte erkannt werden
 
-## Update-Verfügbarkeit
+## Verfügbarkeit von Updates
 
-Die Update-Verfügbarkeit wird durch Guard-Funktionen in `src/state/guards.hpp` bestimmt:
+Die Verfügbarkeit von Updates wird durch Guard-Funktionen in `src/state/guards.hpp` bestimmt:
 
 ```cpp
 bool hasFilesystemUpdate(const State &state, const Event &event) {
@@ -171,28 +171,28 @@ bool hasSoftwareUpdate(const State &state, const Event &event) {
 }
 ```
 
-Diese Flags werden gesteuert von:
+Diese Flags werden folgendermaßen gesetzt:
 
-| Flagge | Legen Sie fest, wann |
+| Flag | Gesetzt, wenn |
 |------|----------|
-| `isSoftwareUpdateAvailable` | `FORCE_UPDATE`-Kompilierungsflag oder Server zeigt Aktualisierung an |
-| `isFilesystemUpdateAvailable` | `FORCE_UPDATE`-Kompilierungsflag oder Server zeigt Aktualisierung an |
+| `isSoftwareUpdateAvailable` | `FORCE_UPDATE`-Kompilierungsflag oder der Server zeigt ein Update an |
+| `isFilesystemUpdateAvailable` | `FORCE_UPDATE`-Kompilierungsflag oder der Server zeigt ein Update an |
 
 <Warning>
 Die aktuelle Implementierung verfügt über ein TODO für die automatische Update-Überprüfung. Derzeit werden Aktualisierungen manuell ausgelöst und die Verfügbarkeit muss über Kompilierungsflags oder externe Mechanismen festgelegt werden.
 </Warning>
 
-## Schlüsselquelldateien
+## Wichtige Quelldateien
 
 | Datei | Zweck |
 |------|---------|
-| `src/tasks/update.cpp` | Aufgabenimplementierungen aktualisieren (`updateSoftwareTask`, `updateFilesystemTask`) |
-| `src/tasks/update.h` | Aktualisieren Sie Aufgabendeklarationen und Verfügbarkeitsflags |
+| `src/tasks/update.cpp` | Implementierungen der Update-Tasks (`updateSoftwareTask`, `updateFilesystemTask`) |
+| `src/tasks/update.h` | Deklarationen der Update-Tasks und Verfügbarkeitsflags |
 | `src/state/machine.h` | Zustandsmaschinendefinition mit Aktualisierungszuständen |
-| `src/state/guards.hpp` | Schutzfunktionen für Update-Verfügbarkeit |
-| `src/devices/registry.cpp` | Registrierungsinitialisierung von LittleFS |
-| `data/registry.json` | Zuordnungen von Dienst-UUID zu Protokollspezifikationen |
-| `data/protocols/*.json` | Technische Daten des Buttplug.io v4-Geräts |
+| `src/state/guards.hpp` | Guard-Funktionen für die Verfügbarkeit von Updates |
+| `src/devices/registry.cpp` | Registrierungsinitialisierung aus LittleFS |
+| `data/registry.json` | Zuordnungen von Dienst-UUIDs zu Protokollspezifikationen |
+| `data/protocols/*.json` | Buttplug.io-v4-Gerätespezifikationen |
 
 ## Entwicklungshinweise
 
@@ -209,7 +209,7 @@ Dadurch werden sowohl `isSoftwareUpdateAvailable` als auch `isFilesystemUpdateAv
 
 ### Lokale Dateisystem-Updates
 
-Wenn Sie lokal entwickeln, verwenden Sie die Funktion „Dateisystem hochladen“ von PlatformIO:
+Wenn Sie lokal entwickeln, verwenden Sie die Funktion „Upload Filesystem“ von PlatformIO:
 
 ```bash
 pio run --target uploadfs
@@ -218,7 +218,7 @@ pio run --target uploadfs
 Dadurch wird der Inhalt des Verzeichnisses `data/` auf die LittleFS-Partition hochgeladen.
 
 <Warning>
-„Dateisystem hochladen“ löscht die vorhandene LittleFS-Partition vor dem Schreiben. Alle Laufzeitänderungen gehen verloren.
+"Upload Filesystem" löscht die vorhandene LittleFS-Partition vor dem Schreiben. Alle Laufzeitänderungen gehen verloren.
 </Warning>
 
 ## Verwandte Dokumentation

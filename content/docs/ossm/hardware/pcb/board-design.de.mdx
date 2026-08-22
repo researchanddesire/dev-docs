@@ -1,128 +1,128 @@
 ---
 title: "Platinendesign und Verkabelung"
-description: "Verdrahtungspläne und GPIO-Pinbelegung für die offizielle OSSM-Platine und alternative Konfigurationen"
+description: "Verdrahtungspläne und GPIO-Pinbelegungen für die offizielle OSSM-Platine und alternative Konfigurationen"
 ---
 
-In dieser Anleitung erfahren Sie, wie Sie die offizielle OSSM-Platine anschließen und alternative Konfigurationen mit einem ESP32, Pegelumschaltung und gängigen Motortreibern verkabeln.
+Diese Anleitung zeigt, wie Sie die offizielle OSSM-Platine anschließen und alternative Konfigurationen mit einem ESP32, Pegelwandlung und gängigen Motortreibern verdrahten.
 
 ## Voraussetzungen
 
-Bevor Sie beginnen, stellen Sie sicher, dass Sie Folgendes haben:
+Stellen Sie vor dem Beginn sicher, dass Sie Folgendes haben:
 
-- Ein ESP32-Entwicklungsboard (ESP32-DevKitC oder kompatibel)
-- Ein Motortreiber, der Schritt-/Richtungseingaben akzeptiert
-- Ein Netzteil, das auf Ihren Motor und Treiber abgestimmt ist
-- Grundlegende Werkzeuge: Abisolierzangen, kleiner Schraubendrehersatz, Multimeter
+- Ein ESP32-Entwicklungsboard (ESP32‑DevKitC oder kompatibel)
+- Einen Motortreiber, der Step-/Direction-Eingänge akzeptiert
+- Ein auf Motor und Treiber ausgelegtes Netzteil
+- Grundlegende Werkzeuge: Abisolierzange, kleiner Schraubendrehersatz, Multimeter
 
 <Note>
-Die meisten ESP32-Boards verwenden eine 3,3-V-Logik. Bei höheren Geschwindigkeiten kann es bei 5V-Logiktreibern zu fehlenden Schritten kommen. Verwenden Sie einen Pegelumsetzer, um Schritt/Richtung/Aktivierung für einen zuverlässigen Betrieb auf 5 V umzuwandeln.
+Die meisten ESP32-Boards verwenden eine 3,3-V-Logik. Bei höheren Geschwindigkeiten kann dies bei Treibern mit 5-V-Logik zu Schrittverlusten führen. Verwenden Sie einen Pegelwandler, um Step/Direction/Enable für einen zuverlässigen Betrieb auf 5 V umzusetzen.
 </Note>
 
 ### Prototyping-Komponenten (für kundenspezifische Verkabelung)
 
-Wenn Sie ohne die offizielle Platine verkabeln, benötigen Sie normalerweise:
+Wenn Sie ohne die offizielle Platine verdrahten, benötigen Sie normalerweise:
 
-- Logischer Pegelumsetzer (3,3 V → 5 V, 4+ Kanäle)
-- Lötfreies Steckbrett oder Protoboard
-- Dupont-Pullover (männlich↔männlich und männlich↔weiblich)
-- 5-V-Schiene für die High-Side des Level-Shifters (oft bei Ihrem Treiber oder einem separaten Regler erhältlich)
+- Logikpegelwandler (3,3 V → 5 V, mindestens 4 Kanäle)
+- Lötfreies Breadboard oder Proto-Board
+- Dupont-Jumper (male↔male und male↔female)
+- Eine 5-V-Schiene für die High-Side des Pegelwandlers (oft vom Treiber oder einem separaten Regler verfügbar)
 
 <Tip>
-Halten Sie die Signalverkabelung kurz und sauber. Verlegen Sie Schritt/Richtung/Freigabe vom Motor und den Stromkabeln weg, um Geräusche zu minimieren.
+Halten Sie die Signalverkabelung kurz und ordentlich. Verlegen Sie Step/Direction/Enable nicht in der Nähe von Motor- und Stromversorgungsleitungen, um Störungen zu minimieren.
 </Tip>
 
 ## Offizielle OSSM-Verkabelung
 
-Die Referenz-OSSM-Leiterplatte umfasst Pegelumschaltung und standardisierte Stiftleisten. Dies ist der empfohlene Ansatz für die meisten Builds.
+Die OSSM-Referenzplatine umfasst eine Pegelwandlung und standardisierte Anschlüsse. Dies ist für die meisten Aufbauten der empfohlene Ansatz.
 
-### Referenzplatinenlayout
+### Layout der Referenzplatine
 
 <Frame caption="OSSM-Referenzplatine (Version 1) – Vorderansicht mit Darstellung der Komponentenplatzierung">
-  <img src="./_images/150361448-80e9fdaf-4a8c-4054-a920-6eab9aa68678.webp" alt="OSSM-Referenzplatine der Version 1 mit ESP32-Sockel, Pegelwandlern und JST-Anschlüssen" />
+  <img src="./_images/150361448-80e9fdaf-4a8c-4054-a920-6eab9aa68678.webp" alt="OSSM-Referenzplatine Version 1 mit ESP32-Sockel, Pegelwandlern und JST-Anschlüssen" />
 </Frame>
 
-### Leiterplatten-Anschlussplan
+### Anschlussplan der Platine
 
 <Frame caption="Anschlussplan mit Motortreiber- und Peripherieanschlüssen">
-  <img src="./_images/150355658-2ab2c53f-8da0-41ce-ad61-cfe9965b9ab2.webp" alt="OSSM Leiterplatten-Anschlussplan mit beschrifteten Motortreiber-Ausgängen, Encoder-Eingängen und Leistungsanschlüssen" />
+  <img src="./_images/150355658-2ab2c53f-8da0-41ce-ad61-cfe9965b9ab2.webp" alt="OSSM-Anschlussplan der Platine mit beschriftetem Motortreiberausgang, Encodereingang und Stromversorgungsanschlüssen" />
 </Frame>
 
-### ESP32 GPIO-Pinbelegung (Standard)
+### ESP32-GPIO-Pinbelegung (Standard)
 
-Dies sind die Standard-Firmware-Zuordnungen für die OSSM-Leiterplatte:
+Dies sind die standardmäßigen Firmware-Zuordnungen für die OSSM-Platine:
 
 | Signal      | GPIO-Pin | Funktion                                      |
 |-------------|----------|-----------------------------------------------|
-| Schritt        | GPIO 14  | Schrittimpulsausgabe an Motortreiber             |
-| Richtung   | GPIO 27  | Richtungssignal an den Lokführer              |
-| Aktivieren      | GPIO 26  | Motortreiber aktivieren/deaktivieren                   |
-| Encoder A   | GPIO 36  | Quadratur-Encoder-Kanal A (nur Eingang)     |
-| Encoder B   | GPIO 39  | Quadratur-Encoder-Kanal B (nur Eingang)     |
+| Step        | GPIO 14  | Step-Impulsausgang zum Motortreiber           |
+| Direction   | GPIO 27  | Direction-Signal zum Motortreiber             |
+| Enable      | GPIO 26  | Motortreiber aktivieren/deaktivieren          |
+| Encoder A   | GPIO 36  | Quadratur-Encoderkanal A (nur Eingang)        |
+| Encoder B   | GPIO 39  | Quadratur-Encoderkanal B (nur Eingang)        |
 
-<Frame caption="ESP32 GPIO-Pinbelegung, die die Steuersignalführung zeigt">
-  <img src="./_images/152600401-80b986ea-6f5b-480d-ba74-5b5001079c1b.webp" alt="OSSM GPIO-Pinbelegungsdiagramm mit Schritt-, Richtungs- und Aktivierungspins auf ESP32" />
+<Frame caption="ESP32-GPIO-Pinbelegung mit der Führung der Steuersignale">
+  <img src="./_images/152600401-80b986ea-6f5b-480d-ba74-5b5001079c1b.webp" alt="OSSM-GPIO-Pinbelegungsdiagramm mit Step-, Direction- und Enable-Pins am ESP32" />
 </Frame>
 
-<Frame caption="JST-Header-Positionen mit Pin-Beschriftung zur einfachen Identifizierung">
-  <img src="./_images/226189433-db28dfc6-22ac-4fdb-8b45-afe0c3fa9a7b.webp" alt="Die Positionen der JST-Steckerleisten auf der OSSM-Platine zeigen Motorausgang, Encodereingang und Hilfsanschlüsse" />
+<Frame caption="Positionen der JST-Anschlüsse mit Pinbeschriftungen zur einfachen Identifizierung">
+  <img src="./_images/226189433-db28dfc6-22ac-4fdb-8b45-afe0c3fa9a7b.webp" alt="Positionen der JST-Anschlüsse auf der OSSM-Platine mit Motorausgang, Encodereingang und Zusatzanschlüssen" />
 </Frame>
 
 <Info>
-Bei Bedarf kann die Firmware die Pins neu zuordnen. Wenn Sie die Verkabelung ändern, aktualisieren Sie Ihre Firmware-Konfiguration entsprechend.
+Die Firmware kann die Pins bei Bedarf neu zuordnen. Wenn Sie die Verkabelung ändern, aktualisieren Sie die Firmware-Konfiguration entsprechend.
 </Info>
 
 ## Alternative Verkabelungskonfigurationen
 
 <Info>
-Die folgenden Setups sind validierte Integrationsmuster. Hardwarerevisionen können andere Pinbelegungen erfordern. Überprüfen Sie daher die entsprechenden Platinen-, Treiber- und Motorspezifikationen.
+Die folgenden Aufbauten sind validierte Integrationsmuster. Bei Hardware-Revisionen können andere Pinbelegungen erforderlich sein. Prüfen Sie daher die Spezifikationen der jeweiligen Platine, des Treibers und des Motors.
 </Info>
 
-### TB6600 Schrittmotortreiber
+### TB6600-Schrittmotortreiber
 
-Verwenden Sie dies, wenn Sie einen Schrittmotor mit einem externen Treiber im TB6600-Stil antreiben.
+Verwenden Sie diese Konfiguration, wenn Sie einen Schrittmotor mit einem externen Treiber im TB6600-Stil betreiben.
 
 <Steps>
-  <Step title="Motorleistung und Phasen anschließen">
-    Verdrahten Sie die Motorversorgung (üblicherweise 24 V) mit dem TB6600 DC+ und DC‑. Schließen Sie die Motorphasen gemäß dem Schaltplan des Motors an A+, A-, B+, B- an.
+  <Step title="Motorversorgung und Phasen anschließen">
+    Verdrahten Sie die Motorversorgung (üblicherweise 24 V) mit DC+ und DC‑ des TB6600. Schließen Sie die Motorphasen gemäß dem Verdrahtungsplan des Motors an A+, A‑, B+ und B‑ an.
 
     <Warning>
-    Schrittmotoren niemals im laufenden Betrieb anschließen. Trennen Sie die Stromversorgung, bevor Sie die Motorverkabelung ändern.
+    Schließen Sie Schrittmotoren niemals unter Spannung an. Trennen Sie die Stromversorgung, bevor Sie die Motorverkabelung ändern.
     </Warning>
   </Step>
-  <Step title="Kabelsteuersignale (über Levelshifter)">
-    Verbinden Sie ESP32-Signale über den 3,3V→5V-Pegelumsetzer mit den Treibereingängen:
+  <Step title="Steuersignale über den Pegelwandler verdrahten">
+    Verbinden Sie die ESP32-Signale über den 3,3-V→5-V-Pegelwandler mit den Treibereingängen:
 
-    - Schritt (GPIO 14) → PUL+
-    - Richtung (GPIO 27) → DIR+
-    - Aktivieren (GPIO 26, falls verwendet) → ENA+
-    - GND (ESP32/Levelshifter) → PUL‑, DIR‑, ENA‑
+    - Step (GPIO 14) → PUL+
+    - Direction (GPIO 27) → DIR+
+    - Enable (GPIO 26, falls verwendet) → ENA+
+    - GND (ESP32/Pegelwandler) → PUL‑, DIR‑, ENA‑
 
     <Check>
-    Alle Gründe sind zwischen ESP32, Levelshifter und Fahrer gleich.
+    ESP32, Pegelwandler und Treiber müssen eine gemeinsame Masse haben.
     </Check>
   </Step>
   <Step title="DIP-Schalter einstellen">
-    Konfigurieren Sie die Strombegrenzung passend zu Ihrem Motor und wählen Sie eine für Ihre Mechanik geeignete Mikroschritteinstellung. Beginnen Sie konservativ und nehmen Sie dann während des Tests eine Feinabstimmung vor.
+    Konfigurieren Sie die Strombegrenzung passend zu Ihrem Motor und wählen Sie eine für Ihre Mechanik geeignete Mikroschritteinstellung. Beginnen Sie vorsichtig und stimmen Sie die Einstellung während des Tests fein ab.
   </Step>
 </Steps>
 
-<Frame caption="Verdrahtungsplan für TB6600-Schrittmotortreiber mit OSSM-Controller">
-  <img src="./_images/159145946-a9960bba-c9bc-4717-b3b4-5b5c34b4a3d2.webp" alt="Anschlussdiagramm, das die Signalausgänge der Leiterplatte OSSM zeigt, die über einen Pegelumsetzer mit den Eingängen des Schrittmotortreibers TB6600 verdrahtet sind" />
+<Frame caption="Verdrahtungsplan für einen TB6600-Schrittmotortreiber mit OSSM-Controller">
+  <img src="./_images/159145946-a9960bba-c9bc-4717-b3b4-5b5c34b4a3d2.webp" alt="Anschlussplan mit OSSM-Platinensignalausgängen, die über einen Pegelwandler mit den Eingängen des TB6600-Schrittmotortreibers verbunden sind" />
 </Frame>
 
 ### Servomotor mit integriertem Treiber (iHSV57, 42AIM30 usw.)
 
-Viele integrierte Servos akzeptieren Schritt/Richtung/Aktivierung genau wie ein Schrittmotortreiber.
+Viele Servomotoren mit integriertem Treiber akzeptieren Step/Direction/Enable wie ein Schrittmotortreiber.
 
-<Frame caption="Verkabelungskonfiguration des Servomotors mit Schritt-/Richtungsschnittstelle">
-  <img src="./_images/783876cf-f5bf-4708-9b4f-bd89723713f9.webp" alt="Verdrahtungsplan für den Anschluss eines Servomotors mit geschlossenem Regelkreis an die OSSM-Steuerung über eine Schritt-/Richtungsschnittstelle" />
+<Frame caption="Verkabelung eines Servomotors mit Step-/Direction-Schnittstelle">
+  <img src="./_images/783876cf-f5bf-4708-9b4f-bd89723713f9.webp" alt="Verdrahtungsplan für den Anschluss eines Servomotors mit geschlossenem Regelkreis an den OSSM-Controller über eine Step-/Direction-Schnittstelle" />
 </Frame>
 
 <Tip>
-Einige integrierte Servos akzeptieren 3,3-V-Logik direkt; andere benötigen 5V. Schauen Sie in der Dokumentation Ihres Servos nach – möglicherweise können Sie den Levelshifter weglassen.
+Einige Servomotoren mit integriertem Treiber akzeptieren direkt eine 3,3-V-Logik, andere benötigen 5 V. Lesen Sie die Dokumentation Ihres Servomotors; möglicherweise können Sie den Pegelwandler weglassen.
 </Tip>
 
-### Zusätzliche Optionen für Schrittmotortreiber
+### Weitere Optionen für Schrittmotortreiber
 
 Weitere Designs und archivierte Schaltpläne finden Sie im Hardware-Archiv des Repositorys:
 
@@ -130,101 +130,101 @@ Weitere Designs und archivierte Schaltpläne finden Sie im Hardware-Archiv des R
 /ossm/hardware/PCB Files/Archive/
 ```
 
-## Best Practices für Stromversorgung und Erdung
+## Bewährte Verfahren für Stromversorgung und Erdung
 
-- Verwenden Sie eine Einpunkt-(Stern-)Erdung zwischen ESP32, Levelshifter und Fahrer
-- Halten Sie die Schritt-/Richtungs-/Aktivierungsleitungen kurz; Vermeiden Sie es, sie parallel zur Motorleistung zu betreiben
-- Verdrehen Sie jedes Motorphasenpaar (A+/A- und B+/B-), um EMI zu reduzieren
-- Sorgen Sie für eine Zugentlastung aller Anschlüsse, um intermittierende Fehler zu vermeiden
-- Bei langen Leitungen sollten Sie ein abgeschirmtes Kabel für Steuersignale in Betracht ziehen und die Abschirmung nur an einem Ende mit Gehäuse/Erde verbinden
+- Verwenden Sie eine einpunktige Sternmasse zwischen ESP32, Pegelwandler und Treiber.
+- Halten Sie Step-/Direction-/Enable-Leitungen kurz und vermeiden Sie eine parallele Führung zu den Motorversorgungsleitungen.
+- Verdrillen Sie jedes Motorphasenpaar (A+/A‑ und B+/B‑), um elektromagnetische Störungen zu reduzieren.
+- Sorgen Sie an allen Anschlüssen für eine Zugentlastung, um intermittierende Fehler zu vermeiden.
+- Verwenden Sie bei langen Leitungen ein abgeschirmtes Kabel für die Steuersignale und verbinden Sie die Abschirmung nur an einem Ende mit Gehäuse oder Erde.
 
-## Überprüfen Sie Ihre Verkabelung
+## Verkabelung überprüfen
 
 Führen Sie diese Prüfungen durch, bevor Sie den Motortreiber mit Strom versorgen.
 
 <Steps>
-  <Step title="Kontinuität und Pin-Zuordnung">
-    Verwenden Sie ein Multimeter, um zu überprüfen, ob jedes Signal vom richtigen ESP32-Pin zum Treibereingang gelangt.
+  <Step title="Durchgang und Pinbelegung">
+    Verwenden Sie ein Multimeter, um zu bestätigen, dass jedes Signal vom richtigen ESP32-Pin zum Treibereingang geführt wird.
 
     <Check>
-    Schritt, Richtung und Aktivierung zeigen jeweils Kontinuität von ESP32 → Levelshifter → Fahrer an.
+    Step, Direction und Enable müssen jeweils vom ESP32 über den Pegelwandler bis zum Treiber Durchgang zeigen.
     </Check>
   </Step>
-  <Step title="Isolierung zwischen Signalen und Strom">
-    Stellen Sie sicher, dass keine Kurzschlüsse zwischen benachbarten Signalleitungen oder zwischen Signal- und Stromschienen bestehen.
+  <Step title="Isolation zwischen Signalen und Stromversorgung">
+    Stellen Sie sicher, dass keine Kurzschlüsse zwischen benachbarten Signalleitungen oder zwischen einem Signal und einer Stromschiene vorhanden sind.
 
     <Check>
-    Kein Durchgang zwischen benachbarten Pins oder zwischen Signalen und DC+/DC‑.
+    Zwischen benachbarten Pins sowie zwischen Signalen und DC+/DC‑ darf kein Durchgang bestehen.
     </Check>
   </Step>
-  <Step title="Strompolarität und Spannung">
-    Überprüfen Sie die Polarität und Spannung der Stromversorgung an den Treiberklemmen, bevor Sie den Motor anschließen.
+  <Step title="Versorgungspolarität und Spannung">
+    Prüfen Sie Polarität und Spannung der Versorgung an den Treiberklemmen, bevor Sie den Motor anschließen.
 
     <Warning>
-    Eine Verpolung kann den Treiber sofort beschädigen. Überprüfen Sie die DC+- und DC-Ausrichtung noch einmal.
+    Verpolung kann den Treiber sofort beschädigen. Prüfen Sie die Ausrichtung von DC+ und DC‑ noch einmal.
     </Warning>
   </Step>
 </Steps>
 
 ## Checkliste für das erste Einschalten
 
-- Schalten Sie den Treiber bei abgeklemmtem Motor ein und vergewissern Sie sich, dass die Status-LEDs normal aussehen
-- Schließen Sie den Motor an und steuern Sie dann eine Bewegung mit sehr niedriger Geschwindigkeit an
-- Überprüfen Sie die Richtungsänderungen auf Befehl
-- Wenn Sie einen Encoder verwenden, stellen Sie sicher, dass sich die Zählwerte gleichmäßig in eine Richtung ändern und bei Richtungswechsel umkehren
+- Schalten Sie den Treiber bei getrenntem Motor ein und prüfen Sie, ob die Status-LEDs normal aussehen.
+- Schließen Sie den Motor an und geben Sie anschließend eine Bewegung mit sehr niedriger Geschwindigkeit vor.
+- Prüfen Sie, ob sich die Richtung auf Befehl ändert.
+- Wenn Sie einen Encoder verwenden, bestätigen Sie, dass sich die Zählwerte gleichmäßig in eine Richtung ändern und bei einem Richtungswechsel umkehren.
 
 <Check>
-Sie können Bewegungen mit niedriger Geschwindigkeit steuern, ohne Schritte zu verpassen, ohne Schwingungen oder Fahrerfehler.
+Sie können eine Bewegung mit niedriger Geschwindigkeit ausführen, ohne Schrittverluste, Schwingungen oder Treiberfehler.
 </Check>
 
 ## Fehlerbehebung
 
 <AccordionGroup>
-  <Accordion title="Der Motor verpasst bei hoher Geschwindigkeit Schritte">
-    Dies weist normalerweise auf eine Nichtübereinstimmung des Logikpegels oder eine schlechte Signalintegrität hin.
+  <Accordion title="Der Motor verliert bei hoher Geschwindigkeit Schritte">
+    Dies deutet normalerweise auf einen nicht passenden Logikpegel oder eine schlechte Signalintegrität hin.
 
-    - Der Levelshifter wird beidseitig mit Strom versorgt (3,3V und 5V)
-    - Die Erdung ist zwischen ESP32, Levelshifter und Fahrer gleich
-    - Die Signalkabel sind kurz und werden von der Motorstromversorgung entfernt verlegt
+    - Der Pegelwandler wird auf beiden Seiten mit Strom versorgt (3,3 V und 5 V).
+    - ESP32, Pegelwandler und Treiber haben eine gemeinsame Masse.
+    - Die Signalleitungen sind kurz und verlaufen nicht entlang der Motorversorgungsleitungen.
 
     <Tip>
-    Wenn Sie keinen Levelshifter verwenden, fügen Sie einen hinzu. Wenn ja, überprüfen Sie die 5-V-Versorgung an den High-Side-Pins.
+    Wenn Sie keinen Pegelwandler verwenden, fügen Sie einen hinzu. Wenn Sie einen verwenden, prüfen Sie die 5-V-Versorgung an den High-Side-Pins.
     </Tip>
   </Accordion>
 
-  <Accordion title="Motor reagiert nicht auf Befehle">
-    Der Fahrer empfängt möglicherweise keine gültigen Steuersignale.
+  <Accordion title="Der Motor reagiert nicht auf Befehle">
+    Möglicherweise empfängt der Treiber keine gültigen Steuersignale.
 
-    - Überprüfen Sie die Polarität des Aktivierungseingangs. Viele Treiber verwenden Active-Low-Enable
-    - Bestätigen Sie, dass die Schritt-/Richtungspins mit Ihrer Firmware-Konfiguration übereinstimmen
-    - Stellen Sie sicher, dass der Treiber über ausreichend Strom verfügt (überprüfen Sie die Status-LEDs).
+    - Prüfen Sie die Polarität des Enable-Eingangs; viele Treiber verwenden ein active-low Enable.
+    - Bestätigen Sie, dass die Step-/Direction-Pins mit Ihrer Firmware-Konfiguration übereinstimmen.
+    - Stellen Sie sicher, dass der Treiber ausreichend mit Strom versorgt wird (prüfen Sie die Status-LEDs).
 
     <Info>
-    Verwenden Sie einen Logikanalysator oder ein Oszilloskop, um Schrittimpulse am Treibereingang zu bestätigen.
+    Verwenden Sie einen Logikanalysator oder ein Oszilloskop, um die Step-Impulse am Treibereingang zu bestätigen.
     </Info>
   </Accordion>
 
-  <Accordion title="Unregelmäßige oder zittrige Bewegung">
-    Elektrische Störungen oder Versorgungsinstabilität können den Steuerpfad beeinträchtigen.
+  <Accordion title="Unregelmäßige oder ruckartige Bewegung">
+    Elektrische Störungen oder eine instabile Versorgung können den Steuerpfad beeinträchtigen.
 
-    - Halten Sie die Signalkabel getrennt von den Motorleistungskabeln
-    - Stellen Sie sicher, dass die Treiberversorgung unter Last innerhalb der Spezifikation bleibt
-    - Fügen Sie eine lokale Entkopplung in der Nähe der Treibereingänge hinzu
+    - Halten Sie die Signalleitungen von den Motorversorgungskabeln getrennt.
+    - Prüfen Sie, ob die Treiberversorgung unter Last innerhalb der Spezifikation bleibt.
+    - Fügen Sie in der Nähe der Treibereingänge eine lokale Entkopplung hinzu.
 
     <Tip>
-    Fügen Sie 0,1-µF-Keramikkondensatoren in der Nähe der Steuereingänge des Treibers (zur Erde) hinzu. Verwenden Sie für lange Signalstrecken ein abgeschirmtes Kabel.
+    Fügen Sie 0,1-µF-Keramikkondensatoren nahe den Steuereingängen des Treibers (gegen GND) hinzu. Verwenden Sie bei langen Signalstrecken ein abgeschirmtes Kabel.
     </Tip>
   </Accordion>
 
-  <Accordion title="Motor läuft in die falsche Richtung">
-    Das Richtungssignal ist relativ zu Ihrer Verkabelung invertiert.
+  <Accordion title="Der Motor läuft in die falsche Richtung">
+    Das Direction-Signal ist gegenüber Ihrer Verkabelung invertiert.
 
     <Info>
-    Tauschen Sie die Richtungspolarität am Stecker aus oder kehren Sie die Richtung in der Firmware um, indem Sie die Einstellung `INVERT_DIRECTION` ändern.
+    Tauschen Sie die Richtungspolarität am Anschluss oder invertieren Sie die Richtung in der Firmware, indem Sie die Einstellung `INVERT_DIRECTION` ändern.
     </Info>
   </Accordion>
 </AccordionGroup>
 
 <Warning>
-Schalten Sie das Gerät immer aus und warten Sie, bis sich die Kondensatoren entladen haben, bevor Sie die Verkabelung neu vornehmen. Eine Verpolung oder ein Kurzschluss der Ausgänge kann Ihre Hardware dauerhaft beschädigen.
+Schalten Sie das Gerät immer aus und warten Sie, bis die Kondensatoren entladen sind, bevor Sie die Verkabelung ändern. Verpolung oder kurzgeschlossene Ausgänge können Ihre Hardware dauerhaft beschädigen.
 </Warning>

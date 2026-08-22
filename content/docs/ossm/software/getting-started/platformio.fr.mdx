@@ -1,29 +1,29 @@
 ---
 title: "Configuration de PlatformIO"
-description: "Configurez PlatformIO dans VS Code pour compiler et télécharger le micrologiciel OSSM de manière fiable"
+description: "Configurez PlatformIO dans VS Code pour compiler et téléverser le micrologiciel OSSM de manière fiable"
 ---
 
-OSSM est construit avec PlatformIO au-dessus de VS Code. Si vous venez de l'IDE Arduino, la transition peut sembler peu familière au premier abord, mais vous obtiendrez des builds plus rapides, une meilleure gestion des dépendances et une configuration cohérente entre les contributeurs.
+OSSM est développé avec PlatformIO dans VS Code. Si vous venez de l'IDE Arduino, la transition peut sembler peu familière au premier abord, mais vous obtiendrez des compilations plus rapides, une meilleure gestion des dépendances et une configuration cohérente pour tous les contributeurs.
 
 <Tip>
-PlatformIO gère les bibliothèques, les chaînes d'outils et les environnements de construction pour vous. Les versions antérieures d'OSSM pourraient être adaptées à Arduino, mais le projet a dépassé cette approche. L'apprentissage de PlatformIO prend moins de temps que le reconditionnement d'OSSM pour Arduino à chaque version.
+PlatformIO gère les bibliothèques, les chaînes d'outils et les environnements de compilation pour vous. Les versions antérieures d'OSSM pouvaient être adaptées à Arduino, mais le projet a dépassé cette approche. Apprendre à utiliser PlatformIO prend moins de temps que de réadapter OSSM pour Arduino à chaque version.
 </Tip>
 
 ## Pourquoi PlatformIO ?
 
 - Plus de temps pour les fonctionnalités – moins de temps à gérer les dépendances
 - Collaboration plus facile : environnement de développement cohérent pour chaque contributeur
-- Résolution automatique des dépendances : bibliothèques récupérées et épinglées pour des versions reproductibles
-- Intelligence du code : saisie semi-automatique, peluchage et détection d'erreurs en ligne
+- Résolution automatique des dépendances : bibliothèques récupérées et épinglées pour des compilations reproductibles
+- Intelligence du code : saisie semi-automatique, linting et détection d'erreurs en ligne
 
 ## Conditions préalables
 
-- VSCode installé
-- Câble de données USB pour votre carte (les câbles de charge uniquement ne pourront pas être téléchargés)
+- VS Code installé
+- Câble de données USB pour votre carte (les câbles réservés à la charge ne permettent pas le téléversement)
 - Pilotes de carte installés si votre système d'exploitation l'exige (par exemple, CP210x ou CH340)
 
 <Note>
-La carte OSSM de référence utilise un module de développement <strong>Espressif ESP32</strong> intégré.
+La carte OSSM de référence utilise un module de développement <strong>Espressif ESP32 Dev Module</strong> intégré.
 </Note>
 
 ## Installation
@@ -33,11 +33,11 @@ La carte OSSM de référence utilise un module de développement <strong>Espress
 Installez VS Code, puis ajoutez l'extension "PlatformIO IDE" à partir de VS Code Marketplace. Après l'installation, redémarrez VS Code pour activer PlatformIO.
 
 <Check>
-Vous devriez voir l'icône PlatformIO à tête extraterrestre dans la barre d'activité à gauche.
+Vous devriez voir l'icône PlatformIO à tête extraterrestre dans l'Activity Bar à gauche.
 </Check>
 </Step>
 
-<Step title="Accueil PlatformIO ouvert">
+<Step title="Ouvrir PlatformIO Home">
 Cliquez sur l'icône PlatformIO pour ouvrir PlatformIO Home.
 
 <Frame>
@@ -45,15 +45,15 @@ Cliquez sur l'icône PlatformIO pour ouvrir PlatformIO Home.
 </Frame>
 
 <Frame>
-<img src="./_images/156351872-008e57a4-5e65-40f8-b65c-b663318317d8.webp" alt="Interface d'accueil de PlatformIO" />
+<img src="./_images/156351872-008e57a4-5e65-40f8-b65c-b663318317d8.webp" alt="Interface de PlatformIO Home" />
 </Frame>
 </Step>
 
 <Step title="Ouvrez le projet OSSM">
-Depuis PlatformIO Home, sélectionnez « Ouvrir le projet » et choisissez le dossier OSSM qui contient `platformio.ini` (minuscules).
+Depuis PlatformIO Home, sélectionnez "Open Project" et choisissez le dossier OSSM qui contient `platformio.ini` (minuscules).
 
 <Frame>
-<img src="./_images/156352091-867148c0-e9bd-47fa-a4e9-7c99c8fce5b1.webp" alt="Ouvrir la boîte de dialogue Projet dans PlatformIO" />
+<img src="./_images/156352091-867148c0-e9bd-47fa-a4e9-7c99c8fce5b1.webp" alt="Boîte de dialogue « Open Project » dans PlatformIO" />
 </Frame>
 
 <Frame>
@@ -61,19 +61,19 @@ Depuis PlatformIO Home, sélectionnez « Ouvrir le projet » et choisissez le do
 </Frame>
 
 <Check>
-L'explorateur doit afficher `platformio.ini`, un dossier `src/` et un dossier `lib/`.
+L'Explorer doit afficher `platformio.ini`, un dossier `src/` et un dossier `lib/`.
 </Check>
 </Step>
 
 <Step title="Sélectionnez le bon environnement (le cas échéant)">
-Si le projet définit plusieurs environnements dans `platformio.ini` (par exemple, différentes cartes ou options de construction), utilisez le sélecteur d'environnement dans la barre d'état VS Code (généralement étiqueté avec l'environnement actif) pour choisir celui qui correspond à votre carte.
+Si le projet définit plusieurs environnements dans `platformio.ini` (par exemple, différentes cartes ou options de compilation), utilisez le sélecteur d'environnement dans la VS Code Status Bar (généralement étiqueté avec l'environnement actif) pour choisir celui qui correspond à votre carte.
 
 <Note>
 S'il n'y a qu'un seul environnement, PlatformIO le sélectionne automatiquement.
 </Note>
 </Step>
 
-<Step title="Ouvrez le point d'entrée du firmware">
+<Step title="Ouvrez le point d'entrée du micrologiciel">
 Ouvrez `src/main.cpp` pour vérifier la source du micrologiciel.
 
 <Frame>
@@ -81,37 +81,37 @@ Ouvrez `src/main.cpp` pour vérifier la source du micrologiciel.
 </Frame>
 </Step>
 
-<Step title="Construire et télécharger le firmware">
-Utilisez l'icône ✓ (Build) pour compiler et l'icône → (Upload) pour flasher le tableau. Ces contrôles se trouvent dans la barre d'état en bas de VS Code.
+<Step title="Compiler et téléverser le micrologiciel">
+Utilisez l'icône ✓ (Build) pour compiler et l'icône → (Upload) pour flasher la carte. Ces contrôles se trouvent dans la Status Bar en bas de VS Code.
 
 <Frame>
-<img src="./_images/156352700-12fad91c-a8d2-48fa-97cc-ee088d0ff219.webp" alt="Boutons de compilation et de téléchargement dans la barre d'état" />
+<img src="./_images/156352700-12fad91c-a8d2-48fa-97cc-ee088d0ff219.webp" alt="Boutons Build et Upload dans la Status Bar" />
 </Frame>
 
-- Créez d'abord pour détecter les erreurs localement, ou téléchargez directement pour compiler et flasher en une seule étape.
+- Effectuez d'abord une compilation pour détecter les erreurs localement, ou téléversez directement pour compiler et flasher en une seule étape.
 - Assurez-vous que votre carte est connectée et que le port série correct est sélectionné.
 
 <Check>
-Une build réussie se termine par `SUCCESS` dans le terminal. Un téléchargement réussi affiche `Hash of data verified` ou une confirmation similaire du téléchargeur ESP32.
+Une compilation réussie se termine par `SUCCESS` dans le terminal. Un téléversement réussi affiche `Hash of data verified` ou une confirmation similaire de l'outil de téléversement ESP32.
 </Check>
 </Step>
 </Steps>
 
 ## Tâches courantes
 
-- Sélectionnez le port série : PlatformIO → Accès rapide → "Sélectionner le port série".
-- Surveiller la sortie série : cliquez sur l'icône de prise (Moniteur) dans la barre d'état ou exécutez `PlatformIO: Monitor` à partir de la palette de commandes.
-- Version propre : exécutez `PlatformIO: Clean` pour supprimer les artefacts compilés avant la reconstruction.
+- Sélectionner le port série : PlatformIO → Quick Access → "Select Serial Port".
+- Surveiller la sortie série : cliquez sur l'icône de prise (Monitor) dans la Status Bar ou exécutez `PlatformIO: Monitor` à partir de la Command Palette.
+- Nettoyer la compilation : exécutez `PlatformIO: Clean` pour supprimer les artefacts compilés avant de reconstruire.
 
 ## Dépannage
 
 <AccordionGroup>
-<Accordion title="Le téléchargement échoue ou la carte n'est pas détectée">
+<Accordion title="Le téléversement échoue ou la carte n'est pas détectée">
 Les causes les plus courantes sont une configuration incorrecte du port série ou de la carte.
 
 ### Vérifiez votre port série
 
-Sous Windows, la carte apparaît sous la forme `COMx`. Sous macOS/Linux, il apparaît sous `/dev/tty.*` ou `/dev/cu.*`.
+Sous Windows, la carte apparaît sous la forme `COMx`. Sous macOS/Linux, elle apparaît sous `/dev/tty.*` ou `/dev/cu.*`.
 
 Définissez le port dans PlatformIO :
 
@@ -124,12 +124,12 @@ Si vous ne voyez pas de port, essayez un autre câble USB, un autre port USB ou 
 </Tip>
 
 <Note>
-La cible de référence de la carte OSSM est **Espressif ESP32 Dev Module**. Assurez-vous que votre environnement `platformio.ini` utilise le paramètre `board` correct pour ESP32.
+Pour la carte OSSM de référence, la cible de carte est **Espressif ESP32 Dev Module**. Assurez-vous que votre environnement `platformio.ini` utilise le paramètre `board` correct pour ESP32.
 </Note>
 </Accordion>
 
-<Accordion title="La construction échoue en raison de mises à jour de la bibliothèque ou de la plate-forme">
-Une mise à jour d'une plate-forme ou d'une bibliothèque peut introduire des modifications importantes. Épinglez les versions dans `platformio.ini` pour restaurer une configuration connue.
+<Accordion title="La compilation échoue en raison de mises à jour de la bibliothèque ou de la plate-forme">
+Une mise à jour d'une plate-forme ou d'une bibliothèque peut introduire des modifications incompatibles. Épinglez les versions dans `platformio.ini` pour restaurer une configuration éprouvée.
 
 ```ini platformio.ini
 ; Example: pin the Espressif32 platform
@@ -148,13 +148,13 @@ Cela indique généralement une inadéquation du débit en bauds.
 - Assurez-vous que le micrologiciel et le moniteur série utilisent le même débit en bauds
 </Accordion>
 
-<Accordion title="Coincé lors de la connexion… pendant le téléchargement">
+<Accordion title="Bloqué sur « connecting… » pendant le téléversement">
 - Maintenez ou appuyez sur les boutons BOOT/EN de la carte comme requis par votre module ESP32
-- Appuyez sur Réinitialiser une fois le téléchargement terminé si la carte ne redémarre pas automatiquement
+- Appuyez sur reset une fois le téléversement terminé si la carte ne redémarre pas automatiquement
 - Déconnectez les autres applications susceptibles d'utiliser le même port série
 </Accordion>
 </AccordionGroup>
 
 <Info>
-Si vous rencontrez des problèmes non abordés ici, capturez le journal complet de création/téléchargement de PlatformIO à partir du terminal VS Code et incluez-le lorsque vous demandez de l'aide. Le journal contient l'environnement sélectionné, les versions de la plateforme et les messages d'erreur exacts.
+Si vous rencontrez des problèmes non abordés ici, capturez le journal complet de compilation/téléversement de PlatformIO à partir du VS Code Terminal et incluez-le lorsque vous demandez de l'aide. Le journal contient l'environnement sélectionné, les versions de la plateforme et les messages d'erreur exacts.
 </Info>

@@ -3,52 +3,52 @@ title: "GPIO-besturing"
 description: "Bedien GPIO-uitgangspinnen op uw OSSM via Bluetooth Low Energy voor accessoires en integraties"
 ---
 
-De OSSM stelt vier GPIO-pinnen bloot die kunnen worden bediend via Bluetooth Low Energy (BLE). Gebruik deze pinnen om externe accessoires, indicatoren, relais of andere hardware-integraties te activeren.
+De OSSM maakt vier GPIO-pinnen beschikbaar die via Bluetooth Low Energy (BLE) kunnen worden bediend. Gebruik deze pinnen om externe accessoires, indicatoren, relais of andere hardware-integraties te activeren.
 
 <Info>
-GPIO-besturing is een functie van ontwikkelaars/makers. Er is een BLE-clienttoepassing nodig om opdrachten te verzenden; er is geen interface op het apparaat voor GPIO-besturing.
+GPIO-besturing is een functie voor ontwikkelaars/makers. Er is een BLE-clienttoepassing nodig om opdrachten te verzenden; er is geen interface op het apparaat voor GPIO-besturing.
 </Info>
 
 ## Overzicht
 
-Met de GPIO-eigenschap kunt u:
+Met het GPIO-kenmerk kunt u:
 
-- Stel een van de 4 pinnen in op HOOG of LAAG
-- Lees huidige mogelijkheden
-- Integreer externe hardware met uw OSSM
+- een van de vier pinnen op HIGH of LOW instellen
+- de huidige mogelijkheden uitlezen
+- externe hardware met uw OSSM integreren
 
 ### Gebruiksgevallen
 
-- **LED-indicatoren** — Signaleren apparaatstatus naar externe verlichting
-- **Relaisbesturing** — Trigger externe apparaten aan/uit
-- **Accessoire synchronisatie** — Coördineren met andere hardware
-- **Aangepaste integraties** — Bouw uw eigen besturingssystemen
+- **LED-indicatoren** — De apparaatstatus naar externe verlichting signaleren
+- **Relaisbesturing** — Externe apparaten in- en uitschakelen
+- **Accessoiresynchronisatie** — Met andere hardware coördineren
+- **Aangepaste integraties** — Eigen regelsystemen bouwen
 
 ## BLE-kenmerk
 
-| Eigendom | Waarde |
+| Eigenschap | Waarde |
 |----------|-------|
 | UUID | `522b443a-4f53-534d-4000-420badbabe69` |
-| Eigenschappen | LEES, SCHRIJF |
+| Eigenschappen | READ, WRITE |
 | Naamruimte | 0x4 (GPIO) |
 
 <Note>
-Het GPIO-kenmerk maakt deel uit van de belangrijkste OSSM BLE-service (`522b443a-4f53-534d-0001-420badbabe69`). Maak eerst verbinding met de service en open vervolgens dit kenmerk.
+Het GPIO-kenmerk maakt deel uit van de hoofd-OSSM-BLE-service (`522b443a-4f53-534d-0001-420badbabe69`). Maak eerst verbinding met de service en krijg vervolgens toegang tot dit kenmerk.
 </Note>
 
 ## Pin-toewijzing
 
-De firmware onthult 4 logische pinnen die zijn toegewezen aan ESP32 GPIO-nummers:
+De firmware biedt vier logische pinnen die zijn toegewezen aan ESP32 GPIO-nummers:
 
-| Logische pin | ESP32GPIO | Bestuurslocatie |
+| Logische pin | ESP32 GPIO | Bordlocatie |
 |-------------|------------|----------------|
-| 1 | GPIO2 | Beschikbaar op kop |
-| 2 | GPIO15 | Beschikbaar op kop |
-| 3 | GPIO22 | Beschikbaar op kop |
-| 4 | GPIO33 | Beschikbaar op kop |
+| 1 | GPIO 2 | Beschikbaar op de header |
+| 2 | GPIO 15 | Beschikbaar op de header |
+| 3 | GPIO 22 | Beschikbaar op de header |
+| 4 | GPIO 33 | Beschikbaar op de header |
 
 <Warning>
-Deze GPIO-pinnen zijn rechtstreeks verbonden met de ESP32. Ze voeren logische niveaus van 3,3 V uit met een beperkte stroomcapaciteit (~12 mA per pin). Gebruik geschikte stuurprogramma's voor belastingen met hoge stroomsterkte.
+Deze GPIO-pinnen zijn rechtstreeks verbonden met de ESP32. Ze voeren logische niveaus van 3,3 V uit met een beperkte stroombelastbaarheid (~12 mA per pin). Gebruik geschikte stuurcircuits voor belastingen met een hoge stroomsterkte.
 </Warning>
 
 ## Commando-indeling
@@ -61,33 +61,33 @@ Stuur een string in het formaat:
 <pin_number>:<state>
 ```
 
-**Pincode:** `1`, `2`, `3` of `4`
+**Pinnummer:** `1`, `2`, `3` of `4`
 
 **Statuswaarden:**
-- `high` of `1` — Stel pin HOOG in (3,3 V)
-- `low` of `0` — Stel pin LAAG in (0V)
+- `high` of `1` — Pin instellen op HIGH (3,3 V)
+- `low` of `0` — Pin instellen op LOW (0 V)
 
 **Voorbeelden:**
 
 | Commando | Effect |
 |---------|--------|
-| `1:high` | Zet pin 1 (GPIO 2) HOOG |
-| `2:low` | Zet pin 2 (GPIO 15) LAAG |
-| `3:1` | Zet pin 3 (GPIO 22) HOOG |
-| `4:0` | Zet pin 4 (GPIO 33) LAAG |
+| `1:high` | Pin 1 (GPIO 2) instellen op HIGH |
+| `2:low` | Pin 2 (GPIO 15) instellen op LOW |
+| `3:1` | Pin 3 (GPIO 22) instellen op HIGH |
+| `4:0` | Pin 4 (GPIO 33) instellen op LOW |
 
-### Schrijf reacties
+### Schrijfreacties
 
 | Antwoord | Betekenis |
 |----------|---------|
-| `ok:1:high` | Pin 1 is succesvol ingesteld op HOOG |
-| `ok:2:low` | Pin 2 is succesvol ingesteld op LAAG |
+| `ok:1:high` | Pin 1 is succesvol ingesteld op HIGH |
+| `ok:2:low` | Pin 2 is succesvol ingesteld op LOW |
 | `error:invalid_format` | Commandoformaat niet herkend |
 | `error:pin_out_of_range` | Pinnummer niet 1-4 |
 
 ### Lezen (mogelijkheden)
 
-Het lezen van het kenmerk retourneert een hint voor mogelijkheden:
+Het lezen van het kenmerk geeft een overzicht van de beschikbare mogelijkheden.
 
 ```
 pins:[1,2,3,4]
@@ -159,10 +159,10 @@ GPIO Pin → 220Ω Resistor → LED Anode (+)
 ```
 
 <Tip>
-Gebruik een weerstand van 220 Ω tot 470 Ω voor standaard LED's. De 3,3V-uitgang van de ESP32 biedt voldoende spanning voor de meeste LED's.
+Gebruik een weerstand van 220 Ω tot 470 Ω voor standaard-LED's. De 3,3 V-uitgang van de ESP32 biedt voldoende spanning voor de meeste LED's.
 </Tip>
 
-### Relais controle
+### Relaisbesturing
 
 Gebruik voor hogere stroombelastingen een optogeïsoleerde relaismodule:
 
@@ -172,15 +172,15 @@ GPIO Pin → Relay Module Signal
 GND      → Relay Module GND
 ```
 
-De meeste relaismodules met opto-isolatie werken met 3,3V-logica. Controleer de specificaties van uw module.
+De meeste opto-geïsoleerde relaismodules werken met 3,3 V-logica. Controleer de specificaties van uw module.
 
 <Warning>
-Sluit nooit netspanning (120V/240V) rechtstreeks op de OSSM aan. Gebruik altijd relaismodules met de juiste specificaties en de juiste veiligheidsmaatregelen.
+Sluit nooit netspanning (120 V/240 V) rechtstreeks op de OSSM aan. Gebruik altijd relaismodules met de juiste specificaties en neem passende veiligheidsmaatregelen.
 </Warning>
 
-### Conversie op logisch niveau
+### Conversie van logicaniveau
 
-Als u een logische 5V-uitgang nodig heeft:
+Als u een logische 5 V-uitgang nodig heeft:
 
 ```
 GPIO Pin → Level Shifter 3.3V Side
@@ -191,11 +191,11 @@ GND      → Level Shifter GND
 
 ## Beperkingen
 
-- **Geen PWM-ondersteuning** — Pinnen zijn alleen digitaal HOOG/LAAG
-- **Geen invoerwaarde** — GPIO heeft alleen uitvoer via deze interface
-- **Geen persistentie** — Pinstatussen worden opnieuw ingesteld op LAAG bij het opnieuw opstarten van het apparaat
+- **Geen PWM-ondersteuning** — Pinnen zijn alleen digitaal HIGH/LOW
+- **Geen ingangen uitlezen** — GPIO is via deze interface uitsluitend een uitgang
+- **Geen persistentie** — Pinstatussen worden bij het opnieuw opstarten van het apparaat teruggezet naar LOW
 - **Geen interrupts** — Kan niet activeren op basis van externe signalen
-- **Huidige limieten** — ESP32 GPIO maximaal ~12 mA per pin, 40 mA totaal
+- **Stroomlimieten** — ESP32 GPIO maximaal ~12 mA per pin, 40 mA in totaal
 
 ## Problemen oplossen
 
@@ -207,23 +207,23 @@ GND      → Level Shifter GND
 - Controleer met een multimeter of de spanning verandert
 </Accordion>
 
-<Accordion title="error:invalid_format antwoord">
+<Accordion title="error:invalid_format-antwoord">
 Het opdrachtformaat werd niet herkend. Geldige formaten:
 - `1:high`, `1:low`, `1:1`, `1:0`
 - `2:high`, `2:low`, `2:1`, `2:0`
 - enz.
 
-De behuizing maakt niet uit (`HIGH` en `high` werken beide).
+Hoofdlettergebruik is niet van belang (`HIGH` en `high` werken beide).
 </Accordion>
 
-<Accordion title="error:pin_out_of_range reactie">
-Pincode moet 1, 2, 3 of 4 zijn. Controleer uw opdracht.
+<Accordion title="error:pin_out_of_range-reactie">
+Het pinnummer moet 1, 2, 3 of 4 zijn. Controleer uw opdracht.
 </Accordion>
 
 <Accordion title="Aangesloten apparaat werkt niet">
-- Controleer de spanning met een multimeter (moet 0V of ~3,3V zijn)
-- Controleer de huidige vereisten: ESP32 GPIO beperkt tot ~12 mA
-- Zorg voor een gemeenschappelijke basis tussen OSSM en uw apparaat
+- Controleer de spanning met een multimeter (moet 0 V of ~3,3 V zijn)
+- Controleer de stroomvereisten: ESP32 GPIO is beperkt tot ~12 mA
+- Zorg voor een gemeenschappelijke massa tussen OSSM en uw apparaat
 - Overweeg het gebruik van een transistor of relais voor hogere stroombelastingen
 </Accordion>
 </AccordionGroup>
