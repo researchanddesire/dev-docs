@@ -8,7 +8,7 @@ description: "Inzicht in de broncodeorganisatie van de OSSM-firmware"
 De OSSM-firmware volgt een modulaire, op functies gebaseerde architectuur. Elke functie bevindt zich in een eigen naamruimtemap, waardoor de codebase gemakkelijker te navigeren en te onderhouden is.
 
 <Info>
-Blader door de broncode op GitHub: [Software/bron/](https://github.com/KinkyMakers/OSSM-hardware/tree/main/Software/src)
+Blader door de broncode op GitHub: [Software/src/](https://github.com/KinkyMakers/OSSM-hardware/tree/main/Software/src)
 </Info>
 
 ## Overzicht
@@ -40,7 +40,7 @@ Blader door de broncode op GitHub: [Software/bron/](https://github.com/KinkyMake
 
 | Map | Doel |
 |--------|---------|
-| `include/boost/` | Bibliotheken met alleen headers (statusmachine Boost.SML) |
+| `include/boost/` | Bibliotheken met alleen headers (toestandsmachine Boost.SML) |
 | `lib/StrokeEngine/` | Bewegingspatroonbibliotheek (gemodificeerd) |
 | `src/` | Belangrijkste broncode |
 | `test/` | Eenheidstests |
@@ -49,10 +49,10 @@ Blader door de broncode op GitHub: [Software/bron/](https://github.com/KinkyMake
 
 De firmware maakt gebruik van een **functiegebaseerde organisatie** waar gerelateerde code samenleeft:
 
-- **Naamruimten over klassen** - Functies zijn georganiseerd als naamruimtefuncties in plaats van als klassenmethoden
+- **Naamruimten in plaats van klassen** - Functies zijn georganiseerd als naamruimtefuncties in plaats van als klassenmethoden
 - **Gezamenlijke bestanden** - De header, implementatie en gerelateerde code van elke functie bevinden zich in dezelfde map
-- **Algemene statusstructuren** - Gedeelde status wordt beheerd via speciale statusstructuren in plaats van via klasseleden
-- **Staatloze modules** - Functiefuncties werken op basis van de globale status, waardoor ze gemakkelijker te testen en te redeneren zijn
+- **Globale statusstructuren** - Gedeelde status wordt beheerd via speciale statusstructuren in plaats van via klasseleden
+- **Staatloze modules** - Functies werken op basis van de globale toestand, waardoor ze gemakkelijker te testen en te begrijpen zijn
 
 <Note>
 De klasse `OSSM` in `ossm/OSSM.h` blijft behouden voor achterwaartse compatibiliteit met de verwerking van BLE-opdrachten. Nieuwe functies moeten gebruik maken van staatloze naamruimtefuncties.
@@ -80,40 +80,40 @@ De map `ossm/` bevat de kernapplicatielogica, geordend op functie.
 
 | Map | Doel |
 |--------|---------|
-| `state/` | Architectuur van staatsmachines |
+| `state/` | Architectuur van toestandsmachines |
 | `pages/` | UI-schermen |
 | `homing/` | Homing-reeks |
 | `menu/` | Menunavigatie |
 | `simple_penetration/` | Eenvoudige penetratiemodus |
-| `stroke_engine/` | Slagmotormodus |
+| `stroke_engine/` | StrokeEngine-modus |
 | `pattern_controls/` | Patroonselectie-UI |
 | `play_controls/` | Bediening voor afspelen/pauzeren/snelheid |
 
-### Staatsmachine (`ossm/state/`)
+### Toestandsmachine (`ossm/state/`)
 
-De componenten van de staatsmachine zijn gescheiden voor duidelijkheid en testbaarheid.
+De componenten van de toestandsmachine zijn gescheiden voor duidelijkheid en testbaarheid.
 
 | Bestand | Doel |
 |------|---------|
 | [`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h) | Overgangstabeldefinitie met behulp van Boost.SML |
-| [`actions.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h) / `actions.cpp` | Statusovergangsacties (display-updates, motorbesturing) |
+| [`actions.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h) / `actions.cpp` | Toestandsovergangsacties (display-updates, motorbesturing) |
 | [`guards.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h) / `guards.cpp` | Voorwaardelijke controles op overgangen |
-| `state.h` / `state.cpp` | Initialisatie van de staatsmachine en globale instantie |
+| `state.h` / `state.cpp` | Initialisatie van de toestandsmachine en globale instantie |
 
-**Staatsstructuren** beheren verschillende aspecten van de applicatie:
+**Toestandsstructuren** beheren verschillende aspecten van de applicatie:
 
 | Bestand | Doel |
 |------|---------|
 | `session.h` | Huidige sessie (starttijd, aantal slagen, afstand) |
-| `settings.h` | Gebruikersinstellingen (snelheid, slag, gevoel, diepte, patroon) |
-| `calibration.h` | Homing-status (sensoroffset, slagstappen, homed-status) |
+| `settings.h` | Gebruikersinstellingen (snelheid, slag, sensatie, diepte, patroon) |
+| `calibration.h` | Homing-toestand (sensoroffset, slagstappen, homed-status) |
 | `motion.h` | Bewegingsdoelen (positie, snelheid, tijd) |
 | `menu.h` | Huidige menuselectie |
 | `ble.h` | Bluetooth-verbindingsstatus |
 | `error.h` | Foutmeldingen |
 
 <Tip>
-Zie [Architectuur van staatsmachines](/ossm/software/architecture/state-machine) voor meer informatie over hoe de statusmachine werkt.
+Zie [Architectuur van toestandsmachines](/ossm/software/architecture/state-machine) voor meer informatie over hoe de toestandsmachine werkt.
 </Tip>
 
 ### UI-pagina's (`ossm/pages/`)
@@ -138,19 +138,19 @@ Elke bedrijfsmodus is een op zichzelf staande module met zijn bewegingsbesturing
 | `simple_penetration/` | Basisbeweging heen en weer met gecontroleerde snelheid |
 | `stroke_engine/` | Complexe patronen met behulp van de StrokeEngine-bibliotheek |
 
-### Beheer gebruikersinterfaces
+### Bedieningsinterfaces
 
 | Module | Beschrijving |
 |--------|-------------|
 | `menu/` | Navigatie en weergave in het hoofdmenu |
-| `pattern_controls/` | Patroonselectie-interface voor de Stroke Engine-modus |
+| `pattern_controls/` | Patroonselectie-interface voor de StrokeEngine-modus |
 | `play_controls/` | Bediening voor snelheid, slag, diepte en sensatie |
 
 ### Functiemodules
 
 | Module | Beschrijving |
 |--------|-------------|
-| `homing/` | Startvolgorde (voorwaartse scan, achterwaartse scan, kalibratie) |
+| `homing/` | Homing-reeks (voorwaartse scan, achterwaartse scan, kalibratie) |
 
 ## Hardwareservices (`src/services/`)
 
@@ -229,7 +229,7 @@ Configuratiewaarden en opsommingen worden gecentraliseerd in de map `constants/`
 | `Menu.h` | Menuoptie enum |
 | `Version.h` | Informatie over de firmwareversie |
 | `UserConfig.h` | Door de gebruiker configureerbare instellingen |
-| `Images.h` | Bitmap-items weergeven |
+| `Images.h` | Bitmap-assets voor het display |
 | `LogTags.h` | ESP-IDF-logboektags |
 | `copy/` | Gelokaliseerde tekenreeksen |
 
@@ -239,7 +239,7 @@ Zie [Configuratie](/ossm/software/getting-started/configuration) voor configurat
 
 ## Hulpprogramma's (`src/utils/`)
 
-Helperfuncties en klassen die in de hele codebase worden gebruikt.
+Hulpfuncties en klassen die in de hele codebase worden gebruikt.
 
 <Tree>
   <Tree.Folder name="utils" defaultOpen>
@@ -255,8 +255,8 @@ Helperfuncties en klassen die in de hele codebase worden gebruikt.
 
 | Bestand | Doel |
 |------|---------|
-| `StateLogger.h` | Registreert statusmachineovergangen voor foutopsporing |
-| `RecursiveMutex.h` | Draadveilige mutex-wikkelaar voor ESP32 |
+| `StateLogger.h` | Registreert toestandovergangen voor foutopsporing |
+| `RecursiveMutex.h` | Threadveilige mutex-wrapper voor ESP32 |
 | `StrokeEngineHelper.h` | StrokeEngine-integratiehulpprogramma's |
 | `format.h` | Hulpmiddelen voor het formatteren van tekenreeksen |
 | `analog.h` | Middeling en verwerking van analoge ingangen |
@@ -285,13 +285,13 @@ Gedeelde gegevenstypen die in modules worden gebruikt.
 
 ### Boost.SML (`include/boost/sml.hpp`)
 
-[Boost.SML](https://boost-ext.github.io/sml/) is een statusmachinebibliotheek met alleen headers. Het is rechtstreeks in het project opgenomen voor versiestabiliteit.
+[Boost.SML](https://boost-ext.github.io/sml/) is een toestandsmachinebibliotheek die alleen uit headers bestaat. De bibliotheek is rechtstreeks in het project opgenomen voor versiestabiliteit.
 
-### Slagmotor (`lib/StrokeEngine/`)
+### StrokeEngine (`lib/StrokeEngine/`)
 
-Een aangepaste versie van [theelims/StrokeEngine](https://github.com/theelims/StrokeEngine) die bewegingspatronen genereert. De bibliotheek wordt geleverd en aangepast aan OSSM-specifieke vereisten.
+Een aangepaste versie van [theelims/StrokeEngine](https://github.com/theelims/StrokeEngine) die bewegingspatronen genereert. De bibliotheek is meegeleverd en aangepast aan OSSM-specifieke vereisten.
 
-## Configuratie bouwen
+## Buildconfiguratie
 
 Het `platformio.ini`-bestand definieert de build-omgevingen:
 
@@ -305,8 +305,8 @@ Het `platformio.ini`-bestand definieert de build-omgevingen:
 ## Verder lezen
 
 <CardGroup cols={2}>
-<Card title="Staatsmachine" icon="diagram-project" href="/ossm/software/architecture/state-machine">
-  Duik diep in de Boost.SML-statusmachine-architectuur.
+<Card title="Toestandsmachine" icon="diagram-project" href="/ossm/software/architecture/state-machine">
+  Duik diep in de architectuur van de Boost.SML-toestandsmachine.
 </Card>
 
 <Card title="Configuratie" icon="sliders" href="/ossm/software/getting-started/configuration">
@@ -314,7 +314,7 @@ Het `platformio.ini`-bestand definieert de build-omgevingen:
 </Card>
 
 <Card title="Weergaveservice" icon="display" href="/ossm/software/display/display-service">
-  Meer informatie over de thread-safe display-API.
+  Meer informatie over de threadveilige display-API.
 </Card>
 
 <Card title="BLE-communicatie" icon="bluetooth" href="/ossm/software/communication/ble">

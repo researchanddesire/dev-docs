@@ -6,16 +6,16 @@ description: "Verstehen Sie die in die OSSM-Firmware integrierten Sicherheitsmec
 Die OSSM-Firmware umfasst mehrere Sicherheitsfunktionen, die Unfälle verhindern, die Hardware schützen und einen vorhersehbaren Betrieb gewährleisten sollen. In dieser Anleitung werden die einzelnen Sicherheitsmechanismen und ihre Funktionsweise erläutert.
 
 <Warning>
-Sicherheitsfunktionen sind eine Ergänzung und kein Ersatz für sichere Nutzungspraktiken. Befolgen Sie beim Betrieb Ihres OSSM stets die Anweisungen [Sicherheitshinweise](https://docs.researchanddesire.com/ossm/safety).
+Sicherheitsfunktionen sind eine Ergänzung und kein Ersatz für sichere Nutzungspraktiken. Befolgen Sie beim Betrieb Ihres OSSM stets die [Sicherheitshinweise](https://docs.researchanddesire.com/ossm/safety).
 </Warning>
 
-## Sicherheitscheck vor dem Flug
+## Sicherheitsprüfung vor dem Start
 
-Vor dem Eintritt in einen Betriebsmodus führt das OSSM eine Vorflugprüfung durch, um versehentliche Hochgeschwindigkeitsstarts zu verhindern.
+Vor dem Eintritt in einen Betriebsmodus führt das OSSM eine Vorabprüfung durch, um versehentliche Starts mit hoher Geschwindigkeit zu verhindern.
 
 ### Wie es funktioniert
 
-Wenn Sie im Menü „Einfache Penetration“ oder „Stroke Engine“ auswählen:
+Wenn Sie im Menü Simple Penetration oder Stroke Engine auswählen:
 
 1. Die Firmware liest das Geschwindigkeitspotentiometer
 2. Wenn die Geschwindigkeit über 1 % (`commandDeadZonePercentage`) liegt, erscheint ein Warnbildschirm
@@ -30,28 +30,28 @@ Speed: 45%
 Decrease the speed to begin playing.
 ```
 
-### Preflight umgehen
+### Vorabprüfung umgehen
 
-Sie können den Preflight-Check nicht umgehen. Der Modus startet erst, wenn der Geschwindigkeitsregler nahe Null steht. So stellen Sie sicher, dass Sie stets mit einem sicheren Tempo beginnen und dieses bewusst steigern.
+Sie können die Vorabprüfung nicht umgehen. Der Modus startet erst, wenn der Geschwindigkeitsregler nahe Null steht. So stellen Sie sicher, dass Sie stets mit einer sicheren Geschwindigkeit beginnen und diese bewusst steigern.
 
 <Tip>
-Wenn der Preflight-Bildschirm erscheint, drehen Sie einfach Ihren Geschwindigkeitsregler ganz gegen den Uhrzeigersinn. Der Modus startet innerhalb einer Sekunde, sobald der Messwert unter den Schwellenwert fällt.
+Wenn der Bildschirm der Vorabprüfung erscheint, drehen Sie einfach Ihren Geschwindigkeitsregler ganz gegen den Uhrzeigersinn. Der Modus startet innerhalb einer Sekunde, sobald der Messwert unter den Schwellenwert fällt.
 </Tip>
 
-### Verlassen des Preflights
+### Vorabprüfung verlassen
 
 **Drücken Sie lange auf den Encoder**, um zum Hauptmenü zurückzukehren, ohne den Modus zu starten.
 
 ## BLE-Trennsicherheit
 
-Wenn Sie Ihr OSSM über Bluetooth steuern, könnte eine unerwartete Trennung dazu führen, dass das Gerät mit hoher Geschwindigkeit läuft. Um dies zu verhindern, beinhaltet die Firmware einen automatischen Ramp-Down.
+Wenn Sie Ihr OSSM über Bluetooth steuern, könnte eine unerwartete Trennung dazu führen, dass das Gerät mit hoher Geschwindigkeit läuft. Um dies zu verhindern, umfasst die Firmware ein automatisches Herunterregeln.
 
 ### Wie es funktioniert
 
 Wenn eine BLE-Verbindung verloren geht:
 
 1. Die Firmware erfasst die aktuelle Geschwindigkeit beim Trennen
-2. Nach einer Verzögerung von **1 Sekunde** beginnt der Abstieg
+2. Nach einer Verzögerung von **1 Sekunde** beginnt das Herunterregeln
 3. Über **2 Sekunden** sinkt die Geschwindigkeit mithilfe einer Ease-in-out-Sinuskurve auf Null
 4. Das Gerät läuft mit Nullgeschwindigkeit weiter, bis es wieder angeschlossen oder manuell gestoppt wird
 
@@ -70,27 +70,27 @@ Die Ease-in-out-Sinuskurve sorgt für eine sanfte Verzögerung:
 Dies fühlt sich natürlicher an als eine lineare Verzögerung und reduziert die mechanische Belastung.
 
 <Note>
-Wenn die Geschwindigkeit beim Verbindungsabbruch bereits Null war, erfolgt keine Rampe – das Gerät läuft einfach im Ruhezustand weiter.
+Wenn die Geschwindigkeit beim Verbindungsabbruch bereits Null war, erfolgt kein Herunterregeln – das Gerät bleibt einfach im Ruhezustand.
 </Note>
 
 ### Manuelle Überbrückung
 
-Die lokalen Bedienelemente (Potentiometer und Encoder) bleiben während und nach der Trennung aktiv. Du kannst:
+Die lokalen Bedienelemente (Potentiometer und Encoder) bleiben während und nach der Trennung aktiv. Sie können:
 
-- Stoppen Sie das Gerät manuell mit dem Geschwindigkeitsknopf
-- Drücken Sie lange auf den Encoder, um den Not-Aus-Schalter zu aktivieren
-- Stellen Sie die Verbindung über BLE wieder her, um die Kontrolle wieder aufzunehmen
+- das Gerät manuell mit dem Geschwindigkeitsknopf stoppen
+- den Encoder lange drücken, um einen Notstopp auszulösen
+- die Verbindung über BLE wiederherstellen, um die Steuerung fortzusetzen
 
-## Homing-Sicherheit
+## Sicherheit bei der Referenzfahrt
 
-Die Homing-Sequenz umfasst mehrere Sicherheitsprüfungen, um mechanische Probleme vor Beginn des Betriebs zu erkennen.
+Die Referenzfahrt umfasst mehrere Sicherheitsprüfungen, um mechanische Probleme vor Beginn des Betriebs zu erkennen.
 
 ### Timeout-Schutz
 
 Die Referenzfahrt muss innerhalb von **40 Sekunden** abgeschlossen sein. Wenn der Aktuator innerhalb dieser Zeit nicht beide Endlagen gefunden hat:
 
 1. Der Motor stoppt
-2. Es wird ein Fehlerbildschirm angezeigt: „Die Referenzfahrt hat zu lange gedauert. Bitte überprüfen Sie Ihre Verkabelung und versuchen Sie es erneut.“
+2. Es wird ein Fehlerbildschirm angezeigt: "Homing took too long. Please check your wiring and try again."
 3. Es erscheint ein QR-Code mit einem Link zu Ressourcen zur Fehlerbehebung
 4. Drücken Sie den Encoder, um neu zu starten
 
@@ -102,7 +102,7 @@ Die Referenzfahrt muss innerhalb von **40 Sekunden** abgeschlossen sein. Wenn de
 
 ### Stromerfassung
 
-Das OSSM verwendet eine sensorlose Referenzfahrt – es erkennt das Ende des Verfahrwegs durch Überwachung des Motorstroms. Wenn der Strom `sensorlessCurrentLimit` (Standard: 1,5 %) überschreitet, erkennt die Firmware, dass der Antrieb einen physischen Stopp erreicht hat.
+Das OSSM verwendet eine sensorlose Referenzfahrt – es erkennt das Ende des Verfahrwegs durch Überwachung des Motorstroms. Wenn der Strom den Wert von `sensorlessCurrentLimit` (Standard: 1,5 %) überschreitet, erkennt die Firmware, dass der Aktuator einen physischen Anschlag erreicht hat.
 
 <Info>
 Die sensorlose Referenzierung macht Endschalter überflüssig und erkennt dennoch mechanische Grenzen zuverlässig.
@@ -110,13 +110,13 @@ Die sensorlose Referenzierung macht Endschalter überflüssig und erkennt dennoc
 
 ### Validierung des Mindesthubs
 
-Nach der Referenzfahrt überprüft die Firmware, ob die gemessene Hublänge `minStrokeLengthMm` überschreitet (Standard: 50 mm). Wenn der Hub zu kurz ist:
+Nach der Referenzfahrt überprüft die Firmware, ob die gemessene Hublänge den Wert von `minStrokeLengthMm` überschreitet (Standard: 50 mm). Wenn der Hub zu kurz ist:
 
-1. Es wird ein Fehlerbildschirm angezeigt: „Hub zu kurz. Bitte überprüfen Sie Ihren Antriebsriemen.“
+1. Es wird ein Fehlerbildschirm angezeigt: "Stroke too short. Please check your drive belt."
 2. Das Gerät geht in den Fehlerzustand über
 3. Drücken Sie den Encoder, um die Hilfe anzuzeigen, und drücken Sie dann erneut, um neu zu starten
 
-**Häufige Ursachen für einen kurzen Schlaganfall:**
+**Häufige Ursachen für einen kurzen Hub:**
 - Riemen rutscht auf Riemenscheiben
 - Riemenspannung zu locker
 - Mechanische Blockierung oder Behinderung
@@ -124,53 +124,53 @@ Nach der Referenzfahrt überprüft die Firmware, ob die gemessene Hublänge `min
 
 ### Offset-Puffer
 
-Nach der Erkennung jedes Wegendes fährt der Antrieb um `strokeZeroOffsetMm` zurück (Standard: 6 mm). Dieser Puffer:
+Nach der Erkennung jedes Endes des Verfahrwegs fährt der Aktuator um `strokeZeroOffsetMm` zurück (Standard: 6 mm). Dieser Puffer:
 
-- Verhindert, dass der Aktuator wiederholt den physischen Endanschlag erreicht
+- Verhindert, dass der Aktuator wiederholt gegen den physischen Endanschlag stößt
 - Bietet einen Sicherheitsspielraum für Positionsfehler
 - Reduziert den Verschleiß mechanischer Komponenten
 
-## Nothalt
+## Notstopp
 
 Sie können jederzeit während des Betriebs einen sofortigen Stopp auslösen.
 
 ### So lösen Sie aus
 
-**Drücken Sie den Encoder in jedem Betriebsmodus etwa 3 Sekunden lang**.
+**Halten Sie den Encoder in jedem Betriebsmodus etwa 3 Sekunden lang gedrückt**.
 
 ### Was geschieht
 
 1. `forceStop()` wird auf dem Schrittmotortreiber aufgerufen
 2. Motorausgänge werden sofort deaktiviert
-3. Das Gerät ist als „nicht referenziert“ markiert.
+3. Das Gerät ist als „not homed“ markiert
 4. Sie kehren zum Hauptmenü zurück
 
 <Warning>
-Ein Notstopp führt dazu, dass der OSSM seine Positionsreferenz verliert. Sie müssen neu starten und in den Ausgangszustand zurückkehren, bevor Sie den Betrieb wieder aufnehmen können.
+Ein Notstopp führt dazu, dass das OSSM seine Positionsreferenz verliert. Sie müssen neu starten und eine neue Referenzfahrt durchführen, bevor Sie den Betrieb wieder aufnehmen können.
 </Warning>
 
-### Wann zu verwenden
+### Wann Sie ihn verwenden sollten
 
-Verwenden Sie den Not-Aus-Schalter, wenn:
+Verwenden Sie den Notstopp, wenn:
 
-- Während des Betriebs fühlt sich etwas falsch an
-- Sie müssen aus irgendeinem Grund sofort aufhören
-- Das Gerät verhält sich unerwartet
-- Sie hören ungewöhnliche Geräusche aus dem mechanischen System
+- sich während des Betriebs etwas falsch anfühlt
+- Sie aus irgendeinem Grund sofort stoppen müssen
+- sich das Gerät unerwartet verhält
+- Sie ungewöhnliche Geräusche aus dem mechanischen System hören
 
 <Note>
-Zögern Sie nicht, den Not-Aus-Schalter zu betätigen – er dient Ihrer Sicherheit. Die erneute Referenzierung dauert nur wenige Sekunden.
+Zögern Sie nicht, den Notstopp zu verwenden – er dient Ihrer Sicherheit. Eine neue Referenzfahrt dauert nur wenige Sekunden.
 </Note>
 
 ## Fehlerzustände
 
-Wenn die Firmware ein Problem erkennt, wechselt sie in einen Fehlerstatus mit hilfreichen Informationen.
+Wenn die Firmware ein Problem erkennt, wechselt sie in einen Fehlerzustand mit hilfreichen Informationen.
 
 ### Fehlerbildschirm
 
 Der Fehlerbildschirm zeigt Folgendes an:
 
-1. Header „Fehler“.
+1. Überschrift „Error“
 2. Eine Beschreibung des Problems
 3. Anleitung für die nächsten Schritte
 
@@ -178,7 +178,7 @@ Der Fehlerbildschirm zeigt Folgendes an:
 
 Drücken Sie auf dem Fehlerbildschirm den Encoder, um den Hilfebildschirm anzuzeigen, der Folgendes anzeigt:
 
-- Überschrift „Hilfe anfordern“.
+- Überschrift „Get Help“
 - Anweisungen zum Besuch von Discord oder GitHub
 - Ein QR-Code, der auf [unbox.ossm.tech](https://unbox.ossm.tech) verweist
 
@@ -190,13 +190,13 @@ Mehrere Konfigurationsparameter beeinflussen das Sicherheitsverhalten:
 
 | Parameter | Standard | Wirkung |
 |-----------|---------|--------|
-| `commandDeadZonePercentage` | 1.0% | Preflight-Schwellenwert für Geschwindigkeitsknopf |
-| `sensorlessCurrentLimit` | 1.5% | Aktueller Schwellenwert für die Homing-Erkennung |
+| `commandDeadZonePercentage` | 1.0% | Schwellenwert der Vorabprüfung für den Geschwindigkeitsregler |
+| `sensorlessCurrentLimit` | 1.5% | Stromschwellenwert für die Referenzfahrterkennung |
 | `minStrokeLengthMm` | 50mm | Minimaler gültiger Hub nach der Referenzfahrt |
-| `strokeZeroOffsetMm` | 6mm | Sicherheitspuffer durch physische Endanschläge |
+| `strokeZeroOffsetMm` | 6mm | Sicherheitspuffer vor den physischen Endanschlägen |
 
 <Warning>
-Eine Änderung dieser Werte kann die Sicherheitsmargen verringern. Ändern Sie sie nur, wenn Sie die Auswirkungen verstehen und gründlich getestet haben.
+Eine Änderung dieser Werte kann die Sicherheitsmargen verringern. Ändern Sie sie nur, wenn Sie die Auswirkungen verstehen und sie gründlich getestet haben.
 </Warning>
 
 ## Verwandte Seiten

@@ -1,19 +1,19 @@
 ---
-title: „PCB-Übersicht“
-description: „Technische Dokumentation für die RADR-Hauptplatine (OSSM Wireless v0.4)“
+title: "PCB-Übersicht"
+description: "Technische Dokumentation für die RADR-Hauptplatine (OSSM Wireless v0.4)"
 ---
 
 In diesem Abschnitt wird das Haupt-PCB-Design von RADR behandelt, einschließlich Schaltplänen, Komponentenspezifikationen und Fertigungsdateien.
 
-## Board-Übersicht
+## Platinenübersicht
 
 | Spezifikation | Wert |
 |---------------|-------|
-| Vorstandsname | OSSM Wireless |
+| Boardname | OSSM Wireless |
 | Version | v0.4 |
 | Mikrocontroller | ESP32-S3 mit PSRAM |
-| Design-Software | Altium-Designer |
-| Anzahl der Ebenen | 2 (geschätzt) |
+| Design-Software | Altium Designer |
+| Anzahl der Lagen | 2 (geschätzt) |
 
 Die RADR-Leiterplatte integriert die gesamte Elektronik, die für eine eigenständige drahtlose Fernbedienung erforderlich ist, einschließlich Mikrocontroller, Anzeigeschnittstelle, Energieverwaltung, Benutzereingaben und Feedbacksystemen.
 
@@ -28,38 +28,38 @@ Die RADR-Leiterplatte integriert die gesamte Elektronik, die für eine eigenstä
 | Parameter | Wert |
 |-----------|-------|
 | MCU | ESP32-S3 |
-| Erinnerung | Enthält PSRAM |
-| Kabellos | WLAN + Bluetooth LE |
-| Betriebsspannung | 3,3 V |
+| Speicher | Enthält PSRAM |
+| Drahtlos | WiFi + Bluetooth LE |
+| Betriebsspannung | 3.3V |
 
 Der ESP32-S3 bietet:
 - Dual-Core-Xtensa-LX7-Prozessor
 - Integriertes Bluetooth Low Energy für die Gerätekommunikation
-- Ausreichend GPIO für alle Ein-, Ausgänge und Peripheriegeräte
+- Ausreichend GPIO für alle Ein- und Ausgänge sowie Peripheriegeräte
 - Energiesparende Schlafmodi zur Batterieschonung
 
 ### Energieverwaltung
 
 | Komponente | Funktion |
 |-----------|----------|
-| USB-C-Anschluss | 5V Ladeeingang |
+| USB-C-Anschluss | 5V-Ladeeingang |
 | Lade-IC | Laden des LiPo-Akkus |
-| MAX17048 | Tankanzeige (Batterieüberwachung) |
-| LDO/Regler | 3,3V Systemstrom |
+| MAX17048 | Ladezustandsmesser (Batterieüberwachung) |
+| LDO/Regler | 3,3-V-Systemversorgung |
 
 Das Stromversorgungssystem unterstützt:
 - USB-C-Aufladung (5V-Eingang)
 - LED-Anzeige für Hardware-Ladevorgang
-- Präziser Batterieprozentsatz über I²C-Tankanzeige
+- Präziser Batterieprozentsatz über einen I²C-Ladezustandsmesser
 - Tiefschlafstrom < 100μA
 
 ### Anzeigeschnittstelle
 
 | Parameter | Wert |
 |-----------|-------|
-| Anzeigetyp | TFT-LCD |
+| Anzeigetyp | TFT LCD |
 | Auflösung | 320 x 240 Pixel |
-| Farbtiefe | 16-Bit (RGB565) |
+| Farbtiefe | 16 Bit (RGB565) |
 | Schnittstelle | SPI |
 | Hintergrundbeleuchtung | PWM-gesteuert |
 
@@ -69,11 +69,11 @@ Das Stromversorgungssystem unterstützt:
 |-------|------|------|
 | Linker Encoder | Drehen + Drücken | GPIO 10, 11 |
 | Rechter Encoder | Drehen + Drücken | GPIO 42, 41 |
-| Linke Schulter | Momentaner Schalter | GPIO 48 |
-| Rechte Schulter | Momentaner Schalter | GPIO 1 |
-| Unter dem Bildschirm links | Momentaner Schalter | GPIO 38 |
-| Unter-Bildschirm-Mitte | Momentaner Schalter | GPIO 39 |
-| Unter dem Bildschirm rechts | Momentaner Schalter | GPIO 40 |
+| Linke Schulter | Momentschalter | GPIO 48 |
+| Rechte Schulter | Momentschalter | GPIO 1 |
+| Unter dem Bildschirm links | Momentschalter | GPIO 38 |
+| Unter dem Bildschirm Mitte | Momentschalter | GPIO 39 |
+| Unter dem Bildschirm rechts | Momentschalter | GPIO 40 |
 
 <Note>
 Die angezeigten GPIO-Zuweisungen gelten für v0.4-Boards mit PSRAM. Frühere v1.x-Boards verwenden unterschiedliche Pins für den linken Encoder (GPIO 35, 36) und LEDs (GPIO 37).
@@ -100,33 +100,33 @@ Der Schaltplan ist in Funktionsblöcke unterteilt:
 
 | Abschnitt | Beschreibung |
 |---------|-------------|
-| Leistung | USB-C-Eingang, Ladeschaltung, Spannungsregelung |
+| Stromversorgung | USB-C-Eingang, Ladeschaltung, Spannungsregelung |
 | MCU | ESP32-S3, Quarz, Reset, Boot-Auswahl |
-| Anzeige | TFT-LCD-Anschluss, Hintergrundbeleuchtungstreiber |
+| Anzeige | TFT-LCD-Anschluss, Treiber der Hintergrundbeleuchtung |
 | Eingaben | Drehgeber, Tasten, Pull-Up/Pull-Down-Widerstände |
 | Rückmeldung | LED-Datenleitung, Summertreiber, Motortreiber |
-| Batterie | MAX17048 Tankanzeige, Batterieanschluss |
+| Batterie | MAX17048 Ladezustandsmesser, Batterieanschluss |
 | Erweiterung | QWIIC-Anschluss, Programmier-Header |
 
 ## Überlegungen zum PCB-Layout
 
 ### Komponentenplatzierung
 
-- **MCU** zentral positioniert für ausgewogenes Trace-Routing
+- **MCU** zentral positioniert für eine ausgewogene Leiterbahnführung
 - **USB-C**-Anschluss an der Platinenkante für Zugänglichkeit
-- **Display-Anschluss** für die Flachbandkabelführung zum Gehäuse ausgerichtet
-- **Batterieanschluss** für die interne Batterieplatzierung positioniert
-- **QWIIC-Anschluss** zugänglich für Erweiterungsmodule
+- **Display**-Anschluss für die Flachbandkabelführung zum Gehäuse ausgerichtet
+- **Batterie**-Anschluss für die interne Batterieplatzierung positioniert
+- **QWIIC**-Anschluss zugänglich für Erweiterungsmodule
 
 ### Überlegungen zur Antenne
 
 Der ESP32-S3 verwendet eine integrierte PCB-Antenne oder eine externe Antenne (versionsabhängig). Der Antennenbereich sollte freigehalten werden von:
 - Masseebenen direkt darunter
 - Nähe zum Metallgehäuse
-- Hochfrequente Schaltsignale
+- hochfrequenten Schaltsignalen
 
 <Warning>
-Platzieren Sie keine Komponenten und verlegen Sie keine Leiterbahnen in der Sperrzone der Antenne. Dadurch wird die WLAN-Leistung erheblich beeinträchtigt.
+Platzieren Sie keine Komponenten und verlegen Sie keine Leiterbahnen in der Sperrzone der Antenne. Dadurch wird die WiFi-Leistung erheblich beeinträchtigt.
 </Warning>
 
 ## Designdateien
@@ -135,14 +135,14 @@ Alle Designdateien sind im GitHub-Repository verfügbar:
 
 | Datei | Format | Beschreibung |
 |------|--------|-------------|
-| PCB – OSSM Wireless v0.4.pcbdoc | Altium-Designer | PCB-Layout mit Kupfer, Siebdruck, Bohrdateien |
-| Schaltplan – OSSM Wireless V0.4.schdoc | Altium-Designer | Vollständige schematische Erfassung |
-| RADR-Schema – OSSM Wireless V0.4.pdf | PDF | Druckbare schematische Referenz |
-| RADR BOM – OSSM Wireless – v0.4 – S3.xlsx | Excel | Stückliste mit Teilenummern |
+| PCB - OSSM Wireless v0.4.pcbdoc | Altium Designer | PCB-Layout mit Kupfer, Siebdruck, Bohrdateien |
+| Schematic - OSSM Wireless V0.4.schdoc | Altium Designer | Vollständiger Schaltplan |
+| RADR Schematic - OSSM Wireless V0.4.pdf | PDF | Druckbare Schaltplanreferenz |
+| RADR BOM - OSSM Wireless - v0.4 - S3.xlsx | Excel | Stückliste mit Teilenummern |
 | RADR PCB render.png | PNG | 3D-Rendering der zusammengebauten Platine |
 
 <Card title="Designdateien herunterladen" icon="download" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Hardware/Electronics">
-Greifen Sie auf Altium-Projektdateien, Gerbers und Stücklisten auf GitHub zu.
+Greifen Sie auf Altium-Projektdateien, Gerber-Dateien und Stücklisten auf GitHub zu.
 </Card>
 
 ## Herstellung
@@ -154,9 +154,9 @@ Empfohlene Spezifikationen für die Bestellung:
 | Parameter | Wert |
 |-----------|-------|
 | Schichten | 2 |
-| Dicke | 1,6 mm |
+| Dicke | 1.6mm |
 | Oberflächenbeschaffenheit | HASL oder ENIG |
-| Kupfergewicht | 1 Unze |
+| Kupfergewicht | 1oz |
 | Lötmaske | Jede Farbe |
 | Siebdruck | Weiß |
 
@@ -168,7 +168,7 @@ Empfohlene Spezifikationen für die Bestellung:
 | PCBA-Service | Produktionsmengen |
 
 <Tip>
-Dienste wie JLCPCB und PCBWay bieten kombinierte Leiterplattenfertigung und -montage. Laden Sie die Gerbers und die Stückliste hoch, um eine schlüsselfertige Lösung zu erhalten.
+Dienste wie JLCPCB und PCBWay bieten kombinierte Leiterplattenfertigung und -montage. Laden Sie die Gerber-Dateien und die Stückliste hoch, um eine schlüsselfertige Lösung zu erhalten.
 </Tip>
 
 ### Kritische Komponenten
@@ -197,14 +197,14 @@ Version v0.4 verwendet die ESP32-S3-Variante. Das Suffix „S3“ im BOM-Dateina
 <AccordionGroup>
 <Accordion title="Das Board lässt sich nicht einschalten">
 - Überprüfen Sie die USB-C-Verbindung und das Kabel
-- Überprüfen Sie den 3,3-V-Reglerausgang
+- Überprüfen Sie den 3.3V-Reglerausgang
 - Überprüfen Sie die Stromschienen auf Kurzschlüsse
 - Stellen Sie sicher, dass der Akku angeschlossen und geladen ist
 </Accordion>
 
 <Accordion title="Anzeige funktioniert nicht">
 - Überprüfen Sie die Verbindung des Flachbandkabels
-- SPI-Signale mit Oszilloskop prüfen
+- Überprüfen Sie die SPI-Signale mit einem Oszilloskop
 - Bestätigen Sie das PWM-Signal der Hintergrundbeleuchtung
 - Testen Sie die Stromschienen des Displays
 </Accordion>
@@ -213,21 +213,21 @@ Version v0.4 verwendet die ESP32-S3-Variante. Das Suffix „S3“ im BOM-Dateina
 - Überprüfen Sie den Antennenbereich auf Kurzschlüsse oder Brücken
 - Stellen Sie sicher, dass ESP32-S3 richtig programmiert ist
 - Stellen Sie sicher, dass sich kein Metall in der Nähe der Antennenzone befindet
-- Test mit entfernter HF-Abschirmung (falls zutreffend)
+- Testen Sie mit entfernter HF-Abschirmung (falls zutreffend)
 </Accordion>
 
 <Accordion title="Akku wird nicht geladen">
 - Überprüfen Sie, ob USB-C-CC-Widerstände vorhanden sind
 - Überprüfen Sie die Lade-IC-Anschlüsse
-- Batteriespannung am Stecker messen
+- Messen Sie die Batteriespannung am Stecker
 - Bestätigen Sie den Lade-LED-Schaltkreis
 </Accordion>
 
 <Accordion title="Tasten reagieren nicht">
-- Pull-Up-/Pull-Down-Widerstände prüfen
+- Überprüfen Sie die Pull-Up-/Pull-Down-Widerstände
 - Überprüfen Sie die GPIO-Zuweisungen in der Firmware
 - Testen Sie den Durchgang von der Taste zur MCU
-- Auf kalte Lötstellen prüfen
+- Prüfen Sie auf kalte Lötstellen.
 </Accordion>
 </AccordionGroup>
 

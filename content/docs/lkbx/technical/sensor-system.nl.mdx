@@ -11,22 +11,22 @@ Uw apparaat heeft twee soorten sensoren:
 
 | Sensortype | Hoeveelheid | Doel |
 |-------------|----------|---------|
-| TMR-sensoren | 3 | Detecteer de positie van de vergrendelingspeddel |
-| Hall-effect sensoren | 2 | Detecteer de aanwezigheid van de achterplaat |
+| TMR-sensoren | 3 | Positie van de vergrendelingspeddel detecteren |
+| Hall-effectsensoren | 2 | Aanwezigheid van de achterplaat detecteren |
 
 ## TMR-sensoren (peddeldetectie)
 
-Drie TMR-sensoren (Tunnel Magnetoresistentie) detecteren of de vergrendelingspeddel zich in de vergrendelde of ontgrendelde positie bevindt.
+Drie TMR-sensoren (Tunnel Magnetoresistance) detecteren of de vergrendelingspeddel zich in de vergrendelde of ontgrendelde positie bevindt.
 
 ### Hoe ze werken
 
 - Sensoren detecteren het magnetische veld van de peddel
-- Wanneer de peddel in de vergrendelde positie staat, geven de sensoren LAAG aan
-- Wanneer de paddle ontgrendeld is, geven de sensoren HOOG aan
+- Wanneer de peddel in de vergrendelde positie staat, geven de sensoren LOW aan
+- Wanneer de peddel ontgrendeld is, geven de sensoren HIGH aan
 
 ### Detectielogica
 
-Het apparaat beschouwt de paddle als **vergrendeld** wanneer:
+Het apparaat beschouwt de peddel als **vergrendeld** wanneer:
 
 ```
 (TMR1 AND TMR2 AND TMR3) OR
@@ -42,7 +42,7 @@ Twee van de drie sensoren die de vergrendelde positie detecteren, zijn voldoende
 ### Waarom drie sensoren?
 
 - **Redundantie**: Twee-op-drie-stemming zorgt voor betrouwbare detectie
-- **Fouttolerantie**: Een enkele sensorfout leidt niet tot detectie van het verbreken van het slot
+- **Fouttolerantie**: Een enkele sensorfout verhindert de slotdetectie niet
 - **Nauwkeurigheid**: Meerdere sensoren verminderen valse metingen
 
 ## Hall-effectsensoren (achterplaatdetectie)
@@ -52,8 +52,8 @@ Twee Hall-effectsensoren detecteren of de achterplaat correct is bevestigd.
 ### Hoe ze werken
 
 - Sensoren detecteren magneten die in de achterplaat zijn ingebed
-- Wanneer de achterplaat is bevestigd, geeft ten minste één sensor LAAG aan
-- Wanneer de achterplaat wordt verwijderd, geven beide sensoren HOOG aan
+- Wanneer de achterplaat is bevestigd, geeft ten minste één sensor LOW aan
+- Wanneer de achterplaat wordt verwijderd, geven beide sensoren HIGH aan
 
 ### Detectielogica
 
@@ -69,36 +69,36 @@ Elke sensor die de achterplaatmagneet detecteert, is voldoende.
 Het apparaat staat geen vergrendeling toe als de achterplaat niet wordt gedetecteerd. Dit is een veiligheidsvoorziening om vergrendeling zonder goede sluiting te voorkomen.
 </Warning>
 
-## Sensorverificatie tijdens operaties
+## Sensorverificatie tijdens bewerkingen
 
 ### Bediening vergrendelen
 
 Wanneer u een vergrendeling initieert:
 
 1. De motor drijft de peddel naar de vergrendelpositie
-2. Het apparaat wacht maximaal 2 seconden totdat de paddle de positie heeft bereikt
-3. TMR-sensoren controleren of de paddle is vergrendeld
+2. Het apparaat wacht maximaal 2 seconden totdat de peddel de positie heeft bereikt
+3. TMR-sensoren controleren of de peddel is vergrendeld
 4. Hall-sensoren verifiëren dat de achterplaat gesloten is
-5. Als alle controles slagen → Slot bevestigd
+5. Als alle controles slagen → Vergrendeling bevestigd
 6. Als de controles mislukken → Fout weergegeven
 
 ### Ontgrendeling
 
 Wanneer het apparaat ontgrendelt:
 
-1. De motor drijft de peddel aan om de positie te ontgrendelen
-2. Het apparaat wacht maximaal 2 seconden totdat de paddle beweegt
-3. TMR-sensoren controleren of de paddle ontgrendeld is
-4. Als de cheque slaagt → Ontgrendeling bevestigd
+1. De motor drijft de peddel naar de ontgrendelingspositie
+2. Het apparaat wacht maximaal 2 seconden totdat de peddel beweegt
+3. TMR-sensoren controleren of de peddel ontgrendeld is
+4. Als de controle slaagt → Ontgrendeling bevestigd
 5. Als de controle mislukt → E-LOCK-2-fout weergegeven
 
 ## Foutcondities
 
 | Fout | Voorwaarde | Sensoren betrokken |
 |-------|-----------|-----------------|
-| E-SLOT-1 | Kan niet vergrendelen | TMR-sensoren detecteren geen vergrendelde positie |
-| E-SLOT-2 | Kan niet ontgrendelen | TMR-sensoren detecteren nog steeds de vergrendelde positie |
-| E-SLOT-3 | Geen achterplaat | Hall-sensoren detecteren geen achterplaat |
+| E-LOCK-1 | Kan niet vergrendelen | TMR-sensoren detecteren geen vergrendelde positie |
+| E-LOCK-2 | Kan niet ontgrendelen | TMR-sensoren detecteren nog steeds de vergrendelde positie |
+| E-LOCK-3 | Geen achterplaat | Hall-sensoren detecteren geen achterplaat |
 
 <Tip>
 De meeste sensorfouten worden veroorzaakt door fysieke obstructie. Controleer of niets de beweging van de peddel blokkeert en of de achterplaat goed op zijn plaats zit.
@@ -113,12 +113,12 @@ Wanneer uw apparaat is verbonden met WiFi, rapporteert uw apparaat periodiek sen
 | Veld | Beschrijving |
 |-------|-------------|
 | tmr1, tmr2, tmr3 | Individuele TMR-sensorstatussen |
-| hal1, hal2 | Individuele Hall-sensorstatussen |
-| isPaddleLocked | Berekende stand van de peddelvergrendeling |
-| isAchterplaatGesloten | Berekende staat van de achterplaat |
-| huidige staat | Apparaatstatus machinepositie |
-| batterijPercent | Huidig ​​batterijniveau |
-| isOpladen | USB-voeding aangesloten |
+| hall1, hall2 | Individuele Hall-sensorstatussen |
+| isPaddleLocked | Berekende vergrendelingsstatus van de peddel |
+| isBackplateClosed | Berekende status van de achterplaat |
+| currentState | Positie in de toestandsmachine van het apparaat |
+| batteryPercent | Huidig batterijniveau |
+| isCharging | USB-voeding aangesloten |
 
 ### Wanneer logboeken worden verzonden
 
@@ -130,7 +130,7 @@ Wanneer uw apparaat is verbonden met WiFi, rapporteert uw apparaat periodiek sen
 Met deze telemetrie kan uw sleutelhouder de status van het apparaat controleren en wordt ondersteuning geboden bij het op afstand diagnosticeren van problemen.
 </Info>
 
-## Huidige monitoring
+## Stroommonitoring
 
 Een INA219-stroomsensor bewaakt de motorstroom tijdens vergrendel-/ontgrendelingshandelingen:
 
@@ -140,7 +140,7 @@ Een INA219-stroomsensor bewaakt de motorstroom tijdens vergrendel-/ontgrendeling
 - Voorkom motorschade door afslaan
 - Controleer de juiste werking
 
-### Huidige limieten
+### Stroomlimieten
 
 Als de gemiddelde stroom tijdens bedrijf van de motor gedurende langere tijd 50 mA overschrijdt, stopt de motor automatisch om schade te voorkomen.
 
@@ -148,11 +148,11 @@ Als de gemiddelde stroom tijdens bedrijf van de motor gedurende langere tijd 50 
 
 Het slotpictogram in de statusbalk geeft de sensorstatus weer:
 
-| Vergrendelpictogram | Peddel staat | Indicator stip | Staat achterplaat |
+| Vergrendelpictogram | Peddeltoestand | Indicatorpunt | Toestand achterplaat |
 |-----------|--------------|---------------|-----------------|
-| Vergrendeld | Peddel in vergrendelde positie | Groente | Achterplaat gedetecteerd |
+| Vergrendeld | Peddel in vergrendelde positie | Groen | Achterplaat gedetecteerd |
 | Vergrendeld | Peddel in vergrendelde positie | Geel | Achterplaat niet gedetecteerd |
-| Ontgrendeld | Peddel in ontgrendelde positie | Groente | Achterplaat gedetecteerd |
+| Ontgrendeld | Peddel in ontgrendelde positie | Groen | Achterplaat gedetecteerd |
 | Ontgrendeld | Peddel in ontgrendelde positie | Geel | Achterplaat niet gedetecteerd |
 
 Zie [Statussymbolen](../using/symbols) voor gedetailleerde pictogrambeschrijvingen.
@@ -161,28 +161,28 @@ Zie [Statussymbolen](../using/symbols) voor gedetailleerde pictogrambeschrijving
 
 <AccordionGroup>
 <Accordion title="E-LOCK-1: Kan niet vergrendelen">
-De TMR-sensoren detecteren de peddel niet in vergrendelde positie. Rekening:
+De TMR-sensoren detecteren de peddel niet in vergrendelde positie. Controleer het volgende:
 - Niets blokkeert de peddel
 - De achterplaat zit goed op zijn plaats
 - Probeer opnieuw te kalibreren als het probleem zich blijft voordoen
 </Accordion>
 
 <Accordion title="E-LOCK-2: Kan niet ontgrendelen">
-De TMR-sensoren detecteren nog steeds dat de paddle is vergrendeld. Rekening:
+De TMR-sensoren detecteren nog steeds dat de peddel is vergrendeld. Controleer het volgende:
 - Niets verhindert de beweging van de peddel
 - Apparaat heeft voldoende batterij
-- Neem contact op met de klantenservice als de motor klinkt maar de peddel niet beweegt
+- Neem contact op met de klantenservice als de motor geluid maakt maar de peddel niet beweegt
 </Accordion>
 
 <Accordion title="E-LOCK-3: Geen achterplaat">
-De Hall-sensoren detecteren de achterplaat niet. Rekening:
+De Hall-sensoren detecteren de achterplaat niet. Controleer het volgende:
 - De achterplaat zit volledig vast en klikt op zijn plaats
 - Maak het contactgebied tussen apparaat en achterplaat schoon
 - Ga weg van sterke magnetische bronnen
 </Accordion>
 
 <Accordion title="Gele achterplaatindicator">
-De achterplaatindicator licht geel op als Hall-sensoren de achterplaat niet detecteren. Zorg ervoor dat de achterplaat volledig is bevestigd voordat u deze vergrendelt.
+De achterplaatindicator licht geel op als Hall-sensoren de achterplaat niet detecteren. Zorg ervoor dat de achterplaat volledig is bevestigd voordat u het apparaat vergrendelt.
 </Accordion>
 </AccordionGroup>
 
@@ -193,23 +193,23 @@ De achterplaatindicator licht geel op als Hall-sensoren de achterplaat niet dete
 | Parameter | Waarde |
 |-----------|-------|
 | Pinnen | 17, 18, 21 |
-| Actieve staat | LAAG wanneer peddel wordt gedetecteerd |
-| Stemmen | 2 van 3 vereist |
+| Actieve toestand | LOW wanneer peddel wordt gedetecteerd |
+| Stemvereiste | 2 van 3 vereist |
 
-### Hall-effect sensoren
+### Hall-effectsensoren
 
 | Parameter | Waarde |
 |-----------|-------|
 | Pinnen | 6, 15 |
-| Actieve staat | LAAG wanneer magneet wordt gedetecteerd |
-| Stemmen | 1 van 2 vereist |
+| Actieve toestand | LOW wanneer magneet wordt gedetecteerd |
+| Stemvereiste | 1 van 2 vereist |
 
 ### Stroomsensor (INA219)
 
 | Parameter | Waarde |
 |-----------|-------|
 | I2C-pinnen | SDA: 9, SCL: 10 |
-| Huidige limiet | 50mA gemiddeld |
+| Stroomlimiet | 50mA gemiddeld |
 | Monitoringperiode | Tijdens motorische handelingen |
 
 ## Gerelateerde handleidingen

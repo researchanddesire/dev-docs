@@ -1,11 +1,11 @@
 ---
 title: "Service d'affichage"
-description: "Utilisez le service d'affichage thread-safe pour dessiner sur l'OLED SSD1306 128 × 64 avec U8G2"
+description: "Utilisez le service d'affichage thread-safe pour un écran OLED SSD1306 128 × 64 avec U8G2 afin d'y dessiner"
 ---
 
 ## Aperçu
 
-Le service d'affichage est un wrapper global et thread-safe autour du pilote U8G2 pour un OLED SSD1306 128 × 64. Vous l'utilisez pour restituer le texte et les graphiques de n'importe quelle tâche sans scintillement ni déchirure. Un mutex FreeRTOS garantit un accès exclusif pendant que vous dessinez ; les fonctions d'assistance gèrent la suppression de région, l'actualisation partielle, le découpage et la mise en cache de texte.
+Le service d'affichage est un wrapper global et thread-safe autour du pilote U8G2 pour un OLED SSD1306 128 × 64. Vous l'utilisez pour restituer le texte et les graphiques de n'importe quelle tâche sans scintillement ni déchirure. Un mutex FreeRTOS garantit un accès exclusif pendant que vous dessinez ; les fonctions d'assistance gèrent l'effacement des régions, l'actualisation partielle, le découpage et la mise en cache du texte.
 
 <Info>
 Cette page documente l'API de développement au niveau du micrologiciel utilisée sur nos appareils. Pour connaître le comportement de l'affichage destiné à l'utilisateur (par exemple, masquer les écrans de temps restant ou d'état de l'appareil), consultez les pages associées à la fin.
@@ -13,8 +13,8 @@ Cette page documente l'API de développement au niveau du micrologiciel utilisé
 
 ## Conditions préalables
 
-- ESP32 avec matériel I2C disponible
-- Bibliothèque U8G2 intégrée à votre build de firmware
+- ESP32 avec interface I2C matérielle disponible
+- Bibliothèque U8G2 intégrée à la compilation de votre micrologiciel
 - FreeRTOS (pour le mutex d'affichage)
 - Broches configurées pour SDA/SCL dans le `Pins.h` de votre carte
 
@@ -22,7 +22,7 @@ Cette page documente l'API de développement au niveau du micrologiciel utilisé
 
 | Propriété | Valeur |
 |---|---|
-| Afficher | SSD1306 OLED |
+| Affichage | SSD1306 OLED |
 | Résolution | 128×64 pixels |
 | Interface | I2C (matériel) |
 | Rotation | U8G2_R0 (0°) |
@@ -62,12 +62,12 @@ L'écran est traité comme une grille de cellules de 8 × 8 pixels :
 </AccordionGroup>
 
 <Tip>
-Les API de texte U8G2 utilisent la ligne de base pour `y`. Pour les polices de 8 pixels de hauteur, commencez la première ligne de texte à `y = 8`, puis ajoutez la montée/hauteur de ligne de la police pour les lignes suivantes.
+Les API de texte U8G2 utilisent la ligne de base pour `y`. Pour les polices de 8 pixels de hauteur, commencez la première ligne de texte à `y = 8`, puis ajoutez la hauteur d’ascendante/hauteur de ligne de la police pour les lignes suivantes.
 </Tip>
 
-## Sécurité du fil
+## Sécurité des threads
 
-Le service d'affichage expose un mutex FreeRTOS. Verrouillez toujours avant de dessiner et déverrouillez lorsque vous avez terminé.
+Le service d'affichage fournit un mutex FreeRTOS. Verrouillez-le toujours avant de dessiner et déverrouillez-le lorsque vous avez terminé.
 
 ```cpp display_mutex.h
 #pragma once
@@ -115,7 +115,7 @@ Après l'initialisation, l'écran doit être vide et rétroéclairé, et `displa
 </Step>
 
 <Step title="Vérifier le dessin">
-Afficher une seule ligne de texte dans la zone de la page.
+Affichez une seule ligne de texte dans la zone de la page.
 
 ```cpp sanity_check.cpp
 if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
@@ -129,9 +129,9 @@ if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
 </Step>
 </Steps>
 
-## Aides au déblaiement
+## Aides à l'effacement
 
-Effacez efficacement uniquement ce que vous envisagez de redessiner. Tous les assistants utilisent un `updateDisplayArea()` interne pour effectuer une actualisation partielle de la région affectée.
+Effacez efficacement uniquement ce que vous envisagez de redessiner. Toutes les fonctions d'aide utilisent `updateDisplayArea()` en interne pour effectuer une actualisation partielle de la région affectée.
 
 | Fonction | Description | Région effacée |
 |---|---|---|
@@ -153,17 +153,17 @@ void clearPage(bool includeFooter = false, bool includeHeader = false);
 `clearPage()` définit une fenêtre de découpage pour empêcher le contenu de se répandre dans l'en-tête ou le pied de page.
 </Note>
 
-## Actualiser les assistants
+## Aides à l'actualisation
 
-Appelez un assistant d'actualisation après avoir modifié une région. Ceux-ci effectuent des mises à jour minimales de l’affichage.
+Appelez une fonction d’actualisation après avoir modifié une région. Elle effectue une mise à jour minimale de l’affichage.
 
 | Fonction | Description | Région mise à jour |
 |---|---|---|
-| `refreshHeader()` | Pousse le texte d'en-tête | Ligne 0, cellules 0 à 12 |
-| `refreshIcons()` | Pousse la zone d'icône | Ligne 0, cellules 13 à 15 |
-| `refreshFooter()` | Pousse le texte du pied de page | Ligne 7, cellules 0 à 14 |
-| `refreshTimeout()` | Pousse l'indicateur de délai d'attente | Ligne 7, cellule 15 |
-| `refreshPage(includeFooter=false, includeHeader=false)` | Pousse le contenu principal ; en-tête/pied de page en option | Lignes 1 à 6 (plus en-tête/pied de page sur demande) |
+| `refreshHeader()` | Envoie le texte d'en-tête | Ligne 0, cellules 0 à 12 |
+| `refreshIcons()` | Envoie la zone d'icônes | Ligne 0, cellules 13 à 15 |
+| `refreshFooter()` | Envoie le texte du pied de page | Ligne 7, cellules 0 à 14 |
+| `refreshTimeout()` | Met à jour l'indicateur de délai d'attente | Ligne 7, cellule 15 |
+| `refreshPage(includeFooter=false, includeHeader=false)` | Envoie le contenu principal ; en-tête/pied de page en option | Lignes 1 à 6 (plus en-tête/pied de page sur demande) |
 
 ```cpp refresh_helpers.h
 void refreshHeader();
@@ -173,11 +173,11 @@ void refreshTimeout();
 void refreshPage(bool includeFooter = false, bool includeHeader = false);
 ```
 
-## Aides au contenu
+## Fonctions d'aide au contenu
 
 ### `setHeader()`
 
-Définit le texte de l'en-tête. Le service met en majuscule et met en cache la dernière valeur pour éviter les redessins redondants.
+Définit le texte de l'en-tête. Le service convertit la dernière valeur en majuscules et la met en cache pour éviter les redessins redondants.
 
 ```cpp header.h
 void setHeader(String &text);
@@ -210,17 +210,17 @@ int drawWrappedText(int x, int y, const String &text, bool center = false);
 Coordonnée x de départ en pixels.
 </ParamField>
 <ParamField path="y" type="int" required>
-Coordonnée y de base de départ en pixels.
+Coordonnée de départ de la ligne de base y en pixels.
 </ParamField>
 <ParamField path="text" type="String" required>
 Texte à restituer. Prend en charge le littéral `\n` pour les sauts de ligne.
 </ParamField>
 <ParamField path="center" type="bool" default="false">
-Centrez chaque ligne enveloppée dans la zone de page lorsque `true`.
+Centrez chaque ligne renvoyée à la ligne dans la zone de page lorsque `center` vaut `true`.
 </ParamField>
 
 <ResponseField name="return" type="int" required>
-Nombre de lignes tracées.
+Nombre de lignes dessinées.
 </ResponseField>
 
 ## Modèles courants
@@ -252,7 +252,7 @@ if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
 }
 ```
 
-### Dessiner du texte enveloppé et centré
+### Dessiner du texte centré avec retour automatique à la ligne
 
 ```cpp wrapped_text.cpp
 if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
@@ -268,7 +268,7 @@ if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
 
 <Steps>
 <Step title="Verrouillez le mutex pour chaque séquence de dessin">
-Enveloppez le dessin et actualisez-le dans une section critique gardée par `displayMutex`.
+Regroupez les opérations de dessin et d’actualisation dans une section critique protégée par `displayMutex`.
 
 ```cpp lock_and_draw.cpp
 if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
@@ -295,25 +295,25 @@ refreshPage();
 </CodeGroup>
 </Step>
 
-<Step title="Respecter les limites">
-Conserver le contenu dans :
+<Step title="Respectez les limites">
+Conservez le contenu dans :
 
 - En-tête : ligne 0, cellules 0 à 12
 - Icônes : ligne 0, cellules 13 à 15
 - Page : lignes 1 à 6
-- Pied de page : ligne 7, cellules 0 à 14 ; délai d'attente à la cellule 15
+- Pied de page : ligne 7, cellules 0 à 14 ; indicateur de délai d’attente dans la cellule 15
 
-Utilisez `clearPage()` pour découper le contenu de la page loin de l'en-tête/pied de page.
+Utilisez `clearPage()` pour empêcher le contenu de la page d’empiéter sur l’en-tête ou le pied de page.
 </Step>
 
 <Step title="Choisissez des polices lisibles">
 | Zone | Police recommandée |
 |---|---|
 | En-tête/pied de page | `u8g2_font_spleen5x8_mu` |
-| Contenu des pages | Choisissez pour la lisibilité ; ajuster l'espacement des lignes par les mesures de police |
+| Contenu des pages | Choisissez une police lisible ; ajustez l'espacement des lignes selon les métriques de la police |
 
 <Note>
-Tenez compte de l'ascension de la police et de la hauteur totale des lignes lors du calcul des décalages `y` entre les lignes.
+Tenez compte de la hauteur d’ascendante de la police et de la hauteur totale des lignes lors du calcul des décalages `y` entre les lignes.
 </Note>
 </Step>
 </Steps>
@@ -322,8 +322,8 @@ Tenez compte de l'ascension de la police et de la hauteur totale des lignes lors
 
 - Les mises à jour partielles ne redessinent que les régions que vous avez modifiées
 - La mise en cache du texte évite les cycles de dessin/actualisation inutiles
-- Le découpage continue de dessiner à l'intérieur de la région prévue et réduit le dépassement
-- Les séquences protégées par mutex empêchent le déchirement du milieu d'image entre les tâches
+- Le découpage maintient le dessin dans la région prévue et réduit le surdessin
+- Les séquences protégées par mutex empêchent le déchirement d'image entre les tâches
 
 ## Dépannage
 
@@ -335,17 +335,17 @@ Tenez compte de l'ascension de la police et de la hauteur totale des lignes lors
 </Accordion>
 
 <Accordion title="Les mises à jour de l'affichage sont lentes ou scintillent">
-- Utiliser les effacements/actualisations de région au lieu des effacements complets du tampon
+- Utilisez les effacements/actualisations de région au lieu des effacements complets du tampon
 - Regroupez votre dessin dans un bloc protégé par mutex
-- Évitez les changements de police inutiles entre les appels de tirage
+- Évitez les changements de police inutiles entre les appels de dessin
 </Accordion>
 
 <Accordion title="Le texte apparaît mal aligné verticalement">
 - N'oubliez pas que U8G2 utilise une ligne de base pour `y`.
-- Commencez la première ligne de police de 8 px à `y = 8` ou calculez à partir de la montée de la police.
+- Commencez la première ligne de police de 8 px à `y = 8` ou calculez à partir de la hauteur d’ascendante de la police.
 </Accordion>
 
-<Accordion title="Tâches bloquées ou bloquées">
+<Accordion title="Blocage ou tâches bloquées">
 - Libérez toujours le mutex dans les chemins d'erreur
 - Préférez les wrappers de style RAII ou les modèles `goto cleanup`
 </Accordion>
@@ -356,14 +356,14 @@ Tenez compte de l'ascension de la police et de la hauteur totale des lignes lors
 | Dépendance | But |
 |---|---|
 | U8G2 | Rendu SSD1306 et gestion des polices |
-| RTOS gratuit | Mutex pour la sécurité des threads |
+| FreeRTOS | Mutex pour la sécurité des threads |
 | ESP32 HAL | Interface matérielle I2C |
 | `Pins.h` | Définitions des broches de la carte pour SDA/SCL |
 
 ## Pages connexes
 
 <CardGroup cols={3}>
-<Card title="Masquer l'heure d'affichage (fonctionnalité utilisateur)" icon="eye-off" href="https://docs.researchanddesire.com/lockbox/start-end-lock">
+<Card title="Masquer le temps restant affiché (fonctionnalité utilisateur)" icon="eye-off" href="https://docs.researchanddesire.com/lockbox/start-end-lock">
 Comment l'interface utilisateur masque le temps restant sur l'appareil, le tableau de bord et les notifications.
 </Card>
 

@@ -1,15 +1,15 @@
 ---
 title: "StrokeEngine-bibliotheek"
-description: "Creëer veelzijdige strijkbewegingen met stappen- of servomotoren op ESP32 voor doe-het-zelf lineaire positieaandrijfmachines"
+description: "Creëer veelzijdige slagbewegingen met stappen- of servomotoren op ESP32 voor doe-het-zelf lineaire positieaandrijfmachines"
 ---
 
-StrokeEngine is een bibliotheek voor het creëren van een verscheidenheid aan strijkbewegingen met stappen- of servomotoren op een ESP32. Je kunt het gebruiken met elke doe-het-zelfmachine met een lineaire positieaandrijving, aangedreven door een stappen- of servomotor.
+StrokeEngine is een bibliotheek voor het creëren van een verscheidenheid aan slagbewegingen met stappen- of servomotoren op een ESP32. U kunt deze gebruiken met elke doe-het-zelfmachine met een lineaire positieaandrijving, aangedreven door een stappen- of servomotor.
 
 <CardGroup cols={2}>
-  <Card title="FuckIO-voorbeeld" icon="code" href="https://github.com/theelims/FuckIO">
+  <Card title="FuckIO Example" icon="code" href="https://github.com/theelims/FuckIO">
     Referentie-implementatie met behulp van StrokeEngine
   </Card>
-  <Card title="OSSM-project" icon="gear" href="https://github.com/KinkyMakers/OSSM-hardware">
+  <Card title="OSSM Project" icon="gear" href="https://github.com/KinkyMakers/OSSM-hardware">
     Populaire open-source implementatie door Kinky Makers
   </Card>
 </CardGroup>
@@ -26,54 +26,54 @@ Als u deze concepten begrijpt, kunt u sneller aan de slag met StrokeEngine.
 
 De machine maakt gebruik van een intern coördinatensysteem dat metrische eenheden uit de echte wereld omzet in encoder-/stepperstappen. Deze abstractie werkt met alle machinegroottes, ongeacht de motor die u kiest.
 
-<Frame caption="StrokeEngine-coördinatensysteem dat de fysieke verplaatsing, uithaalgrenzen en slagparameters weergeeft">
-  <img src="./_images/coordinates.svg" alt="Coördinatiesysteemdiagram dat de relatie toont tussen fysieke reis-, keepout-grens-, diepte- en slagparameters" />
+<Frame caption="StrokeEngine-coördinatensysteem dat de fysieke verplaatsing, uitsluitingsgrenzen en slagparameters weergeeft">
+  <img src="./_images/coordinates.svg" alt="Coördinatensysteemdiagram dat de relatie toont tussen physicalTravel, keepoutBoundary, depth en stroke" />
 </Frame>
 
 **Belangrijke coördinaatconcepten:**
 
-| Termijn | Beschrijving |
+| Begrip | Beschrijving |
 |------|-------------|
-| **fysiekeReizen** | Het echte fysieke reizen van de ene harde eindstop naar de andere |
-| **buitengrens** | Veiligheidsafstand van elke kant afgetrokken om botsingen te voorkomen |
-| **_reis** | Werkafstand: `physicalTravel - (2 * keepoutBoundary)` |
-| **Thuis** | Positie bij `-keepoutBoundary` (meestal aan de achterkant) |
-| **MIN = 0** | Nulpositie, `keepoutBoundary` weg van huis |
-| **Diepte** | Het verste punt dat de machine uitschuift (instelbaar tijdens runtime) |
-| **Hartinfarct** | De werkafstand van een strijkbeweging (tijdens de looptijd instelbaar) |
+| **physicalTravel** | De werkelijke fysieke verplaatsing van de ene harde eindstop naar de andere |
+| **keepoutBoundary** | Veiligheidsafstand die aan beide kanten wordt afgetrokken om botsingen te voorkomen |
+| **_travel** | Werkafstand: `physicalTravel - (2 * keepoutBoundary)` |
+| **Home** | Positie bij `-keepoutBoundary` (meestal aan de achterkant) |
+| **MIN = 0** | Nulpositie, op een afstand van `keepoutBoundary` van Home |
+| **Depth** | Het verste punt dat de machine uitschuift (instelbaar tijdens runtime) |
+| **Stroke** | De werkafstand van een slagbeweging (tijdens runtime instelbaar) |
 
 <Note>
-Beschouw **Slag** als de amplitude en **Diepte** als een lineaire offset die eraan wordt toegevoegd. De positieve bewegingsrichting is naar voren (naar het lichaam).
+Beschouw **Stroke** als de amplitude en **Depth** als een lineaire offset die eraan wordt toegevoegd. De positieve bewegingsrichting is naar voren (naar het lichaam).
 </Note>
 
 ### Patronen
 
-StrokeEngine maakt gebruik van een patroongenerator om een ​​grote verscheidenheid aan sensaties te bieden. Patronen passen dynamisch parameters zoals snelheid, slag en diepte bewegingsgewijze aan met behulp van trapeziumvormige bewegingsprofielen.
+StrokeEngine maakt gebruik van een patroongenerator om een grote verscheidenheid aan sensaties te bieden. Patronen passen dynamisch parameters zoals speed, stroke en depth per beweging aan met behulp van trapeziumvormige bewegingsprofielen.
 
 Elk patroon accepteert vier parameters:
-- **diepte** — Maximaal uitbreidingspunt
-- **slag** — Bewegingsamplitude
-- **snelheid** — Cycli per minuut
-- **sensatie** — Willekeurige modificator voor patroongedrag (-100 tot 100)
+- **depth** — Maximale uitgeschoven positie
+- **stroke** — Bewegingsamplitude
+- **speed** — Cycli per minuut
+- **sensation** — Vrij instelbare modifier voor patroongedrag (-100 tot 100)
 
 <Info>
-Zie de [Patroondocumentatie](/ossm/software/motion/stroke-engine/pattern) voor gedetailleerde beschrijvingen van beschikbare patronen en instructies voor het maken van uw eigen patronen.
+Zie de [documentatie over patronen](/ossm/software/motion/stroke-engine/pattern) voor gedetailleerde beschrijvingen van beschikbare patronen en instructies voor het maken van uw eigen patronen.
 </Info>
 
-### Gracieuze foutafhandeling
+### Foutafhandeling zonder onderbreking
 
 StrokeEngine verwerkt ongeldige parameters op een elegante manier zonder de werking te onderbreken:
 
-- Alle instelfuncties gebruiken `constrain()` om de invoer van de fysieke mogelijkheden van de machine te beperken
+- Alle instelfuncties gebruiken `constrain()` om de invoer te beperken tot de fysieke mogelijkheden van de machine
 - Waarden buiten de grenzen worden automatisch bijgesneden
-- Patroonopdrachten die de machinelimieten overschrijden, resulteren in kortere slagen of aangepaste hellingen
+- Patroonopdrachten die de machinelimieten overschrijden, resulteren in kortere slagen of aangepaste bewegingsrampen
 - De beweging wordt over de volledige afstand voltooid, maar kan iets langer duren dan verwacht
 
-### Updates van parameters halverwege de slag
+### Parameterupdates halverwege de slag
 
-U kunt de diepte-, lijn-, snelheid- en patroonparameters halverwege de slag bijwerken voor een responsieve, vloeiende gebruikerservaring. Ingebouwde beveiligingen zorgen ervoor dat de machine altijd binnen de perken blijft.
+U kunt de parameters depth, stroke, speed en pattern halverwege de slag bijwerken voor een responsieve, vloeiende gebruikerservaring. Ingebouwde beveiligingen zorgen ervoor dat de machine altijd binnen de grenzen blijft.
 
-### Staatsmachine
+### Toestandsmachine
 
 Een interne eindige toestandsmachine beheert de machinetoestanden:
 
@@ -95,10 +95,10 @@ stateDiagram-v2
 
 | Staat | Beschrijving |
 |-------|-------------|
-| **ONGEDEFINIEERD** | Initiële staat vóór thuiskomst. Motor is uitgeschakeld en positie is onbekend. |
-| **KLAAR** | Thuiskomen voltooid. Machine accepteert bewegingsopdrachten. |
-| **PATROON** | Patroongenerator voert cyclische bewegingen uit. |
-| **INSTELLINGDIEPTE** | Motor volgt de dieptepositie voor interactieve aanpassing. |
+| **UNDEFINED** | Initiële toestand vóór homing. De motor is uitgeschakeld en de positie is onbekend. |
+| **READY** | Homing voltooid. De machine accepteert bewegingsopdrachten. |
+| **PATTERN** | De patroongenerator voert cyclische bewegingen uit. |
+| **SETUPDEPTH** | De motor volgt de dieptepositie voor interactieve aanpassing. |
 
 ## Gebruik
 
@@ -199,19 +199,19 @@ Wanneer `getState()` `READY` retourneert, is de machine in de uitgangspositie ge
 ### Handmatige homing (geen eindstopschakelaar)
 
 <Warning>
-Handmatige homing is gevaarlijk. Het aanroepen van `thisIsHome()` wanneer u niet bij de fysieke eindstop bent, veroorzaakt een onjuist coördinatensysteem, wat resulteert in een crash die uw machine kan beschadigen.
+Handmatige homing is gevaarlijk. Als de machine zich niet bij de fysieke eindstop bevindt, leidt het aanroepen van `thisIsHome()` tot een onjuist coördinatensysteem en daardoor tot een mechanische botsing die uw machine kan beschadigen.
 </Warning>
 
 Als uw machine geen homing-schakelaar heeft, kunt u handmatige homing gebruiken:
 
 1. Verplaats de machine fysiek naar de achterste eindstop
-2. Bel `Stroker.thisIsHome()`
+2. Roep `Stroker.thisIsHome()` aan
 
 ```cpp
 Stroker.thisIsHome();
 ```
 
-Dit schakelt de bestuurder in, stelt de huidige positie in als `-keepoutBoundary` en beweegt langzaam naar positie 0.
+Dit schakelt de motordriver in, stelt de huidige positie in als `-keepoutBoundary` en beweegt langzaam naar positie 0.
 
 ### Beschikbare patronen ophalen
 
@@ -241,12 +241,12 @@ String getPatternJSON() {
 
 | Functie | Beschrijving |
 |----------|-------------|
-| `Stroker.startPattern()` | Start de patroongebaseerde strijkbeweging |
+| `Stroker.startPattern()` | Start de patroongebaseerde slagbeweging |
 | `Stroker.stopMotion()` | Stop onmiddellijk met maximale vertraging |
 
 ### Positiecommando's
 
-Ga naar een van beide uiteinden van de machine voor installatiedoeleinden:
+Verplaats de machine naar een van beide uiteinden voor installatiedoeleinden:
 
 ```cpp
 Stroker.moveToMin();        // Move to rear (home) position
@@ -255,7 +255,7 @@ Stroker.moveToMax(10.0);    // Move at 10 mm/s (default speed)
 ```
 
 <Note>
-Deze functies kunnen worden opgeroepen vanuit de status `PATTERN` of `READY` en stoppen elke huidige beweging. Ze retourneren `false` als ze in een ongeldige status worden aangeroepen.
+Deze functies kunnen worden opgeroepen vanuit de toestand `PATTERN` of `READY` en stoppen elke huidige beweging. Ze retourneren `false` als ze in een ongeldige toestand worden aangeroepen.
 </Note>
 
 ### Interactieve diepte-instelling
@@ -267,18 +267,18 @@ Stroker.setupDepth();           // Default 10 mm/s
 Stroker.setupDepth(10.0);       // Specify speed
 ```
 
-Update de dieptepositie met `Stroker.setDepth(float)` en lees de huidige waarde af met `Stroker.getDepth()`.
+Werk de dieptepositie bij met `Stroker.setDepth(float)` en lees de huidige waarde af met `Stroker.getDepth()`.
 
 <Tip>
-**Fancy-modus:** Roep `Stroker.setupDepth(10.0, true)` op om zowel de diepte als de slag interactief aan te passen. De sensatieschuifregelaar wordt toegewezen aan het interval `[depth-stroke, depth]`:
+**Fancy Mode:** Roep `Stroker.setupDepth(10.0, true)` op om zowel depth als stroke interactief aan te passen. De sensatieschuifregelaar wordt toegewezen aan het interval `[depth-stroke, depth]`:
 - `sensation = 100` — Past de dieptepositie aan
 - `sensation = -100` — Past de slagpositie aan
-- `sensation = 0` — Posities op het middelpunt van de slag
+- `sensation = 0` — Positioneert op het middelpunt van de slag
 </Tip>
 
 ### Parameterfuncties
 
-Update parameters op elk gewenst moment. Waarden worden automatisch beperkt tot machinelimieten:
+Werk parameters op elk gewenst moment bij. Waarden worden automatisch beperkt tot de machinelimieten:
 
 ```cpp
 // Setter functions
@@ -306,9 +306,9 @@ int pattern = Stroker.getPattern();       // Pattern index
 
 ## Geavanceerde functies
 
-### Terugbellen via telemetrie
+### Telemetriecallback
 
-Registreer een terugbelactie om telemetriegegevens te ontvangen voor elke trapeziumvormige beweging:
+Registreer een callback om telemetriegegevens te ontvangen voor elke trapeziumvormige beweging:
 
 ```cpp
 void callbackTelemetry(float position, float speed, bool clipping) {
@@ -319,5 +319,5 @@ Stroker.registerTelemetryCallback(callbackTelemetry);
 ```
 
 <Note>
-Raadpleeg [StrokeEngine.h](https://github.com/theelims/StrokeEngine/blob/main/src/StrokeEngine.h) in de bronrepository voor de volledige API-referentie, inclusief overbelaste functies en extra functies.
+Raadpleeg [StrokeEngine.h](https://github.com/theelims/StrokeEngine/blob/main/src/StrokeEngine.h) in de bronrepository voor de volledige API-referentie, inclusief overladen functies en extra functies.
 </Note>

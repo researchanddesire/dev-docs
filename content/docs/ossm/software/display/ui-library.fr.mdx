@@ -1,11 +1,11 @@
 ---
 title: "Bibliothèque de l'interface utilisateur"
-description: "Bibliothèque de rendu pur pour les écrans d'affichage OSSM — Pages de texte, chaînes, icônes et tests visuels"
+description: "Bibliothèque de rendu pure pour les écrans OSSM — pages de texte, chaînes de caractères, icônes et tests visuels"
 ---
 
 ## Aperçu
 
-La bibliothèque `lib/ui` est une **couche de rendu pur** qui dessine les écrans OSSM dans un tampon U8g2. Il n'a aucune dépendance matérielle, pas de FreeRTOS, pas de mutex – il prend un pointeur `u8g2_t*` et dessine des pixels. La sécurité des threads et les E/S d’affichage sont gérées par le [service d’affichage](/ossm/software/display/display-service).
+La bibliothèque `lib/ui` est une **couche de rendu pure** qui dessine les écrans OSSM dans un tampon U8g2. Elle n'a aucune dépendance matérielle, pas de FreeRTOS ni de mutex – elle prend un pointeur `u8g2_t*` et dessine des pixels. La sécurité des threads et les E/S d’affichage sont gérées par le [service d’affichage](/ossm/software/display/display-service).
 
 Cette séparation signifie que la bibliothèque peut fonctionner en natif (x86) pour des tests visuels automatisés sans ESP32.
 
@@ -13,9 +13,9 @@ Cette séparation signifie que la bibliothèque peut fonctionner en natif (x86) 
 
 **Source :** `Software/lib/ui/src/`
 
-## Page de texte
+## TextPage
 
-`TextPage` est la structure principale pour les écrans basés sur le contenu. Il couvre les pages d'aide, les écrans d'erreur, l'état de la mise à jour, la configuration WiFi, le couplage – tout ce qui est principalement du texte avec des codes QR en option.
+`TextPage` est la structure principale pour les écrans basés sur le contenu. Elle couvre les pages d'aide, les écrans d'erreur, l'état de la mise à jour, la configuration WiFi, le couplage – tout ce qui est principalement du texte avec des codes QR en option.
 
 ```cpp
 struct TextPage {
@@ -33,29 +33,29 @@ struct TextPage {
 
 Tous les champs sont facultatifs. Définissez uniquement ce dont vous avez besoin.
 
-| Champ | Taper | But |
+| Champ | Type | But |
 |---|---|---|
 | `title` | `const char*` | Texte en gras en haut, avec une ligne de séparation en dessous |
-| `subtitle` | `const char*` | Texte moyen ou gras sous le titre ; se divise automatiquement si trop large |
-| `body` | `const char*` | Texte renvoyé à la ligne ; prend en charge les sauts de ligne `\n` |
+| `subtitle` | `const char*` | Texte de graisse moyenne ou en gras sous le titre ; se divise automatiquement si trop large |
+| `body` | `const char*` | Texte avec retour automatique à la ligne ; prend en charge `\n` comme saut de ligne |
 | `bottomText` | `const char*` | Épinglé en bas de l'écran (y=62) |
 | `qrUrl` | `const char*` | Code QR affiché en bas à droite ; limite la largeur du texte |
 | `qrVersion` | `uint8_t` | Version QR (par défaut 3) |
 | `qrScale` | `int` | Échelle de pixels QR (par défaut 2) |
-| `centerBody` | `bool` | Aligner le corps du texte au centre |
-| `scrollPercent` | `int` | Afficher l'indicateur de défilement (0 à 100) ; -1 pour cacher |
+| `centerBody` | `bool` | Centrer le corps du texte |
+| `scrollPercent` | `int` | Afficher l'indicateur de défilement (0 à 100) ; -1 pour le masquer |
 
 ### Ordre de rendu
 
-`drawTextPage()` s'affiche dans cet ordre :
+`drawTextPage()` effectue le rendu dans cet ordre :
 
 1. Effacer le plein écran (en-tête + page + pied de page)
 2. **Code QR** — coin inférieur droit, réduit la largeur du texte disponible
 3. **Titre** — police en gras, suivie d'une ligne de séparation horizontale
-4. **Sous-titre** : essaie d'abord la police moyenne ; revient en gras ; se divise sur deux lignes s'il est encore trop large
-5. **Corps** — enveloppé de mot avec `drawWrappedText()` si un titre est présent ; style de titre centré (`drawStr::title`) si le corps est le seul champ
-6. **Texte du bas** — corrigé à y=62
-7. **Indicateur de défilement** — barre de défilement de droite si `scrollPercent >= 0`
+4. **Sous-titre** : essaie d’abord la graisse moyenne ; revient en gras ; est réparti sur deux lignes s’il est encore trop large
+5. **Corps** — avec retour automatique à la ligne via `drawWrappedText()` si un titre est présent ; style de titre centré (`drawStr::title`) si le corps est le seul champ
+6. **Texte du bas** — fixé à y=62
+7. **Indicateur de défilement** — barre de défilement sur le bord droit si `scrollPercent >= 0`
 
 ### Usage
 
@@ -73,18 +73,18 @@ ui::drawTextPage(&u8g2, page);
 
 ## Pages prédéfinies
 
-`TextPages.h` définit les instances statiques `TextPage` dans l'espace de noms `ui::pages`. Ces chaînes de référence de `Strings.h` :
+`TextPages.h` définit les instances statiques `TextPage` dans l'espace de noms `ui::pages`. Elles utilisent des chaînes de caractères de `Strings.h` :
 
 | Page | Champs utilisés |
 |---|---|
-| `helpPage` | titre, corps, bottomText, qrUrl |
-| `updateCheckingPage` | corps |
-| `noUpdatePage` | corps, texte du bas |
-| `updatingPage` | titre, corps |
-| `errorPage` | titre |
-| `wifiDisconnectedPage` | titre, corps, bottomText, qrUrl |
-| `wifiConnectedPage` | titre, corps, texte du bas |
-| `pairingPage` | titre, corps |
+| `helpPage` | title, body, bottomText, qrUrl |
+| `updateCheckingPage` | body |
+| `noUpdatePage` | body, bottomText |
+| `updatingPage` | title, body |
+| `errorPage` | title |
+| `wifiDisconnectedPage` | title, body, bottomText, qrUrl |
+| `wifiConnectedPage` | title, body, bottomText |
+| `pairingPage` | title, body |
 
 Exemple de définition :
 
@@ -97,16 +97,16 @@ static const TextPage helpPage = {
 };
 ```
 
-## Cordes
+## Chaînes de caractères
 
-Toutes les chaînes d'interface utilisateur résident dans `Strings.h` sous l'espace de noms `ui::strings`. Ils sont stockés en flash à l'aide de `PROGMEM` :
+Toutes les chaînes d'interface utilisateur résident dans `Strings.h` sous l'espace de noms `ui::strings`. Elles sont stockées en mémoire flash à l'aide de `PROGMEM` :
 
 ```cpp
 static const char helpTitle[] PROGMEM = "Get Help";
 static const char helpBody[] PROGMEM = "On Discord,\nor GitHub";
 ```
 
-`Progmem.h` définit `PROGMEM` comme une opération sans opération sur les plates-formes non Arduino, de sorte que les chaînes se compilent à la fois sur ESP32 et sur les versions de test natives.
+`Progmem.h` définit `PROGMEM` comme une opération sans effet sur les plates-formes non Arduino, de sorte que les chaînes se compilent à la fois sur ESP32 et sur les compilations de test natives.
 
 ### Catégories
 
@@ -115,17 +115,17 @@ static const char helpBody[] PROGMEM = "On Discord,\nor GitHub";
 | Image de marque | `researchAndDesire`, `kinkyMakers` |
 | Interface utilisateur générale | `error`, `homing`, `idle`, `restart`, `settings`, `skip` |
 | Menus/modes | `simplePenetration`, `strokeEngine`, `streaming`, `pairing`, `update`, `wifi` |
-| Contrôles de lecture | `speed`, `stroke`, `sensation`, `depth`, `buffer`, `accel`, `max` |
+| Commandes de mouvement | `speed`, `stroke`, `sensation`, `depth`, `buffer`, `accel`, `max` |
 | Avertissements | `speedWarning`, `homingTookTooLong`, `strokeTooShort` |
 | Aide | `helpTitle`, `helpBody`, `helpBottom`, `helpQr` |
 | Mise à jour | `updateChecking`, `noUpdateBody`, `updatingTitle`, `updatingBody` |
-| Wi-Fi | `wifiSetup`, `wifiBody`, `wifiBottom`, `wifiQr`, `wifiConnected` |
+| WiFi | `wifiSetup`, `wifiBody`, `wifiBottom`, `wifiQr`, `wifiConnected` |
 | Couplage | `pairingTitle`, `pairingBody` |
 | Motifs | `patternName0`–`patternName6`, `patternDesc0`–`patternDesc6` |
 
 ### Tableaux de motifs
 
-Les noms et descriptions des modèles de moteur de course sont des tableaux indexés :
+Les noms et descriptions des motifs du Stroke Engine sont des tableaux indexés :
 
 ```cpp
 static const char* const strokeEngineNames[7] = {
@@ -143,7 +143,7 @@ static const char* const strokeEngineDescriptions[7] = {
 
 ### Éléments de menu
 
-`MenuItems.h` mappe les valeurs d'énumération `Menu::` pour afficher les chaînes :
+`MenuItems.h` associe les valeurs d'énumération `Menu::` aux chaînes d'affichage :
 
 ```cpp
 static const char* menuStrings[Menu::NUM_OPTIONS] = {
@@ -172,14 +172,14 @@ namespace IconGlyph {
 }
 ```
 
-`drawHeaderIcons()` affiche l'état WiFi et BLE dans le coin supérieur droit de l'écran. Les états d'erreur superposent des pixels supplémentaires (points d'exclamation) sur le glyphe de base.
+`drawHeaderIcons()` affiche les états WiFi et BLE dans le coin supérieur droit de l'écran. Les états d'erreur superposent des pixels supplémentaires (points d'exclamation) au glyphe de base.
 
 ### Logos (bitmaps XBM)
 
 Les logos sont des tableaux d'octets `PROGMEM` XBM dans `Logos.h` :
 
-- `RDLogo` — Recherche et désir, 57x50 pixels
-- `KMLogo` — Créateurs coquins, 50x50 pixels
+- `RDLogo` — Research & Desire, 57x50 pixels
+- `KMLogo` — Kinky Makers, 50x50 pixels
 
 Ils sont dessinés via la structure `LogoData` et `drawLogo()` :
 
@@ -191,9 +191,9 @@ struct LogoData {
 };
 ```
 
-### Bonjour les animations
+### Animation Hello
 
-`HelloAnimation.h` contient des images de position Y précalculées pour l'animation de démarrage « OSSM ». Chaque image spécifie des décalages Y par lettre :
+`HelloAnimation.h` contient des images correspondant aux positions Y précalculées pour l'animation de démarrage « OSSM ». Chaque image spécifie des décalages Y par lettre :
 
 ```cpp
 struct HelloFrame {
@@ -205,15 +205,15 @@ struct HelloFrame {
 
 ## Autres fonctions de dessin
 
-L'API de rendu complet (`ui.h`) :
+L'API de rendu complète (`ui.h`) :
 
 | Fonction | But |
 |---|---|
 | `drawTextPage()` | Rendre une structure `TextPage` |
-| `drawMenu()` | Menu déroulant avec sélection en surbrillance |
-| `drawPlayControls()` | Barres de vitesse/course/sensation pour les modes de jeu |
-| `drawPreflight()` | Contrôle de sécurité avant le jeu (bouton de vitesse à zéro) |
-| `drawHeaderIcons()` | Icônes d'état WiFi + BLE |
+| `drawMenu()` | Menu défilant avec sélection en surbrillance |
+| `drawPlayControls()` | Barres de vitesse/course/sensation pour les modes de fonctionnement |
+| `drawPreflight()` | Contrôle de sécurité avant le mouvement (bouton de vitesse à zéro) |
+| `drawHeaderIcons()` | Icônes d'état WiFi et BLE |
 | `drawQR()` | Code QR autonome |
 | `drawHelloFrame()` | Image d'animation de démarrage unique |
 | `drawLogo()` | Logo XBM avec titre |
@@ -221,7 +221,7 @@ L'API de rendu complet (`ui.h`) :
 Espaces de noms d'assistance dans `DrawExtensions.h` :
 
 - `drawStr::centered()` — texte centré horizontalement
-- `drawStr::multiLine()` — texte multiligne avec retour à la ligne avec prise en charge UTF-8
+- `drawStr::multiLine()` — texte multiligne avec retour automatique à la ligne et prise en charge UTF-8
 - `drawStr::title()` — texte gras centré à une position fixe
 - `drawShape::scroll()` — indicateur de barre de défilement
 - `drawShape::settingBar()` — barre verticale étiquetée avec niveau de remplissage
@@ -243,11 +243,11 @@ ImageMagick (`magick`) doit être installé pour la conversion PNG. Sans cela, l
 
 ### Comment ça marche
 
-1. Les tests créent un écran U8g2 SSD1306 128x64 uniquement logiciel (pas de matériel, pas d'I2C)
-2. Chaque test appelle les fonctions `ui::draw*()` à restituer dans le tampon
+1. Les tests créent un écran U8g2 SSD1306 128x64 entièrement logiciel (sans matériel, avec une implémentation I2C sans effet)
+2. Chaque test appelle les fonctions `ui::draw*()` pour effectuer le rendu dans le tampon
 3. `savePBM()` écrit le tampon sous forme de bitmap PBM P4
 4. Une fois tous les tests terminés, ImageMagick convertit le PBM en PNG (couleurs inversées, échelle 400 %).
-5. Les images d'animation Bonjour sont intégrées dans un GIF
+5. Les images de l'animation Hello sont assemblées dans un GIF
 
 ### Structure de sortie
 
@@ -275,11 +275,11 @@ test/test_display/_output/
 
 | Fichier de test | Ce qu'il couvre |
 |---|---|
-| `test_textpage.cpp` | Combinaisons de champs TextPage, tests de résistance, QR, débordement de sous-titres, disposition du corps |
-| `test_pages.cpp` | Toutes les pages prédéfinies, descriptions des modèles de moteur de course |
-| `test_scroll.cpp` | Barre de défilement aux valeurs limites et limites |
-| `test_header_icons.cpp` | Les 20 combinaisons de statut WiFi × BLE |
+| `test_textpage.cpp` | Combinaisons de champs TextPage, tests de stress, QR, débordement de sous-titres, disposition du corps |
+| `test_pages.cpp` | Toutes les pages prédéfinies, descriptions des motifs du Stroke Engine |
+| `test_scroll.cpp` | Barre de défilement aux valeurs limites et aux cas particuliers |
+| `test_header_icons.cpp` | Les 20 combinaisons d'états WiFi × BLE |
 | `test_logos.cpp` | Logo RD, logo KM |
-| `test_hello.cpp` | Bonjour toutes les images d'animation, génération GIF |
-| `test_menu.cpp` | Menu avec différents nombres d'éléments, texte long, habillage |
-| `test_play_controls.cpp` | Commandes de contrôle en amont, moteur simple/course/lecture en streaming |
+| `test_hello.cpp` | Toutes les images de l'animation Hello, génération du GIF |
+| `test_menu.cpp` | Menu avec différents nombres d'éléments, texte long, retour automatique à la ligne |
+| `test_play_controls.cpp` | Commandes pour Preflight, Simple Penetration, Stroke Engine et Streaming |

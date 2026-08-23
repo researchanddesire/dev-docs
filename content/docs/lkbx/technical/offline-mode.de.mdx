@@ -1,155 +1,155 @@
 ---
 title: "Offline-Modus"
-description: "Wie Ihr Keuschheitsschloss funktioniert, wenn keine Verbindung zu WLAN oder dem Dashboard besteht"
+description: "Wie Ihre Chastity Lockbox funktioniert, wenn sie nicht mit WiFi oder dem Dashboard verbunden ist"
 ---
 
-Ihr Keuschheitsschloss ist so konzipiert, dass es sowohl online als auch offline funktioniert. In dieser Anleitung wird erklärt, was ohne WLAN funktioniert, was eine Konnektivität erfordert und wie das Gerät mit Übergängen zwischen Online- und Offline-Zuständen umgeht.
+Ihre Chastity Lockbox ist dafür ausgelegt, sowohl online als auch offline zu funktionieren. In dieser Anleitung wird erklärt, was ohne WiFi funktioniert, welche Funktionen eine Verbindung erfordern und wie das Gerät den Wechsel zwischen Online- und Offline-Zuständen handhabt.
 
-## Was funktioniert offline?
+## Was offline funktioniert
 
 Diese Funktionen funktionieren vollständig ohne Internetverbindung:
 
-| Besonderheit | Offline-Verhalten |
+| Funktion | Offline-Verhalten |
 |---------|-----------------|
 | Zeitgesteuerte Sperren | Der Timer zählt lokal weiter herunter |
-| Sperr-/Entriegelungsmechanismus | Die physische Sperre wird aktiviert und freigegeben |
-| Menünavigation | Alle Menüs zugänglich |
-| Tastensteuerung | Volle Funktionalität |
-| Schlafmodi | Automatische und manuelle Schlaffunktion |
+| Verriegelungs-/Entriegelungsmechanismus | Das physische Schloss verriegelt und entriegelt |
+| Menünavigation | Alle Menüs sind zugänglich |
+| Tastensteuerung | Vollständige Funktionalität |
+| Schlafmodi | Automatische und manuelle Schlafmodi funktionieren |
 | Notentriegelung | Kann lokal verwendet werden (falls aktiviert) |
-| Staatliche Persistenz | Der Sperrzustand übersteht Neustarts |
+| Zustandspersistenz | Der Sperrstatus bleibt nach Neustarts erhalten |
 
 <Tip>
-Wenn Sie ohne WLAN unterwegs sind, funktioniert Ihr Schloss weiterhin. Der Timer läuft auf dem Gerät selbst, nicht auf einem Server.
+Wenn Sie an einen Ort ohne WiFi fahren, funktioniert Ihr Schloss weiterhin. Der Timer läuft auf dem Gerät selbst und nicht auf einem Server.
 </Tip>
 
-## Was erfordert WLAN?
+## Was WiFi erfordert
 
-Für diese Funktionen ist eine aktive WLAN-Verbindung erforderlich:
+Für diese Funktionen ist eine aktive WiFi-Verbindung erforderlich:
 
-| Besonderheit | Warum WLAN benötigt wird |
+| Funktion | Warum WiFi benötigt wird |
 |---------|-------------------|
-| Paarung | Das Gerät muss beim Dashboard-Server registriert sein |
+| Kopplung | Das Gerät muss beim Dashboard-Server registriert werden |
 | Firmware-Updates | Downloads vom Update-Server |
-| Dashboard-Synchronisierung | Empfängt Schlüsselhalterbefehle |
-| Zeitsynchronisation | Erhält die genaue Uhrzeit vom NTP-Server |
+| Dashboard-Synchronisierung | Empfängt Befehle des Schlüsselhalters |
+| Zeitsynchronisierung | Erhält die genaue Uhrzeit vom NTP-Server |
 | Aktivitätsprotokollierung | Sendet Ereignisse an das Dashboard |
-| Öffentliche Abstimmung | Erhält Abstimmungsaktualisierungen |
-| Schlüsselhalter-Entriegelung | Fernentriegelungsbefehle |
+| Öffentliche Abstimmung | Empfängt Abstimmungsaktualisierungen |
+| Entriegelung durch den Schlüsselhalter | Befehle zur Fernentriegelung |
 
 ## Zeitanzeige im Offline-Modus
 
-Wenn Ihr Gerät nicht mit WLAN verbunden ist und die Zeit nicht synchronisiert hat, wird auf dem Sperrbildschirm Folgendes angezeigt:
+Wenn Ihr Gerät nicht mit WiFi verbunden ist und die Zeit nicht synchronisiert wurde, wird auf dem Sperrbildschirm Folgendes angezeigt:
 
-> „WLAN verbinden, um die verbleibende Zeit anzuzeigen“
+> "Connect Wi-Fi to see time remaining"
 
 <Warning>
-Ohne Zeitsynchronisierung kann das Gerät die verbleibende Zeit nicht genau anzeigen. Der Sperr-Timer selbst läuft jedoch basierend auf der konfigurierten Dauer immer noch korrekt.
+Ohne Zeitsynchronisierung kann das Gerät die verbleibende Zeit nicht genau anzeigen. Der Sperrtimer selbst läuft jedoch weiterhin korrekt auf Grundlage der konfigurierten Dauer.
 </Warning>
 
 ### Warum das passiert
 
-Das Gerät muss die aktuelle Zeit kennen, um die „verbleibende Zeit“ berechnen zu können. Ohne NTP-Synchronisierung:
+Das Gerät muss die aktuelle Uhrzeit kennen, um „time remaining“ zu berechnen. Ohne NTP-Synchronisierung:
 - Das Gerät kennt die Sperrdauer
 - Das Gerät weiß nicht, wie spät es jetzt ist
-- Daher kann die verbleibende Zeit nicht berechnet werden
+- Daher kann es „time remaining“ nicht berechnen
 
-Sobald die WLAN-Verbindung hergestellt und die Zeit synchronisiert ist, wird die Anzeige aktualisiert, um die genaue verbleibende Zeit anzuzeigen.
+Sobald WiFi verbunden und die Zeit synchronisiert ist, wird die Anzeige aktualisiert und zeigt die genaue verbleibende Zeit an.
 
-## Lokaler Wiedergabemodus
+## Modus „local play“
 
-Wenn Sie eine Sperre direkt auf dem Gerät starten (nicht über das Dashboard), arbeitet es im „Local Play“-Modus:
+Wenn Sie eine Sperre direkt auf dem Gerät starten (nicht über das Dashboard), arbeitet es im Modus „local play“:
 
-### Lokale Spieleigenschaften
+### Eigenschaften des Modus „local play“
 
 - Die Sperrdauer wird lokal auf dem Gerät gespeichert
 - Der Timer läuft unabhängig vom Server
-- Keine Beteiligung des Schlüsselinhabers erforderlich
+- Eine Beteiligung des Schlüsselhalters ist nicht erforderlich
 - Die Sperre endet, wenn der Timer abläuft
 
-### Armaturenbrettschlösser
+### Dashboard-Sperren
 
 Wenn eine Sperre über das Dashboard gestartet wird:
 
-- Die Einstellungen werden über WLAN mit dem Gerät synchronisiert
-- Pausenpläne liegen vor
+- Die Einstellungen werden über WiFi mit dem Gerät synchronisiert
+- Pausenpläne werden empfangen
 - Die Notentriegelung kann aus der Ferne deaktiviert werden
-- Der Schlüsselinhaber kann das Schloss aus der Ferne ändern
+- Der Schlüsselhalter kann die Sperre aus der Ferne ändern
 
 <Info>
-Lokale Sperren (auf dem Gerät gestartet) können nicht über das Dashboard geändert werden. Dashboard-Sperren können von Ihrem Schlüsselinhaber auch dann geändert werden, wenn Sie offline sind – die Änderungen werden synchronisiert, wenn Sie die Verbindung wiederherstellen.
+Lokale Sperren (auf dem Gerät gestartet) können nicht über das Dashboard geändert werden. Dashboard-Sperren können auch offline von Ihrem Schlüsselhalter geändert werden – die Änderungen werden synchronisiert, sobald Sie die Verbindung wiederherstellen.
 </Info>
 
-## Staatliche Persistenz
+## Zustandspersistenz
 
 Ihr Gerät behält seinen Zustand über Folgendes hinweg:
 
 - Neustarts
-- Leistungszyklen
-- WLAN-Unterbrechungen
-- Tiefer Schlaf
+- Aus-/Einschaltzyklen
+- WiFi-Unterbrechungen
+- Deep sleep
 
-Folgende Daten bleiben bestehen:
+Die folgenden Daten bleiben erhalten:
 
-| Daten | Lagerung |
+| Daten | Speicher |
 |------|---------|
-| Sperrzustand (gesperrt/entsperrt) | Nichtflüchtiger Speicher |
-| Endzeit sperren | Nichtflüchtiger Speicher |
+| Sperrstatus (gesperrt/entsperrt) | Nichtflüchtiger Speicher |
+| Endezeit der Sperre | Nichtflüchtiger Speicher |
 | Sitzungseinstellungen | Nichtflüchtiger Speicher |
-| WLAN-Zugangsdaten | Nichtflüchtiger Speicher |
+| WiFi-Anmeldedaten | Nichtflüchtiger Speicher |
 | Kalibrierungsdaten | Nichtflüchtiger Speicher |
 
 <Note>
-Selbst wenn Ihr Gerät vollständig ausfällt, kehrt es beim Einschalten in den gesperrten Zustand zurück.
+Selbst wenn Ihr Gerät vollständig die Stromversorgung verliert, kehrt es beim Einschalten in den gesperrten Zustand zurück.
 </Note>
 
-## WLAN-Wiederverbindungsverhalten
+## Verhalten bei der WiFi-Wiederverbindung
 
-Wenn WLAN während des Betriebs getrennt wird:
+Wenn die WiFi-Verbindung während des Betriebs getrennt wird:
 
 1. **Sofort**: Das Gerät funktioniert normal weiter
 2. **Alle 30 Sekunden**: Automatischer Wiederverbindungsversuch
-3. **Bei erneuter Verbindung**: Synchronisiert den Status mit dem Dashboard
+3. **Bei erneuter Verbindung**: Der Status wird mit dem Dashboard synchronisiert
 
-### Manuelle WLAN-Einrichtung
+### Manuelle WiFi-Einrichtung
 
-Sie können WLAN jederzeit neu konfigurieren über:
-- Hauptmenü → Einstellungen → WLAN-Einstellungen
-- Sperrmenü → WLAN-Einstellungen (im gesperrten Zustand)
+Sie können WiFi jederzeit über folgende Menüs neu konfigurieren:
+- Main Menu → Settings → WiFi Settings
+- Lock Menu → WiFi Settings (while locked)
 
-Dadurch wird das Konfigurationsportal geöffnet, ohne dass sich dies auf Ihren Sperrstatus auswirkt.
+Dadurch wird das Konfigurationsportal geöffnet, ohne Ihren Sperrstatus zu beeinträchtigen.
 
 ## Offline-Szenarien
 
-### Szenario 1: WLAN fällt während der Sperre aus
+### Szenario 1: WiFi fällt während der Sperre aus
 
 - Der Sperrtimer läuft normal weiter
-- Die Anzeige „Verbinden“ wird in der Statusleiste angezeigt
+- Die Anzeige "Connecting" wird in der Statusleiste angezeigt
 - Automatische Wiederverbindungsversuche alle 30 Sekunden
-- Das Schloss wird entsperrt, wenn der Timer abläuft (kein WLAN erforderlich)
+- Das Schloss wird entsperrt, wenn der Timer abläuft (kein WiFi erforderlich)
 
-### Szenario 2: Startsperre ohne WLAN
+### Szenario 2: Sperre ohne WiFi starten
 
-- Navigieren Sie zum Menü „Sperren“.
-- Dauer mit Encoder einstellen
-- Drücken Sie zur Bestätigung die Eingabetaste
-- Schloss rastet lokal ein
-- Die Zeitanzeige zeigt „WLAN verbinden, um die verbleibende Zeit anzuzeigen“
-- Der Timer zählt immer noch korrekt herunter
+- Navigieren Sie im Menü zu "Lock"
+- Stellen Sie die Dauer mit dem Encoder ein
+- Drücken Sie zur Bestätigung "Enter"
+- Die Sperre wird lokal aktiviert
+- Die Zeitanzeige zeigt "Connect Wi-Fi to see time remaining"
+- Der Timer zählt weiterhin korrekt herunter
 
-### Szenario 3: Ohne WLAN zum Standort reisen
+### Szenario 3: Reise an einen Ort ohne WiFi
 
-- Gerät funktioniert normal
-- Dashboard kann keine Befehle senden
-- Lokale Notentriegelung weiterhin verfügbar (falls aktiviert)
-- Bei der Rückkehr zum WLAN wird der Status automatisch synchronisiert
+- Das Gerät funktioniert normal
+- Das Dashboard kann keine Befehle senden
+- Die lokale Notentriegelung bleibt verfügbar (falls aktiviert)
+- Bei der Rückkehr zu WiFi wird der Status automatisch synchronisiert
 
-### Szenario 4: Tiefschlaf unterbricht die WLAN-Verbindung
+### Szenario 4: Deep sleep trennt WiFi
 
-- WLAN wird im Tiefschlaf getrennt (Energiesparen)
-- Sperrzustand unverändert
-- Beim Aufwachen stellt das WLAN automatisch wieder eine Verbindung her
-- Ausstehende Dashboard-Befehle empfangen
+- WiFi wird in Deep sleep getrennt (Energiesparmodus)
+- Der Sperrstatus bleibt unverändert
+- Beim Aufwachen verbindet sich WiFi automatisch wieder
+- Ausstehende Dashboard-Befehle werden empfangen
 
 ## Details zur Dashboard-Synchronisierung
 
@@ -158,56 +158,56 @@ Wenn Sie online sind, synchronisiert sich Ihr Gerät regelmäßig mit dem Dashbo
 ### Ausgehend (Gerät → Dashboard)
 
 - Änderungen des Sperrstatus
-- Knopfdruck
+- Tastendrücke
 - Sensorwerte
-- Verwendung zur Notentriegelung
-- Pausenzeitpunkt
+- Nutzung der Notentriegelung
+- Pausentiming
 
 ### Eingehend (Dashboard → Gerät)
 
-- Befehle sperren
-- Befehle entsperren
-- Aktualisierungen des Pausenplans
+- Sperrbefehle
+- Entsperrbefehle
+- Aktualisierungen der Pausenpläne
 - Änderungen der Sitzungseinstellungen
 - Einstellungen für die Zeitanzeige
 
 <Info>
-Die Synchronisierung erfolgt über MQTT für Echtzeit-Reaktionsfähigkeit. Befehle kommen im Online-Modus normalerweise innerhalb von Sekunden an.
+Die Synchronisierung erfolgt über MQTT, um eine Reaktion in Echtzeit zu ermöglichen. Befehle treffen online normalerweise innerhalb weniger Sekunden ein.
 </Info>
 
-## Beheben von Offline-Problemen
+## Fehlerbehebung bei Offline-Problemen
 
 <AccordionGroup>
 <Accordion title="Die verbleibende Zeit wird nicht angezeigt">
-Stellen Sie eine Verbindung zu WLAN her, um die Zeit zu synchronisieren. Die Sperre läuft noch – Sie können den Countdown nur erst sehen, wenn die Zeit synchronisiert ist.
+Verbinden Sie sich mit WiFi, um die Zeit zu synchronisieren. Die Sperre läuft weiter – Sie können den Countdown erst sehen, wenn die Zeitsynchronisierung abgeschlossen ist.
 </Accordion>
 
-<Accordion title="Schlüsselhalterbefehle können nicht empfangen werden">
-Ihr Gerät muss online sein, um Dashboard-Befehle zu empfangen. Überprüfen Sie den WLAN-Verbindungsstatus in der Statusleiste.
+<Accordion title="Befehle des Schlüsselhalters können nicht empfangen werden">
+Ihr Gerät muss online sein, um Dashboard-Befehle zu empfangen. Überprüfen Sie den WiFi-Verbindungsstatus in der Statusleiste.
 </Accordion>
 
-<Accordion title="Die Sperre wurde beendet, aber das Dashboard zeigt immer noch „gesperrt“ an">
-Das Dashboard wird aktualisiert, wenn Ihr Gerät erneut eine Verbindung herstellt. Stellen Sie eine WLAN-Verbindung her und der Status wird synchronisiert.
+<Accordion title="Die Sperre ist beendet, aber das Dashboard zeigt weiterhin „gesperrt“ an">
+Das Dashboard wird aktualisiert, sobald Ihr Gerät wieder eine Verbindung herstellt. Verbinden Sie sich mit WiFi, damit der Status synchronisiert wird.
 </Accordion>
 
-<Accordion title="WLAN stellt die Verbindung nicht automatisch wieder her">
-Gehen Sie zu Einstellungen → WLAN-Einstellungen, um die Verbindung manuell wiederherzustellen. Ihr Sperrstatus bleibt davon unberührt.
+<Accordion title="WiFi wird nicht automatisch wieder verbunden">
+Gehen Sie zu Settings → WiFi Settings, um die Verbindung manuell wiederherzustellen. Ihr Sperrstatus bleibt davon unberührt.
 </Accordion>
 </AccordionGroup>
 
 ## Verwandte Leitfäden
 
 <CardGroup cols={2}>
-<Card title="WLAN-Setup" icon="wifi" href="https://docs.researchanddesire.com/lockbox/get-started">
-So verbinden Sie Ihr Gerät mit WLAN.
+<Card title="WiFi-Einrichtung" icon="wifi" href="https://docs.researchanddesire.com/lockbox/get-started">
+So verbinden Sie Ihr Gerät mit WiFi.
 </Card>
 
 <Card title="Schlafmodus" icon="moon" href="../device-states/sleep-mode">
-Wie sich Schlaf auf die WLAN-Konnektivität auswirkt.
+Wie sich Schlaf auf die WiFi-Konnektivität auswirkt.
 </Card>
 
 <Card title="Statussymbole" icon="display" href="../using/symbols">
-Die WLAN-Statusanzeige verstehen.
+Die WiFi-Statusanzeige verstehen.
 </Card>
 
 <Card title="Online-Status" icon="signal" href="../support/online-status">

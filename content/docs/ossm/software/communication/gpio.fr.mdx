@@ -13,15 +13,15 @@ Le contrôle GPIO est une fonctionnalité de développeur/créateur. Il nécessi
 
 La caractéristique GPIO permet de :
 
-- Réglez l'une des 4 broches sur HIGH ou LOW
+- Régler l'une des 4 broches sur HIGH ou LOW
 - Lire les capacités actuelles
-- Intégrez du matériel externe à votre OSSM
+- Intégrer du matériel externe à votre OSSM
 
 ### Cas d'utilisation
 
-- **Indicateurs LED** — Signaler l'état de l'appareil à l'éclairage externe
-- **Contrôle de relais** – Déclencher l'activation/la désactivation des appareils externes
-- **Synchronisation des accessoires** – Coordonnez-vous avec d'autres matériels
+- **Indicateurs LED** — Indiquer l'état de l'appareil au moyen d'un éclairage externe
+- **Contrôle de relais** — Déclencher l'activation/la désactivation d'appareils externes
+- **Synchronisation des accessoires** — Coordonner avec d'autres matériels
 - **Intégrations personnalisées** — Créez vos propres systèmes de contrôle
 
 ## Caractéristique BLE
@@ -29,7 +29,7 @@ La caractéristique GPIO permet de :
 | Propriété | Valeur |
 |----------|-------|
 | UUID | `522b443a-4f53-534d-4000-420badbabe69` |
-| Propriétés | LIRE, ÉCRIRE |
+| Propriétés | READ, WRITE |
 | Espace de noms | 0x4 (GPIO) |
 
 <Note>
@@ -40,15 +40,15 @@ La caractéristique GPIO fait partie du service principal OSSM BLE (`522b443a-4f
 
 Le firmware expose 4 broches logiques qui correspondent aux numéros GPIO ESP32 :
 
-| Épingle logique | ESP32GPIO | Emplacement du tableau |
+| Broche logique | ESP32 GPIO | Emplacement sur la carte |
 |-------------|------------|----------------|
-| 1 | GPIO2 | Disponible sur l'en-tête |
-| 2 | GPIO15 | Disponible sur l'en-tête |
-| 3 | GPIO22 | Disponible sur l'en-tête |
-| 4 | GPIO33 | Disponible sur l'en-tête |
+| 1 | GPIO 2 | Disponible sur le connecteur |
+| 2 | GPIO 15 | Disponible sur le connecteur |
+| 3 | GPIO 22 | Disponible sur le connecteur |
+| 4 | GPIO 33 | Disponible sur le connecteur |
 
 <Warning>
-Ces broches GPIO sont directement connectées à l'ESP32. Ils produisent des niveaux logiques de 3,3 V avec une capacité de courant limitée (~ 12 mA par broche). Utilisez des pilotes appropriés pour les charges à courant élevé.
+Ces broches GPIO sont directement connectées à l'ESP32. Elles produisent des niveaux logiques de 3,3 V avec une capacité de courant limitée (~12 mA par broche). Utilisez des circuits de commande/de puissance adaptés pour les charges à courant élevé.
 </Warning>
 
 ## Format de commande
@@ -64,30 +64,30 @@ Envoyez une chaîne au format :
 **Numéro de broche :** `1`, `2`, `3` ou `4`
 
 **Valeurs d'état :**
-- `high` ou `1` — Définir la broche HIGH (3,3 V)
-- `low` ou `0` — Régler la broche BAS (0 V)
+- `high` ou `1` — Définir la broche sur HIGH (3,3 V)
+- `low` ou `0` — Définir la broche sur LOW (0 V)
 
 **Exemples :**
 
 | Commande | Effet |
 |---------|--------|
-| `1:high` | Réglez la broche 1 (GPIO 2) HIGH |
-| `2:low` | Régler la broche 2 (GPIO 15) LOW |
-| `3:1` | Réglez la broche 3 (GPIO 22) HIGH |
-| `4:0` | Régler la broche 4 (GPIO 33) LOW |
+| `1:high` | Définir la broche 1 (GPIO 2) sur HIGH |
+| `2:low` | Définir la broche 2 (GPIO 15) sur LOW |
+| `3:1` | Définir la broche 3 (GPIO 22) sur HIGH |
+| `4:0` | Définir la broche 4 (GPIO 33) sur LOW |
 
-### Écrire des réponses
+### Réponses d'écriture
 
 | Réponse | Signification |
 |----------|---------|
 | `ok:1:high` | La broche 1 a été définie avec succès sur HIGH |
-| `ok:2:low` | La broche 2 a été réglée avec succès sur FAIBLE |
+| `ok:2:low` | La broche 2 a été réglée avec succès sur LOW |
 | `error:invalid_format` | Format de commande non reconnu |
 | `error:pin_out_of_range` | Numéro de broche non 1-4 |
 
 ### Lecture (capacités)
 
-La lecture de la caractéristique renvoie un indice de capacités :
+La lecture de la caractéristique renvoie une indication des capacités disponibles :
 
 ```
 pins:[1,2,3,4]
@@ -175,7 +175,7 @@ GND      → Relay Module GND
 La plupart des modules de relais avec opto-isolation fonctionnent avec une logique 3,3 V. Vérifiez les spécifications de votre module.
 
 <Warning>
-Ne connectez jamais la tension secteur (120 V/240 V) directement à l'OSSM. Utilisez toujours des modules de relais correctement évalués avec les précautions de sécurité appropriées.
+Ne connectez jamais la tension secteur (120 V/240 V) directement à l'OSSM. Utilisez toujours des modules de relais correctement dimensionnés ou homologués pour la tension et le courant concernés, avec les précautions de sécurité appropriées.
 </Warning>
 
 ### Conversion de niveau logique
@@ -192,22 +192,22 @@ GND      → Level Shifter GND
 ## Limites
 
 - **Pas de prise en charge PWM** — Les broches sont uniquement numériques HIGH/LOW
-- **Aucune lecture d'entrée** — GPIO est uniquement en sortie via cette interface
-- **Pas de persistance** — Les états des broches sont réinitialisés à FAIBLE au redémarrage de l'appareil
+- **Aucune lecture d'entrée** — Le GPIO est uniquement utilisable en sortie via cette interface
+- **Pas de persistance** — Les états des broches sont réinitialisés à LOW au redémarrage de l'appareil
 - **Aucune interruption** – Impossible de déclencher en fonction de signaux externes
-- **Limites de courant** — ESP32 GPIO maximum ~ 12 mA par broche, 40 mA au total
+- **Limites de courant** — GPIO ESP32 : ~12 mA maximum par broche, 40 mA au total
 
 ## Dépannage
 
 <AccordionGroup>
-<Accordion title="Le code PIN ne répond pas">
+<Accordion title="La broche ne répond pas">
 - Vérifiez que la connexion BLE est active
 - Vérifiez que le format de commande correspond exactement à `<pin>:<state>`
-- Assurez-vous que le code PIN est compris entre 1 et 4.
+- Assurez-vous que le numéro de broche est compris entre 1 et 4.
 - Vérifiez avec un multimètre que la tension change
 </Accordion>
 
-<Accordion title="erreur : réponse au format_invalide">
+<Accordion title="Réponse error:invalid_format">
 Le format de la commande n'a pas été reconnu. Formats valides :
 - `1:high`, `1:low`, `1:1`, `1:0`
 - `2:high`, `2:low`, `2:1`, `2:0`
@@ -216,15 +216,15 @@ Le format de la commande n'a pas été reconnu. Formats valides :
 La casse n'a pas d'importance (`HIGH` et `high` fonctionnent tous les deux).
 </Accordion>
 
-<Accordion title="erreur : réponse pin_out_of_range">
-Le numéro PIN doit être 1, 2, 3 ou 4. Vérifiez votre commande.
+<Accordion title="Réponse error:pin_out_of_range">
+Le numéro de broche doit être 1, 2, 3 ou 4. Vérifiez votre commande.
 </Accordion>
 
 <Accordion title="L'appareil connecté ne fonctionne pas">
 - Vérifiez la tension avec un multimètre (doit être 0 V ou ~ 3,3 V)
-- Vérifiez les exigences actuelles : GPIO ESP32 limité à ~ 12 mA
-- Assurez un terrain d’entente entre OSSM et votre appareil
-- Envisagez d'utiliser un transistor ou un relais pour les charges de courant plus élevées
+- Vérifiez les exigences de courant : le GPIO ESP32 est limité à ~12 mA
+- Assurez une masse commune entre OSSM et votre appareil
+- Envisagez d'utiliser un transistor ou un relais pour les charges consommant davantage de courant
 </Accordion>
 </AccordionGroup>
 

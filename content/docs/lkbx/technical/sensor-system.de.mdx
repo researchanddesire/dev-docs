@@ -1,9 +1,9 @@
 ---
 title: "Sensorsystem"
-description: "Technische Dokumentation für die Schlosserkennung und die Rückplattensensoren in Ihrem Keuschheitsschloss"
+description: "Technische Dokumentation für die Schlosserkennung und die Rückplattensensoren in Ihrer Chastity Lockbox"
 ---
 
-Ihr Keuschheitsschloss verwendet mehrere Sensoren, um den Schlosszustand und die Position der Rückplatte zu erkennen. In dieser Anleitung wird erläutert, wie das Sensorsystem funktioniert und was das Gerät überwacht.
+Ihre Chastity Lockbox verwendet mehrere Sensoren, um den Schlosszustand und die Position der Rückplatte zu erkennen. In dieser Anleitung wird erläutert, wie das Sensorsystem funktioniert und was das Gerät überwacht.
 
 ## Sensorübersicht
 
@@ -12,7 +12,7 @@ Ihr Gerät verfügt über zwei Arten von Sensoren:
 | Sensortyp | Menge | Zweck |
 |-------------|----------|---------|
 | TMR-Sensoren | 3 | Position des Verriegelungspaddels erkennen |
-| Hall-Effekt-Sensoren | 2 | Erkennen Sie das Vorhandensein der Rückplatte |
+| Hall-Effekt-Sensoren | 2 | Vorhandensein der Rückplatte erkennen |
 
 ## TMR-Sensoren (Paddelerkennung)
 
@@ -21,7 +21,7 @@ Drei TMR-Sensoren (Tunnel Magnetoresistance) erkennen, ob sich das Verriegelungs
 ### Wie sie funktionieren
 
 - Sensoren erfassen das Magnetfeld des Paddels
-- Wenn sich das Paddel in der verriegelten Position befindet, zeigen die Sensoren NIEDRIG an
+- Wenn sich das Paddel in der verriegelten Position befindet, zeigen die Sensoren LOW an
 - Wenn das Paddel entriegelt ist, zeigen die Sensoren HIGH an
 
 ### Erkennungslogik
@@ -106,18 +106,18 @@ Die meisten Sensorfehler werden durch physische Hindernisse verursacht. Stellen 
 
 ## Aktivitätsprotokollierung
 
-Wenn Ihr Gerät mit WLAN verbunden ist, meldet es regelmäßig Sensorzustände an das Dashboard:
+Wenn Ihr Gerät mit WiFi verbunden ist, meldet es regelmäßig Sensorzustände an das Dashboard:
 
 ### Gemeldete Daten
 
 | Feld | Beschreibung |
 |-------|-------------|
 | tmr1, tmr2, tmr3 | Einzelne TMR-Sensorzustände |
-| Halle1, Halle2 | Einzelne Zustände des Hallsensors |
-| isPaddleLocked | Berechneter Zustand der Paddle-Sperre |
+| hall1, hall2 | Einzelne Zustände der Hall-Sensoren |
+| isPaddleLocked | Berechneter Verriegelungszustand des Paddels |
 | isBackplateClosed | Berechneter Backplate-Status |
-| aktueller Zustand | Position der Gerätezustandsmaschine |
-| Batterieprozent | Aktueller Batteriestand |
+| currentState | Position der Gerätezustandsmaschine |
+| batteryPercent | Aktueller Batteriestand |
 | isCharging | USB-Stromversorgung angeschlossen |
 
 ### Wenn Protokolle gesendet werden
@@ -127,20 +127,20 @@ Wenn Ihr Gerät mit WLAN verbunden ist, meldet es regelmäßig Sensorzustände a
 - Regelmäßig während aktiver Sitzungen
 
 <Info>
-Diese Telemetrie hilft Ihrem Schlüsselinhaber, den Gerätestatus zu überwachen und ermöglicht dem Support die Ferndiagnose von Problemen.
+Diese Telemetrie hilft Ihrem Schlüsselhalter, den Gerätestatus zu überwachen und ermöglicht dem Support die Ferndiagnose von Problemen.
 </Info>
 
-## Aktuelle Überwachung
+## Stromüberwachung
 
 Ein INA219-Stromsensor überwacht den Motorstrom während des Sperr-/Entriegelungsvorgangs:
 
 ### Zweck
 
-- Erkennen Sie, wann der Motor seine Bewegung abgeschlossen hat
-- Vermeiden Sie das Abwürgen von Motorschäden
-- Überprüfen Sie den ordnungsgemäßen Betrieb
+- Erkennt, wann der Motor seine Bewegung abgeschlossen hat
+- Verhindert Motorschäden durch Blockieren
+- Überprüft den ordnungsgemäßen Betrieb
 
-### Aktuelle Grenzwerte
+### Stromgrenzen
 
 Wenn der durchschnittliche Strom während des Motorbetriebs über einen längeren Zeitraum 50 mA überschreitet, stoppt der Motor automatisch, um Schäden zu vermeiden.
 
@@ -182,7 +182,7 @@ Die Hall-Sensoren erkennen die Rückplatte nicht. Überprüfen:
 </Accordion>
 
 <Accordion title="Gelbe Rückplattenanzeige">
-Die Rückplattenanzeige leuchtet gelb, wenn die Hall-Sensoren die Rückplatte nicht erkennen. Stellen Sie sicher, dass die Rückplatte vollständig angebracht ist, bevor Sie sie verriegeln.
+Die Rückplattenanzeige leuchtet gelb, wenn die Hall-Sensoren die Rückplatte nicht erkennen. Stellen Sie sicher, dass die Rückplatte vollständig angebracht ist, bevor Sie das Gerät verriegeln.
 </Accordion>
 </AccordionGroup>
 
@@ -192,24 +192,24 @@ Die Rückplattenanzeige leuchtet gelb, wenn die Hall-Sensoren die Rückplatte ni
 
 | Parameter | Wert |
 |-----------|-------|
-| Stifte | 17, 18, 21 |
-| Aktiver Zustand | NIEDRIG, wenn Paddel erkannt wird |
-| Wählen | 2 von 3 erforderlich |
+| Pins | 17, 18, 21 |
+| Aktiver Zustand | LOW, wenn Paddel erkannt wird |
+| Abstimmung | 2 von 3 erforderlich |
 
 ### Hall-Effekt-Sensoren
 
 | Parameter | Wert |
 |-----------|-------|
-| Stifte | 6, 15 |
+| Pins | 6, 15 |
 | Aktiver Zustand | LOW, wenn Magnet erkannt wird |
-| Wählen | 1 von 2 erforderlich |
+| Abstimmung | 1 von 2 erforderlich |
 
 ### Stromsensor (INA219)
 
 | Parameter | Wert |
 |-----------|-------|
 | I2C-Pins | SDA: 9, SCL: 10 |
-| Aktuelle Grenze | Durchschnittlich 50 mA |
+| Stromgrenze | Durchschnittlich 50 mA |
 | Überwachungszeitraum | Während des Motorbetriebs |
 
 ## Verwandte Leitfäden

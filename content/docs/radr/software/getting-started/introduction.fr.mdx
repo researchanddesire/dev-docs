@@ -3,7 +3,7 @@ title: "Présentation du logiciel"
 description: "Architecture du micrologiciel et guide de développement pour la télécommande sans fil RADR"
 ---
 
-Cette section couvre le micrologiciel RADR, y compris l'architecture, la configuration du développement et la manière de modifier ou de contribuer à la base de code.
+Cette section couvre le micrologiciel RADR, y compris l'architecture, l'environnement de développement et la manière de modifier ou de contribuer à la base de code.
 
 ## Présentation du micrologiciel
 
@@ -12,11 +12,11 @@ RADR fonctionne sur un microcontrôleur ESP32-S3 avec un micrologiciel personnal
 | Composant | Technologie |
 |-----------|------------|
 | MCU | ESP32-S3 avec PSRAM |
-| Cadre | Arduino pour ESP32 |
-| Construire un système | PlateformeIO |
-| Langue | C++ |
-| Afficher la bibliothèque | TFT_eSPI |
-| Pile BLE | Agile |
+| Framework | Arduino pour ESP32 |
+| Système de build | PlatformIO |
+| Langage | C++ |
+| Bibliothèque d’affichage | TFT_eSPI |
+| Pile BLE | NimBLE |
 
 ## Version du micrologiciel
 
@@ -33,9 +33,9 @@ Vérifiez régulièrement les mises à jour du micrologiciel pour accéder aux n
 
 ## Code source
 
-La source complète du firmware est disponible sur GitHub :
+Le code source complet du micrologiciel est disponible sur GitHub :
 
-<Card title="Micrologiciel RADR" icon="code" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Software">
+<Card title="RADR Firmware" icon="code" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Software">
 Parcourez le code source et la documentation.
 </Card>
 
@@ -48,9 +48,9 @@ Parcourez le code source et la documentation.
 | Machine à états | Gère les états de l'écran et le flux de navigation |
 | Gestionnaire de périphériques | Gère la découverte et la connexion des appareils Bluetooth |
 | Pilote d'affichage | Rend l'interface utilisateur à l'aide de TFT_eSPI avec mise en mémoire tampon du canevas |
-| Gestionnaire d'entrée | Traite les entrées de l'encodeur, des boutons et du pare-chocs |
+| Gestionnaire d'entrée | Traite les entrées de l'encodeur, des boutons et des boutons latéraux |
 | Système de rétroaction | Contrôle les LED, le buzzer et les vibrations |
-| Registre des appareils | Mappe les UUID Bluetooth aux types d’appareils |
+| Registre des appareils | Associe les UUID Bluetooth aux types d’appareils |
 
 ### Services clés
 
@@ -68,14 +68,14 @@ Parcourez le code source et la documentation.
 
 ### Conditions préalables
 
-- [Code Visual Studio](https://code.visualstudio.com/)
-- [Extension PlateformeIO](https://platformio.org/install/ide?install=vscode)
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [Extension PlatformIO](https://platformio.org/install/ide?install=vscode)
 - Câble USB-C pour flasher
 
-### Commencer
+### Premiers pas
 
 <Steps>
-<Step title="Cloner le référentiel">
+<Step title="Cloner le dépôt">
 ```bash
 git clone https://github.com/researchanddesire/radr-wireless-remote.git
 cd radr-wireless-remote/Software
@@ -86,15 +86,15 @@ cd radr-wireless-remote/Software
 Ouvrez le dossier `Software` dans VS Code. PlatformIO détectera automatiquement la configuration du projet.
 </Step>
 
-<Step title="Construire le firmware">
+<Step title="Compiler le micrologiciel">
 Cliquez sur le bouton PlatformIO Build ou exécutez :
 ```bash
 pio run
 ```
 </Step>
 
-<Step title="Flasher sur l'appareil">
-Connectez RADR via USB-C et cliquez sur Télécharger, ou exécutez :
+<Step title="Flasher le micrologiciel sur l'appareil">
+Connectez RADR via USB-C et cliquez sur Upload, ou exécutez :
 ```bash
 pio run --target upload
 ```
@@ -109,21 +109,21 @@ RADR utilise un rendu de canevas à double tampon pour des mises à jour d'affic
 
 - Les sprites plein écran empêchent le scintillement
 - Mises à jour partielles pour les zones critiques en termes de performances
-- Taux de rafraîchissement constant de l'interface utilisateur de 60 ips
+- Taux de rafraîchissement constant de l'interface utilisateur de 60 fps
 
-### Architecture des machines à états
+### Architecture de la machine à états
 
 L'interface utilisateur utilise une machine à états hiérarchique :
 
 - Transitions claires entre les écrans
-- Logique d'état isolé pour chaque écran
-- Gestion des entrées pilotées par les événements
+- Logique d'état isolée pour chaque écran
+- Gestion des entrées pilotée par les événements
 
 ### Registre des appareils
 
 RADR prend en charge plusieurs types d'appareils via un registre à deux niveaux :
 
-| Enregistrement | Description |
+| Registre | Description |
 |----------|-------------|
 | Intégré | Prise en charge des appareils R+D codés en dur (OSSM) |
 | Dynamique | Définitions de périphériques Buttplug.io basées sur JSON |
@@ -132,17 +132,17 @@ Le registre dynamique (`registry.json`) peut être mis à jour via des mises à 
 
 ## Fichiers de configuration
 
-| Déposer | But |
+| Fichier | Objectif |
 |------|---------|
-| `platformio.ini` | Construire la configuration et les dépendances |
+| `platformio.ini` | Configuration de build et dépendances |
 | `src/config.h` | Définitions et constantes des broches matérielles |
-| `data/registry.json` | Mappages UUID du périphérique Buttplug.io |
+| `data/registry.json` | Mappages des UUID des appareils Buttplug.io |
 
 ## Référence technique
 
 <CardGroup cols={2}>
-<Card title="Flasheur Web" icon="bolt" href="/radr/software/ota-updates/introduction">
-Flash firmware à l’aide de l’outil Web.
+<Card title="Web Flasher" icon="bolt" href="/radr/software/ota-updates/introduction">
+Flashez le micrologiciel avec l’outil web.
 </Card>
 
 <Card title="Communication BLE" icon="bluetooth" href="/radr/software/communication/ble">
@@ -152,15 +152,15 @@ Détails du protocole Bluetooth et communication de l'appareil.
 
 ## Contribuer
 
-Lisez les [directives de contribution](https://github.com/researchanddesire/radr-wireless-remote/blob/main/CONTRIBUTING.md) avant de soumettre une modification concernant la branche `main`.
+Lisez les [directives de contribution](https://github.com/researchanddesire/radr-wireless-remote/blob/main/CONTRIBUTING.md) avant de soumettre une modification sur la branche `main`.
 
 ### Style de code
 
 - Suivre le formatage du code existant
 - Utiliser des noms de variables et de fonctions descriptifs
-- Documenter les fonctions publiques et les logiques complexes
-- Testez les modifications sur le matériel réel avant de les soumettre
+- Documenter les fonctions publiques et la logique complexe
+- Tester les modifications sur le matériel réel avant de les soumettre
 
 ## Licence
 
-Le micrologiciel RADR est publié sous la **Licence matérielle ouverte du CERN version 2 - Fortement réciproque (CERN-OHL-S v2)**. Consultez le référentiel [licence](https://github.com/researchanddesire/radr-wireless-remote/blob/main/LICENSE) pour plus de détails.
+Le micrologiciel RADR est publié sous la **CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S v2)**. Consultez la [licence](https://github.com/researchanddesire/radr-wireless-remote/blob/main/LICENSE) du dépôt pour plus de détails.

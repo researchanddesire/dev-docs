@@ -1,18 +1,18 @@
 ---
 title: "Registre des appareils"
-description: "Comment RADR découvre et crée des instances de périphérique à partir des UUID du service BLE"
+description: "Comment RADR découvre et crée des instances de périphérique à partir des UUID de service BLE"
 ---
 
-Le registre des appareils est le système principal qui mappe les UUID du service Bluetooth Low Energy (BLE) aux usines d’appareils. Lorsque RADR recherche des appareils, il utilise les UUID de service pour déterminer quelle usine doit créer l’instance de périphérique.
+Le registre des appareils est le système principal qui associe les UUID de service Bluetooth Low Energy (BLE) aux fabriques d’appareils. Lorsque RADR recherche des appareils, il utilise les UUID de service pour déterminer quelle fabrique doit créer l’instance de périphérique.
 
 ## Présentation de l'architecture
 
 RADR utilise un système de registre à deux niveaux :
 
-| Étage | Description | Exemple |
+| Niveau | Description | Exemple |
 |------|-------------|---------|
-| Codé en dur | Appareils enregistrés directement dans le code auprès des usines personnalisées | OSSM |
-| Dynamique | Appareils chargés depuis `registry.json` à l'aide de l'usine ButtplugIO | Lovense, Satisfyer, Kiiroo |
+| Codés en dur | Appareils enregistrés directement dans le code avec des fabriques personnalisées | OSSM |
+| Dynamiques | Appareils chargés depuis `registry.json` à l'aide de la fabrique ButtplugIO | Lovense, Satisfyer, Kiiroo |
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -33,13 +33,13 @@ Le registre est renseigné une fois au démarrage de l'appareil via `initRegistr
 
 ## Structure du registre
 
-Le registre est une carte globale qui associe les UUID de service aux fonctions d'usine :
+Le registre est une table globale qui associe les UUID de service aux fonctions de fabrique :
 
 ```cpp
 std::unordered_map<std::string, DeviceFactory> registry;
 ```
 
-Où `DeviceFactory` est défini comme :
+où `DeviceFactory` est défini comme suit :
 
 ```cpp
 typedef Device *(*DeviceFactory)(const NimBLEAdvertisedDevice *advertisedDevice);
@@ -50,11 +50,11 @@ typedef Device *(*DeviceFactory)(const NimBLEAdvertisedDevice *advertisedDevice)
 | Fonction | But |
 |----------|---------|
 | `initRegistry()` | Remplit le registre avec des appareils codés en dur et dynamiques |
-| `getDeviceFactory()` | Recherche une usine par service UUID |
+| `getDeviceFactory()` | Recherche une fabrique à partir de l’UUID de service |
 
 ## Appareils codés en dur
 
-Les appareils codés en dur sont enregistrés directement dans `initRegistry()` auprès d'une usine lambda. Cette approche est utilisée pour les appareils dotés de protocoles personnalisés qui nécessitent une gestion spécialisée.
+Les appareils codés en dur sont enregistrés directement dans `initRegistry()` avec une fabrique lambda. Cette approche est utilisée pour les appareils dotés de protocoles personnalisés qui nécessitent une gestion spécialisée.
 
 ### Exemple OSSM
 
@@ -66,7 +66,7 @@ registry.emplace(
     });
 ```
 
-L'OSSM utilise un protocole BLE personnalisé avec de multiples caractéristiques pour la vitesse, la profondeur, la sensation et le contrôle des coups. Cela nécessite une classe de périphérique dédiée plutôt que l'implémentation générique de ButtplugIO.
+L'OSSM utilise un protocole BLE personnalisé avec plusieurs caractéristiques pour la vitesse, la profondeur, la sensation et le contrôle de la course. Cela nécessite une classe d'appareil dédiée plutôt que l'implémentation générique de ButtplugIO.
 
 ### Quand utiliser l’enregistrement codé en dur
 
@@ -74,15 +74,15 @@ Utilisez l'enregistrement codé en dur lorsque :
 
 - L'appareil utilise un protocole personnalisé non couvert par Buttplug.io
 - Vous avez besoin d'une interface utilisateur spécialisée ou d'une logique de contrôle
-- L'appareil nécessite une manipulation caractéristique unique
+- L'appareil nécessite une gestion spécifique des caractéristiques
 
 ## Appareils dynamiques (ButtplugIO)
 
-Les périphériques dynamiques sont chargés à partir du fichier `data/registry.json` sur le système de fichiers. Cela permet d'ajouter la prise en charge de nouveaux appareils sans modifier le code.
+Les appareils dynamiques sont chargés à partir du fichier `data/registry.json` sur le système de fichiers. Cela permet d'ajouter la prise en charge de nouveaux appareils sans modifier le code.
 
-### Structure du registre.json
+### Structure de `registry.json`
 
-Le registre mappe les UUID du service sur des tableaux de fichiers de spécifications de protocole :
+Le registre associe les UUID de service à des tableaux de fichiers de spécifications de protocole :
 
 ```json
 {
@@ -92,18 +92,18 @@ Le registre mappe les UUID du service sur des tableaux de fichiers de spécifica
 }
 ```
 
-Chaque entrée mappe un UUID (clé) de service BLE à un ou plusieurs fichiers de spécification de protocole (tableau de valeurs).
+Chaque entrée associe un UUID de service BLE (clé) à un ou plusieurs fichiers de spécification de protocole (tableau de valeurs).
 
-### Flux d'usine
+### Flux de la fabrique
 
-Lorsqu'un appareil avec un UUID de service enregistré est découvert :
+Lorsqu'un appareil avec un UUID de service enregistré est détecté :
 
 1. `ButtplugIODeviceFactory` lit `registry.json` depuis LittleFS
-2. Récupère la liste des fichiers de spécifications pour le service UUID
+2. Récupère la liste des fichiers de spécifications pour l'UUID de service
 3. Pour chaque fichier de spécifications :
    - Charge et analyse la configuration JSON
-   - Fait correspondre le nom de l'appareil annoncé aux modèles `communication[0].btle.names`
-   - Extrait les caractéristiques TX/RX pour l'UUID du service
+   - Compare le nom de l'appareil annoncé aux modèles `communication[0].btle.names`
+   - Extrait les caractéristiques TX/RX pour l'UUID de service
 4. Crée une instance `LovenseDevice` avec la configuration correspondante
 
 ### Format de fichier de spécifications de protocole
@@ -142,9 +142,9 @@ Les fichiers de spécifications suivent le format Buttplug.io v4 :
 | `defaults` | Nom de l'appareil par défaut et ensemble de fonctionnalités |
 | `configurations` | Variantes et identifiants spécifiques à l'appareil |
 | `communication[].btle.names` | Modèles de nom de périphérique (prend en charge le caractère générique `*`)  |
-| `communication[].btle.services` | UUID caractéristiques TX/RX par service |
+| `communication[].btle.services` | UUID des caractéristiques TX/RX par service |
 
-## Flux de découverte de périphérique
+## Flux de découverte des appareils
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
@@ -154,12 +154,12 @@ Les fichiers de spécifications suivent le format Buttplug.io v4 :
 └──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
 ```
 
-1. **Scan** : analyse RADR pour les appareils BLE
-2. **Extraire l'UUID** : obtient l'UUID du service annoncé
-3. **Recherche dans le registre** : `getDeviceFactory(serviceUUID)` trouve l'usine
-4. **Créer un appareil** : Factory instancie la classe d'appareil appropriée
+1. **Scan** : RADR recherche des appareils BLE
+2. **Extraire l'UUID** : récupère l'UUID du service annoncé
+3. **Recherche dans le registre** : `getDeviceFactory(serviceUUID)` trouve la fabrique
+4. **Créer un appareil** : la fabrique instancie la classe d'appareil appropriée
 
-## Ajout de la prise en charge d'un nouveau périphérique
+## Ajout de la prise en charge de nouveaux appareils
 
 ### Option A : dynamique (registre Buttplug.io)
 
@@ -167,7 +167,7 @@ Pour les appareils compatibles avec le protocole Buttplug.io :
 
 <Steps>
 <Step title="Obtenir ou créer le fichier de spécifications">
-Obtenez la spécification du protocole Buttplug.io v4 pour l'appareil. Ceux-ci sont disponibles dans le [référentiel de configuration du périphérique Buttplug](https://github.com/buttplugio/buttplug) .
+Obtenez la spécification du protocole Buttplug.io v4 pour l'appareil. Celle-ci est disponible dans le [dépôt de configuration des appareils Buttplug](https://github.com/buttplugio/buttplug).
 </Step>
 
 <Step title="Ajouter un fichier de spécifications aux protocoles">
@@ -177,7 +177,7 @@ data/protocols/your-device.json
 ```
 </Step>
 
-<Step title="Mettre à jour le registre.json">
+<Step title="Mettre à jour `registry.json`">
 Ajoutez le mappage UUID du service à `data/registry.json` :
 ```json
 {
@@ -186,8 +186,8 @@ Ajoutez le mappage UUID du service à `data/registry.json` :
 ```
 </Step>
 
-<Step title="Télécharger le système de fichiers">
-Utilisez PlatformIO pour télécharger le système de fichiers sur l'appareil.
+<Step title="Téléverser le système de fichiers">
+Utilisez PlatformIO pour téléverser le système de fichiers sur l'appareil.
 </Step>
 </Steps>
 
@@ -197,14 +197,14 @@ Pour les appareils nécessitant une gestion de protocole personnalisée :
 
 <Steps>
 <Step title="Créer une classe d'appareil">
-Créez une nouvelle classe d'appareils dans `src/devices/` qui étend la classe de base `Device`.
+Créez une nouvelle classe d'appareil dans `src/devices/` qui étend la classe de base `Device`.
 </Step>
 
 <Step title="Mettre en œuvre les méthodes requises">
 Implémentez `getServiceUUID()`, `getName()` et toute logique de contrôle spécifique à l'appareil.
 </Step>
 
-<Step title="S'inscrire dans initRegistry">
+<Step title="Enregistrer l'appareil dans initRegistry">
 Ajoutez le code d'enregistrement dans `initRegistry()` :
 ```cpp
 registry.emplace(
@@ -216,7 +216,7 @@ registry.emplace(
 </Step>
 
 <Step title="Reconstruire le micrologiciel">
-Compilez et flashez le firmware mis à jour.
+Compilez et flashez le micrologiciel mis à jour.
 </Step>
 </Steps>
 
@@ -224,14 +224,14 @@ Compilez et flashez le firmware mis à jour.
 
 ### Mise à jour du registre (développement)
 
-Lors du développement local, utilisez la fonctionnalité « Télécharger le système de fichiers » de PlatformIO pour flasher le répertoire `data/` sur LittleFS :
+Lors du développement local, utilisez la fonctionnalité « Upload Filesystem » de PlatformIO pour flasher le répertoire `data/` sur LittleFS :
 
 1. Modifiez `data/registry.json` ou ajoutez des fichiers de spécifications à `data/protocols/`
-2. Dans VS Code avec PlatformIO, cliquez sur **Télécharger le système de fichiers** (ou exécutez `pio run --target uploadfs`)
+2. Dans VS Code avec PlatformIO, cliquez sur **Upload Filesystem** (ou exécutez `pio run --target uploadfs`)
 3. L'appareil utilisera le registre mis à jour au prochain démarrage
 
 <Warning>
-"Upload Filesystem" efface la partition LittleFS existante avant l'écriture. Toutes les modifications d'exécution seront perdues.
+"Upload Filesystem" efface la partition LittleFS existante avant l'écriture. Toutes les modifications effectuées pendant l'exécution seront perdues.
 </Warning>
 
 ### Mise à jour du registre (production)
@@ -240,23 +240,23 @@ Lors du développement local, utilisez la fonctionnalité « Télécharger le s
 Les mises à jour du registre OTA sont une fonctionnalité en attente. Actuellement, les mises à jour du registre nécessitent un flash du micrologiciel.
 </Info>
 
-Le workflow prévu pour les appareils de production :
+Le flux de travail prévu pour les appareils de production :
 
-1. Accédez à **Paramètres > Rechercher des mises à jour** sur l'appareil.
+1. Accédez à **Settings > Look for updates** sur l'appareil.
 2. RADR vérifie les mises à jour du registre à partir du serveur
 3. Les fichiers `registry.json` et de protocole mis à jour sont téléchargés OTA
 4. La prise en charge des nouveaux appareils est disponible sans mise à jour complète du micrologiciel
 
 ## Fichiers sources clés
 
-| Déposer | But |
+| Fichier | But |
 |------|---------|
 | `src/devices/registry.h` | Interface de registre et définitions de types |
 | `src/devices/registry.cpp` | Implémentation et initialisation du registre |
-| `src/devices/buttplugio/buttplugIOFactory.cpp` | Usine d'appareils dynamiques |
+| `src/devices/buttplugio/buttplugIOFactory.cpp` | Fabrique d'appareils dynamiques |
 | `src/devices/device.h` | Classe d'appareil de base |
-| `data/registry.json` | UUID du service pour spécifier les mappages de fichiers |
-| `data/protocols/*.json` | Spécifications de l'appareil Buttplug.io v4 |
+| `data/registry.json` | Associations entre UUID de service et fichiers de spécifications |
+| `data/protocols/*.json` | Spécifications d'appareils Buttplug.io v4 |
 
 ## Lectures complémentaires
 

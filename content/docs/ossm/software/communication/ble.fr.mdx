@@ -27,9 +27,9 @@ L'OSSM implémente un service BLE personnalisé avec de multiples caractéristiq
 522b443a-4f53-534d-0001-420badbabe69
 ```
 
-Les caractéristiques sont organisées par [plages d'espaces de noms](#uuid-namespace-structure)  pour faciliter l'expansion et la découverte.
+Les caractéristiques sont organisées par [plages d'espaces de noms](#structure-de-lespace-de-noms-uuid) pour faciliter l'expansion et la découverte.
 
-## Référence caractéristique
+## Référence des caractéristiques
 
 ### Caractéristiques des commandes (inscriptibles)
 
@@ -40,8 +40,8 @@ Utilisez ces caractéristiques pour envoyer des commandes et configurer l'OSSM.
 | Propriété | Valeur |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-1000-420badbabe69` |
-| Propriétés | LIRE, ÉCRIRE |
-| But | Envoyer des commandes pour contrôler le comportement d'OSSM |
+| Propriétés | READ, WRITE |
+| But | Envoyer des commandes pour contrôler le comportement de l'OSSM |
 
 **Format de commande**
 
@@ -54,16 +54,16 @@ go:<state>
 
 | Commande | Paramètre | Plage de valeurs | Description |
 | ------- | --------- | ----------- | ----------- |
-| `set:speed:<value>` | vitesse | 0-100 | Définir le pourcentage de vitesse de course |
-| `set:stroke:<value>` | accident vasculaire cérébral | 0-100 | Définir le pourcentage de longueur de course |
-| `set:depth:<value>` | profondeur | 0-100 | Définir le pourcentage de profondeur de pénétration |
+| `set:speed:<value>` | speed | 0-100 | Définir le pourcentage de vitesse de course |
+| `set:stroke:<value>` | stroke | 0-100 | Définir le pourcentage de longueur de course |
+| `set:depth:<value>` | depth | 0-100 | Définir le pourcentage de profondeur de pénétration |
 | `set:sensation:<value>` | sensation | 0-100 | Définir le pourcentage d'intensité de sensation |
-| `set:pattern:<value>` | modèle | 0-6 | Définir le motif de trait (voir [motifs](#pattern-information-characteristics)) |
+| `set:pattern:<value>` | pattern | 0-6 | Définir le motif de course (voir [motifs](#caractéristiques-des-informations-sur-les-motifs)) |
 | `go:simplePenetration` | - | - | Passer en mode pénétration simple depuis le menu |
-| `go:strokeEngine` | - | - | Passer en mode moteur de course depuis le menu |
+| `go:strokeEngine` | - | - | Passer en mode Stroke Engine depuis le menu |
 | `go:streaming` | - | - | Passer en mode streaming (expérimental) depuis le menu |
 | `go:menu` | - | - | Revenir au menu principal depuis n'importe quel mode |
-| `stream:<pos>:<time>` | pos, heure | pos : 0-100, temps : ms | Envoyer une commande de position en mode streaming (expérimental) |
+| `stream:<pos>:<time>` | pos, time | pos: 0-100, time: ms | Envoyer une commande de position en mode streaming (expérimental) |
 
 **Format de réponse**
 
@@ -81,7 +81,7 @@ Attendez toujours la réponse avant d'envoyer une autre commande. Les commandes 
 | Propriété | Valeur |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-1010-420badbabe69` |
-| Propriétés | LIRE, ÉCRIRE |
+| Propriétés | READ, WRITE |
 | But | Configurer si le bouton de vitesse physique limite les commandes de vitesse BLE |
 
 **Valeurs de configuration**
@@ -93,7 +93,7 @@ Attendez toujours la réponse avant d'envoyer une autre commande. Les commandes 
 
 <Tabs>
 <Tab title="Bouton comme limite (par défaut)">
-Lorsqu'elles sont réglées sur `true`, les commandes de vitesse BLE (0-100) sont traitées comme un pourcentage de la position physique actuelle du bouton.
+Lorsque la valeur est définie sur `true`, les commandes de vitesse BLE (0-100) sont traitées comme un pourcentage de la position physique actuelle du bouton.
 
 **Exemple** : Bouton à 50%, commande BLE `set:speed:80` → Vitesse effective = 40%
 
@@ -101,12 +101,12 @@ Ce mode fournit une limite de sécurité matérielle que les utilisateurs peuven
 </Tab>
 
 <Tab title="Mode indépendant">
-Lorsqu'elles sont réglées sur `false`, les commandes de vitesse BLE (0-100) sont utilisées directement comme valeur de vitesse, ignorant la position du bouton.
+Lorsque la valeur est définie sur `false`, les commandes de vitesse BLE (0-100) sont utilisées directement comme valeur de vitesse, ignorant la position du bouton.
 
 **Exemple** : commande BLE `set:speed:80` → Vitesse effective = 80 %
 
 <Warning>
-En mode indépendant, les commandes BLE peuvent remplacer le bouton physique. Assurez-vous que votre application met en œuvre des contrôles de sécurité appropriés.
+En mode indépendant, les commandes BLE peuvent contourner la limite imposée par le bouton physique. Assurez-vous que votre application met en œuvre des contrôles de sécurité appropriés.
 </Warning>
 </Tab>
 </Tabs>
@@ -124,7 +124,7 @@ En mode indépendant, les commandes BLE peuvent remplacer le bouton physique. As
 | Propriété | Valeur |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-1030-420badbabe69` |
-| Propriétés | LIRE, ÉCRIRE |
+| Propriétés | READ, WRITE |
 | But | Configurer si l'OSSM tente de compenser la latence|
 
 **Valeurs de configuration**
@@ -136,19 +136,19 @@ En mode indépendant, les commandes BLE peuvent remplacer le bouton physique. As
 
 <Tabs>
 <Tab title="Activé">
-Lorsqu'il est défini sur `true`, l'OSSM s'attend à recevoir les commandes et les heures exactes du funscript et à ce que les commandes soient envoyées.
-avec le même délai entre les commandes que la valeur du temps. En calculant le temps entre les commandes reçues et la variable temps
-l'OSSM est capable de déterminer la latence introduite par BLE et de la corriger en modifiant légèrement la vitesse du mouvement.
-Si le temps entre les commandes ne correspond pas à la variable intime, cela ne doit pas être activé. Le réglage du tampon est utilisé pour
-ajouter du retard à tous les mouvements. Cela donne à l'OSSM le temps de recevoir la commande suivante avant que la précédente ne soit terminée. Cela permet
-la suppression de tout retard introduit par des commandes tardives, ainsi que le lissage du mouvement en combinant des mouvements se déplaçant dans la même direction.
-Les joueurs Funscript doivent ajouter cette valeur de tampon à leur décalage de lecture et inclure un paramètre supplémentaire pour affiner le décalage de lecture.
-pour tenir compte du temps de transmission et de tout retard inhérent au funscript lui-même.
+Lorsqu'il est défini sur `true`, l'OSSM s'attend à recevoir les commandes et les temps exacts du funscript, et à ce que les commandes soient envoyées
+avec le même délai entre les commandes que la valeur de temps. En calculant le temps entre les commandes reçues et la variable de temps,
+l'OSSM peut déterminer la latence introduite par BLE et la corriger en modifiant légèrement la vitesse du mouvement.
+Si le temps entre les commandes ne correspond pas à la variable intime, cette option ne doit pas être activée. Le réglage du tampon sert à
+ajouter artificiellement un délai à tous les mouvements. L'OSSM dispose ainsi du temps nécessaire pour recevoir la commande suivante avant la fin de la précédente.
+Cela permet de supprimer les retards introduits par les commandes tardives et de lisser le mouvement en combinant les mouvements dans la même direction.
+Les lecteurs Funscript doivent ajouter cette valeur de tampon à leur décalage de lecture et prévoir un réglage supplémentaire pour affiner ce décalage,
+afin de tenir compte du temps de transmission et de tout retard inhérent au funscript lui-même.
 </Tab>
 
 <Tab title="Désactivé">
-Lorsqu'il est défini sur `false`, l'OSSM exécutera les commandes dès leur réception. Les commandes arrivées en retard seront exécutées en retard. Commandes
-qui arrivent tôt seront exécutés lorsque la commande précédente sera terminée.
+Lorsqu'il est défini sur `false`, l'OSSM exécute les commandes dès leur réception. Les commandes arrivées en retard sont exécutées en retard.
+Les commandes qui arrivent tôt sont exécutées lorsque la commande précédente est terminée.
 
 </Tab>
 </Tabs>
@@ -165,7 +165,7 @@ qui arrivent tôt seront exécutés lorsque la commande précédente sera termin
 | Propriété | Valeur |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-1020-420badbabe69` |
-| Propriétés | LIRE, ÉCRIRE |
+| Propriétés | READ, WRITE |
 | But | Configurez les informations d'identification WiFi et vérifiez l'état de la connexion |
 
 **Format d'écriture**
@@ -195,7 +195,7 @@ Lorsqu'il n'est pas connecté, le champ `ssid` contiendra le dernier SSID enregi
 | -------- | ------- |
 | `ok:wifi:connected` | Connecté avec succès |
 | `ok:wifi:saved` | Identifiants enregistrés, tentative de connexion |
-| `fail:wifi:invalid_format` | Format de commande incorrect (délimiteur de canal manquant) |
+| `fail:wifi:invalid_format` | Format de commande incorrect (délimiteur pipe (\|) manquant) |
 | `fail:wifi:invalid_ssid` | Longueur du SSID invalide (doit comporter entre 1 et 32 caractères) |
 | `fail:wifi:invalid_password` | Longueur du mot de passe invalide (doit comporter entre 8 et 63 caractères) |
 | `fail:wifi:connection_failed` | Impossible de se connecter au réseau |
@@ -239,7 +239,7 @@ Abonnez-vous à ces caractéristiques pour surveiller l'état actuel de l'OSSM.
 | Propriété | Valeur |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-2000-420badbabe69` |
-| Propriétés | LIRE, NOTIFIER |
+| Propriétés | READ, NOTIFY |
 | But | Surveiller l'état et les paramètres actuels d'OSSM |
 
 **Format JSON d'état**
@@ -262,27 +262,27 @@ Abonnez-vous à ces caractéristiques pour surveiller l'état actuel de l'OSSM.
 | `idle` | Initialisation |
 | `homing` | Séquence de référence active |
 | `homing.forward` | Prise de référence avant en cours |
-| `homing.backward` | Retour en arrière en cours |
+| `homing.backward` | Référencement arrière en cours |
 | `menu` | Menu principal affiché |
 | `menu.idle` | État d'inactivité du menu |
 | `simplePenetration` | Mode de pénétration simple |
 | `simplePenetration.idle` | Pénétration simple au ralenti |
-| `simplePenetration.preflight` | Vérifications avant vol |
-| `strokeEngine` | Mode moteur de course |
-| `strokeEngine.idle` | Moteur au ralenti |
-| `strokeEngine.preflight` | Vérifications avant vol |
+| `simplePenetration.preflight` | Vérifications préalables |
+| `strokeEngine` | Mode Stroke Engine |
+| `strokeEngine.idle` | Stroke Engine inactif |
+| `strokeEngine.preflight` | Vérifications préalables |
 | `strokeEngine.pattern` | Sélection de motif |
 | `streaming` | Mode streaming (expérimental) |
 | `update` | Mode mise à jour |
 | `update.checking` | Vérification des mises à jour |
 | `update.updating` | Mise à jour en cours |
 | `update.idle` | Mise à jour inactive |
-| `wifi` | Mode de configuration Wi-Fi |
+| `wifi` | Mode de configuration WiFi |
 | `wifi.idle` | Configuration WiFi inactive |
 | `help` | Écran d'aide |
-| `help.idle` | Aide au ralenti |
+| `help.idle` | Aide inactive |
 | `error` | État d'erreur |
-| `error.idle` | Erreur d'inactivité |
+| `error.idle` | Erreur en état inactif |
 | `error.help` | Aide sur les erreurs |
 | `restart` | État de redémarrage |
 
@@ -296,15 +296,15 @@ Pour l'implémentation complète de la machine d'état, voir [OSSM.h](https://gi
 - Notifications périodiques toutes les 1 000 ms lorsqu'aucun changement d'état ne se produit
 - Les notifications s'arrêtent lorsqu'aucun client n'est connecté
 
-### Caractéristiques des informations sur le modèle
+### Caractéristiques des informations sur les motifs
 
-#### Caractéristique de la liste de modèles
+#### Caractéristique de la liste des motifs
 
 | Propriété | Valeur |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-3000-420badbabe69` |
-| Propriétés | LIRE |
-| But | Obtenez les modèles de traits disponibles |
+| Propriétés | READ |
+| But | Obtenir les motifs de course disponibles |
 
 **Format de réponse**
 
@@ -320,37 +320,37 @@ Pour l'implémentation complète de la machine d'état, voir [OSSM.h](https://gi
 ]
 ```
 
-#### Caractéristique de description du modèle
+#### Caractéristique de description du motif
 
 | Propriété | Valeur |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-3010-420badbabe69` |
-| Propriétés | LIRE, ÉCRIRE |
-| But | Obtenez des descriptions pour des modèles de traits individuels |
+| Propriétés | READ, WRITE |
+| But | Obtenir des descriptions pour des motifs de course individuels |
 
-Pour récupérer une description de modèle :
+Pour récupérer une description de motif :
 
 <Steps>
-<Step title="Écrire l'index du modèle">
-Écrivez le numéro d'index (0-6) à la caractéristique.
+<Step title="Écrire l'index du motif">
+Écrivez le numéro d'index (0-6) dans la caractéristique.
 </Step>
 
 <Step title="Lire le descriptif">
-Lisez la caractéristique pour recevoir la chaîne de description du modèle.
+Lisez la caractéristique pour recevoir la chaîne de description du motif.
 </Step>
 </Steps>
 
-**Descriptions des modèles**
+**Descriptions des motifs**
 
-| Modèle | Indice | Description |
+| Motif | Indice | Description |
 | ------- | ----- | ----------- |
-| Coup simple | 0 | Accélération, roue libre et décélération également réparties ; aucune sensation |
-| Taquiner martèlement | 1 | Changements de vitesse avec sensation ; équilibre les mouvements plus rapides |
-| Coup de robot | 2 | La sensation varie en accélération ; du robotique au progressif |
-| Moitié-moitié | 3 | Les traits en pleine et demi-profondeur alternent ; la sensation affecte la vitesse |
-| Plus profond | 4 | La profondeur de course augmente par cycle ; Les jeux de sensations comptent |
-| Stop'n'Go | 5 | Pauses entre les coups ; la sensation ajuste la longueur |
-| Insister | 6 | Modifie la longueur, maintient la vitesse ; la sensation influence la direction |
+| Simple Stroke | 0 | Accélération, roue libre et décélération également réparties ; aucune sensation |
+| Teasing Pounding | 1 | Changements de vitesse avec sensation ; équilibre les mouvements plus rapides |
+| Robo Stroke | 2 | La sensation fait varier l'accélération ; du robotique au progressif |
+| Half'n'Half | 3 | Les courses en pleine et demi-profondeur alternent ; la sensation affecte la vitesse |
+| Deeper | 4 | La profondeur de course augmente par cycle ; la sensation détermine le nombre |
+| Stop'n'Go | 5 | Pauses entre les courses ; la sensation ajuste la longueur |
+| Insist | 6 | Modifie la longueur, maintient la vitesse ; la sensation influence la direction |
 
 ### Commandes de streaming (expérimental)
 
@@ -365,7 +365,7 @@ En mode streaming (`go:streaming`), l'OSSM accepte les commandes de position en 
 | Propriété | Valeur |
 | -------- | ----- |
 | Format | `stream:<position>:<time>` |
-| Position | 0-100 (pourcentage de course) |
+| Position | 0-100 (pourcentage de la course) |
 | Temps | Millisecondes pour atteindre la position cible |
 
 **Exemples de commandes**
@@ -379,13 +379,13 @@ stream:50:300     # Move to 50% (mid-stroke) in 300ms
 **Comment ça marche**
 
 1. Entrez en mode streaming avec `go:streaming`
-2. L'OSSM se met en position 0 (complètement rétracté)
-3. Envoyer des commandes `stream:<pos>:<time>` pour contrôler le mouvement
+2. L'OSSM effectue son référencement jusqu’à la position 0 (complètement rétractée)
+3. Envoyez des commandes `stream:<pos>:<time>` pour contrôler le mouvement
 4. Le firmware calcule la vitesse requise pour atteindre la position cible dans le temps spécifié
-5. Motion utilise une accélération maximale pour une sensation de réactivité
+5. Le mouvement utilise une accélération maximale pour une sensation de réactivité
 
 <Note>
-La position 0 représente complètement rétractée (origine) et la position 100 représente complètement déployée. Le paramètre de temps indique la durée du mouvement, permettant à l'OSSM de calculer la vitesse appropriée pour une lecture fluide.
+La position 0 correspond à une rétraction complète (position d’origine) et la position 100 à une extension complète. Le paramètre de temps indique la durée du mouvement, permettant à l’OSSM de calculer la vitesse appropriée pour une lecture fluide.
 </Note>
 
 **Exigences**
@@ -395,7 +395,7 @@ La position 0 représente complètement rétractée (origine) et la position 100
 - Commandes envoyées via la caractéristique de commande principale
 
 <Tip>
-Pour la lecture de funscript, consultez l'outil [Funscript Player](/ossm/software/communication/ble#streaming-mode) qui gère automatiquement le timing et la génération de commandes.
+Pour la lecture de funscript, consultez l'outil [Lecteur Funscript](/ossm/software/communication/ble#commandes-de-streaming-expérimental) qui gère automatiquement le timing et la génération de commandes.
 </Tip>
 
 ### Caractéristiques GPIO
@@ -405,61 +405,61 @@ Pour la lecture de funscript, consultez l'outil [Funscript Player](/ossm/softwar
 | Propriété | Valeur |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-4000-420badbabe69` |
-| Propriétés | LIRE, ÉCRIRE |
+| Propriétés | READ, WRITE |
 | But | Contrôlez les broches de sortie GPIO pour les accessoires et les intégrations |
 
 Écrivez les commandes au format `<pin>:<state>` où la broche est 1-4 et l'état est `high`/`low` ou `1`/`0`.
 
 **Mappage des broches :**
 
-| Épingle logique | ESP32GPIO |
+| Broche logique | ESP32 GPIO |
 | ----------- | ---------- |
-| 1 | GPIO2 |
-| 2 | GPIO15 |
-| 3 | GPIO22 |
-| 4 | GPIO33 |
+| 1 | GPIO 2 |
+| 2 | GPIO 15 |
+| 3 | GPIO 22 |
+| 4 | GPIO 33 |
 
 **Format de réponse :**
 
 | Réponse | Signification |
 | -------- | ------- |
-| `ok:<pin>:<state>` | Épingle définie avec succès |
+| `ok:<pin>:<state>` | Broche définie avec succès |
 | `error:invalid_format` | Format de commande non reconnu |
 | `error:pin_out_of_range` | Numéro de broche non 1-4 |
 
 <Info>
-Pour une documentation GPIO détaillée, y compris des exemples d'intégration matérielle, voir [GPIO Control](/ossm/software/communication/gpio).
+Pour une documentation GPIO détaillée, y compris des exemples d'intégration matérielle, voir [Contrôle GPIO](/ossm/software/communication/gpio).
 </Info>
 
 ## Émulation Fleshy Thrust Sync (tests uniquement)
 
 <Warning>
-Cette fonctionnalité est destinée uniquement aux tests de développement et son utilisation n'est **pas recommandée**. Il nécessite une version spéciale du micrologiciel et pourra être supprimé dans les versions futures.
+Cette fonctionnalité est destinée uniquement aux tests de développement et son utilisation n'est **pas recommandée**. Elle nécessite une version spéciale du micrologiciel et pourra être supprimée dans les versions futures.
 </Warning>
 
-Le micrologiciel OSSM peut éventuellement émuler le protocole BLE Fleshy Thrust Sync (FTS) pour les tests de compatibilité avec des applications telles que faptap.net. Cette fonctionnalité est désactivée par défaut et nécessite la compilation du firmware avec l'indicateur `PRETEND_TO_BE_FLESHY_THRUST_SYNC`.
+Le micrologiciel OSSM peut éventuellement émuler le protocole BLE Fleshy Thrust Sync (FTS) pour les tests de compatibilité avec des applications telles que faptap.net. Cette fonctionnalité est désactivée par défaut et nécessite la compilation du firmware avec l’option de compilation `PRETEND_TO_BE_FLESHY_THRUST_SYNC`.
 
 ### Service FTS
 
 | Propriété | Valeur |
 | -------- | ----- |
 | UUID du service | `0000ffe0-0000-1000-8000-00805f9b34fb` |
-| UUID caractéristique | `0000ffe1-0000-1000-8000-00805f9b34fb` |
-| Propriétés | LIRE, ÉCRIRE, NOTIFIER, INDIQUER |
+| UUID de la caractéristique | `0000ffe1-0000-1000-8000-00805f9b34fb` |
+| Propriétés | READ, WRITE, NOTIFY, INDICATE |
 
 ### Format de protocole binaire
 
 FTS utilise un format binaire compact plutôt que des commandes texte :
 
-| Octet | Description | Gamme |
+| Octet | Description | Plage |
 | ---- | ----------- | ----- |
 | 0 | Position | 0-180 (uint8) |
 | 1 | Octet de poids fort du temps | MSB du temps en ms |
-| 2 | Temps octet de poids faible | LSB du temps en ms |
+| 2 | Octet de poids faible du temps | LSB du temps en ms |
 
 **Mappage de position** : 0 = entièrement rétracté, 180 = entièrement étendu
 
-**Format de l'heure** : entier non signé de 16 bits en gros-boutiste (ordre des octets du réseau)
+**Format du temps/de la durée** : entier non signé de 16 bits en gros-boutiste (ordre des octets du réseau)
 
 ### Exemple
 
@@ -475,7 +475,7 @@ Byte 2: 0xFA (250 & 0xFF = 250)
 L'émulation FTS utilise le même mécanisme de streaming sous-jacent que la commande native `stream:pos:time`. L'OSSM doit être en mode streaming pour que les commandes prennent effet.
 </Note>
 
-### Pourquoi pas recommandé
+### Pourquoi ce n'est pas recommandé
 
 - Le protocole FTS est une spécification tierce non contrôlée par le projet OSSM
 - Les modifications de protocole dans les applications compatibles FTS peuvent rompre la compatibilité
@@ -484,12 +484,12 @@ L'émulation FTS utilise le même mécanisme de streaming sous-jacent que la com
 
 ## Service d'informations sur les appareils
 
-L'OSSM implémente le service d'information sur les appareils BLE standard pour l'identification.
+L'OSSM implémente le service d'informations sur les appareils BLE standard pour l'identification.
 
-| Caractéristiques | UUID | Valeur |
+| Caractéristique | UUID | Valeur |
 | -------------- | ---- | ----- |
 | Service | `180A` | Service d'informations sur les appareils |
-| Nom du fabricant | `2A29` | "Recherche et désir" |
+| Nom du fabricant | `2A29` | "Research And Desire" |
 | ID système | `2A23` | `88:1A:14:FF:FE:34:29:63` |
 
 ## Structure de l'espace de noms UUID
@@ -504,12 +504,12 @@ L'OSSM utilise un espace de noms UUID structuré pour une expansion organisée.
 
 ### Plages d'espaces de noms
 
-| Gamme | Portée hexagonale | Description |
+| Plage | Plage hexadécimale | Description |
 | ----- | --------- | ----------- |
 | 0x0 | 0x0000–0x0FFF | Réservé aux messages système |
 | 0x1 | 0x1000–0x1FFF | Commandes et configuration |
 | 0x2 | 0x2000–0x2FFF | Informations sur l'état |
-| 0x3 | 0x3000–0x3FFF | Informations sur le modèle |
+| 0x3 | 0x3000–0x3FFF | Informations sur les motifs |
 | 0x4 | 0x4000–0x4FFF | Paramétrage des broches GPIO |
 | 0x5–0xD | 0x5000–0xDFFF | Réservé pour une utilisation future |
 | 0xE | 0xE000–0xEFFF | Réservé aux statistiques |
@@ -532,7 +532,7 @@ L'OSSM utilise un espace de noms UUID structuré pour une expansion organisée.
 ```
 </Tab>
 
-<Tab title="Modèles (0x3xxx)">
+<Tab title="Motifs (0x3xxx)">
 ```
 522b443a-4f53-534d-3000-420badbabe69  # Pattern list
 522b443a-4f53-534d-3010-420badbabe69  # Pattern description
@@ -548,25 +548,25 @@ L'OSSM utilise un espace de noms UUID structuré pour une expansion organisée.
 
 ## Gestion des connexions
 
-### Publicité
+### Diffusion BLE
 
 | Paramètre | Valeur |
 | ------- | ----- |
 | Nom de l'appareil | `OSSM` |
-| UUID de service | Service principal + Service d'informations sur les appareils |
-| Intervalle de publicité | 20-40 ms (optimisé pour la fiabilité) |
-| Redémarrage automatique | La publicité reprend lorsque tous les clients se déconnectent |
+| UUID des services | Service principal + Service d'informations sur les appareils |
+| Intervalle de diffusion | 20-40 ms (optimisé pour la fiabilité) |
+| Redémarrage automatique | La diffusion reprend lorsque tous les clients se déconnectent |
 
 ### Sécurité
 
 | Paramètre | Valeur |
 | ------- | ----- |
 | Couplage | "Just Works" (aucune authentification requise) |
-| Cryptage | Connexions sécurisées BLE activées |
-| Collage | Désactivé (pas de couplage persistant) |
+| Cryptage | BLE Secure Connections activées |
+| Bonding | Désactivé (pas de couplage persistant) |
 
 <Note>
-L'OSSM utilise le couplage « Just Works » pour faciliter son utilisation. Toute personne à portée de BLE peut se connecter lorsque l'appareil fait de la publicité.
+L'OSSM utilise le couplage « Just Works » pour faciliter son utilisation. Toute personne à portée de BLE peut se connecter lorsque l'appareil diffuse.
 </Note>
 
 ### Sécurité de déconnexion
@@ -577,14 +577,14 @@ Lorsqu'une connexion BLE est perdue de manière inattendue, l'OSSM réduit autom
 
 1. Connexion perdue détectée
 2. **Délai d'une seconde** — permet de brèves interruptions de signal sans déclenchement
-3. **Rampe de 2 secondes** — la vitesse diminue de la valeur actuelle à zéro à l'aide de la courbe sinusoïdale d'entrée-sortie facile
+3. **Rampe de 2 secondes** — la vitesse diminue de la valeur actuelle à zéro à l'aide d'une courbe sinusoïdale à accélération/décélération progressive
 4. L'appareil continue à vitesse nulle jusqu'à ce qu'il soit reconnecté ou arrêté manuellement
 
 <Info>
-La courbe sinusoïdale facile d'entrée et de sortie offre une décélération douce qui semble naturelle et réduit les contraintes mécaniques. Si la vitesse était déjà nulle au moment de la déconnexion, aucune rampe ne se produit.
+La courbe sinusoïdale à accélération/décélération progressive offre une décélération douce qui semble naturelle et réduit les contraintes mécaniques. Si la vitesse était déjà nulle au moment de la déconnexion, aucune rampe ne se produit.
 </Info>
 
-**Considérations client :**
+**Considérations pour les clients :**
 
 - Mettre en œuvre une surveillance des connexions pour détecter rapidement les déconnexions
 - Envisagez une logique de reconnexion automatique
@@ -607,10 +607,10 @@ L'appareil apparaît dans les résultats de l'analyse.
 </Step>
 
 <Step title="Connectez-vous à l'appareil">
-Établissez une connexion du GATT à l’OSSM.
+Établissez une connexion GATT à l’OSSM.
 </Step>
 
-<Step title="Découvrez les prestations">
+<Step title="Découvrez les services">
 Découvrez tous les services et caractéristiques de l'appareil.
 
 <Check>
@@ -623,7 +623,7 @@ Activez les notifications sur la caractéristique d'état pour recevoir des mise
 </Step>
 
 <Step title="Lire l'état initial">
-Lisez l'état actuel et la liste des modèles pour initialiser votre application.
+Lisez l'état actuel et la liste des motifs pour initialiser votre application.
 </Step>
 
 <Step title="Envoyer des commandes">
@@ -641,7 +641,7 @@ Commencez à envoyer des commandes pour contrôler l’OSSM.
 - Surveiller les changements d'état pour confirmer l'exécution de la commande
 </Card>
 
-<Card title="Surveillance de l'État" icon="eye">
+<Card title="Surveillance de l'état" icon="eye">
 - Abonnez-vous aux notifications sur les caractéristiques de l'état
 - Analyser les mises à jour de l'état JSON de manière fiable
 - Gérer les transitions d'état de manière appropriée
@@ -780,7 +780,7 @@ asyncio.run(connect_to_ossm())
 </Accordion>
 
 <Accordion title="Aucune mise à jour de l'état">
-**Symptômes** : les caractéristiques de l'état ne sont jamais mises à jour après l'abonnement.
+**Symptômes** : la caractéristique d'état n'est jamais mise à jour après l'abonnement.
 
 **Solutions** :
 - Vérifier que l'abonnement aux notifications a réussi

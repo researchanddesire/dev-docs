@@ -3,45 +3,45 @@ title: "Offline-modus"
 description: "Hoe uw Chastity Lockbox werkt wanneer deze niet is verbonden met WiFi of het dashboard"
 ---
 
-Uw Chastity Lockbox is ontworpen om zowel online als offline te functioneren. In deze handleiding wordt uitgelegd wat werkt zonder WiFi, wat connectiviteit vereist en hoe het apparaat omgaat met overgangen tussen online en offline statussen.
+Uw Chastity Lockbox is ontworpen om zowel online als offline te functioneren. In deze handleiding wordt uitgelegd wat zonder WiFi werkt, waarvoor verbinding nodig is en hoe het apparaat omgaat met overgangen tussen online en offline.
 
 ## Wat offline werkt
 
-Deze functies functioneren volledig zonder internetverbinding:
+Deze functies werken volledig zonder internetverbinding:
 
-| Functie | Offline gedrag |
+| Functie | Offlinegedrag |
 |---------|-----------------|
-| Getimede sloten | Timer blijft lokaal aftellen |
-| Vergrendel-/ontgrendelmechanisme | Fysiek slot wordt ingeschakeld en vrijgegeven |
-| Menunavigatie | Alle menu's toegankelijk |
-| Knopbedieningen | Volledige functionaliteit |
-| Slaapmodi | Automatisch en handmatig slaapwerk |
+| Tijdgestuurde sloten | De timer blijft lokaal aftellen |
+| Vergrendelings-/ontgrendelingsmechanisme | Het fysieke slot vergrendelt en ontgrendelt |
+| Menunavigatie | Alle menu's zijn toegankelijk |
+| Knopbediening | Volledige functionaliteit |
+| Slaapmodi | Automatische en handmatige slaapmodi werken |
 | Noodontgrendeling | Kan lokaal worden gebruikt (indien ingeschakeld) |
-| Volharding van de staat | De vergrendelingsstatus overleeft opnieuw opstarten |
+| Statusbehoud | De vergrendelingsstatus blijft na opnieuw opstarten behouden |
 
 <Tip>
-Ga je ergens heen zonder wifi, dan blijft je slot werken. De timer draait op het apparaat zelf, niet op een server.
+Als u naar een plek zonder WiFi gaat, blijft uw slot werken. De timer draait op het apparaat zelf en niet op een server.
 </Tip>
 
-## Wat vereist WiFi
+## Wat WiFi vereist
 
 Voor deze functies is een actieve WiFi-verbinding vereist:
 
 | Functie | Waarom WiFi nodig is |
 |---------|-------------------|
-| Koppelen | Apparaat moet zich registreren bij de dashboardserver |
-| Firmware-updates | Downloads van updateserver |
-| Dashboardsynchronisatie | Ontvangt sleutelhouderopdrachten |
-| Tijdsynchronisatie | Krijgt nauwkeurige tijd van de NTP-server |
-| Activiteitenregistratie | Verzendt gebeurtenissen naar het dashboard |
-| Publieke stemming | Ontvangt stemupdates |
-| Sleutelhouder ontgrendelen | Commando's voor ontgrendelen op afstand |
+| Koppelen | Het apparaat moet zich registreren bij de dashboardserver |
+| Firmware-updates | Downloads van de updateserver |
+| Dashboardsynchronisatie | Ontvangt opdrachten van de sleutelhouder |
+| Tijdsynchronisatie | Haalt de juiste tijd op van de NTP-server |
+| Activiteitenlogboek | Verstuurt gebeurtenissen naar het dashboard |
+| Openbare stemming | Ontvangt updates over stemmingen |
+| Ontgrendeling door sleutelhouder | Opdrachten voor ontgrendeling op afstand |
 
 ## Tijdweergave wanneer offline
 
-Wanneer uw apparaat niet is verbonden met WiFi en de tijd niet heeft gesynchroniseerd, wordt op het vergrendelscherm het volgende weergegeven:
+Wanneer uw apparaat niet met WiFi is verbonden en de tijd niet is gesynchroniseerd, toont het vergrendelscherm:
 
-> "Verbind Wi-Fi om de resterende tijd te zien"
+> "Connect Wi-Fi to see time remaining"
 
 <Warning>
 Zonder tijdsynchronisatie kan het apparaat de resterende tijd niet nauwkeurig weergeven. De vergrendelingstimer zelf loopt echter nog steeds correct op basis van de geconfigureerde duur.
@@ -49,107 +49,107 @@ Zonder tijdsynchronisatie kan het apparaat de resterende tijd niet nauwkeurig we
 
 ### Waarom dit gebeurt
 
-Het apparaat moet de huidige tijd weten om de 'resterende tijd' te berekenen. Zonder NTP-synchronisatie:
+Het apparaat moet de huidige tijd kennen om „time remaining“ te berekenen. Zonder NTP-synchronisatie:
 - Het apparaat kent de vergrendelingsduur
 - Het apparaat weet niet hoe laat het nu is
-- Daarom kan de resterende tijd niet worden berekend
+- Daarom kan het „time remaining“ niet berekenen
 
-Zodra WiFi verbinding maakt en de tijd synchroniseert, wordt het display bijgewerkt om de resterende tijd nauwkeurig weer te geven.
+Zodra WiFi verbinding maakt en de tijd synchroniseert, wordt de weergave bijgewerkt met de nauwkeurige resterende tijd.
 
-## Lokale afspeelmodus
+## Modus "local play"
 
-Wanneer u een vergrendeling rechtstreeks op het apparaat start (niet vanaf het dashboard), werkt deze in de modus "lokaal afspelen":
+Wanneer u een vergrendeling rechtstreeks op het apparaat start (niet vanaf het dashboard), werkt deze in de modus "local play":
 
-### Lokale speeleigenschappen
+### Kenmerken van "local play"
 
 - De vergrendelingsduur wordt lokaal op het apparaat opgeslagen
-- Timer werkt onafhankelijk van de server
-- Geen betrokkenheid van de sleutelhouder vereist
+- De timer werkt onafhankelijk van de server
+- De sleutelhouder hoeft niet betrokken te zijn
 - De vergrendeling eindigt wanneer de timer afloopt
 
-### Dashboardsloten
+### Dashboardvergrendelingen
 
-Wanneer een vergrendeling wordt gestart vanaf het dashboard:
+Wanneer een vergrendeling vanaf het dashboard wordt gestart:
 
-- Instellingen worden via wifi met het apparaat gesynchroniseerd
-- Pauzeschema's zijn ontvangen
+- Instellingen worden via WiFi met het apparaat gesynchroniseerd
+- Pauzeschema's worden ontvangen
 - Noodontgrendeling kan op afstand worden uitgeschakeld
-- Sleutelhouder kan slot op afstand wijzigen
+- De sleutelhouder kan de vergrendeling op afstand wijzigen
 
 <Info>
-Lokale vergrendelingen (gestart op het apparaat) kunnen niet worden gewijzigd vanaf het dashboard. Dashboardvergrendelingen kunnen door uw sleutelhouder worden aangepast, zelfs als u offline bent. De wijzigingen worden gesynchroniseerd wanneer u opnieuw verbinding maakt.
+Lokale vergrendelingen (gestart op het apparaat) kunnen niet vanaf het dashboard worden gewijzigd. Dashboardvergrendelingen kunnen door uw sleutelhouder worden gewijzigd, ook wanneer u offline bent – de wijzigingen worden gesynchroniseerd zodra u opnieuw verbinding maakt.
 </Info>
 
-## Volharding van de staat
+## Statusbehoud
 
-Uw apparaat behoudt zijn status over:
+Uw apparaat behoudt zijn status tijdens:
 
 - Opnieuw opstarten
 - Stroomcycli
 - WiFi-verbrekingen
-- Diepe slaap
+- Deep sleep
 
-De volgende gegevens blijven bestaan:
+De volgende gegevens blijven behouden:
 
 | Gegevens | Opslag |
 |------|---------|
 | Vergrendelingsstatus (vergrendeld/ontgrendeld) | Niet-vluchtig geheugen |
-| Eindtijd vergrendelen | Niet-vluchtig geheugen |
+| Eindtijd van de vergrendeling | Niet-vluchtig geheugen |
 | Sessie-instellingen | Niet-vluchtig geheugen |
-| WiFi-referenties | Niet-vluchtig geheugen |
+| WiFi-inloggegevens | Niet-vluchtig geheugen |
 | Kalibratiegegevens | Niet-vluchtig geheugen |
 
 <Note>
-Zelfs als uw apparaat volledig stroom verliest, keert het terug naar de vergrendelde status wanneer het wordt ingeschakeld.
+Zelfs als uw apparaat volledig zonder stroom komt te zitten, keert het bij inschakelen terug naar de vergrendelde status.
 </Note>
 
-## Gedrag bij opnieuw verbinden via WiFi
+## Gedrag bij opnieuw verbinden met WiFi
 
-Wanneer WiFi tijdens bedrijf wordt verbroken:
+Wanneer de WiFi-verbinding tijdens het gebruik wordt verbroken:
 
-1. **Onmiddellijk**: het apparaat blijft normaal werken
-2. **Elke 30 seconden**: Automatische herverbindingspoging
-3. **Bij opnieuw verbinden**: synchroniseert de status met het dashboard
+1. **Onmiddellijk**: Het apparaat blijft normaal werken
+2. **Elke 30 seconden**: Automatische poging om opnieuw verbinding te maken
+3. **Bij opnieuw verbinden**: De status wordt met het dashboard gesynchroniseerd
 
-### Handmatige WiFi-installatie
+### WiFi handmatig instellen
 
-U kunt WiFi op elk gewenst moment opnieuw configureren via:
-- Hoofdmenu → Instellingen → WiFi-instellingen
-- Menu vergrendelen → WiFi-instellingen (terwijl vergrendeld)
+U kunt WiFi op elk moment opnieuw configureren via:
+- Main Menu → Settings → WiFi Settings
+- Lock Menu → WiFi Settings (while locked)
 
 Hiermee wordt het configuratieportaal geopend zonder dat dit invloed heeft op uw vergrendelingsstatus.
 
 ## Offline scenario's
 
-### Scenario 1: WiFi valt uit tijdens vergrendeling
+### Scenario 1: WiFi valt uit tijdens een vergrendeling
 
 - De vergrendelingstimer loopt normaal door
-- De indicator "Verbinden" wordt weergegeven op de statusbalk
-- Automatische herverbindingspogingen elke 30 seconden
-- Het slot wordt ontgrendeld wanneer de timer afloopt (geen WiFi nodig)
+- De indicator "Connecting" wordt op de statusbalk weergegeven
+- Elke 30 seconden wordt automatisch geprobeerd opnieuw verbinding te maken
+- Het slot wordt ontgrendeld wanneer de timer afloopt (WiFi is niet nodig)
 
-### Scenario 2: Startslot zonder WiFi
+### Scenario 2: Een vergrendeling starten zonder WiFi
 
-- Navigeer naar het menu Vergrendelen
-- Duur instellen met encoder
-- Druk op Enter om te bevestigen
-- Slot blokkeert lokaal
-- Tijdweergave toont "Verbind Wi-Fi om de resterende tijd te zien"
-- Timer telt nog steeds correct af
+- Navigeer in het menu naar "Lock"
+- Stel de duur in met de encoder
+- Druk ter bevestiging op "Enter"
+- De vergrendeling wordt lokaal geactiveerd
+- De tijdweergave toont "Connect Wi-Fi to see time remaining"
+- De timer telt nog steeds correct af
 
-### Scenario 3: Reis naar locatie zonder WiFi
+### Scenario 3: Reizen naar een plek zonder WiFi
 
-- Apparaat werkt normaal
-- Dashboard kan geen opdrachten verzenden
-- Lokale noodontgrendeling nog steeds beschikbaar (indien ingeschakeld)
+- Het apparaat werkt normaal
+- Het dashboard kan geen opdrachten verzenden
+- Lokale noodontgrendeling blijft beschikbaar (indien ingeschakeld)
 - Bij terugkeer naar WiFi wordt de status automatisch gesynchroniseerd
 
-### Scenario 4: Bij diepe slaap wordt de wifi-verbinding verbroken
+### Scenario 4: Deep sleep verbreekt de WiFi-verbinding
 
-- WiFi wordt verbroken tijdens diepe slaap (energiebesparing)
-- Vergrendelingsstatus ongewijzigd
+- WiFi wordt tijdens Deep sleep verbroken (energiebesparing)
+- De vergrendelingsstatus blijft ongewijzigd
 - Bij het ontwaken maakt WiFi automatisch opnieuw verbinding
-- Dashboardopdrachten in behandeling ontvangen
+- Openstaande dashboardopdrachten worden ontvangen
 
 ## Details van dashboardsynchronisatie
 
@@ -157,49 +157,49 @@ Wanneer u online bent, synchroniseert uw apparaat periodiek met het dashboard:
 
 ### Uitgaand (apparaat → dashboard)
 
-- Statuswijzigingen vergrendelen
-- Knoppersen
+- Wijzigingen in de vergrendelingsstatus
+- Knopdrukken
 - Sensormetingen
 - Gebruik van noodontgrendeling
-- Pauzetijd
+- Pauzetiming
 
-### Binnenkomend (dashboard → apparaat)
+### Inkomend (dashboard → apparaat)
 
-- Commando's vergrendelen
-- Ontgrendel opdrachten
+- Vergrendelingsopdrachten
+- Ontgrendelingsopdrachten
 - Updates van het pauzeschema
 - Wijzigingen in sessie-instellingen
 - Voorkeuren voor tijdweergave
 
 <Info>
-Synchronisatie gebeurt via MQTT voor realtime reactievermogen. Commando's arriveren doorgaans binnen enkele seconden wanneer ze online zijn.
+Synchronisatie gebeurt via MQTT voor realtime reactievermogen. Opdrachten komen online doorgaans binnen enkele seconden aan.
 </Info>
 
 ## Offlineproblemen oplossen
 
 <AccordionGroup>
-<Accordion title="Resterende tijd wordt niet weergegeven">
-Maak verbinding met WiFi om de tijd te synchroniseren. De vergrendeling is nog steeds actief. Je kunt het aftellen pas zien nadat de tijd is gesynchroniseerd.
+<Accordion title="De resterende tijd wordt niet weergegeven">
+Maak verbinding met WiFi om de tijd te synchroniseren. De vergrendeling loopt nog – u kunt het aftellen pas zien nadat de tijd is gesynchroniseerd.
 </Accordion>
 
-<Accordion title="Kan geen sleutelhouderopdrachten ontvangen">
-Uw apparaat moet online zijn om dashboardopdrachten te kunnen ontvangen. Controleer de WiFi-verbindingsstatus in de statusbalk.
+<Accordion title="Kan geen opdrachten van de sleutelhouder ontvangen">
+Uw apparaat moet online zijn om dashboardopdrachten te ontvangen. Controleer de WiFi-verbindingsstatus op de statusbalk.
 </Accordion>
 
-<Accordion title="Vergrendeling beëindigd, maar het dashboard geeft nog steeds aan dat het vergrendeld is">
-Het dashboard wordt bijgewerkt wanneer uw apparaat opnieuw verbinding maakt. Maak verbinding met WiFi en de status wordt gesynchroniseerd.
+<Accordion title="De vergrendeling is beëindigd, maar het dashboard toont nog steeds 'vergrendeld'">
+Het dashboard wordt bijgewerkt wanneer uw apparaat opnieuw verbinding maakt. Maak verbinding met WiFi, waarna de status wordt gesynchroniseerd.
 </Accordion>
 
 <Accordion title="WiFi maakt niet automatisch opnieuw verbinding">
-Ga naar Instellingen → WiFi-instellingen om handmatig opnieuw verbinding te maken. Uw vergrendelingsstatus wordt niet beïnvloed.
+Ga naar Settings → WiFi Settings om handmatig opnieuw verbinding te maken. Uw vergrendelingsstatus blijft ongewijzigd.
 </Accordion>
 </AccordionGroup>
 
 ## Gerelateerde handleidingen
 
 <CardGroup cols={2}>
-<Card title="WiFi-installatie" icon="wifi" href="https://docs.researchanddesire.com/lockbox/get-started">
-Hoe u uw apparaat met WiFi kunt verbinden.
+<Card title="WiFi instellen" icon="wifi" href="https://docs.researchanddesire.com/lockbox/get-started">
+Zo verbindt u uw apparaat met WiFi.
 </Card>
 
 <Card title="Slaapmodus" icon="moon" href="../device-states/sleep-mode">
@@ -207,10 +207,10 @@ Hoe slaap de WiFi-connectiviteit beïnvloedt.
 </Card>
 
 <Card title="Statussymbolen" icon="display" href="../using/symbols">
-De WiFi-statusindicator begrijpen.
+Inzicht in de WiFi-statusindicator.
 </Card>
 
 <Card title="Onlinestatus" icon="signal" href="../support/online-status">
-Hoe u kunt verifiëren dat uw apparaat online is.
+Hoe u controleert of uw apparaat online is.
 </Card>
 </CardGroup>

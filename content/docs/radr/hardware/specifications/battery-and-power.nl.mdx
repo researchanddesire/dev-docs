@@ -12,20 +12,20 @@ RADR maakt gebruik van een lithiumbatterij met intelligente monitoring:
 | Onderdeel | Beschrijving |
 |-----------|-------------|
 | Batterijtype | Lithium-polymeer (LiPo) |
-| Brandstofmeter IC | MAX17048 |
+| Laadtoestandsmeter-IC | MAX17048 |
 | Oplaadpoort | USB-C |
 | Oplaadindicator | Hardware-LED |
 
-### MAX17048 Brandstofmeter
+### MAX17048-laadtoestandsmeter
 
-De MAX17048 is een nauwkeurige brandstofmeter die het volgende biedt:
+De MAX17048 is een nauwkeurige laadtoestandsmeter die het volgende biedt:
 
 - **Batterijpercentage** — Nauwkeurige aflezing van de laadstatus (0–100%)
 - **Batterijspanning** — Realtime spanningsmeting
 - **Batterijwaarschuwingen** — Programmeerbare drempelmeldingen
 
 <Info>
-De brandstofmeter maakt gebruik van eigen algoritmen om de resterende levensduur van de batterij nauwkeurig te schatten, waarbij factoren als temperatuur en ontladingssnelheid worden gecompenseerd.
+De laadtoestandsmeter maakt gebruik van eigen algoritmen om de resterende gebruiksduur van de batterij nauwkeurig te schatten, waarbij factoren als temperatuur en ontladingssnelheid worden gecompenseerd.
 </Info>
 
 ## Batterij-indicator
@@ -36,12 +36,12 @@ De batterijstatus wordt weergegeven in de statusbalk bovenaan het scherm:
 |-------|-------------------|
 | Vol | 90–100% |
 | Hoog | 60–89% |
-| Medium | 30–59% |
+| Gemiddeld | 30–59% |
 | Laag | 10–29% |
 | Kritisch | 0–9% |
 
 <Warning>
-Wanneer de batterij een kritiek niveau bereikt, slaat u uw sessie op en laadt u RADR op om onverwacht afsluiten te voorkomen.
+Wanneer de batterij een kritiek niveau bereikt, slaat u uw sessie op en laadt u RADR op om een onverwachte uitschakeling te voorkomen.
 </Warning>
 
 ## Opladen
@@ -52,7 +52,7 @@ RADR wordt opgeladen via de USB-C-poort aan de bovenkant van het apparaat, naast
 
 - Sluit een standaard USB-C-kabel aan
 - Compatibel met USB-opladers, powerbanks en USB-poorten van computers
-- Opladen werkt terwijl RADR is in- of uitgeschakeld
+- Opladen werkt terwijl RADR aan of uit staat
 
 ### Oplaadindicator
 
@@ -64,7 +64,7 @@ Een hardware-LED geeft de laadstatus aan:
 | LED uit | Volledig opgeladen of niet aangesloten |
 
 <Note>
-De oplaad-LED staat los van de softwaregestuurde RGB-LED's van RADR. Het wordt rechtstreeks bestuurd door het laadcircuit.
+De oplaad-LED staat los van de softwaregestuurde RGB-leds van RADR. Deze wordt rechtstreeks door het laadcircuit bestuurd.
 </Note>
 
 <Note>
@@ -74,14 +74,14 @@ RADR vertrouwt op de hardware-oplaad-LED in plaats van op software gebaseerde op
 ### Oplaadtips
 
 <Tip>
-Voor het snelste opladen gebruikt u een USB-lader met een vermogen van 5V/1A of hoger.
+Voor het snelste opladen gebruikt u een USB-lader die geschikt is voor 5V/1A of hoger.
 </Tip>
 
 <Tip>
 U kunt RADR gebruiken tijdens het opladen, maar het opladen kan langer duren tijdens actief gebruik.
 </Tip>
 
-## Machtsstaten
+## Energietoestanden
 
 RADR heeft verschillende energietoestanden:
 
@@ -95,8 +95,8 @@ RADR heeft verschillende energietoestanden:
 ### Actief (inactief)
 
 - Display aan, achtergrondverlichting actief
-- Bluetooth-scannen of in het menu
-- LED's in inactief patroon
+- Bluetooth scant of RADR staat in het menu
+- Leds in een inactief patroon
 - Gemiddeld stroomverbruik
 
 ### Slaapmodus
@@ -105,41 +105,41 @@ RADR heeft verschillende energietoestanden:
 - Bluetooth uitgeschakeld
 - LED's uit
 - Zeer laag stroomverbruik
-- GPIO-wake ingeschakeld
+- GPIO-wekfunctie ingeschakeld
 
 ### Uitschakelen
 
 - Alle systemen uitgeschakeld
 - Geen stroomverbruik
-- Vereist aan/uit-schakelaar om te ontwaken
+- Ontwaken vereist de aan/uit-schakelaar
 
 ## Diepe slaapmodus
 
 Diepe slaap levert aanzienlijke energiebesparingen op als u RADR niet gebruikt, maar later snel toegang wilt hebben.
 
 <Info>
-Technisch gezien gebruikt RADR intern de "lichte slaap" -modus in plaats van echte diepe slaap. Dit zorgt voor een betrouwbaardere ontwaking van de knoppen en toch een zeer laag stroomverbruik. De gebruikerservaring is hetzelfde: het apparaat lijkt uitgeschakeld totdat er op een knop wordt gedrukt.
+Technisch gezien gebruikt RADR intern de modus voor "Light Sleep" in plaats van echte diepe slaap. Dit zorgt ervoor dat het apparaat betrouwbaarder via de knoppen wordt gewekt, terwijl het stroomverbruik zeer laag blijft. De gebruikerservaring is hetzelfde: het apparaat lijkt uitgeschakeld totdat er op een knop wordt gedrukt.
 </Info>
 
 ### Overgaan naar de slaapmodus
 
-1. Selecteer in het hoofdmenu **Slaap**
+1. Selecteer in het hoofdmenu **Sleep**
 2. RADR voert de afsluitsequentie uit:
    - Verbreekt de verbinding met alle aangesloten apparaten
    - Speelt het uitschakelzoemergeluid af
    - Schakelt de achtergrondverlichting van het display uit
-   - Wist alle LED's
-   - Komt in diepe slaap
+   - Schakelt alle leds uit
+   - Gaat naar de diepe slaapstand
 
-### Wakkere bronnen
+### Bronnen voor ontwaken
 
 De volgende knoppen kunnen RADR uit de diepe slaap halen:
 
 | Knop | GPIO |
 |--------|------|
-| Midden onder het scherm | GPIO39 |
-| Links onder het scherm | GPIO38 |
-| Rechts onder het scherm | GPIO40 |
+| Midden onder het scherm | GPIO 39 |
+| Links onder het scherm | GPIO 38 |
+| Rechts onder het scherm | GPIO 40 |
 
 Druk op een van deze knoppen om RADR te activeren. Het apparaat voert een volledige herstart uit.
 
@@ -148,10 +148,10 @@ Druk op een van deze knoppen om RADR te activeren. Het apparaat voert een volled
 | Functie | Slaapmodus | Uitschakelen |
 |---------|------------|-----------|
 | Stroomverbruik | Zeer laag | Geen |
-| Wakker tijd | ~2 seconden | ~5 seconden |
-| Wake-methode | Knop indrukken | Aan/uit-schakelaar |
-| Staat behouden | Nee | Nee |
-| Gebruiksgeval | Tussen sessies | Opslag |
+| Ontwaaktijd | ~2 seconden | ~5 seconden |
+| Ontwaakmethode | Knop indrukken | Aan/uit-schakelaar |
+| Toestand behouden | Nee | Nee |
+| Gebruikssituatie | Tussen sessies | Opslag |
 
 <Tip>
 Gebruik de slaapmodus tijdens sessies met pauzes. Gebruik de aan/uit-schakelaar voor langere opslag.
@@ -161,10 +161,10 @@ Gebruik de slaapmodus tijdens sessies met pauzes. Gebruik de aan/uit-schakelaar 
 
 ### Maximaliseren van de levensduur van de batterij
 
-1. **Gebruik de slaapmodus** — Zet RADR tijdens het nemen van pauzes in de sluimerstand in plaats van deze inactief te laten
+1. **Gebruik de slaapmodus** — Zet RADR tijdens pauzes in de slaapmodus in plaats van het inactief te laten
 2. **Lagere helderheid** — De achtergrondverlichting van het scherm verbruikt aanzienlijk veel stroom
-3. **Verbinding verbreken wanneer klaar** — Actieve Bluetooth-verbindingen verbruiken meer stroom
-4. **Uitschakelen voor opslag** — Gebruik de fysieke schakelaar voor uitgebreide opslag
+3. **Verbinding verbreken als u klaar bent** — Actieve Bluetooth-verbindingen verbruiken meer stroom
+4. **Uitschakelen voor opslag** — Gebruik de fysieke schakelaar voor langere opslag
 
 ### Controle van de batterijstatus
 
@@ -172,7 +172,7 @@ Gebruik de slaapmodus tijdens sessies met pauzes. Gebruik de aan/uit-schakelaar 
 - Laad vóór sessies op om onderbrekingen halverwege de sessie te voorkomen
 - Zorg ervoor dat de batterij niet vaak volledig leeg raakt
 
-### Beste praktijken voor opladen
+### Aanbevolen laadmethoden
 
 - Gebruik hoogwaardige USB-C-kabels
 - Opladen bij gematigde temperaturen (vermijd extreme hitte/kou)
@@ -183,16 +183,16 @@ Gebruik de slaapmodus tijdens sessies met pauzes. Gebruik de aan/uit-schakelaar 
 
 | Parameter | Waarde |
 |-----------|-------|
-| Bedrijfsspanning | 3,3V (geregeld) |
-| Laadspanning | 5V-USB |
-| Diepe slaapstroom | < 100 μA |
+| Bedrijfsspanning | 3.3V (geregeld) |
+| Laadspanning | 5V USB |
+| Stroom in diepe slaap | < 100μA |
 | Actieve stroom | Varieert per activiteit |
 
 ## Problemen oplossen
 
 <AccordionGroup>
 <Accordion title="Het batterijpercentage lijkt onnauwkeurig">
-- Na langdurige opslag moet de brandstofmeter mogelijk worden gekalibreerd
+- Na langdurige opslag moet de laadtoestandsmeter mogelijk worden gekalibreerd
 - Volledig opladen en vervolgens één keer volledig ontladen om opnieuw te kalibreren
 - De batterijwaarden stabiliseren zich na een paar oplaadcycli
 </Accordion>
@@ -201,7 +201,7 @@ Gebruik de slaapmodus tijdens sessies met pauzes. Gebruik de aan/uit-schakelaar 
 - Probeer een andere USB-C-kabel
 - Probeer een andere USB-stroombron
 - Zorg ervoor dat de USB-C-poort schoon en onbeschadigd is
-- Controleer of de oplaad-LED brandt wanneer aangesloten
+- Controleer of de oplaad-LED brandt wanneer RADR is aangesloten
 </Accordion>
 
 <Accordion title="Batterij raakt snel leeg">
@@ -211,7 +211,7 @@ Gebruik de slaapmodus tijdens sessies met pauzes. Gebruik de aan/uit-schakelaar 
 - Oudere batterijen kunnen een verminderde capaciteit hebben
 </Accordion>
 
-<Accordion title="Zal niet uit de slaap ontwaken">
+<Accordion title="RADR wordt niet wakker uit de slaapmodus">
 - Houd een knop onder het scherm 2-3 seconden ingedrukt
 - Probeer de aan/uit-schakelaar als de knoppen niet reageren
 - Zorg ervoor dat de batterij niet volledig leeg is

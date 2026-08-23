@@ -5,7 +5,7 @@ description: "Documentation pour l'introduction."
 
 # Présentation du micrologiciel
 
-Le micrologiciel Open Source Sex Machine (OSSM) est un système de contrôle basé sur ESP32 qui gère les mouvements, les entrées de l'utilisateur et la communication de votre appareil. Ce guide vous guide à travers l'architecture du projet et vous aide à configurer votre environnement de développement.
+Le micrologiciel Open Source Sex Machine (OSSM) est un système de contrôle basé sur ESP32 qui gère les mouvements, les entrées de l'utilisateur et la communication de votre appareil. Ce guide présente l'architecture du projet et vous aide à configurer votre environnement de développement.
 
 ## Technologies de base
 
@@ -13,15 +13,15 @@ Le micrologiciel OSSM s'appuie sur quatre technologies clés qui fonctionnent en
 
 <AccordionGroup>
 <Accordion title="Machine à états - Boost SML" icon="diagram-project">
-[Boost SML](https://boost-ext.github.io/sml/) (State Machine Language) est une bibliothèque C++ en en-tête uniquement qui fournit un langage spécifique au domaine pour définir des machines à états.
+[Boost SML](https://boost-ext.github.io/sml/) (State Machine Language) est une bibliothèque C++ uniquement composée d’en-têtes qui fournit un langage spécifique au domaine pour définir des machines à états.
 
 **Pourquoi nous l'utilisons :**
-- La vérification de la machine d'état au moment de la compilation détecte les erreurs avant l'exécution
-- Aucune surcharge d'exécution par rapport aux implémentations manuelles de commutateurs/de cas
+- La vérification de la machine à états au moment de la compilation détecte les erreurs avant l'exécution
+- Aucune surcharge d'exécution par rapport aux implémentations manuelles avec switch/case
 - Une syntaxe claire et déclarative rend les transitions d'état complexes lisibles
 - Gère les transitions entre les états comme inactif, en cours d'exécution, erreur et référencement
 
-La machine d'état régit les modes de fonctionnement de l'appareil, garantissant des transitions sûres et un comportement prévisible. Pour plus de détails, consultez la documentation [State Machine Architecture](/ossm/software/architecture/state-machine).
+La machine à états régit les modes de fonctionnement de l'appareil, garantissant des transitions sûres et un comportement prévisible. Pour plus de détails, consultez la documentation [Architecture de la machine à états](/ossm/software/architecture/state-machine).
 </Accordion>
 
 <Accordion title="Affichage - Bibliothèque U8G2" icon="display">
@@ -33,7 +33,7 @@ La machine d'état régit les modes de fonctionnement de l'appareil, garantissan
 - Rendu de police intégré avec plusieurs tailles et styles
 - Dessin accéléré par le matériel pour des mises à jour fluides de l'interface utilisateur
 
-U8G2 restitue l'interface sur l'appareil, y compris la vitesse, la profondeur, la sélection de modèle et l'état du système.
+U8G2 restitue l'interface sur l'appareil, y compris la vitesse, la profondeur, la sélection de motifs et l'état du système.
 </Accordion>
 
 <Accordion title="Gestion des tâches - FreeRTOS" icon="layer-group">
@@ -41,27 +41,27 @@ U8G2 restitue l'interface sur l'appareil, y compris la vitesse, la profondeur, l
 
 **Pourquoi nous l'utilisons :**
 - Exécute plusieurs tâches simultanées (contrôle de mouvement, mises à jour d'affichage, gestion des entrées)
-- La planification basée sur les priorités garantit que les tâches de mouvement urgentes s'exécutent de manière fiable
+- La planification basée sur les priorités garantit que les tâches de mouvement soumises à des contraintes temporelles s'exécutent de manière fiable
 - Communication inter-tâches via des files d'attente et des sémaphores
 - Intégré au framework ESP32 Arduino par défaut
 
-FreeRTOS permet au micrologiciel de traiter simultanément les entrées de l'utilisateur, de mettre à jour l'affichage et de maintenir un timing précis du moteur.
+FreeRTOS permet au micrologiciel de traiter simultanément les entrées de l'utilisateur, de mettre à jour l'affichage et de maintenir un cadencement précis du moteur.
 </Accordion>
 
 <Accordion title="Contrôle de mouvement - StrokeEngine" icon="wave-pulse">
-[StrokeEngine](https://github.com/theelims/StrokeEngine) est une bibliothèque de modèles de mouvement créée par theelims, modifiée pour les exigences spécifiques à OSSM.
+[StrokeEngine](https://github.com/theelims/StrokeEngine) est une bibliothèque de motifs de mouvement créée par theelims, modifiée pour les exigences spécifiques à OSSM.
 
 **Pourquoi nous l'utilisons :**
-- Génère des modèles de mouvement fluides et personnalisables avec une vitesse et une profondeur configurables
-- Prend en charge plusieurs types de motifs (constants, aléatoires, oscillants, etc.)
+- Génère des motifs de mouvement fluides et personnalisables avec une vitesse et une profondeur configurables
+- Prend en charge plusieurs types de motifs de mouvement (constants, aléatoires, oscillants, etc.)
 - Gère la rampe d'accélération pour la protection du moteur
 - Fournit un réglage des paramètres en temps réel sans interruption du mouvement
 
-StrokeEngine traduit les paramètres utilisateur en commandes de moteur précises, permettant ainsi la variété de modèles de mouvement disponibles dans OSSM.
+StrokeEngine traduit les paramètres utilisateur en commandes de moteur précises, permettant ainsi la variété de motifs de mouvement disponibles dans OSSM.
 </Accordion>
 </AccordionGroup>
 
-## Commencer
+## Premiers pas
 
 Configurez votre environnement de développement en suivant ces étapes.
 
@@ -70,15 +70,15 @@ Configurez votre environnement de développement en suivant ces étapes.
 Avant de commencer, assurez-vous d'avoir :
 - Un ordinateur exécutant Windows, macOS ou Linux
 - Git installé sur votre système
-- Une connexion internet pour télécharger les dépendances
+- Une connexion Internet pour télécharger les dépendances
 
 <Steps>
 <Step title="Installer VS Code et PlatformIO">
 Téléchargez et installez [Visual Studio Code](https://code.visualstudio.com/), puis ajoutez l'extension PlatformIO.
 
-1. Ouvrir le code VS
+1. Ouvrez VS Code
 2. Accédez au panneau Extensions (Ctrl+Shift+X / Cmd+Shift+X)
-3. Rechercher « IDE PlatformIO »
+3. Recherchez « PlatformIO IDE »
 4. Cliquez sur **Installer** et attendez la fin de l'installation.
 5. Redémarrez VS Code lorsque vous y êtes invité
 
@@ -87,8 +87,8 @@ Pour des instructions détaillées de configuration de PlatformIO, consultez not
 </Tip>
 </Step>
 
-<Step title="Cloner le référentiel">
-Ouvrez un terminal et clonez le référentiel OSSM sur votre ordinateur local.
+<Step title="Cloner le dépôt">
+Ouvrez un terminal et clonez le dépôt OSSM sur votre ordinateur local.
 
 <Tabs>
 <Tab title="HTTPS">
@@ -105,7 +105,7 @@ cd OSSM-hardware/Software
 ```
 </Tab>
 
-<Tab title="CLI GitHub">
+<Tab title="GitHub CLI">
 ```bash
 gh repo clone KinkyMakers/OSSM-hardware
 cd OSSM-hardware/Software
@@ -114,14 +114,14 @@ cd OSSM-hardware/Software
 </Tabs>
 
 <Note>
-Si vous envisagez d'apporter des modifications, créez d'abord le référentiel, puis clonez votre fork à la place.
+Si vous envisagez d'apporter des modifications, forkez d'abord le dépôt, puis clonez votre fork.
 </Note>
 </Step>
 
 <Step title="Ouvrez le projet dans VS Code">
 Lancez le projet à l'aide de PlatformIO.
 
-1. Ouvrir le code VS
+1. Ouvrez VS Code
 2. Sélectionnez **Fichier > Ouvrir le dossier**.
 3. Accédez au répertoire `OSSM-hardware/Software` que vous venez de cloner
 4. Cliquez sur **Sélectionner un dossier** (ou **Ouvrir** sur macOS)
@@ -129,16 +129,16 @@ Lancez le projet à l'aide de PlatformIO.
 PlatformIO détecte automatiquement le fichier `platformio.ini` et configure le projet.
 
 <Check>
-Vous devriez voir la barre d'outils PlatformIO apparaître au bas de VS Code avec les boutons de construction, de téléchargement et de surveillance.
+Vous devriez voir la barre d'outils PlatformIO apparaître au bas de VS Code avec les boutons de compilation, de téléversement et de surveillance.
 </Check>
 </Step>
 
-<Step title="Construire et télécharger le firmware">
+<Step title="Compiler et téléverser le micrologiciel">
 Compilez le projet et flashez-le sur votre ESP32.
 
 1. Connectez votre carte ESP32 via USB
-2. Cliquez sur le bouton **PlatformIO : Build** (icône de coche) pour compiler
-3. Une fois la construction réussie, cliquez sur **PlatformIO : Upload** (icône de flèche) pour flasher le firmware.
+2. Cliquez sur le bouton **PlatformIO: Build** (icône de coche) pour compiler
+3. Une fois la compilation réussie, cliquez sur **PlatformIO: Upload** (icône de flèche) pour flasher le micrologiciel.
 
 <Warning>
 Assurez-vous de sélectionner le bon port COM si plusieurs périphériques série sont connectés. Vous pouvez configurer cela dans `platformio.ini` ou via le moniteur de périphérique PlatformIO.
@@ -150,23 +150,23 @@ Assurez-vous de sélectionner le bon port COM si plusieurs périphériques séri
 
 <CardGroup cols={2}>
 <Card title="Modes de fonctionnement" icon="play" href="/ossm/software/getting-started/operating-modes">
-  Découvrez les modes Pénétration simple, Moteur de course et Streaming.
+  Découvrez les modes Simple Penetration, Stroke Engine et Streaming.
 </Card>
 
-<Card title="Caractéristiques de sécurité" icon="shield" href="/ossm/software/getting-started/safety-features">
-  Comprenez les vérifications avant vol, la sécurité de déconnexion et l'arrêt d'urgence.
+<Card title="Fonctions de sécurité" icon="shield" href="/ossm/software/getting-started/safety-features">
+  Comprenez les vérifications préalables, la sécurité en cas de déconnexion et l'arrêt d'urgence.
 </Card>
 
 <Card title="Configuration" icon="sliders" href="/ossm/software/getting-started/configuration">
-  Personnalisez les paramètres de mouvement, les épingles et les préférences utilisateur.
+  Personnalisez les paramètres de mouvement, les broches et les préférences utilisateur.
 </Card>
 
-<Card title="Wi-Fi et mises à jour" icon="wifi" href="/ossm/software/getting-started/wifi-and-updates">
-  Configurez le WiFi et installez les mises à jour du micrologiciel en direct.
+<Card title="WiFi et mises à jour" icon="wifi" href="/ossm/software/getting-started/wifi-and-updates">
+  Configurez le WiFi et installez les mises à jour du micrologiciel sans fil (OTA).
 </Card>
 
 <Card title="Structure des dossiers" icon="folder-tree" href="/ossm/software/architecture/folder-structure">
-  Comprendre l'organisation du code source et l'architecture modulaire.
+  Découvrez l'organisation du code source et l'architecture modulaire.
 </Card>
 
 <Card title="Configuration de PlatformIO" icon="wrench" href="/ossm/software/getting-started/platformio">

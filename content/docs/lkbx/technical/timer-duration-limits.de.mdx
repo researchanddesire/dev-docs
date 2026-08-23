@@ -3,11 +3,11 @@ title: "Timer-Dauerbegrenzungen"
 description: "Vollständige Referenz für Sperrzeitdauern von 30 Sekunden bis 1000 Jahren"
 ---
 
-Wenn Sie eine Zeitsperre für Ihr Keuschheitsschloss einrichten, können Sie eine Dauer zwischen 30 Sekunden und über 1000 Jahren wählen. In dieser Anleitung wird erläutert, wie das Timer-System funktioniert und welche Zeitbereiche verfügbar sind.
+Wenn Sie eine Zeitsperre für Ihre Chastity Lockbox einrichten, können Sie eine Dauer zwischen 30 Sekunden und über 1000 Jahren wählen. In dieser Anleitung wird erläutert, wie das Timer-System funktioniert und welche Zeitbereiche verfügbar sind.
 
 ## Übersicht über den Dauerbereich
 
-| Minimum | Maximal |
+| Minimum | Maximum |
 |---------|---------|
 | 30 Sekunden | 1000 Jahre |
 
@@ -17,12 +17,12 @@ Der Timer verwendet intern eine Präzision im Millisekundenbereich und unterstü
 
 ## Dauer einstellen
 
-Wenn Sie im Hauptmenü **Sperren** auswählen, wird der Timer-Konfigurationsbildschirm angezeigt:
+Wenn Sie im Hauptmenü **Lock** auswählen, wird der Timer-Konfigurationsbildschirm angezeigt:
 
 1. **Drehen Sie den Encoder**, um die Dauer anzupassen
 2. Eine visuelle Bogenanzeige zeigt Ihre Position innerhalb der aktuellen Einheitenreichweite an
 3. Die Dauer wird in einem für Menschen lesbaren Format angezeigt (z. B. „10 Minuten“, „3 Tage“).
-4. **Drücken Sie die Eingabetaste**, um zu bestätigen und die Sperre zu starten
+4. **Drücken Sie Enter**, um zu bestätigen und die Sperre zu starten
 
 ### Standardstartwert
 
@@ -36,7 +36,7 @@ Abhängig vom aktuellen Wert bildet der Encoder unterschiedliche Zeiteinheiten a
 
 | Reichweite | Inkrement | Beispielwerte |
 |-------|-----------|----------------|
-| 30–120 Sekunden | 1 Sekunde | 30er, 31er, 32er... 120er |
+| 30–120 Sekunden | 1 Sekunde | 30 s, 31 s, 32 s ... 120 s |
 
 ### Minuten (1–120 Minuten)
 
@@ -75,10 +75,10 @@ Abhängig vom aktuellen Wert bildet der Encoder unterschiedliche Zeiteinheiten a
 | 1–1000 Jahre | 1 Jahr | 1 Jahr, 2 Jahre... 1000 Jahre |
 
 <Warning>
-Extrem lange Laufzeiten werden technisch unterstützt, aber nicht empfohlen. Erwägen Sie die Verwendung des Modus **Für immer sperren** mit Schlüsselhalterkontrolle für unbefristete Sperren, anstatt mehrjährige Timer einzustellen.
+Extrem lange Laufzeiten werden technisch unterstützt, aber nicht empfohlen. Erwägen Sie die Verwendung des Modus **Lock Forever** mit Schlüsselhalterkontrolle für unbefristete Sperren, anstatt mehrjährige Timer einzustellen.
 </Warning>
 
-## Visuelle Lichtbogenanzeige
+## Visuelle Bogenanzeige
 
 Auf dem Timer-Bildschirm wird ein halbkreisförmiger Bogen angezeigt, der Ihre Position innerhalb des aktuellen Einheitenbereichs anzeigt:
 
@@ -92,8 +92,8 @@ Der Bogen wird zurückgesetzt, wenn Sie in einen neuen Einheitenbereich wechseln
 
 Für die Timer-Konfiguration ist die Beschleunigung des Encoders aktiviert:
 
-- **Langsame Drehungen**: Präzise, ​​einstufige Änderungen
-- **Schnelle Wendungen**: Größere Sprünge, um Ihr Ziel schnell zu erreichen
+- **Langsame Drehungen**: Präzise, einstufige Änderungen
+- **Schnelle Drehungen**: Größere Sprünge, um Ihr Ziel schnell zu erreichen
 
 <Tip>
 Drehen Sie bei sehr langer Dauer den Encoder schnell, um die Bereiche schneller zu durchlaufen, und verlangsamen Sie ihn dann zur Feinabstimmung.
@@ -105,11 +105,11 @@ Intern werden die Dauern mithilfe der folgenden Konvertierungen in Millisekunden
 
 | Einheit | Millisekunden |
 |------|--------------|
-| 1 Sekunde | 1,000 |
-| 1 Minute | 60,000 |
-| 1 Stunde | 3,600,000 |
-| 1 Tag | 86,400,000 |
-| 1 Woche | 604,800,000 |
+| 1 Sekunde | 1.000 |
+| 1 Minute | 60.000 |
+| 1 Stunde | 3.600.000 |
+| 1 Tag | 86.400.000 |
+| 1 Woche | 604.800.000 |
 | 1 Monat | 2.629.746.000 (~30,44 Tage) |
 | 1 Jahr | 31.556.952.000 (~365,24 Tage) |
 
@@ -134,7 +134,7 @@ Wenn Sie das Dashboard zum Erstellen von Sperren verwenden:
 
 - **Dashboard**: Bietet möglicherweise verschiedene Voreinstellungen und Optionen für die Dauer
 - **Gerät**: Verwendet das hier beschriebene Encoder-basierte System
-- Beide werden synchronisiert, wenn eine WLAN-Verbindung besteht
+- Beide werden synchronisiert, wenn eine WiFi-Verbindung besteht
 
 <Info>
 Über das Dashboard erstellte Sperren werden von Ihrem Gerät empfangen und zeigen die verbleibende Zeit im gleichen Format an.

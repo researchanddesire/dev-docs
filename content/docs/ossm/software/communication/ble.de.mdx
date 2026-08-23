@@ -27,20 +27,20 @@ Das OSSM implementiert einen benutzerdefinierten BLE-Dienst mit mehreren Merkmal
 522b443a-4f53-534d-0001-420badbabe69
 ```
 
-Die Merkmale sind zur einfachen Erweiterung und Entdeckung nach [Namensraumbereiche](#uuid-namespace-structure) organisiert.
+Die Merkmale sind zur einfachen Erweiterung und Entdeckung nach [Namensraumbereichen](#uuid-namespace-struktur) organisiert.
 
-## Charakteristische Referenz
+## Referenz der Merkmale
 
-### Befehlseigenschaften (beschreibbar)
+### Befehlsmerkmale (beschreibbar)
 
-Nutzen Sie diese Eigenschaften, um Befehle zu senden und den OSSM zu konfigurieren.
+Nutzen Sie diese Merkmale, um Befehle zu senden und den OSSM zu konfigurieren.
 
-#### Primäre Befehlseigenschaft
+#### Primäres Befehlsmerkmal
 
-| Eigentum | Wert |
+| Eigenschaft | Wert |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-1000-420badbabe69` |
-| Eigenschaften | LESEN, SCHREIBEN |
+| Eigenschaften | READ, WRITE |
 | Zweck | Senden Sie Befehle, um das OSSM-Verhalten zu steuern |
 
 **Befehlsformat**
@@ -54,16 +54,16 @@ go:<state>
 
 | Befehl | Parameter | Wertebereich | Beschreibung |
 | ------- | --------- | ----------- | ----------- |
-| `set:speed:<value>` | Geschwindigkeit | 0-100 | Stellen Sie den Prozentsatz der Hubgeschwindigkeit ein |
-| `set:stroke:<value>` | Schlaganfall | 0-100 | Stellen Sie den Prozentsatz der Strichlänge ein |
-| `set:depth:<value>` | Tiefe | 0-100 | Stellen Sie den Prozentsatz der Eindringtiefe ein |
-| `set:sensation:<value>` | Sensation | 0-100 | Stellen Sie den Prozentsatz der Empfindungsintensität ein |
-| `set:pattern:<value>` | Muster | 0-6 | Strichmuster einstellen (siehe [Muster](#pattern-information-characteristics)) |
+| `set:speed:<value>` | speed | 0-100 | Stellen Sie den Prozentsatz der Hubgeschwindigkeit ein |
+| `set:stroke:<value>` | stroke | 0-100 | Stellen Sie den Prozentsatz der Hublänge ein |
+| `set:depth:<value>` | depth | 0-100 | Stellen Sie den Prozentsatz der Eindringtiefe ein |
+| `set:sensation:<value>` | sensation | 0-100 | Stellen Sie den Prozentsatz der Empfindungsintensität ein |
+| `set:pattern:<value>` | pattern | 0-6 | Hubmuster einstellen (siehe [Muster](#musterinformationsmerkmale)) |
 | `go:simplePenetration` | - | - | Wechseln Sie im Menü in den einfachen Penetrationsmodus |
-| `go:strokeEngine` | - | - | Wechseln Sie im Menü in den Hubmotor-Modus |
+| `go:strokeEngine` | - | - | Wechseln Sie im Menü in den Stroke Engine-Modus |
 | `go:streaming` | - | - | Wechseln Sie über das Menü in den Streaming-Modus (experimentell). |
 | `go:menu` | - | - | Von jedem Modus aus zum Hauptmenü zurückkehren |
-| `stream:<pos>:<time>` | pos, Zeit | Pos: 0-100, Zeit: ms | Senden Sie einen Positionsbefehl im Streaming-Modus (experimentell) |
+| `stream:<pos>:<time>` | pos, time | pos: 0-100, time: ms | Senden Sie einen Positionsbefehl im Streaming-Modus (experimentell) |
 
 **Antwortformat**
 
@@ -76,12 +76,12 @@ go:<state>
 Warten Sie immer auf die Antwort, bevor Sie einen weiteren Befehl senden. Befehle werden nacheinander abgearbeitet.
 </Tip>
 
-#### Konfigurationscharakteristik des Geschwindigkeitsknopfs
+#### Konfigurationsmerkmal des Geschwindigkeitsknopfs
 
-| Eigentum | Wert |
+| Eigenschaft | Wert |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-1010-420badbabe69` |
-| Eigenschaften | LESEN, SCHREIBEN |
+| Eigenschaften | READ, WRITE |
 | Zweck | Konfigurieren Sie, ob der physische Geschwindigkeitsknopf BLE-Geschwindigkeitsbefehle begrenzt |
 
 **Konfigurationswerte**
@@ -119,12 +119,12 @@ Im unabhängigen Modus können BLE-Befehle den physischen Knopf außer Kraft set
 | `error:invalid_value` | Ungültige Eingabe bereitgestellt |
 
 
-#### Konfigurationsmerkmal der Latenzkompensation
+#### Konfigurationsmerkmal für die Latenzkompensation
 
-| Eigentum | Wert |
+| Eigenschaft | Wert |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-1030-420badbabe69` |
-| Eigenschaften | LESEN, SCHREIBEN |
+| Eigenschaften | READ, WRITE |
 | Zweck | Konfigurieren Sie, ob der OSSM versucht, die Latenz zu kompensieren|
 
 **Konfigurationswerte**
@@ -136,18 +136,18 @@ Im unabhängigen Modus können BLE-Befehle den physischen Knopf außer Kraft set
 
 <Tabs>
 <Tab title="Aktiviert">
-Bei der Einstellung `true` erwartet der OSSM, dass er die genauen Befehle und Zeiten vom Funscript empfängt und dass die Befehle gesendet werden
-mit der gleichen Verzögerung zwischen den Befehlen wie der Zeitwert. Durch Berechnung der Zeit zwischen empfangenen Befehlen und der Zeitvariablen
-Der OSSM ist in der Lage, die durch BLE verursachte Latenz zu bestimmen und sie bei geringfügigen Änderungen der Bewegungsgeschwindigkeit zu korrigieren.
-Wenn die Zeit zwischen den Befehlen nicht mit der Intime-Variablen übereinstimmt, sollte dies nicht aktiviert werden. Die Puffereinstellung wird künstlich genutzt
-Fügen Sie allen Bewegungen eine Verzögerung hinzu. Dies gibt dem OSSM Zeit, den nächsten Befehl zu empfangen, bevor der vorherige abgeschlossen ist. Dies ermöglicht
-die Beseitigung jeglicher durch verspätete Befehle verursachter Verzögerungen sowie die Glättung von Bewegungen durch die Kombination von Bewegungen in die gleiche Richtung.
-Funscript-Player sollten diesen Pufferwert zu ihrem Wiedergabe-Offset hinzufügen und eine zusätzliche Einstellung zur Feinabstimmung des Wiedergabe-Offsets hinzufügen
-um die Übertragungszeit und etwaige durch das Funkskript selbst verursachte Verzögerungen zu berücksichtigen.
+Bei der Einstellung `true` erwartet der OSSM, die genauen Befehle und Zeitangaben aus dem Funscript zu empfangen und dass die Befehle mit derselben Verzögerung zwischen den Befehlen wie der Zeitwert
+gesendet werden.
+Durch die Berechnung der Zeit zwischen empfangenen Befehlen und der Zeitvariable kann der OSSM die durch BLE verursachte Latenz bestimmen
+und durch geringfügige Änderungen der Bewegungsgeschwindigkeit korrigieren.
+Wenn die Zeit zwischen den Befehlen nicht mit der intime-Variable übereinstimmt, sollte diese Option nicht aktiviert werden. Die Puffereinstellung wird verwendet, um allen Bewegungen künstlich eine Verzögerung hinzuzufügen.
+So hat der OSSM Zeit, den nächsten Befehl zu empfangen, bevor der vorherige abgeschlossen ist. Dadurch lassen sich Verzögerungen durch verspätete Befehle beseitigen und Bewegungen durch das Kombinieren gleichgerichteter Bewegungen glätten.
+Funscript-Player sollten diesen Pufferwert zu ihrem Wiedergabe-Offset hinzufügen und eine zusätzliche Einstellung zur Feinabstimmung des Wiedergabe-Offsets vorsehen,
+um die Übertragungszeit und etwaige Verzögerungen des Funscripts selbst zu berücksichtigen.
 </Tab>
 
 <Tab title="Deaktiviert">
-Bei der Einstellung `false` führt der OSSM Befehle aus, sobald sie empfangen werden. Verspätet eintreffende Befehle werden verspätet ausgeführt. Befehle
+Bei der Einstellung `false` führt der OSSM Befehle aus, sobald sie empfangen werden. Verspätet eintreffende Befehle werden verspätet ausgeführt.
 Befehle, die früher eintreffen, werden ausgeführt, wenn der vorherige Befehl beendet ist.
 
 </Tab>
@@ -162,11 +162,11 @@ Befehle, die früher eintreffen, werden ausgeführt, wenn der vorherige Befehl b
 
 #### WiFi-Konfigurationsmerkmal
 
-| Eigentum | Wert |
+| Eigenschaft | Wert |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-1020-420badbabe69` |
-| Eigenschaften | LESEN, SCHREIBEN |
-| Zweck | Konfigurieren Sie WLAN-Anmeldeinformationen und überprüfen Sie den Verbindungsstatus |
+| Eigenschaften | READ, WRITE |
+| Zweck | WiFi-Anmeldeinformationen konfigurieren und den Verbindungsstatus prüfen |
 
 **Format schreiben**
 
@@ -202,11 +202,11 @@ Wenn keine Verbindung besteht, enthält das Feld `ssid` die zuletzt gespeicherte
 | `fail:wifi:save_failed` | Anmeldeinformationen konnten nicht im NVS gespeichert werden |
 
 <Tip>
-WLAN-Anmeldeinformationen werden im nichtflüchtigen Speicher (NVS) gespeichert und bleiben auch nach Geräteneustarts erhalten. Das Gerät versucht beim Start, mithilfe der gespeicherten Anmeldeinformationen automatisch eine Verbindung herzustellen.
+WiFi-Anmeldeinformationen werden im nichtflüchtigen Speicher (NVS) gespeichert und bleiben auch nach Geräteneustarts erhalten. Das Gerät versucht beim Start, mithilfe der gespeicherten Anmeldeinformationen automatisch eine Verbindung herzustellen.
 </Tip>
 
 <Warning>
-WLAN-Anmeldeinformationen werden im Klartext über BLE übertragen. Stellen Sie sicher, dass Sie der Verbindung vertrauen und sich in einer sicheren Umgebung befinden, wenn Sie die WLAN-Einstellungen konfigurieren.
+WiFi-Anmeldeinformationen werden im Klartext über BLE übertragen. Stellen Sie sicher, dass Sie der Verbindung vertrauen und sich in einer sicheren Umgebung befinden, wenn Sie die WiFi-Einstellungen konfigurieren.
 </Warning>
 
 **Beispielverwendung**
@@ -236,13 +236,13 @@ Abonnieren Sie diese Merkmale, um den aktuellen Zustand des OSSM zu überwachen.
 
 #### Aktuelles Zustandsmerkmal
 
-| Eigentum | Wert |
+| Eigenschaft | Wert |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-2000-420badbabe69` |
-| Eigenschaften | LESEN, BENACHRICHTIGEN |
+| Eigenschaften | READ, NOTIFY |
 | Zweck | Überwachen Sie den aktuellen OSSM-Status und die aktuellen Einstellungen |
 
-**JSON-Format angeben**
+**JSON-Format des Zustands**
 
 ```json
 {
@@ -256,7 +256,7 @@ Abonnieren Sie diese Merkmale, um den aktuellen Zustand des OSSM zu überwachen.
 ```
 
 <AccordionGroup>
-<Accordion title="Verfügbare Staaten">
+<Accordion title="Verfügbare Zustände">
 | Zustand | Beschreibung |
 | ----- | ----------- |
 | `idle` | Initialisierung |
@@ -267,10 +267,10 @@ Abonnieren Sie diese Merkmale, um den aktuellen Zustand des OSSM zu überwachen.
 | `menu.idle` | Ruhezustand des Menüs |
 | `simplePenetration` | Einfacher Penetrationsmodus |
 | `simplePenetration.idle` | Einfache Penetration im Leerlauf |
-| `simplePenetration.preflight` | Kontrollen vor dem Flug |
-| `strokeEngine` | Taktmotormodus |
-| `strokeEngine.idle` | Hubmotor im Leerlauf |
-| `strokeEngine.preflight` | Kontrollen vor dem Flug |
+| `simplePenetration.preflight` | Vorabprüfungen |
+| `strokeEngine` | Stroke Engine-Modus |
+| `strokeEngine.idle` | Stroke Engine inaktiv |
+| `strokeEngine.preflight` | Vorabprüfungen |
 | `strokeEngine.pattern` | Musterauswahl |
 | `streaming` | Streaming-Modus (experimentell) |
 | `update` | Update-Modus |
@@ -278,13 +278,13 @@ Abonnieren Sie diese Merkmale, um den aktuellen Zustand des OSSM zu überwachen.
 | `update.updating` | Aktualisierung läuft |
 | `update.idle` | Update im Leerlauf |
 | `wifi` | WiFi-Setup-Modus |
-| `wifi.idle` | WLAN-Setup im Leerlauf |
+| `wifi.idle` | WiFi-Setup im Leerlauf |
 | `help` | Hilfebildschirm |
-| `help.idle` | Helfen Sie im Leerlauf |
+| `help.idle` | Hilfe im Leerlauf |
 | `error` | Fehlerstatus |
-| `error.idle` | Fehler im Leerlauf |
+| `error.idle` | Fehler im Leerlauf-Unterstatus |
 | `error.help` | Fehlerhilfe |
-| `restart` | Status neu starten |
+| `restart` | Neustartstatus |
 
 Die vollständige Implementierung des Zustandsautomaten finden Sie unter [OSSM.h](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/OSSM.h) im Quell-Repository.
 </Accordion>
@@ -298,13 +298,13 @@ Die vollständige Implementierung des Zustandsautomaten finden Sie unter [OSSM.h
 
 ### Musterinformationsmerkmale
 
-#### Merkmale der Musterliste
+#### Merkmal der Musterliste
 
-| Eigentum | Wert |
+| Eigenschaft | Wert |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-3000-420badbabe69` |
-| Eigenschaften | LESEN |
-| Zweck | Erhalten Sie verfügbare Strichmuster |
+| Eigenschaften | READ |
+| Zweck | Verfügbare Hubmuster abrufen |
 
 **Antwortformat**
 
@@ -322,17 +322,17 @@ Die vollständige Implementierung des Zustandsautomaten finden Sie unter [OSSM.h
 
 #### Musterbeschreibungsmerkmal
 
-| Eigentum | Wert |
+| Eigenschaft | Wert |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-3010-420badbabe69` |
-| Eigenschaften | LESEN, SCHREIBEN |
-| Zweck | Erhalten Sie Beschreibungen für einzelne Strichmuster |
+| Eigenschaften | READ, WRITE |
+| Zweck | Beschreibungen einzelner Hubmuster abrufen |
 
 So rufen Sie eine Musterbeschreibung ab:
 
 <Steps>
 <Step title="Schreiben Sie den Musterindex">
-Schreiben Sie die Indexnummer (0-6) auf das Merkmal.
+Schreiben Sie die Indexnummer (0-6) in das Merkmal.
 </Step>
 
 <Step title="Lesen Sie die Beschreibung">
@@ -344,13 +344,13 @@ Lesen Sie das Merkmal, um die Musterbeschreibungszeichenfolge zu erhalten.
 
 | Muster | Index | Beschreibung |
 | ------- | ----- | ----------- |
-| Einfacher Schlaganfall | 0 | Beschleunigung, Ausrollen, Verzögerung gleichmäßig aufgeteilt; keine Sensation |
-| Neckendes Stampfen | 1 | Geschwindigkeitswechsel mit Gefühl; gleicht schnellere Schläge aus |
+| Simple Stroke | 0 | Beschleunigung, Ausrollen und Verzögerung gleichmäßig aufgeteilt; keine Empfindung |
+| Teasing Pounding | 1 | Geschwindigkeitswechsel mit Empfindung; gleicht schnellere Hübe aus |
 | Robo Stroke | 2 | Empfindung variiert Beschleunigung; von roboterhaft bis schrittweise |
-| Halb und halb | 3 | Striche mit voller und halber Tiefe wechseln sich ab; Das Gefühl beeinflusst die Geschwindigkeit |
-| Tiefer | 4 | Die Schlagtiefe erhöht sich pro Zyklus; Sensationssätze zählen |
-| Stop'n'Go | 5 | Pausen zwischen den Schlägen; Gefühl passt die Länge an |
-| Pochen | 6 | Ändert die Länge, behält die Geschwindigkeit bei; Empfindung beeinflusst die Richtung |
+| Half'n'Half | 3 | Hübe mit voller und halber Tiefe wechseln sich ab; die Empfindung beeinflusst die Geschwindigkeit |
+| Deeper | 4 | Die Hubtiefe erhöht sich pro Zyklus; die Empfindung bestimmt die Anzahl |
+| Stop'n'Go | 5 | Pausen zwischen den Hüben; die Empfindung passt die Länge an |
+| Insist | 6 | Ändert die Länge, behält die Geschwindigkeit bei; Empfindung beeinflusst die Richtung |
 
 ### Streaming-Befehle (experimentell)
 
@@ -362,7 +362,7 @@ Im Streaming-Modus (`go:streaming`) akzeptiert das OSSM Echtzeit-Positionsbefehl
 
 #### Stream-Positionsbefehl
 
-| Eigentum | Wert |
+| Eigenschaft | Wert |
 | -------- | ----- |
 | Format | `stream:<position>:<time>` |
 | Position | 0-100 (Prozentsatz des Hubs) |
@@ -379,10 +379,10 @@ stream:50:300     # Move to 50% (mid-stroke) in 300ms
 **Wie es funktioniert**
 
 1. Wechseln Sie mit `go:streaming` in den Streaming-Modus
-2. Das OSSM rastet auf Position 0 ein (vollständig eingefahren)
+2. Das OSSM fährt Position 0 an (vollständig eingefahren)
 3. Senden Sie `stream:<pos>:<time>`-Befehle, um die Bewegung zu steuern
 4. Die Firmware berechnet die erforderliche Geschwindigkeit, um die Zielposition innerhalb der vorgegebenen Zeit zu erreichen
-5. Motion nutzt maximale Beschleunigung für ein reaktionsfreudiges Gefühl
+5. Die Bewegung nutzt maximale Beschleunigung für ein reaktionsfreudiges Gefühl
 
 <Note>
 Position 0 bedeutet vollständig eingefahren (Home), und Position 100 bedeutet vollständig ausgefahren. Der Zeitparameter gibt an, wie lange die Bewegung dauern sollte, sodass der OSSM die geeignete Geschwindigkeit für eine reibungslose Wiedergabe berechnen kann.
@@ -392,20 +392,20 @@ Position 0 bedeutet vollständig eingefahren (Home), und Position 100 bedeutet v
 
 - Firmware-Version 3.0 oder höher
 - OSSM muss sich im Streaming-Modus befinden (Status: `streaming` oder `streaming.idle`).
-- Befehle, die über die primäre Befehlseigenschaft gesendet werden
+- Befehle, die über das primäre Befehlsmerkmal gesendet werden
 
 <Tip>
-Informationen zur Funscript-Wiedergabe finden Sie im Tool [Funscript-Player](/ossm/software/communication/ble#streaming-mode), das das Timing und die Befehlsgenerierung automatisch übernimmt.
+Informationen zur Funscript-Wiedergabe finden Sie im Tool [Funscript-Player](/ossm/software/communication/ble#streaming-befehle-experimentell), das das Timing und die Befehlsgenerierung automatisch übernimmt.
 </Tip>
 
-### GPIO-Eigenschaften
+### GPIO-Merkmale
 
-#### GPIO-Steuercharakteristik
+#### GPIO-Steuermerkmal
 
-| Eigentum | Wert |
+| Eigenschaft | Wert |
 | -------- | ----- |
 | UUID | `522b443a-4f53-534d-4000-420badbabe69` |
-| Eigenschaften | LESEN, SCHREIBEN |
+| Eigenschaften | READ, WRITE |
 | Zweck | Steuern Sie GPIO-Ausgangspins für Zubehör und Integrationen |
 
 Schreiben Sie Befehle im Format `<pin>:<state>`, wobei Pin 1-4 ist und der Status `high`/`low` oder `1`/`0` ist.
@@ -434,24 +434,24 @@ Eine ausführliche GPIO-Dokumentation einschließlich Hardware-Integrationsbeisp
 ## Fleshy Thrust Sync-Emulation (nur zum Testen)
 
 <Warning>
-Diese Funktion dient nur Entwicklungstests und wird **nicht zur Verwendung empfohlen**. Es erfordert einen speziellen Firmware-Build und kann in zukünftigen Versionen entfernt werden.
+Diese Funktion dient nur Entwicklungstests und wird **nicht zur Verwendung empfohlen**. Sie erfordert einen speziellen Firmware-Build und kann in zukünftigen Versionen entfernt werden.
 </Warning>
 
 Die OSSM-Firmware kann optional das Fleshy Thrust Sync (FTS) BLE-Protokoll für Kompatibilitätstests mit Anwendungen wie faptap.net emulieren. Diese Funktion ist standardmäßig deaktiviert und erfordert das Kompilieren der Firmware mit dem Flag `PRETEND_TO_BE_FLESHY_THRUST_SYNC`.
 
 ### FTS-Dienst
 
-| Eigentum | Wert |
+| Eigenschaft | Wert |
 | -------- | ----- |
 | Dienst-UUID | `0000ffe0-0000-1000-8000-00805f9b34fb` |
-| Charakteristische UUID | `0000ffe1-0000-1000-8000-00805f9b34fb` |
-| Eigenschaften | LESEN, SCHREIBEN, BENACHRICHTIGEN, ANZEIGEN |
+| Merkmals-UUID | `0000ffe1-0000-1000-8000-00805f9b34fb` |
+| Eigenschaften | READ, WRITE, NOTIFY, INDICATE |
 
 ### Binäres Protokollformat
 
 FTS verwendet ein kompaktes Binärformat anstelle von Textbefehlen:
 
-| Byte | Beschreibung | Reichweite |
+| Byte | Beschreibung | Bereich |
 | ---- | ----------- | ----- |
 | 0 | Position | 0-180 (uint8) |
 | 1 | Zeit High-Byte | MSB der Zeit in ms |
@@ -489,7 +489,7 @@ Das OSSM implementiert den Standard-BLE-Geräteinformationsdienst zur Identifizi
 | Merkmal | UUID | Wert |
 | -------------- | ---- | ----- |
 | Service | `180A` | Geräteinformationsdienst |
-| Herstellername | `2A29` | „Forschung und Verlangen“ |
+| Herstellername | `2A29` | "Research And Desire" |
 | System-ID | `2A23` | `88:1A:14:FF:FE:34:29:63` |
 
 ## UUID-Namespace-Struktur
@@ -504,11 +504,11 @@ Das OSSM verwendet einen strukturierten UUID-Namespace für die organisierte Erw
 
 ### Namespacebereiche
 
-| Reichweite | Hex-Bereich | Beschreibung |
+| Bereich | Hex-Bereich | Beschreibung |
 | ----- | --------- | ----------- |
 | 0x0 | 0x0000–0x0FFF | Reserviert für Systemmeldungen |
 | 0x1 | 0x1000–0x1FFF | Befehle und Konfiguration |
-| 0x2 | 0x2000–0x2FFF | Staatliche Informationen |
+| 0x2 | 0x2000–0x2FFF | Statusinformationen |
 | 0x3 | 0x3000–0x3FFF | Musterinformationen |
 | 0x4 | 0x4000–0x4FFF | GPIO-Pin-Einstellung |
 | 0x5–0xD | 0x5000–0xDFFF | Für zukünftige Verwendung reserviert |
@@ -548,28 +548,28 @@ Das OSSM verwendet einen strukturierten UUID-Namespace für die organisierte Erw
 
 ## Verbindungsmanagement
 
-### Werbung
+### Advertising
 
 | Einstellung | Wert |
 | ------- | ----- |
 | Gerätename | `OSSM` |
 | Dienst-UUIDs | Primärer Dienst + Geräteinformationsdienst |
-| Werbeintervall | 20–40 ms (optimiert für Zuverlässigkeit) |
-| Automatischer Neustart | Die Werbung wird fortgesetzt, wenn alle Clients die Verbindung trennen |
+| Advertising-Intervall | 20–40 ms (optimiert für Zuverlässigkeit) |
+| Automatischer Neustart | Advertising wird fortgesetzt, wenn alle Clients die Verbindung trennen |
 
 ### Sicherheit
 
 | Einstellung | Wert |
 | ------- | ----- |
-| Paarung | „Just Works“ (keine Authentifizierung erforderlich) |
-| Verschlüsselung | Sichere BLE-Verbindungen aktiviert |
-| Bindung | Deaktiviert (keine dauerhafte Kopplung) |
+| Kopplung | „Just Works“ (keine Authentifizierung erforderlich) |
+| Verschlüsselung | BLE Secure Connections aktiviert |
+| Bonding | Deaktiviert (keine dauerhafte Kopplung) |
 
 <Note>
-Das OSSM verwendet zur Vereinfachung der Verwendung die „Just Works“-Kopplung. Jeder innerhalb der BLE-Reichweite kann eine Verbindung herstellen, wenn das Gerät Werbung sendet.
+Das OSSM verwendet zur Vereinfachung der Verwendung die „Just Works“-Kopplung. Jeder innerhalb der BLE-Reichweite kann eine Verbindung herstellen, wenn das Gerät Advertising betreibt.
 </Note>
 
-### Abschaltsicherheit
+### Sicherheit bei Verbindungstrennung
 
 Wenn eine BLE-Verbindung unerwartet verloren geht, verringert das OSSM automatisch die Geschwindigkeit, um einen außer Kontrolle geratenen Betrieb zu verhindern.
 
@@ -578,13 +578,13 @@ Wenn eine BLE-Verbindung unerwartet verloren geht, verringert das OSSM automatis
 1. Verbindungsverlust festgestellt
 2. **1 Sekunde Verzögerung** – ermöglicht kurze Signalausfälle ohne Auslösung
 3. **2-Sekunden-Rampe** – Die Geschwindigkeit nimmt mithilfe der Ease-in-out-Sinuskurve vom aktuellen Wert auf Null ab
-4. Das Gerät fährt mit der Geschwindigkeit Null weiter, bis es wieder angeschlossen oder manuell gestoppt wird
+4. Das Gerät fährt mit der Geschwindigkeit Null weiter, bis es wieder verbunden oder manuell gestoppt wird
 
 <Info>
 Die Ease-in-out-Sinuskurve sorgt für eine sanfte Verzögerung, die sich natürlich anfühlt und die mechanische Belastung reduziert. Wenn die Geschwindigkeit beim Trennen bereits Null war, erfolgt keine Rampe.
 </Info>
 
-**Überlegungen für den Kunden:**
+**Überlegungen für Clients:**
 
 - Implementieren Sie eine Verbindungsüberwachung, um Verbindungsabbrüche schnell zu erkennen
 - Erwägen Sie die automatische Wiederverbindungslogik
@@ -610,15 +610,15 @@ Das Gerät wird in den Scanergebnissen angezeigt.
 Initiieren Sie eine GATT-Verbindung zum OSSM.
 </Step>
 
-<Step title="Entdecken Sie Dienstleistungen">
-Entdecken Sie alle Dienste und Eigenschaften auf dem Gerät.
+<Step title="Entdecken Sie Dienste">
+Entdecken Sie alle Dienste und Merkmale auf dem Gerät.
 
 <Check>
 Die primäre Dienst-UUID `522b443a-4f53-534d-0001-420badbabe69` wurde gefunden.
 </Check>
 </Step>
 
-<Step title="Abonnieren Sie staatliche Benachrichtigungen">
+<Step title="Abonnieren Sie Statusbenachrichtigungen">
 Aktivieren Sie Benachrichtigungen zum Statusmerkmal, um Echtzeitaktualisierungen zu erhalten.
 </Step>
 
@@ -641,8 +641,8 @@ Beginnen Sie mit dem Senden von Befehlen zur Steuerung des OSSM.
 - Überwachen Sie Statusänderungen, um die Befehlsausführung zu bestätigen
 </Card>
 
-<Card title="Staatliche Überwachung" icon="eye">
-- Abonnieren Sie Benachrichtigungen zu Landesmerkmalen
+<Card title="Statusüberwachung" icon="eye">
+- Abonnieren Sie Benachrichtigungen zu Statusmerkmalen
 - Analysieren Sie JSON-Statusaktualisierungen zuverlässig
 - Behandeln Sie Zustandsübergänge angemessen
 - Implementieren Sie die Timeout-Behandlung für fehlende Updates
@@ -785,7 +785,7 @@ asyncio.run(connect_to_ossm())
 **Lösungen**:
 - Überprüfen Sie, ob das Benachrichtigungsabonnement erfolgreich war
 - Überprüfen Sie, ob Ihre BLE-Bibliothek Benachrichtigungen unterstützt
-- Stellen Sie sicher, dass Sie Benachrichtigungen von der richtigen charakteristischen UUID lesen
+- Stellen Sie sicher, dass Sie Benachrichtigungen von der richtigen Merkmals-UUID lesen
 - Versuchen Sie, die Verbindung zu trennen und erneut herzustellen
 </Accordion>
 

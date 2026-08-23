@@ -5,7 +5,7 @@ description: "Verstehen der Organisation des OSSM-Firmware-Quellcodes"
 
 # Ordnerstruktur
 
-Die OSSM-Firmware folgt einer modularen, funktionsbasierten Architektur. Jede Funktion befindet sich in einem eigenen Namespace-Ordner, wodurch die Codebasis einfacher zu navigieren und zu verwalten ist.
+Die OSSM-Firmware folgt einer modularen, featurebasierten Architektur. Jedes Feature befindet sich in einem eigenen Namespace-Ordner, wodurch die Codebasis einfacher zu navigieren und zu verwalten ist.
 
 <Info>
 Durchsuchen Sie den Quellcode auf GitHub: [Software/src/](https://github.com/KinkyMakers/OSSM-hardware/tree/main/Software/src)
@@ -47,12 +47,12 @@ Durchsuchen Sie den Quellcode auf GitHub: [Software/src/](https://github.com/Kin
 
 ## Designphilosophie
 
-Die Firmware verwendet eine **funktionsbasierte Organisation**, in der zugehöriger Code zusammenlebt:
+Die Firmware verwendet eine **featurebasierte Organisation**, in der zusammengehöriger Code gemeinsam abgelegt ist:
 
-- **Namespaces über Klassen** – Features sind als Namespace-Funktionen und nicht als Klassenmethoden organisiert
-- **Gemeinsam gespeicherte Dateien** – Der Header, die Implementierung und der zugehörige Code jedes Features befinden sich im selben Ordner
+- **Namespaces statt Klassen** – Features sind als Namespace-Funktionen und nicht als Klassenmethoden organisiert
+- **Zusammengehörige Dateien** – Der Header, die Implementierung und der zugehörige Code jedes Features befinden sich im selben Ordner
 - **Globale Zustandsstrukturen** – Der gemeinsame Zustand wird über dedizierte Zustandsstrukturen und nicht über Klassenmitglieder verwaltet
-- **Zustandslose Module** – Feature-Funktionen basieren auf dem globalen Status, was das Testen und Nachdenken erleichtert
+- **Zustandslose Module** – Feature-Funktionen arbeiten mit dem globalen Zustand, was das Testen und Nachvollziehen erleichtert
 
 <Note>
 Die `OSSM`-Klasse in `ossm/OSSM.h` wird aus Gründen der Abwärtskompatibilität mit der BLE-Befehlsverarbeitung beibehalten. Neue Funktionen sollten zustandslose Namespace-Funktionen verwenden.
@@ -60,7 +60,7 @@ Die `OSSM`-Klasse in `ossm/OSSM.h` wird aus Gründen der Abwärtskompatibilität
 
 ## Kernanwendung (`src/ossm/`)
 
-Der Ordner `ossm/` enthält die Kernanwendungslogik, geordnet nach Funktionen.
+Der Ordner `ossm/` enthält die Kernanwendungslogik, geordnet nach Features.
 
 <Tree>
   <Tree.Folder name="ossm" defaultOpen>
@@ -85,7 +85,7 @@ Der Ordner `ossm/` enthält die Kernanwendungslogik, geordnet nach Funktionen.
 | `homing/` | Homing-Sequenz |
 | `menu/` | Menünavigation |
 | `simple_penetration/` | Einfacher Penetrationsmodus |
-| `stroke_engine/` | Stroke Engine-Modus |
+| `stroke_engine/` | StrokeEngine-Modus |
 | `pattern_controls/` | Benutzeroberfläche zur Musterauswahl |
 | `play_controls/` | Wiedergabe-/Pause-/Geschwindigkeitssteuerung |
 
@@ -104,8 +104,8 @@ Aus Gründen der Übersichtlichkeit und Testbarkeit sind die Zustandsmaschinenko
 
 | Datei | Zweck |
 |------|---------|
-| `session.h` | Aktuelle Sitzung (Startzeit, Schlagzahl, Distanz) |
-| `settings.h` | Benutzereinstellungen (Geschwindigkeit, Hub, Gefühl, Tiefe, Muster) |
+| `session.h` | Aktuelle Sitzung (Startzeit, Anzahl der Hübe, Distanz) |
+| `settings.h` | Benutzereinstellungen (Geschwindigkeit, Hub, Empfindung, Tiefe, Muster) |
 | `calibration.h` | Referenzzustand (Sensor-Offset, Hubschritte, Referenzstatus) |
 | `motion.h` | Bewegungsziele (Position, Geschwindigkeit, Zeit) |
 | `menu.h` | Aktuelle Menüauswahl |
@@ -138,19 +138,19 @@ Jeder Betriebsmodus ist mit seiner Bewegungssteuerungslogik ein eigenständiges 
 | `simple_penetration/` | Einfache Hin- und Herbewegung mit kontrollierter Geschwindigkeit |
 | `stroke_engine/` | Komplexe Muster mithilfe der StrokeEngine-Bibliothek |
 
-### Kontrollieren Sie Benutzeroberflächen
+### Steuerungsoberflächen
 
 | Modul | Beschreibung |
 |--------|-------------|
 | `menu/` | Hauptmenünavigation und Rendering |
-| `pattern_controls/` | Musterauswahlschnittstelle für den Stroke Engine-Modus |
+| `pattern_controls/` | Musterauswahlschnittstelle für den StrokeEngine-Modus |
 | `play_controls/` | Geschwindigkeits-, Hub-, Tiefen- und Empfindungssteuerung |
 
 ### Funktionsmodule
 
 | Modul | Beschreibung |
 |--------|-------------|
-| `homing/` | Homing-Sequenz (Vorwärtsscan, Rückwärtsscan, Kalibrierung) |
+| `homing/` | Referenzfahrt (Vorwärtsscan, Rückwärtsscan, Kalibrierung) |
 
 ## Hardware-Services (`src/services/`)
 
@@ -193,9 +193,9 @@ Der Ordner `services/` stellt Hardware-Abstraktionsschichten bereit.
 | `display.h/.cpp` | OLED-Display (U8g2) |
 | `encoder.h/.cpp` | Drehgebereingang |
 | `led.h/.cpp` | RGB-LED-Statusanzeige |
-| `board.h/.cpp` | Board-Initialisierung |
+| `board.h/.cpp` | Platineninitialisierung |
 | `tasks.h/.cpp` | FreeRTOS-Aufgabenverwaltung |
-| `wm.h/.cpp` | WLAN-Manager |
+| `wm.h/.cpp` | WiFi-Manager |
 | `communication/` | BLE- und WiFi-Kommunikation |
 
 <Info>
@@ -226,10 +226,10 @@ Konfigurationswerte und Enumerationen sind im Ordner `constants/` zentralisiert.
 |------|---------|
 | `Config.h` | Systemkonfiguration (Geschwindigkeiten, Limits, Timeouts) |
 | `Pins.h` | GPIO-Pin-Definitionen |
-| `Menu.h` | Menüoption enum |
+| `Menu.h` | Enum der Menüoptionen |
 | `Version.h` | Informationen zur Firmware-Version |
 | `UserConfig.h` | Vom Benutzer konfigurierbare Einstellungen |
-| `Images.h` | Bitmap-Assets anzeigen |
+| `Images.h` | Bitmap-Assets für die Anzeige |
 | `LogTags.h` | ESP-IDF-Protokollierungstags |
 | `copy/` | Lokalisierte Zeichenfolgen |
 
@@ -285,17 +285,17 @@ Gemeinsame Datentypen, die modulübergreifend verwendet werden.
 
 ### Boost.SML (`include/boost/sml.hpp`)
 
-[Boost.SML](https://boost-ext.github.io/sml/) ist eine reine Header-Zustandsmaschinenbibliothek. Aus Gründen der Versionsstabilität ist es direkt in das Projekt eingebunden.
+[Boost.SML](https://boost-ext.github.io/sml/) ist eine reine Header-Zustandsmaschinenbibliothek. Aus Gründen der Versionsstabilität ist sie direkt in das Projekt eingebunden.
 
 ### StrokeEngine (`lib/StrokeEngine/`)
 
-Eine modifizierte Version von [theelims/StrokeEngine](https://github.com/theelims/StrokeEngine), die Bewegungsmuster generiert. Die Bibliothek wird für OSSM-spezifische Anforderungen bereitgestellt und angepasst.
+Eine modifizierte Version von [theelims/StrokeEngine](https://github.com/theelims/StrokeEngine), die Bewegungsmuster generiert. Die Bibliothek ist in den Quellcode eingebunden und für OSSM-spezifische Anforderungen angepasst.
 
 ## Build-Konfiguration
 
 Die Datei `platformio.ini` definiert Build-Umgebungen:
 
-| Umfeld | Zweck |
+| Umgebung | Zweck |
 |-------------|---------|
 | `development` | Lokale Entwicklung mit Debug-Protokollierung |
 | `staging` | Tests vor der Veröffentlichung |

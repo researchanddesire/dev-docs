@@ -14,61 +14,61 @@ Die OSSM-Firmware stellt **7 Muster** (Indizes 0-6) zur Verfügung: Simple Strok
 ### OSSM-Muster (0-6)
 
 <AccordionGroup>
-<Accordion title="Einfacher Schlaganfall">
-Erstellt ein trapezförmiges Hubprofil mit 1/3 Beschleunigung, 1/3 Leerlauf und 1/3 Verzögerung.
+<Accordion title="Simple Stroke">
+Erstellt ein trapezförmiges Hubprofil mit 1/3 Beschleunigung, 1/3 Bewegung mit konstanter Geschwindigkeit und 1/3 Verzögerung.
 
 <Note>
-Der Empfindungsparameter hat auf dieses Muster keinen Einfluss.
+Der Sensation-Parameter hat auf dieses Muster keinen Einfluss.
 </Note>
 </Accordion>
 
-<Accordion title="Necken oder Stampfen">
-Passt das Geschwindigkeitsverhältnis zwischen Ein- und Ausbewegungen anhand des Empfindungswerts an:
+<Accordion title="Teasing or Pounding">
+Passt das Geschwindigkeitsverhältnis zwischen Ein- und Ausbewegungen anhand des Sensation-Werts an:
 
-- **Positive Empfindung (> 0)**: Beschleunigt die Einführbewegung (bis zu 5x) für ein hartes, stoßendes Gefühl
-- **Negatives Gefühl (< 0)**: Beschleunigt die Auswärtsbewegung für ein aufregenderes Gefühl
+- **Positive Sensation (> 0)**: Beschleunigt die Einführbewegung (bis zu 5x) für ein hartes, stoßendes Gefühl
+- **Negative Sensation (< 0)**: Beschleunigt die Auswärtsbewegung für ein stärkeres Teasing-Gefühl
 
 Die Gesamthubzeit bleibt konstant und hängt nur vom globalen Geschwindigkeitsparameter ab.
 </Accordion>
 
 <Accordion title="Robo Stroke">
-Steuert die Hubbeschleunigung über den Empfindungswert:
+Steuert die Hubbeschleunigung über den Sensation-Wert:
 
-- **Positive Werte**: Erhöhen Sie die Beschleunigung, bis die Bewegung eine konstante Geschwindigkeit erreicht (fühlt sich roboterhaft an)
+- **Positive Werte**: Erhöht die Beschleunigung, bis die Bewegung eine konstante Geschwindigkeit erreicht (fühlt sich roboterhaft an)
 - **Neutral (0)**: Entspricht Simple Stroke (1/3, 1/3, 1/3 Profil)
-- **Negative Werte**: Reduzieren Sie die Beschleunigung auf ein Dreiecksprofil
+- **Negative Werte**: Reduziert die Beschleunigung auf ein Dreiecksprofil
 </Accordion>
 
-<Accordion title="Halb und halb">
-Ähnlich wie Teasing oder Pounding, aber jeder zweite Schlag erreicht nur die halbe Tiefe.
+<Accordion title="Half'n'Half">
+Ähnlich wie Teasing or Pounding, aber jeder zweite Hub erreicht nur die halbe Tiefe.
 
-- **Positive Empfindung (> 0)**: Beschleunigt die Einführbewegung (bis zu 5x) für ein hartes, stoßendes Gefühl
-- **Negatives Gefühl (< 0)**: Beschleunigt die Auswärtsbewegung für ein aufregenderes Gefühl
+- **Positive Sensation (> 0)**: Beschleunigt die Einführbewegung (bis zu 5x) für ein hartes, stoßendes Gefühl
+- **Negative Sensation (< 0)**: Beschleunigt die Auswärtsbewegung für ein stärkeres Teasing-Gefühl
 
-Die Schlagzeit bleibt bei allen Strichen gleich, auch bei Strichen mit halber Tiefe.
+Die Hubzeit bleibt bei allen Hüben gleich, auch bei Hüben mit halber Tiefe.
 </Accordion>
 
-<Accordion title="Tiefer">
+<Accordion title="Deeper">
 Erhöht die Eintauchtiefe mit jedem Hub schrittweise bis zum Erreichen des Maximums, wird dann zurückgesetzt und neu gestartet.
 
-Der Sensationswert steuert, wie viele Hübe einen Rampenzyklus absolvieren.
+Der Sensation-Wert steuert, wie viele Hübe einen Rampenzyklus absolvieren.
 </Accordion>
 
 <Accordion title="Stop'n'Go">
-Fügt Pausen zwischen einer Reihe von Strichen ein. Die Anzahl der Hübe steigt von 1 auf 5 und zurück.
+Fügt Pausen zwischen einer Reihe von Hüben ein. Die Anzahl der Hübe steigt von 1 auf 5 und wieder zurück.
 
-Der Empfindungswert steuert die Pausendauer zwischen Schlagserien.
+Der Sensation-Wert steuert die Pausendauer zwischen Hubserien.
 </Accordion>
 
-<Accordion title="Bestehen Sie darauf">
-Reduziert die effektive Hublänge bei konstanter Hubgeschwindigkeit. Dadurch entstehen Schwingungsmuster mit höheren Empfindungswerten.
+<Accordion title="Insist">
+Reduziert die effektive Hublänge bei konstanter Hubgeschwindigkeit. Dadurch entstehen Schwingungsmuster mit höheren Sensation-Werten.
 
-- **Positives Gefühl**: Die Striche wandern nach vorne
-- **Negatives Gefühl**: Die Schläge wandern nach hinten
+- **Positive Sensation**: Die Hübe wandern nach vorne
+- **Negative Sensation**: Die Hübe wandern nach hinten
 </Accordion>
 </AccordionGroup>
 
-### Nur-Bibliothek-Muster
+### Nur in der Bibliothek verfügbare Muster
 
 Diese Muster sind in der StrokeEngine-Bibliothek verfügbar, aber in der OSSM-Firmware **derzeit nicht implementiert**. Sie sind hier für Entwickler dokumentiert, die benutzerdefinierte Firmware oder andere StrokeEngine-basierte Projekte erstellen.
 
@@ -76,19 +76,19 @@ Diese Muster sind in der StrokeEngine-Bibliothek verfügbar, aber in der OSSM-Fi
 <Accordion title="Jack Hammer">
 Erzeugt ein Vibrationsmuster, das beim Einführen vibriert und in einer Bewegung sanft herausgezogen wird.
 
-Der Empfindungswert legt die Vibrationsamplitude von 3 mm bis 25 mm fest.
+Der Sensation-Wert legt die Vibrationsamplitude von 3 mm bis 25 mm fest.
 </Accordion>
 
-<Accordion title="Strichknabber">
-Fügt den Strichen eine Vibrationsüberlagerung hinzu, die sowohl beim Ein- als auch beim Ausfahren vibriert.
+<Accordion title="Stroke Nibbler">
+Fügt den Hüben eine Vibrationsüberlagerung hinzu, die sowohl beim Ein- als auch beim Ausfahren vibriert.
 
-Der Empfindungswert legt die Vibrationsamplitude von 3 mm bis 25 mm fest.
+Der Sensation-Wert legt die Vibrationsamplitude von 3 mm bis 25 mm fest.
 </Accordion>
 </AccordionGroup>
 
 ## Erstellen benutzerdefinierter Muster
 
-Sie können Ihre eigenen Muster erstellen, indem Sie die Klasse `Pattern` in der Nur-Header-Datei [Muster.h](https://github.com/theelims/StrokeEngine/blob/main/src/pattern.h) unterklassifizieren.
+Sie können Ihre eigenen Muster erstellen, indem Sie in der Header-only-Datei [pattern.h](https://github.com/theelims/StrokeEngine/blob/main/src/pattern.h) eine Unterklasse von `Pattern` erstellen.
 
 <Steps>
 <Step title="Unterklasse der Pattern-Klasse">
@@ -103,8 +103,8 @@ class SimpleStroke : public Pattern {
 Der Konstruktor speichert die Anzeigenamenzeichenfolge des Musters.
 </Step>
 
-<Step title="Überschreiben Sie Set-Funktionen bei Bedarf">
-Implementieren Sie Set-Funktionen erneut, wenn Sie benutzerdefinierte Berechnungen benötigen:
+<Step title="Überschreiben Sie set-Funktionen bei Bedarf">
+Implementieren Sie set-Funktionen erneut, wenn Sie benutzerdefinierte Berechnungen benötigen:
 
 ```cpp pattern.h
 void setTimeOfStroke(float speed = 0) {
@@ -115,7 +115,7 @@ void setTimeOfStroke(float speed = 0) {
 </Step>
 
 <Step title="Implementieren Sie die nextTarget-Funktion">
-Dies ist die Kernfunktion, die StrokeEngine nach jedem Strich aufruft, um die nächsten Bewegungsparameter abzurufen.
+Dies ist die Kernfunktion, die StrokeEngine nach jedem Hub aufruft, um die nächsten Bewegungsparameter abzurufen.
 
 ```cpp pattern.h
 motionParameter nextTarget(unsigned int index) {
@@ -140,7 +140,7 @@ motionParameter nextTarget(unsigned int index) {
 ```
 
 <Info>
-Der Parameter `index` beginnt bei 0, wenn das Muster zum ersten Mal aufgerufen wird, und erhöht sich nach jedem Strich um 1. Verwenden Sie dies, um Muster zu erstellen, die sich im Laufe der Zeit ändern.
+Der Parameter `index` beginnt bei 0, wenn das Muster zum ersten Mal aufgerufen wird, und erhöht sich nach jedem Hub um 1. Verwenden Sie dies, um Muster zu erstellen, die sich im Laufe der Zeit ändern.
 </Info>
 </Step>
 
@@ -170,24 +170,24 @@ static Pattern *patternTable[] = {
 
 ## Musteranforderungen
 
-### Tiefen- und Strichgrenzen
+### Tiefen- und Hubgrenzen
 
 <Warning>
-Muster müssen Strichpositionen innerhalb des Intervalls `[0, stroke]` zurückgeben. StrokeEngine überwacht alle zurückgegebenen `motionParameter`-Werte und schneidet Positionen außerhalb von `[depth - stroke, depth]` ab, um Verletzungen vorzubeugen.
+Muster müssen Hubpositionen innerhalb des Intervalls `[0, stroke]` zurückgeben. StrokeEngine überwacht alle zurückgegebenen `motionParameter`-Werte und schneidet Positionen außerhalb von `[depth - stroke, depth]` ab, um Verletzungen vorzubeugen.
 </Warning>
 
-Die in StrokeEngine festgelegten Tiefen- und Strichwerte sind axiomatische Grenzen. Ihr Muster definiert den Umschlag, den es innerhalb dieser Grenzen verwendet. Für die Geschwindigkeit über `timeOfStroke` gelten die gleichen Sicherheitsbeschränkungen.
+Die in StrokeEngine festgelegten Tiefen- und Hubwerte sind axiomatische Grenzen. Ihr Muster definiert den Bewegungsbereich, den es innerhalb dieser Grenzen verwendet. Für die Geschwindigkeit über `timeOfStroke` gelten die gleichen Sicherheitsbeschränkungen.
 
-### Anmutige Parameteränderungen
+### Reibungslose Parameteränderungen
 
-Ihr Muster muss Parameteränderungen ordnungsgemäß verarbeiten. Wenn sich die Tiefen- oder Strichwerte während des Vorgangs ändern, muss das Muster:
+Ihr Muster muss Parameteränderungen ordnungsgemäß verarbeiten. Wenn sich die Tiefen- oder Hubwerte während des Vorgangs ändern, muss das Muster:
 
-- Bleiben Sie jederzeit innerhalb des Intervalls `[depth, depth - stroke]`
-- Führen Sie Transferbewegungen mit der gleichen Geschwindigkeit aus wie normale Bewegungen
-- Vermeiden Sie unberechenbares Verhalten
+- jederzeit innerhalb des Intervalls `[depth, depth - stroke]` bleiben
+- Transferbewegungen mit der gleichen Geschwindigkeit wie normale Bewegungen ausführen
+- unberechenbares Verhalten vermeiden
 
 <Tip>
-Testen Sie Ihr Muster gründlich anhand von Parameteränderungen, insbesondere Tiefen- und Strichänderungen, die möglicherweise zusätzliche Strichabstände erfordern.
+Testen Sie Ihr Muster gründlich anhand von Parameteränderungen, insbesondere Tiefen- und Hubänderungen, die möglicherweise zusätzliche Hubstrecken erfordern.
 </Tip>
 
 ### Verwendung des Indexparameters
@@ -195,14 +195,14 @@ Testen Sie Ihr Muster gründlich anhand von Parameteränderungen, insbesondere T
 Der Parameter `index` liefert wichtige Statusinformationen:
 
 - **Wird auf 0 zurückgesetzt**, wenn `StrokeEngine.setPattern(int)` oder `StrokeEngine.startMotion()` aufgerufen wird
-- **Inkremente** nach jedem erfolgreich ausgeführten Zug
-- **Durch den Vergleich von `index == _index`** wird ermittelt, ob es sich um eine Aktualisierung des aktuellen Strichs und nicht um einen neuen Strich handelt
+- **Wird nach jedem erfolgreich ausgeführten Zug inkrementiert**
+- **Durch den Vergleich von `index == _index`** wird ermittelt, ob es sich um eine Aktualisierung des aktuellen Hubs und nicht um einen neuen Hub handelt
 
-Speichern Sie den letzten Index in `_index`, bevor Sie in zeitlich variierenden Mustern zum Verfolgungshubstatus zurückkehren.
+Speichern Sie den letzten Index in `_index`, bevor die Funktion zurückkehrt, um den Hubstatus zu verfolgen.
 
 ### Pausen implementieren
 
-Muster können Pausen zwischen Strichen einfügen. Wenn die Zielposition erreicht ist, fragt StrokeEngine alle paar Millisekunden nach neuen Bewegungsbefehlen.
+Muster können Pausen zwischen Hüben einfügen. Wenn die Zielposition erreicht ist, fragt StrokeEngine alle paar Millisekunden nach neuen Bewegungsbefehlen.
 
 Um eine Pause zu implementieren, geben Sie `_nextMove.skip = true` von Ihrer `nextTarget()`-Funktion zurück. StrokeEngine wird später erneut abfragen, anstatt eine neue Bewegung zu starten.
 
@@ -215,9 +215,9 @@ Die Basisklasse `Pattern` stellt drei Hilfsfunktionen für die Pausenverwaltung 
 | `_isStillDelayed()` | Gibt `true` zurück, wenn die geplante Zeit nicht erreicht wurde |
 
 <Note>
-Wenn ein Strich überfällig wird, wird er sofort ausgeführt. Eine Beispielimplementierung finden Sie im Stop'n'Go-Muster.
+Wenn ein Hub überfällig wird, wird er sofort ausgeführt. Eine Beispielimplementierung finden Sie im Stop'n'Go-Muster.
 </Note>
 
 ## Mitwirkende Muster
 
-Nachdem Sie Ihr Muster gründlich getestet haben, senden Sie eine Pull-Anfrage mit Ihrer aktualisierten [Muster.h](https://github.com/theelims/StrokeEngine/blob/main/src/pattern.h)-Datei.
+Nachdem Sie Ihr Muster gründlich getestet haben, senden Sie einen Pull Request mit Ihrer aktualisierten [pattern.h](https://github.com/theelims/StrokeEngine/blob/main/src/pattern.h)-Datei.

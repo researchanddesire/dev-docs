@@ -1,24 +1,24 @@
 ---
-title: "WLAN und Updates"
-description: "Konfigurieren Sie die WLAN-Konnektivität und installieren Sie Over-the-Air-Firmware-Updates auf Ihrem OSSM."
+title: "WiFi und Updates"
+description: "Konfigurieren Sie die WiFi-Verbindung und installieren Sie OTA-Firmware-Updates auf Ihrem OSSM."
 ---
 
-Das OSSM unterstützt WLAN-Konnektivität für OTA-Firmware-Updates (Over-the-Air). In dieser Anleitung wird erklärt, wie Sie Ihr OSSM mit Ihrem Heimnetzwerk verbinden und nach Updates suchen.
+Das OSSM unterstützt WiFi-Konnektivität für Over-the-Air-(OTA-)Firmware-Updates. In dieser Anleitung wird erklärt, wie Sie Ihr OSSM mit Ihrem Heimnetzwerk verbinden und nach Updates suchen.
 
-## WLAN-Einrichtung
+## WiFi-Einrichtung
 
-### WLAN-Einrichtung starten
+### WiFi-Einrichtung starten
 
 <Steps>
-<Step title="Navigieren Sie zu WLAN-Setup">
-Scrollen Sie im Hauptmenü zu **WiFi-Setup** und drücken Sie den Encoder, um es auszuwählen.
+<Step title="Navigieren Sie zu WiFi Setup">
+Scrollen Sie im Hauptmenü zu **WiFi Setup** und drücken Sie den Encoder, um es auszuwählen.
 </Step>
 
 <Step title="Verbindungsanweisungen anzeigen">
 Das Display zeigt:
 
-- Überschrift „WiFi-Setup“.
-- Anleitung zur Verbindung mit „OSSM Setup“
+- Überschrift "WiFi Setup"
+- Anleitung zur Verbindung mit "OSSM Setup"
 - Ein QR-Code für eine schnelle Verbindung
 
 Der QR-Code kodiert: `WIFI:S:OSSM Setup;T:nopass;;`
@@ -27,9 +27,9 @@ Der QR-Code kodiert: `WIFI:S:OSSM Setup;T:nopass;;`
 <Step title="Stellen Sie eine Verbindung zum OSSM-Zugangspunkt her">
 Auf Ihrem Telefon oder Computer:
 
-1. Öffnen Sie die WLAN-Einstellungen
+1. Öffnen Sie die WiFi-Einstellungen
 2. Suchen Sie nach einem Netzwerk namens **OSSM Setup**
-3. Verbinden (kein Passwort erforderlich)
+3. Verbinden Sie sich (kein Passwort erforderlich)
 
 <Tip>
 Scannen Sie den QR-Code mit der Kamera Ihres Telefons, um mit unterstützten Geräten eine Verbindung mit nur einem Fingertipp herzustellen.
@@ -41,70 +41,70 @@ Nach der Verbindung mit dem OSSM-Zugangspunkt:
 
 1. Ein Captive-Portal sollte sich automatisch öffnen
 2. Wenn nicht, öffnen Sie einen Browser und navigieren Sie zu `192.168.4.1`
-3. Wählen Sie Ihr WLAN-Heimnetzwerk aus der Liste aus
-4. Geben Sie Ihr WLAN-Passwort ein
-5. Klicken Sie auf **Speichern**
+3. Wählen Sie Ihr WiFi-Heimnetzwerk aus der Liste aus
+4. Geben Sie Ihr WiFi-Passwort ein
+5. Klicken Sie auf **Save**
 
-Der OSSM wird versuchen, eine Verbindung zu Ihrem Heimnetzwerk herzustellen.
+Das OSSM wird versuchen, eine Verbindung zu Ihrem Heimnetzwerk herzustellen.
 </Step>
 
-<Step title="Beenden Sie die WLAN-Einrichtung">
-Drücken Sie den Encoder oder wählen Sie **Neustart**, um den WLAN-Einrichtungsmodus zu verlassen. Der OSSM wird neu gestartet und verbindet sich mit Ihrem konfigurierten Netzwerk.
+<Step title="Beenden Sie die WiFi-Einrichtung">
+Drücken Sie den Encoder oder wählen Sie **Restart**, um den WiFi-Einrichtungsmodus zu verlassen. Das OSSM wird neu gestartet und verbindet sich mit Ihrem konfigurierten Netzwerk.
 </Step>
 </Steps>
 
-### Verbindung wird überprüft
+### Verbindung überprüfen
 
-Nach dem Neustart versucht der OSSM, eine Verbindung zu Ihrem konfigurierten WLAN-Netzwerk herzustellen. Sie können die Verbindung überprüfen, indem Sie:
+Nach dem Neustart versucht das OSSM, eine Verbindung zu Ihrem konfigurierten WiFi-Netzwerk herzustellen. Sie können die Verbindung wie folgt überprüfen:
 
-1. Wählen Sie im Hauptmenü **Aktualisieren** aus
-2. Wenn eine WLAN-Verbindung besteht, wird „Nach Updates suchen …“ angezeigt.
-3. Wenn keine WLAN-Verbindung besteht, werden Sie zur WLAN-Einrichtung weitergeleitet
+1. Wählen Sie im Hauptmenü **Update** aus
+2. Wenn eine WiFi-Verbindung besteht, wird "Checking for update..." angezeigt.
+3. Wenn keine WiFi-Verbindung besteht, werden Sie zur WiFi-Einrichtung weitergeleitet
 
 <Note>
-Das OSSM zeigt seine IP-Adresse nicht auf dem Bildschirm an. Für erweiterte Netzwerke können Sie es in der DHCP-Client-Liste Ihres Routers finden oder Netzwerk-Scan-Tools verwenden.
+Das OSSM zeigt seine IP-Adresse nicht auf dem Bildschirm an. Für erweiterte Netzwerkkonfigurationen können Sie sie in der DHCP-Client-Liste Ihres Routers finden oder Netzwerk-Scan-Tools verwenden.
 </Note>
 
-### WLAN-Einstellungen löschen
+### WiFi-Einstellungen löschen
 
 So stellen Sie eine Verbindung zu einem anderen Netzwerk her oder beheben Verbindungsprobleme:
 
-1. Wählen Sie **WiFi-Setup** aus dem Menü
+1. Wählen Sie **WiFi Setup** aus dem Menü
 2. Beim Speichern neuer Einstellungen wird die bisherige Netzwerkkonfiguration überschrieben
 3. Alternativ können Sie die Firmware neu flashen, um alle Einstellungen zu löschen
 
-## Over-the-Air-Updates
+## Over-the-air-Updates
 
-Der OSSM kann Firmware-Updates direkt über WLAN herunterladen und installieren, ohne eine Verbindung zu einem Computer herzustellen.
+Das OSSM kann Firmware-Updates direkt über WiFi herunterladen und installieren, ohne eine Verbindung zu einem Computer herzustellen.
 
 ### Voraussetzungen
 
-- Aktive WLAN-Verbindung (konfiguriert über WLAN-Setup)
+- Aktive WiFi-Verbindung (konfiguriert über WiFi Setup)
 - Internetzugang über Ihr Netzwerk
-- Ausreichend Akku/Strom während des Aktualisierungsvorgangs
+- Ausreichender Akkustand bzw. eine ausreichende Stromversorgung während des Updates
 
 ### Suche nach Updates
 
 <Steps>
-<Step title="Navigieren Sie zu „Aktualisieren“.">
-Scrollen Sie im Hauptmenü zu **Aktualisieren** und drücken Sie den Encoder.
+<Step title="Navigieren Sie zu Update">
+Scrollen Sie im Hauptmenü zu **Update** und drücken Sie den Encoder.
 </Step>
 
 <Step title="Warten Sie auf die Versionsprüfung">
-Während das OSSM den Update-Server kontaktiert, wird auf dem Display „Checking for update...“ angezeigt.
+Während das OSSM den Update-Server kontaktiert, wird auf dem Display "Checking for update..." angezeigt.
 
-Die Firmware sendet ihre aktuelle Version (`SW_VERSION`) an den Server, der antwortet, ob ein Update verfügbar ist.
+Die Firmware sendet ihre aktuelle Version (`SW_VERSION`) an den Server, der meldet, ob ein Update verfügbar ist.
 </Step>
 
 <Step title="Überprüfen Sie das Ergebnis">
 Sie sehen einen von zwei Bildschirmen:
 
 **Kein Update verfügbar:**
-- Meldung „Kein Update verfügbar“.
+- Meldung "No Update Available"
 - Drücken Sie den Encoder, um zum Menü zurückzukehren
 
 **Update verfügbar:**
-- Meldung „OSSM wird aktualisiert…“.
+- Meldung "Updating OSSM..."
 - Das Update beginnt automatisch
 </Step>
 </Steps>
@@ -112,7 +112,7 @@ Sie sehen einen von zwei Bildschirmen:
 ### Während des Updates
 
 <Warning>
-Schalten Sie Ihr OSSM während eines Updates nicht aus und trennen Sie es nicht. Dies kann die Firmware beschädigen und eine manuelle Wiederherstellung erfordern.
+Schalten Sie Ihr OSSM während eines Updates nicht aus und trennen Sie es nicht von der Stromversorgung. Dies kann die Firmware beschädigen und eine manuelle Wiederherstellung erfordern.
 </Warning>
 
 Der Update-Prozess:
@@ -122,41 +122,41 @@ Der Update-Prozess:
 3. Schreibt die Firmware in den Flash-Speicher
 4. Startet das Gerät automatisch neu
 
-Das Display zeigt: „Update läuft. Dies kann bis zu 60 Sekunden dauern.“
+Das Display zeigt: "Update is in progress. This may take up to 60s."
 
 ### Nach dem Update
 
-Nach einem erfolgreichen Update startet der OSSM automatisch neu. Es wird:
+Nach einem erfolgreichen Update startet das OSSM automatisch neu. Es wird:
 
-1. Booten Sie mit der neuen Firmware
-2. Führen Sie die Referenzfahrtsequenz durch
-3. Zurück zum Hauptmenü
+1. mit der neuen Firmware starten
+2. die Referenzfahrt durchführen
+3. zum Hauptmenü zurückkehren
 
 <Check>
-Ihre Einstellungen und WLAN-Konfiguration bleiben bei Updates erhalten.
+Ihre Einstellungen und WiFi-Konfiguration bleiben bei Updates erhalten.
 </Check>
 
-### Kanäle aktualisieren
+### Update-Kanäle
 
-Die OSSM-Firmware unterstützt mehrere Update-Kanäle:
+Das OSSM unterstützt mehrere Update-Kanäle:
 
 | Kanal | URL | Beschreibung |
 |---------|-----|-------------|
-| Produktion | `d2g4f7zewm360.cloudfront.net` | Stabile Versionen für den allgemeinen Gebrauch |
-| Entwicklung | `d2oq8yqnezqh3r.cloudfront.net` | Vorabversionen zum Testen |
+| Production | `d2g4f7zewm360.cloudfront.net` | Stabile Versionen für den allgemeinen Gebrauch |
+| Development | `d2oq8yqnezqh3r.cloudfront.net` | Vorabversionen zum Testen |
 
 <Note>
-Der Update-Kanal wird zur Kompilierzeit bestimmt. Die Produktionsfirmware überprüft den Produktionsserver. Die Entwicklungsfirmware überprüft den Entwicklungsserver.
+Der Update-Kanal wird zur Kompilierzeit bestimmt. Die Production-Firmware überprüft den Production-Server; die Development-Firmware überprüft den Development-Server.
 </Note>
 
 ## Fehlerbehebung
 
 <AccordionGroup>
-<Accordion title="OSSM-Setup-Netzwerk kann nicht gefunden werden">
-- Stellen Sie sicher, dass Sie sich im WLAN-Setup-Modus befinden (auf dem Bildschirm wird der QR-Code angezeigt).
+<Accordion title="OSSM Setup-Netzwerk kann nicht gefunden werden">
+- Stellen Sie sicher, dass Sie sich im WiFi Setup-Modus befinden (auf dem Bildschirm wird der QR-Code angezeigt).
 - Gehen Sie näher an das OSSM heran
-- Versuchen Sie, die WLAN-Liste Ihres Geräts zu aktualisieren
-- Starten Sie den OSSM neu und versuchen Sie es erneut
+- Versuchen Sie, die WiFi-Liste Ihres Geräts zu aktualisieren
+- Starten Sie das OSSM neu und versuchen Sie es erneut
 </Accordion>
 
 <Accordion title="Das Captive-Portal wird nicht angezeigt">
@@ -165,40 +165,40 @@ Der Update-Kanal wird zur Kompilierzeit bestimmt. Die Produktionsfirmware überp
 - Versuchen Sie es mit einem anderen Gerät
 </Accordion>
 
-<Accordion title="WLAN stellt keine Verbindung zum Heimnetzwerk her">
-- Überprüfen Sie, ob Ihr WLAN-Passwort korrekt ist
-- Stellen Sie sicher, dass Ihr Netzwerk 2,4 GHz hat (ESP32 unterstützt kein 5 GHz).
+<Accordion title="WiFi stellt keine Verbindung zum Heimnetzwerk her">
+- Überprüfen Sie, ob Ihr WiFi-Passwort korrekt ist
+- Stellen Sie sicher, dass Ihr Netzwerk das 2,4-GHz-Band nutzt (ESP32 unterstützt kein 5-GHz-Band).
 - Überprüfen Sie, ob Ihr Router neue Geräte zulässt
-- Versuchen Sie, den OSSM näher an Ihren Router zu bringen
+- Versuchen Sie, das OSSM näher an Ihren Router zu bringen
 </Accordion>
 
 <Accordion title="Die Aktualisierungsprüfung schlägt fehl">
-- Überprüfen Sie, ob eine WLAN-Verbindung besteht (versuchen Sie es zuerst mit der WLAN-Einrichtung).
+- Überprüfen Sie, ob eine WiFi-Verbindung besteht (versuchen Sie es zuerst mit WiFi Setup).
 - Überprüfen Sie Ihre Internetverbindung
 - Der Update-Server ist möglicherweise vorübergehend nicht verfügbar
 - Versuchen Sie es in ein paar Minuten noch einmal
 </Accordion>
 
 <Accordion title="Der Update-Download schlägt fehl oder es kommt zu einer Zeitüberschreitung">
-- Stellen Sie während des Updates ein stabiles WLAN-Signal sicher
+- Stellen Sie während des Updates ein stabiles WiFi-Signal sicher
 - Gehen Sie bei Bedarf näher an Ihren Router heran
 - Stellen Sie sicher, dass Ihre Internetverbindung funktioniert
-- Versuchen Sie es erneut mit einem neuen Stromanschluss
+- Schließen Sie die Stromversorgung neu an und versuchen Sie es erneut
 </Accordion>
 
 <Accordion title="OSSM startet nach dem Update nicht">
 Dies ist selten, kann aber passieren, wenn das Update unterbrochen wurde. Wiederherstellungsoptionen:
 
 1. Versuchen Sie, das Gerät aus- und wieder einzuschalten (Netzstecker ziehen und wieder einstecken).
-2. Wenn das Gerät nicht startet, müssen Sie über USB mit [PlattformIO](/ossm/software/getting-started/platformio) neu flashen
+2. Wenn das Gerät nicht startet, müssen Sie über USB mit [PlatformIO](/ossm/software/getting-started/platformio) neu flashen
 </Accordion>
 </AccordionGroup>
 
 ## Technische Details
 
-### Serverkommunikation aktualisieren
+### Kommunikation mit dem Update-Server
 
-Der OSSM sendet eine POST-Anfrage an den Update-Server mit:
+Das OSSM sendet eine POST-Anfrage an den Update-Server mit:
 
 ```json
 {
@@ -218,21 +218,21 @@ Der Server antwortet mit:
 
 Wenn `needUpdate` `true` ist, lädt die Firmware die Binärdatei vom Firmware-Verteilungsserver herunter.
 
-### Firmware-Binärspeicherorte
+### Speicherorte der Firmware-Binärdateien
 
-| Kanal | Binäre URL |
+| Kanal | URL der Binärdatei |
 |---------|------------|
-| Produktion | `d2sy3zdr3r1gt5.cloudfront.net/firmware.bin` |
-| Entwicklung | `d2sy3zdr3r1gt5.cloudfront.net/firmware-dev.bin` |
+| Production | `d2sy3zdr3r1gt5.cloudfront.net/firmware.bin` |
+| Development | `d2sy3zdr3r1gt5.cloudfront.net/firmware-dev.bin` |
 
 ## Verwandte Seiten
 
 <CardGroup cols={2}>
-<Card title="PlatformIO-Setup" icon="wrench" href="/ossm/software/getting-started/platformio">
+<Card title="PlatformIO Setup" icon="wrench" href="/ossm/software/getting-started/platformio">
   Manuelle Firmware-Updates über USB für Entwicklung oder Wiederherstellung.
 </Card>
 
-<Card title="BLE-Protokoll" icon="bluetooth" href="/ossm/software/communication/ble">
-  Steuern Sie Ihr OSSM drahtlos über Bluetooth statt über WLAN.
+<Card title="BLE Protocol" icon="bluetooth" href="/ossm/software/communication/ble">
+  Steuern Sie Ihr OSSM drahtlos über Bluetooth statt über WiFi.
 </Card>
 </CardGroup>

@@ -1,11 +1,11 @@
 ---
 title: "Anzeigedienst"
-description: "Verwenden Sie den Thread-sicheren Anzeigedienst, um mit U8G2 auf das 128×64 SSD1306 OLED zu zeichnen."
+description: "Verwenden Sie den threadsicheren Anzeigedienst, um mit U8G2 auf das 128×64 SSD1306 OLED zu zeichnen."
 ---
 
 ## Überblick
 
-Der Anzeigedienst ist ein globaler, threadsicherer Wrapper um den U8G2-Treiber für ein 128×64 SSD1306 OLED. Sie verwenden es, um Text und Grafiken aus jeder Aufgabe ohne Flimmern oder Tearing zu rendern. Ein FreeRTOS-Mutex garantiert exklusiven Zugriff beim Zeichnen; Hilfsfunktionen kümmern sich um das Löschen von Regionen, die teilweise Aktualisierung, das Ausschneiden und das Zwischenspeichern von Text.
+Der Anzeigedienst ist ein globaler, threadsicherer Wrapper um den U8G2-Treiber für ein 128×64 SSD1306 OLED. Sie verwenden ihn, um Text und Grafiken aus jeder Aufgabe ohne Flimmern oder Tearing zu rendern. Ein FreeRTOS-Mutex garantiert exklusiven Zugriff beim Zeichnen; Hilfsfunktionen kümmern sich um das Löschen von Regionen, die teilweise Aktualisierung, das Ausschneiden und das Zwischenspeichern von Text.
 
 <Info>
 Auf dieser Seite wird die Entwickler-API auf Firmware-Ebene dokumentiert, die auf unseren Geräten verwendet wird. Informationen zum benutzerseitigen Anzeigeverhalten (z. B. Ausblenden der Bildschirme für die verbleibende Zeit oder den Gerätestatus) finden Sie auf den entsprechenden Seiten am Ende.
@@ -20,7 +20,7 @@ Auf dieser Seite wird die Entwickler-API auf Firmware-Ebene dokumentiert, die au
 
 ## Hardwarekonfiguration
 
-| Eigentum | Wert |
+| Eigenschaft | Wert |
 |---|---|
 | Anzeige | SSD1306 OLED |
 | Auflösung | 128×64 Pixel |
@@ -50,7 +50,7 @@ Der Bildschirm wird als Raster aus 8×8-Pixel-Zellen behandelt:
 </Accordion>
 
 <Accordion title="Seitenbereich (Zeilen 1–6)">
-- 6 Reihen hoch (48 px)
+- 6 Zeilen hoch (48 px)
 - 16 Zellen breit (128 px)
 - Der gesamte Hauptinhalt sollte hier gerendert werden
 </Accordion>
@@ -62,7 +62,7 @@ Der Bildschirm wird als Raster aus 8×8-Pixel-Zellen behandelt:
 </AccordionGroup>
 
 <Tip>
-U8G2-Text-APIs verwenden die Baseline für `y`. Beginnen Sie bei Schriftarten mit einer Höhe von 8 Pixeln die erste Textzeile bei `y = 8` und fügen Sie dann den Aufstieg/die Zeilenhöhe der Schriftart für nachfolgende Zeilen hinzu.
+U8G2-Text-APIs verwenden die Baseline für `y`. Beginnen Sie bei Schriftarten mit einer Höhe von 8 Pixeln die erste Textzeile bei `y = 8` und fügen Sie dann die Oberlänge/Zeilenhöhe der Schriftart für nachfolgende Zeilen hinzu.
 </Tip>
 
 ## Thread-Sicherheit
@@ -129,9 +129,9 @@ if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
 </Step>
 </Steps>
 
-## Räumungshelfer
+## Löschhilfen
 
-Löschen Sie effizient nur das, was Sie neu zeichnen möchten. Alle Helfer verwenden einen internen `updateDisplayArea()`, um eine teilweise Aktualisierung der betroffenen Region durchzuführen.
+Löschen Sie effizient nur das, was Sie neu zeichnen möchten. Alle Hilfsfunktionen verwenden intern `updateDisplayArea()`, um eine teilweise Aktualisierung der betroffenen Region durchzuführen.
 
 | Funktion | Beschreibung | Region gelöscht |
 |---|---|---|
@@ -153,17 +153,17 @@ void clearPage(bool includeFooter = false, bool includeHeader = false);
 `clearPage()` legt ein Clipping-Fenster fest, um zu verhindern, dass Inhalte in die Kopf- oder Fußzeile gelangen.
 </Note>
 
-## Helfer aktualisieren
+## Aktualisierungs-Hilfsfunktionen
 
 Rufen Sie einen Aktualisierungshelfer auf, nachdem Sie eine Region geändert haben. Diese führen minimale Aktualisierungen der Anzeige durch.
 
 | Funktion | Beschreibung | Region aktualisiert |
 |---|---|---|
-| `refreshHeader()` | Verschiebt Kopfzeilentext | Zeile 0, Zellen 0–12 |
-| `refreshIcons()` | Verschiebt den Symbolbereich | Zeile 0, Zellen 13–15 |
-| `refreshFooter()` | Verschiebt Fußzeilentext | Zeile 7, Zellen 0–14 |
-| `refreshTimeout()` | Drückt die Timeout-Anzeige | Zeile 7, Zelle 15 |
-| `refreshPage(includeFooter=false, includeHeader=false)` | Pusht den Hauptinhalt; optionale Kopf-/Fußzeile | Zeilen 1–6 (plus Kopf-/Fußzeile auf Anfrage) |
+| `refreshHeader()` | Überträgt den Kopfzeilentext | Zeile 0, Zellen 0–12 |
+| `refreshIcons()` | Überträgt den Symbolbereich | Zeile 0, Zellen 13–15 |
+| `refreshFooter()` | Überträgt den Fußzeilentext | Zeile 7, Zellen 0–14 |
+| `refreshTimeout()` | Aktualisiert die Timeout-Anzeige | Zeile 7, Zelle 15 |
+| `refreshPage(includeFooter=false, includeHeader=false)` | Überträgt den Hauptinhalt; optionale Kopf-/Fußzeile | Zeilen 1–6 (plus Kopf-/Fußzeile auf Anfrage) |
 
 ```cpp refresh_helpers.h
 void refreshHeader();
@@ -173,11 +173,11 @@ void refreshTimeout();
 void refreshPage(bool includeFooter = false, bool includeHeader = false);
 ```
 
-## Content-Helfer
+## Inhaltshelfer
 
 ### `setHeader()`
 
-Legt den Kopfzeilentext fest. Der Dienst schreibt den letzten Wert in Großbuchstaben und speichert ihn zwischen, um redundante Neuzeichnungen zu vermeiden.
+Legt den Kopfzeilentext fest. Der Dienst wandelt den letzten Wert in Großbuchstaben um und speichert ihn zwischen, um redundante Neuzeichnungen zu vermeiden.
 
 ```cpp header.h
 void setHeader(String &text);
@@ -210,17 +210,17 @@ int drawWrappedText(int x, int y, const String &text, bool center = false);
 Start-X-Koordinate in Pixel.
 </ParamField>
 <ParamField path="y" type="int" required>
-Y-Koordinate der Anfangsbasislinie in Pixel.
+Y-Koordinate der Startbasislinie in Pixel.
 </ParamField>
 <ParamField path="text" type="String" required>
 Text zum Rendern. Unterstützt das Literal `\n` für Zeilenumbrüche.
 </ParamField>
 <ParamField path="center" type="bool" default="false">
-Zentrieren Sie jede umbrochene Zeile innerhalb des Seitenbereichs, wenn `true`.
+Zentrieren Sie jede umbrochene Zeile innerhalb des Seitenbereichs, wenn `true` gesetzt ist.
 </ParamField>
 
 <ResponseField name="return" type="int" required>
-Anzahl der gezeichneten Linien.
+Anzahl der gezeichneten Zeilen.
 </ResponseField>
 
 ## Gemeinsame Muster
@@ -268,7 +268,7 @@ if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
 
 <Steps>
 <Step title="Sperren Sie den Mutex für jede Zeichensequenz">
-Wickeln Sie die Zeichnung ein und aktualisieren Sie sie in einem kritischen Abschnitt, der von `displayMutex` geschützt wird.
+Fassen Sie Zeichnen und Aktualisieren in einem durch `displayMutex` geschützten kritischen Abschnitt zusammen.
 
 ```cpp lock_and_draw.cpp
 if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
@@ -278,7 +278,7 @@ if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
 ```
 </Step>
 
-<Step title="Bevorzugen Sie Regionshelfer gegenüber vollständigen Clearings">
+<Step title="Bevorzugen Sie Regionshelfer gegenüber vollständigen Löschvorgängen">
 Minimieren Sie Busverkehr und Flimmern, indem Sie die Hilfsprogramme `clear*()` und `refresh*()` verwenden.
 
 <CodeGroup>
@@ -295,25 +295,25 @@ refreshPage();
 </CodeGroup>
 </Step>
 
-<Step title="Respektiere Grenzen">
+<Step title="Beachten Sie die Grenzen">
 Halten Sie den Inhalt innerhalb von:
 
 - Kopfzeile: Zeile 0, Zellen 0–12
 - Symbole: Zeile 0, Zellen 13–15
 - Seite: Zeilen 1–6
-- Fußzeile: Zeile 7, Zellen 0–14; Zeitüberschreitung bei Zelle 15
+- Fußzeile: Zeile 7, Zellen 0–14; Timeout-Anzeige in Zelle 15
 
-Verwenden Sie `clearPage()`, um den Seiteninhalt von der Kopf-/Fußzeile wegzuschneiden.
+Verwenden Sie `clearPage()`, um den Seiteninhalt von der Kopf-/Fußzeile fernzuhalten.
 </Step>
 
 <Step title="Wählen Sie lesbare Schriftarten">
 | Bereich | Empfohlene Schriftart |
 |---|---|
 | Kopf-/Fußzeile | `u8g2_font_spleen5x8_mu` |
-| Seiteninhalt | Aus Gründen der Lesbarkeit auswählen; Passen Sie den Zeilenabstand anhand der Schriftartmetriken an |
+| Seiteninhalt | Aus Gründen der Lesbarkeit auswählen; passen Sie den Zeilenabstand anhand der Schriftartmetriken an |
 
 <Note>
-Berücksichtigen Sie bei der Berechnung der `y`-Versatze zwischen Zeilen den Aufstieg der Schriftart und die Gesamtzeilenhöhe.
+Berücksichtigen Sie bei der Berechnung der `y`-Versätze zwischen Zeilen die Oberlänge der Schriftart und die Gesamtzeilenhöhe.
 </Note>
 </Step>
 </Steps>
@@ -322,8 +322,8 @@ Berücksichtigen Sie bei der Berechnung der `y`-Versatze zwischen Zeilen den Auf
 
 - Bei Teilaktualisierungen werden nur die von Ihnen geänderten Regionen neu gezeichnet
 - Text-Caching vermeidet unnötige Zeichen-/Aktualisierungszyklen
-- Durch das Ausschneiden bleibt das Zeichnen innerhalb des vorgesehenen Bereichs erhalten und das Überzeichnen wird reduziert
-- Mutex-geschützte Sequenzen verhindern ein Mid-Frame-Tearing zwischen Aufgaben
+- Durch das Ausschneiden bleibt das Zeichnen innerhalb des vorgesehenen Bereichs und unnötiges Überzeichnen wird reduziert
+- Mutex-geschützte Sequenzen verhindern Bildzerreißen mitten im Frame zwischen Aufgaben
 
 ## Fehlerbehebung
 
@@ -335,14 +335,14 @@ Berücksichtigen Sie bei der Berechnung der `y`-Versatze zwischen Zeilen den Auf
 </Accordion>
 
 <Accordion title="Die Anzeigeaktualisierungen sind langsam oder flackern">
-- Verwenden Sie Regionslöschungen/-aktualisierungen anstelle von vollständigen Pufferlöschungen
-- Stapeln Sie Ihre Zeichnung in einem Mutex-geschützten Block
+- Verwenden Sie das Löschen/Aktualisieren von Regionen anstelle des vollständigen Löschens des Puffers
+- Bündeln Sie Ihre Zeichenvorgänge in einem durch den Mutex geschützten Block
 - Vermeiden Sie unnötige Schriftartänderungen zwischen Zeichenaufrufen
 </Accordion>
 
 <Accordion title="Der Text scheint vertikal falsch ausgerichtet zu sein">
 - Denken Sie daran, dass U8G2 eine Baseline für `y` verwendet
-- Beginnen Sie die erste 8-Pixel-Schriftzeile bei `y = 8` oder berechnen Sie anhand des Schriftaufstiegs
+- Beginnen Sie die erste 8-Pixel-Schriftzeile bei `y = 8` oder berechnen Sie dies anhand der Oberlänge der Schriftart
 </Accordion>
 
 <Accordion title="Deadlock oder blockierte Aufgaben">

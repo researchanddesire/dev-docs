@@ -15,7 +15,7 @@ Ces paramètres définissent la manière dont l'OSSM se déplace et se trouvent 
 
 ### Vitesse et accélération
 
-| Paramètre | Défaut | Unité | Description |
+| Paramètre | Valeur par défaut | Unité | Description |
 |-----------|---------|------|-------------|
 | `maxSpeedMmPerSecond` | 900.0 | mm/s | Vitesse linéaire maximale de l'actionneur |
 | `maxAcceleration` | 10000.0 | mm/s² | Taux d'accélération/décélération maximum |
@@ -26,11 +26,11 @@ Ces limites s'appliquent à tous les modes de fonctionnement. La vitesse réelle
 
 ### Configuration du moteur
 
-| Paramètre | Défaut | Unité | Description |
+| Paramètre | Valeur par défaut | Unité | Description |
 |-----------|---------|------|-------------|
-| `motorStepPerRevolution` | 800.0 | pas/tour | Pas de moteur par tour complet |
-| `pulleyToothCount` | 20.0 | dents | Nombre de dents sur la poulie motrice |
-| `beltPitchMm` | 2.0 | mm | Distance entre dents de courroie (norme GT2) |
+| `motorStepPerRevolution` | 800.0 | steps/rev | Pas de moteur par tour complet |
+| `pulleyToothCount` | 20.0 | teeth | Nombre de dents sur la poulie motrice |
+| `beltPitchMm` | 2.0 | mm | Distance entre les dents de la courroie (norme GT2) |
 
 Ces valeurs se combinent pour calculer `stepsPerMM` :
 
@@ -45,44 +45,44 @@ Si vous utilisez un matériel différent (par exemple, une poulie à 16 dents ou
 
 ### Limites de course
 
-| Paramètre | Défaut | Unité | Description |
+| Paramètre | Valeur par défaut | Unité | Description |
 |-----------|---------|------|-------------|
 | `maxStrokeSteps` | 500.0 | mm | Longueur de course maximale utilisable |
-| `minStrokeLengthMm` | 50.0 | mm | Course minimale pour réussir la validation de référence |
+| `minStrokeLengthMm` | 50.0 | mm | Course minimale pour réussir la validation du référencement |
 
 <Note>
-`maxStrokeSteps` définit la course maximale absolue. Réglez ceci sur la longueur de votre rail moins le support de bloc linéaire (75 mm sur OSSM standard) moins une marge de sécurité de 20 mm.
+`maxStrokeSteps` définit la course maximale absolue. Utilisez la formule : maxStrokeSteps = longueur du rail − support de bloc linéaire (75 mm pour un OSSM standard) − marge de sécurité de 20 mm.
 </Note>
 
 ### Configuration de référencement
 
-| Paramètre | Défaut | Unité | Description |
+| Paramètre | Valeur par défaut | Unité | Description |
 |-----------|---------|------|-------------|
-| `sensorlessCurrentLimit` | 1.5 | % | Seuil actuel indiquant la fin du voyage |
+| `sensorlessCurrentLimit` | 1.5 | % | Seuil de courant indiquant la fin de course |
 
-L'OSSM utilise une prise d'origine sans capteur : il détecte le moment où l'actionneur atteint la fin de sa course en surveillant le courant du moteur. Lorsque le courant dépasse ce seuil, le micrologiciel sait que l'actionneur a atteint un arrêt physique.
+L'OSSM utilise une prise d'origine sans capteur : il détecte le moment où l'actionneur atteint la fin de sa course en surveillant le courant du moteur. Lorsque le courant dépasse ce seuil, le micrologiciel sait que l'actionneur a atteint une butée physique.
 
 ## Configuration avancée
 
 Ces paramètres affinent le comportement du micrologiciel et se trouvent dans `Config::Advanced`.
 
-| Paramètre | Défaut | Unité | Description |
+| Paramètre | Valeur par défaut | Unité | Description |
 |-----------|---------|------|-------------|
 | `strokeZeroOffsetMm` | 6.0 | mm | Distance tampon par rapport à la position physique d'origine |
-| `commandDeadZonePercentage` | 1.0 | % | Zone morte du potentiomètre pour éviter le bruit |
-| `accelerationScaling` | 100.0 | - | Affecte l'agressivité du mouvement en pénétration simple |
+| `commandDeadZonePercentage` | 1.0 | % | Zone morte du potentiomètre pour éviter le bruit de mesure |
+| `accelerationScaling` | 100.0 | - | Affecte l'agressivité du mouvement en mode Simple Penetration |
 
 <AccordionGroup>
-<Accordion title="courseZeroOffsetMm">
+<Accordion title="strokeZeroOffsetMm">
 Après la prise d'origine, l'actionneur recule de la butée physique de cette distance. Cela empêche l'actionneur de heurter à plusieurs reprises la butée pendant le fonctionnement normal.
 </Accordion>
 
-<Accordion title="commandeDeadZonePercentage">
-Les potentiomètres analogiques peuvent produire des lectures bruyantes proches de zéro. Cette zone morte garantit que le bouton de vitesse s'enregistre comme « zéro » lorsqu'il est tourné complètement dans le sens inverse des aiguilles d'une montre, même si la lecture électrique est légèrement supérieure à 0 %.
+<Accordion title="commandDeadZonePercentage">
+Les potentiomètres analogiques peuvent produire des mesures bruitées proches de zéro. Cette zone morte garantit que le bouton de vitesse s'enregistre comme « zéro » lorsqu'il est tourné complètement dans le sens inverse des aiguilles d'une montre, même si la lecture électrique est légèrement supérieure à 0 %.
 </Accordion>
 
-<Accordion title="accélérationMise à l'échelle">
-En mode Pénétration simple, l'accélération est calculée comme suit :
+<Accordion title="accelerationScaling">
+En mode Simple Penetration, l'accélération est calculée comme suit :
 ```cpp
 acceleration = maxSpeedMmPerSecond * speed * speed / accelerationScaling
 ```
@@ -105,7 +105,7 @@ Langues disponibles :
 - `fr` — Français
 
 <Note>
-La sélection de la langue nécessite actuellement de recompiler le firmware. Un sélecteur de langue d'exécution est prévu pour les prochaines versions.
+La sélection de la langue nécessite actuellement de recompiler le firmware. Un sélecteur de langue à l'exécution est prévu pour les prochaines versions.
 </Note>
 
 ### Unités d'affichage
@@ -120,45 +120,45 @@ Lorsque `true`, les distances s'affichent en mètres. Lorsque `false`, les dista
 
 Les broches matérielles sont définies dans `src/constants/Pins.h`. Modifiez-les si vous construisez du matériel personnalisé.
 
-### Afficher les épingles
+### Broches d'affichage
 
-| Épingle | GPIO par défaut | Description |
+| Broche | GPIO par défaut | Description |
 |-----|--------------|-------------|
 | `oledReset` | -1 | Broche de réinitialisation OLED (-1 si partagée avec la réinitialisation de la carte) |
-| `ledPin` | 25 | Broche de données LED RVB (WS2812B) |
+| `ledPin` | 25 | Broche de données LED RGB (WS2812B) |
 
 ### Broches de pilote
 
-| Épingle | GPIO par défaut | Description |
+| Broche | GPIO par défaut | Description |
 |-----|--------------|-------------|
-| `motorStepPin` | 14 | Signal STEP pas à pas/servo |
-| `motorDirectionPin` | 27 | Signal DIR moteur pas à pas/servo |
-| `motorEnablePin` | 26 | Signal ENA pas à pas/servo |
+| `motorStepPin` | 14 | Signal STEP du moteur pas à pas/servo |
+| `motorDirectionPin` | 27 | Signal DIR du moteur pas à pas/servo |
+| `motorEnablePin` | 26 | Signal ENA du moteur pas à pas/servo |
 | `currentSensorPin` | 36 | Entrée de détection de courant analogique |
 | `stopPin` | 19 | Interrupteur d'arrêt d'urgence (en option) |
 | `limitSwitchPin` | 12 | Entrée de fin de course (en option) |
 
 ### Broches distantes
 
-| Épingle | GPIO par défaut | Description |
+| Broche | GPIO par défaut | Description |
 |-----|--------------|-------------|
 | `speedPotPin` | 34 | Entrée analogique du potentiomètre de vitesse |
 | `encoderSwitch` | 35 | Entrée du bouton de l'encodeur |
-| `encoderA` | 18 | Canal codeur A |
-| `encoderB` | 5 | Canal codeur B |
+| `encoderA` | 18 | Canal de l'encodeur A |
+| `encoderB` | 5 | Canal de l'encodeur B |
 | `displayData` | 21 | I2C SDA pour OLED |
 | `displayClock` | 19 | I2C SCL pour OLED |
 
 ### Broches d'extension GPIO
 
-Ces broches sont disponibles pour les accessoires via [BLE GPIO control](/ossm/software/communication/gpio) :
+Ces broches sont disponibles pour les accessoires via [contrôle GPIO par BLE](/ossm/software/communication/gpio) :
 
-| Épingle logique | GPIO | Description |
+| Broche logique | GPIO | Description |
 |-------------|------|-------------|
-| Broche 1 | GPIO2 | Sortie à usage général |
-| Broche 2 | GPIO15 | Sortie à usage général |
-| Broche 3 | GPIO22 | Sortie à usage général |
-| Broche 4 | GPIO33 | Sortie à usage général |
+| Broche 1 | GPIO 2 | Sortie à usage général |
+| Broche 2 | GPIO 15 | Sortie à usage général |
+| Broche 3 | GPIO 22 | Sortie à usage général |
+| Broche 4 | GPIO 33 | Sortie à usage général |
 
 ## Modification de la configuration
 
@@ -180,30 +180,30 @@ Ouvrez le fichier de configuration correspondant dans votre éditeur :
 - `src/constants/Pins.h` — Affectations des broches matérielles
 </Step>
 
-<Step title="Reconstruire et télécharger">
-Utilisez PlatformIO pour compiler et télécharger le firmware modifié :
+<Step title="Recompiler et téléverser">
+Utilisez PlatformIO pour compiler et téléverser le firmware modifié :
 
 1. Cliquez sur le bouton **Build** pour vérifier la compilation de vos modifications.
-2. Cliquez sur **Télécharger** pour flasher le nouveau firmware
+2. Cliquez sur **Upload** pour flasher le nouveau firmware
 
 <Check>
-Après le téléchargement, l'OSSM redémarrera et utilisera votre nouvelle configuration.
+Après le téléversement, l'OSSM redémarrera et utilisera votre nouvelle configuration.
 </Check>
 </Step>
 </Steps>
 
 <Warning>
-Testez toujours soigneusement les modifications de configuration. Commencez avec des vitesses faibles et vérifiez que la prise en charge se termine avec succès avant un fonctionnement normal.
+Testez toujours soigneusement les modifications de configuration. Commencez avec des vitesses faibles et vérifiez que le référencement se termine avec succès avant un fonctionnement normal.
 </Warning>
 
 ## Pages connexes
 
 <CardGroup cols={2}>
 <Card title="Configuration de PlatformIO" icon="wrench" href="/ossm/software/getting-started/platformio">
-  Configurez votre environnement de développement pour modifier et télécharger le firmware.
+  Configurez votre environnement de développement pour modifier et téléverser le firmware.
 </Card>
 
-<Card title="Caractéristiques de sécurité" icon="shield" href="/ossm/software/getting-started/safety-features">
-  Comprendre comment les valeurs de configuration affectent les systèmes de sécurité.
+<Card title="Fonctionnalités de sécurité" icon="shield" href="/ossm/software/getting-started/safety-features">
+  Comprenez comment les valeurs de configuration affectent les systèmes de sécurité.
 </Card>
 </CardGroup>
