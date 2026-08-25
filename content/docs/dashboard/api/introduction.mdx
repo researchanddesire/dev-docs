@@ -107,10 +107,20 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 
 ## Rate Limiting
 
+Requests are rate limited **per API token**, at a default of **60 requests per
+minute**. When you exceed the limit, the API responds with `429` and the
+standard error envelope:
+
+```json
+{ "ok": false, "error": "Rate limit exceeded" }
+```
+
+The response includes a `Retry-After` header giving the number of seconds to
+wait before retrying.
+
 <Note>
-  The API does not currently enforce strict rate limits, but please be
-  respectful with your request volume. Excessive usage may result in throttling
-  in future releases.
+  If you receive a `429`, wait for the `Retry-After` duration before retrying —
+  requests sent before then will keep returning `429` until the window resets.
 </Note>
 
 ## Permissions and RLS
