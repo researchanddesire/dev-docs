@@ -1,9 +1,0 @@
-{
-  "title": "RADR",
-  "root": true,
-  "pages": [
-    "index",
-    "software",
-    "hardware"
-  ]
-}

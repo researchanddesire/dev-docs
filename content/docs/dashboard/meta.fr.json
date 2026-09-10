@@ -1,8 +1,0 @@
-{
-  "title": "API du tableau de bord",
-  "pages": [
-    "index",
-    "observability",
-    "api"
-  ]
-}
