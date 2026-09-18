@@ -1,0 +1,102 @@
+---
+title: "Exemples côté navigateur"
+description: "Exécutez JavaScript ou TypeScript avec PKCE et une origine enregistrée, sans secret."
+---
+
+Enregistrez **Application navigateur**, authentification `none`, scope `profile:read`,
+retour `http://127.0.0.1:8080/browser.html` et origine `http://127.0.0.1:8080`.
+L’origine n’a ni chemin ni barre finale. Les apps navigateur ne reçoivent et
+n’embarquent aucun secret client.
+
+## Exécuter JavaScript ou TypeScript
+
+Téléchargez <a href="/examples/oauth/browser.html" download>browser.html</a> et un script dans un nouveau
+dossier réservé à la démo. Remplacez `issuer` et `clientId` par votre environnement
+et votre enregistrement navigateur ; `redirectUri` doit correspondre exactement.
+
+<Tabs>
+<Tab title="JavaScript">
+
+Téléchargez <a href="/examples/oauth/browser.js" download>browser.js</a>. Le HTML charge directement ce fichier, sans compilation ni dépendance.
+
+</Tab>
+<Tab title="TypeScript">
+
+Téléchargez <a href="/examples/oauth/browser.ts" download>browser.ts</a>. Il propose le même parcours avec des types. Utilisez votre compilateur ou installez-en un dans le dossier de la démo :
+
+```bash
+pnpm add --save-dev typescript
+pnpm exec tsc browser.ts --target ES2022 --module ES2022 --lib "ES2022,DOM,DOM.Iterable" --strict
+```
+
+Le navigateur charge le JavaScript produit, pas le TypeScript.
+
+</Tab>
+</Tabs>
+
+Dans le dossier de la démo, lancez un serveur local avec Python 3 :
+
+```bash
+python -m http.server 8080 --bind 127.0.0.1
+```
+
+Ouvrez `http://127.0.0.1:8080/browser.html`, connectez le compte, vérifiez l’accès
+au profil, puis déconnectez. Testez aussi le refus. Le serveur expose le contenu du
+dossier : n’y placez aucun identifiant secret. `file://`, un autre port ou
+`localhost` ne correspondent pas à cet enregistrement. Pour un déploiement,
+enregistrez le retour HTTPS et son origine, puis adaptez le script.
+
+## Échange du code
+
+Web Crypto crée l’état et le challenge S256. Seule la transaction temporaire est
+gardée dans `sessionStorage`. Au retour, le script retire la transaction et le code
+de l’URL, puis vérifie état, émetteur et paramètres dupliqués avant l’échange :
+
+```javascript
+export async function exchangeCode(
+  issuer,
+  clientId,
+  redirectUri,
+  code,
+  verifier,
+) {
+  // Invoke only after consuming and validating the initiating transaction.
+  const response = await fetch(new URL("/oauth/token", issuer), {
+    method: "POST",
+    credentials: "omit",
+    redirect: "error",
+    body: new URLSearchParams({
+      grant_type: "authorization_code",
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      code,
+      code_verifier: verifier,
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok)
+    throw new Error(`Token request failed (${response.status})`);
+  return response.json();
+}
+```
+
+Les endpoints de jeton et de révocation acceptent uniquement les origines enregistrées.
+Gardez `credentials: "omit"`, sans cookies du tableau de bord, HTTP Basic ou secret.
+L’API reçoit le jeton Bearer dans Authorization. La démo vérifie les scopes accordés
+avant d’activer l’action de profil.
+
+## Durée de vie et stockage
+
+Le jeton d’accès reste en mémoire ; aucun renouvellement n’est demandé. Rechargez
+la page ou attendez dix minutes et une nouvelle connexion sera nécessaire. Recharger
+ne révoque pas la connexion sur le serveur : déconnectez d’abord ou utilisez ensuite
+**Paramètres → Applications connectées** chez R+D.
+
+Ne stockez pas de jetons Bearer dans les URL, `localStorage` ou la transaction PKCE.
+Pour un accès web persistant, envisagez le [modèle backend](/fr/build-an-app/examples/backend).
+Une persistance navigateur doit tenir compte des scripts et de la rotation stricte.
+
+Évitez scripts tiers et outils d’analyse sur les retours. Le HTML fixe une politique
+no-referrer. Web Crypto exige HTTPS hors développement local. Consultez
+[Web Crypto](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)
+et les [recommandations OAuth](https://www.rfc-editor.org/rfc/rfc9700).

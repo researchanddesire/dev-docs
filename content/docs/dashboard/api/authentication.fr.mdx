@@ -3,11 +3,15 @@ title: "Authentification"
 description: "Créez et gérez des jetons API pour authentifier vos requêtes"
 ---
 
-Toutes les requêtes API nécessitent un jeton API valide transmis dans l'en-tête `Authorization`. Les jetons sont des JWTs signés avec l'identité de votre compte, de sorte que tout accès aux données respecte automatiquement les autorisations de votre compte.
+Vous créez un produit pour d’autres utilisateurs R+D ? Commencez par [Créer une application](/fr/build-an-app) pour l’accès développeur, l’enregistrement et les exemples par plateforme.
+
+Toutes les requêtes API nécessitent un jeton valide dans l’en-tête `Authorization`. Les jetons personnels sont des identifiants opaques associés à votre compte. Les produits tiers peuvent utiliser les [connexions OAuth](/fr/dashboard/api/oauth) lorsqu’elles sont activées dans leur environnement.
 
 <Info>
-  La création de jetons API nécessite un abonnement **Ultra**. Si vous n'en avez pas encore,
-  consultez [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription) pour passer à une formule supérieure.
+  La création de jetons API nécessite un abonnement **Ultra**. Si vous n'en avez
+  pas encore, consultez
+  [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription)
+  pour passer à une formule supérieure.
 </Info>
 
 ## Créer un jeton
@@ -18,8 +22,8 @@ Toutes les requêtes API nécessitent un jeton API valide transmis dans l'en-tê
   </Step>
 
 <Step title="Cliquer sur Créer un jeton">
-  Cliquez sur le bouton **Créer un jeton** et donnez un nom descriptif à votre jeton
-  (par exemple, « Home Assistant Integration » ou « Python Script »).
+  Cliquez sur le bouton **Créer un jeton** et donnez un nom descriptif à votre
+  jeton (par exemple, « Home Assistant Integration » ou « Python Script »).
 </Step>
 
   <Step title="Copier votre jeton">
@@ -80,7 +84,10 @@ La page des paramètres **Clés API** affiche tous vos jetons actifs :
 
 Cliquez sur l'icône de la corbeille à côté d'un jeton pour le révoquer. La révocation est immédiate : les requêtes qui utilisent ce jeton reçoivent immédiatement des réponses `401 Unauthorized`.
 
-<Tip>Révoquez et recréez régulièrement vos jetons, conformément aux bonnes pratiques de sécurité.</Tip>
+<Tip>
+  Révoquez et recréez régulièrement vos jetons, conformément aux bonnes
+  pratiques de sécurité.
+</Tip>
 
 ### Limites des jetons
 
@@ -88,11 +95,11 @@ Vous pouvez avoir jusqu'à **5 jetons actifs** à la fois. Si vous en avez besoi
 
 ## Réponses aux erreurs
 
-| Statut | Signification                                                      |
-| ------ | ------------------------------------------------------------ |
-| `401`  | Jeton manquant, invalide, expiré ou révoqué                         |
+| Statut | Signification                                                                     |
+| ------ | --------------------------------------------------------------------------------- |
+| `401`  | Jeton manquant, invalide, expiré ou révoqué                                       |
 | `403`  | Le jeton est valide, mais vous n'avez pas l'autorisation d'effectuer cette action |
-| `404`  | Ressource introuvable (ou inaccessible avec vos autorisations)      |
+| `404`  | Ressource introuvable (ou inaccessible avec vos autorisations)                    |
 
 <ResponseExample>
 ```json 401 Unauthorized

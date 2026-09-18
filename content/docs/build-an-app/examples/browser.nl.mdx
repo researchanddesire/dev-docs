@@ -1,0 +1,99 @@
+---
+title: "Voorbeelden voor browserclients"
+description: "Voer JavaScript of TypeScript uit met PKCE en geregistreerde origin, zonder geheim."
+---
+
+Registreer **Browsertoepassing**, authenticatie `none`, scope `profile:read`,
+callback `http://127.0.0.1:8080/browser.html` en origin `http://127.0.0.1:8080`.
+De origin heeft geen pad of afsluitende slash. Browserapps krijgen en bevatten geen clientgeheim.
+
+## JavaScript of TypeScript uitvoeren
+
+Download <a href="/examples/oauth/browser.html" download>browser.html</a> en één scriptvariant naar een
+nieuwe map met alleen demobestanden. Vervang `issuer` en `clientId` bovenaan door
+je omgeving en browserregistratie; `redirectUri` moet exact overeenkomen.
+
+<Tabs>
+<Tab title="JavaScript">
+
+Download <a href="/examples/oauth/browser.js" download>browser.js</a>. De HTML laadt het direct, zonder buildstap of afhankelijkheden.
+
+</Tab>
+<Tab title="TypeScript">
+
+Download <a href="/examples/oauth/browser.ts" download>browser.ts</a>. Dit biedt dezelfde flow met typen. Gebruik je compiler of installeer er een in de demomap:
+
+```bash
+pnpm add --save-dev typescript
+pnpm exec tsc browser.ts --target ES2022 --module ES2022 --lib "ES2022,DOM,DOM.Iterable" --strict
+```
+
+De browser laadt het gemaakte JavaScript, niet TypeScript.
+
+</Tab>
+</Tabs>
+
+Start vanuit de demomap een lokale server met Python 3:
+
+```bash
+python -m http.server 8080 --bind 127.0.0.1
+```
+
+Open `http://127.0.0.1:8080/browser.html`, koppel je account, controleer profieltoegang
+en ontkoppel. Test ook weigering. De server deelt de inhoud van de map: plaats daar
+geen geheime gegevens. `file://`, een andere poort of `localhost` passen niet bij
+de registratie. Registreer voor deployment je HTTPS-callback en origin en pas het script aan.
+
+## Code-uitwisseling
+
+Web Crypto maakt state en een S256-challenge. Alleen de tijdelijke transactie wordt
+in `sessionStorage` bewaard. Bij terugkeer verwijdert het script de transactie en
+de code uit de URL en controleert het state, issuer en dubbele parameters:
+
+```javascript
+export async function exchangeCode(
+  issuer,
+  clientId,
+  redirectUri,
+  code,
+  verifier,
+) {
+  // Invoke only after consuming and validating the initiating transaction.
+  const response = await fetch(new URL("/oauth/token", issuer), {
+    method: "POST",
+    credentials: "omit",
+    redirect: "error",
+    body: new URLSearchParams({
+      grant_type: "authorization_code",
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      code,
+      code_verifier: verifier,
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok)
+    throw new Error(`Token request failed (${response.status})`);
+  return response.json();
+}
+```
+
+De token- en intrekkingsendpoints accepteren alleen geregistreerde browser-origins.
+Behoud `credentials: "omit"`, zonder dashboardcookies, HTTP Basic of geheim. API-calls
+sturen het Bearer-token in Authorization. De demo controleert scopes voordat de
+profielactie beschikbaar wordt.
+
+## Levensduur en opslag
+
+Het access-token blijft in het geheugen; de demo vraagt geen refresh-token. Na
+herladen of tien minuten is opnieuw koppelen nodig. Herladen trekt de serverkoppeling
+niet in: ontkoppel eerst of gebruik daarna **Instellingen → Verbonden apps** bij R+D.
+
+Bewaar Bearer-tokens niet in URL’s, `localStorage` of de PKCE-transactie. Overweeg
+voor blijvende webtoegang het [backendpatroon](/nl/build-an-app/examples/backend).
+Browseropslag moet rekening houden met scripttoegang en strikte refresh-rotatie.
+
+Houd callbacks vrij van externe scripts en analyses. De HTML stelt no-referrer in.
+Web Crypto vereist HTTPS buiten lokale ontwikkeling. Zie
+[Web Crypto](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)
+en de [OAuth-beveiligingsaanbevelingen](https://www.rfc-editor.org/rfc/rfc9700).

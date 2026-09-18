@@ -1,0 +1,109 @@
+---
+title: "Koppelvoorbeelden"
+description: "Kies een OAuth-voorbeeld voor je backend, native toepassing of browser."
+---
+
+Begin na het [maken van je toepassing](/nl/build-an-app/first-application). Alle voorbeelden
+gebruiken autorisatiecodes met S256 PKCE en lezen alleen het gekoppelde profiel.
+
+| Voorbeeld                                            | Talen                                 | Inhoud                                                           |
+| ---------------------------------------------------- | ------------------------------------- | ---------------------------------------------------------------- |
+| [Backend-OAuth](/nl/build-an-app/examples/backend)   | TypeScript / Node.js 24, Python 3.11+ | Helpers voor toestemming, callback, API, vernieuwen en intrekken |
+| [Native / desktop](/nl/build-an-app/examples/native) | JavaScript / Node.js 24, Python 3.11+ | Uitvoerbare demo’s met systeembrowser en IP-loopback             |
+| [Browser](/nl/build-an-app/examples/browser)         | JavaScript, TypeScript                | HTML-demo met publieke client en token in het geheugen           |
+
+De voorbeelden gebruiken standaardbibliotheken. Backend-helpers vereisen sessies en
+opslag van je eigen framework. Native en browserdemo’s werken na registratie en
+configuratie. Dit zijn leervoorbeelden, geen SDK of volledige productie-app.
+
+## Video: een account koppelen en ontkoppelen
+
+Stille opname van de lokale app met fictieve accounts. De interface is Engels; ondertitels zijn beschikbaar in het Engels, Duits, Frans en Nederlands.
+
+Deze opname gebruikt een backendapp en een geaccepteerde tester. Je ziet toestemming, een echte code-uitwisseling en intrekking, maar geen API-gegevensverzoek. Toestemming geven en ontkoppelen werken hetzelfde voor native en browserclients.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Video: een account koppelen en ontkoppelen"
+  poster="/videos/oauth/link-account.png"
+>
+  <source src="/videos/oauth/link-account.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+    default
+  />
+  Je browser kan deze video niet afspelen. Gebruik de download of het transcript
+  hieronder.
+</video>
+
+<a href="/videos/oauth/link-account.webm" download>
+  Video downloaden (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Videotranscript">
+    <p><strong>0:00</strong> Een geaccepteerde tester opent de externe app en kiest ‘Link your R+D account’.</p>
+
+    <p><strong>0:08</strong> R+D toont de app en de gevraagde rechten. Controleer deze voordat je toegang toestaat.</p>
+
+    <p><strong>0:14</strong> Kies ‘Allow selected permissions’. De browser keert terug naar de callback van de app.</p>
+
+    <p><strong>0:19</strong> De server controleert de callback en wisselt de code uit met PKCE. De tokens blijven op de server.</p>
+
+    <p><strong>0:25</strong> Open R+D-instellingen → Verbonden apps om toegang te bekijken of te verwijderen.</p>
+
+    <p><strong>0:32</strong> Kies ‘Disconnect’. De app kan deze koppeling niet meer gebruiken voor API-toegang.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## De gedeelde uitwisseling
+
+1. Maak willekeurige state en een PKCE-verifier voor de gebruiker die de koppeling start.
+2. Open `/oauth/authorize` met client-ID, exacte callback, scope, state en S256-challenge.
+3. Verbruik de transactie één keer en controleer `state` en `iss`, ook bij weigering.
+4. Stuur code, callback en verifier als formulier naar `/oauth/token`. Backends authenticeren zich ook.
+5. Lees de verleende scopes en stuur het Bearer-token alleen naar toegestane API-operaties.
+
+Gebruik een vaste issuer per omgeving. Metadata staat op
+`/.well-known/oauth-authorization-server`; kies nooit een tokenendpoint uit een
+ongecontroleerde `iss`. Tokens zijn ondoorzichtig en geen OpenID Connect-ID-tokens.
+
+## Fouten afhandelen
+
+Controleer bij `access_denied` state en issuer en blijf ontkoppeld. Wijs onverwachte,
+dubbele of verlopen callbackparameters af zonder code-uitwisseling. Gebruik een
+afgewezen code niet opnieuw; controleer PKCE, callback, omgeving en clientauthenticatie.
+Vernieuw bij `401` indien mogelijk één keer veilig of koppel opnieuw; controleer bij
+`403` scopes en account-/apparaatrechten; wacht bij `429` op `Retry-After`.
+Probeer een oud refresh-token nooit opnieuw na een onduidelijk resultaat.
+
+Access-tokens blijven tien minuten geldig. De demo’s vragen geen `offline_access`.
+De limiet is 60 API-aanvragen per minuut, app en gebruiker. Zie de
+[OAuth-referentie](/nl/dashboard/api/oauth) voor alle levensduurregels.

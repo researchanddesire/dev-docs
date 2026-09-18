@@ -1,0 +1,102 @@
+---
+title: "Beispiele für Browser-Clients"
+description: "Starten Sie JavaScript oder TypeScript mit PKCE und registriertem Ursprung, ohne Geheimnis."
+---
+
+Registrieren Sie **Browser-Anwendung**, Authentifizierung `none`, Scope `profile:read`,
+Rückruf `http://127.0.0.1:8080/browser.html` und Ursprung `http://127.0.0.1:8080`.
+Der Ursprung hat keinen Pfad oder abschließenden Schrägstrich. Browser-Apps erhalten
+und speichern kein Client-Geheimnis.
+
+## JavaScript oder TypeScript starten
+
+Laden Sie <a href="/examples/oauth/browser.html" download>browser.html</a> und eine Skriptvariante in ein
+neues Verzeichnis nur für die Demo. Ersetzen Sie oben im Skript `issuer` und
+`clientId` durch Ihre Umgebung und Browser-Registrierung; `redirectUri` muss genau passen.
+
+<Tabs>
+<Tab title="JavaScript">
+
+Laden Sie <a href="/examples/oauth/browser.js" download>browser.js</a> herunter. Die HTML-Datei lädt dieses Skript direkt, ohne Build-Schritt oder Abhängigkeiten.
+
+</Tab>
+<Tab title="TypeScript">
+
+Laden Sie <a href="/examples/oauth/browser.ts" download>browser.ts</a> herunter. Es implementiert denselben Ablauf mit Typen. Verwenden Sie einen vorhandenen Compiler oder installieren Sie ihn nur im Demo-Verzeichnis:
+
+```bash
+pnpm add --save-dev typescript
+pnpm exec tsc browser.ts --target ES2022 --module ES2022 --lib "ES2022,DOM,DOM.Iterable" --strict
+```
+
+Der Browser lädt das erzeugte JavaScript, nicht den TypeScript-Quelltext.
+
+</Tab>
+</Tabs>
+
+Starten Sie im Demo-Verzeichnis einen lokalen Server mit Python 3:
+
+```bash
+python -m http.server 8080 --bind 127.0.0.1
+```
+
+Öffnen Sie `http://127.0.0.1:8080/browser.html`, verbinden Sie das Konto, prüfen Sie
+den Profilzugriff und trennen Sie die Verbindung. Testen Sie auch Ablehnung. Der
+statische Server gibt Verzeichnisinhalte frei; dort dürfen keine Zugangsdaten liegen.
+`file://`, andere Ports oder `localhost` passen nicht zur Registrierung. In einer
+bereitgestellten App registrieren Sie HTTPS-Rückruf und Ursprung und ändern das Skript.
+
+## Codeaustausch
+
+Web Crypto erzeugt State und S256-Challenge. Nur die kurzlebige Transaktion wird in
+`sessionStorage` gespeichert. Beim Rückruf entfernt das Skript die Transaktion und
+den Code aus der URL und prüft State, Issuer und doppelte Parameter vor dem Austausch:
+
+```javascript
+export async function exchangeCode(
+  issuer,
+  clientId,
+  redirectUri,
+  code,
+  verifier,
+) {
+  // Invoke only after consuming and validating the initiating transaction.
+  const response = await fetch(new URL("/oauth/token", issuer), {
+    method: "POST",
+    credentials: "omit",
+    redirect: "error",
+    body: new URLSearchParams({
+      grant_type: "authorization_code",
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      code,
+      code_verifier: verifier,
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok)
+    throw new Error(`Token request failed (${response.status})`);
+  return response.json();
+}
+```
+
+Token- und Widerrufs-Endpunkte erlauben nur registrierte Browser-Ursprünge. Verwenden
+Sie `credentials: "omit"`, keine Dashboard-Cookies, kein HTTP Basic und kein Geheimnis.
+API-Anfragen senden den Bearer-Token im Authorization-Header. Die Demo prüft erteilte
+Scopes, bevor die Profilaktion freigegeben wird.
+
+## Token-Lebensdauer und Speicherung
+
+Das Access-Token bleibt nur im Arbeitsspeicher; die Demo fordert kein Refresh-Token
+an. Nach Neuladen oder Ablauf von zehn Minuten ist eine neue Verbindung nötig.
+Neuladen widerruft keine serverseitige Verbindung. Trennen Sie vorher oder nutzen
+Sie danach **Einstellungen → Verbundene Apps** bei R+D.
+
+Speichern Sie Bearer-Token nicht in URLs, `localStorage` oder der PKCE-Transaktion.
+Für dauerhaften Webzugriff eignet sich das [Backend-Muster](/de/build-an-app/examples/backend).
+Browser-Persistenz muss Skriptzugriff auf Zugangsdaten und strikte Refresh-Rotation berücksichtigen.
+
+Halten Sie Rückrufseiten frei von fremden Skripten und Analysen. Die HTML-Demo setzt
+eine No-Referrer-Richtlinie. Web Crypto benötigt außerhalb lokaler Entwicklung HTTPS.
+Siehe [Web Crypto](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)
+und [OAuth-Sicherheit](https://www.rfc-editor.org/rfc/rfc9700).

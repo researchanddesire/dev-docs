@@ -1,0 +1,143 @@
+---
+title: "Connect accounts with OAuth"
+description: "Register an integration, invite testers, and request account permissions with OAuth 2.0"
+---
+
+Building a product for other R+D users? Start with [Build an app](/build-an-app) for developer access, registration, and platform-specific examples. This page is the protocol reference.
+
+OAuth is available when enabled for your environment. Request developer access at
+`/app/developers`. This page is intentionally absent from the dashboard navigation.
+Personal API tokens continue to work independently.
+
+## Register an app
+
+Submit your developer application, including your integration and data-use details.
+After approval, create an app with its name, website, privacy policy, support email,
+callback URLs, and requested scopes. Each app has its own review.
+
+Choose one platform per registration:
+
+| Platform         | Client authentication                                                  | Callback requirements                                                                                                  |
+| ---------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Backend          | `client_secret_basic` (recommended) or registered `client_secret_post` | Exact HTTPS URL; loopback HTTP for development                                                                         |
+| Browser          | `none`; never embed a secret                                           | Exact callback and browser origin                                                                                      |
+| Native / desktop | `none`; use the system browser                                         | Reviewed app identifier and callback ownership evidence; claimed HTTPS, reverse-domain scheme, or IP-loopback listener |
+
+All platforms require **S256 PKCE**. An account can register five apps and an app
+can register ten callbacks. Wildcards, URL credentials and fragments are rejected.
+Native IP-loopback callbacks may vary their port; the actual URL is bound to the code.
+
+Before first app approval, its owner can invite **five additional R+D accounts** by
+exact email address or username search. Pending and accepted invitations both count.
+Invitees accept under `/app/developers` and can then test account linking. Invitations
+grant testing access only; they do not grant app management or partner/device access.
+Removing an invite also revokes that account's app connections.
+
+App changes create a new review submission. The current approved configuration remains
+active while the new submission is reviewed. Removing scopes restricts existing grants
+immediately. Approval revokes prior connections so users can review the new configuration.
+Disabling or suspending an app revokes connections; restoring it requires fresh consent.
+
+## Authorization code flow
+
+Use the issuer for your environment, such as `https://staging.researchanddesire.com`.
+Discover endpoints from `/.well-known/oauth-authorization-server`. Production and staging
+registrations and tokens are separate.
+
+Generate a cryptographically random `state` and a new PKCE verifier for each login:
+
+```javascript
+import { randomBytes, createHash } from "node:crypto";
+
+const state = randomBytes(32).toString("base64url");
+const verifier = randomBytes(32).toString("base64url");
+const challenge = createHash("sha256").update(verifier).digest("base64url");
+const url = new URL("/oauth/authorize", issuer);
+url.search = new URLSearchParams({
+  response_type: "code",
+  client_id: clientId,
+  redirect_uri: callbackUrl,
+  scope: "profile:read lkbx:read lkbx:control offline_access",
+  state,
+  code_challenge: challenge,
+  code_challenge_method: "S256",
+});
+// Store state and verifier in the initiating user's session, then redirect to url.
+```
+
+The user signs in, sees the app's identity and permissions, and allows a subset or cancels.
+Shared-account access and offline access require separate opt-in on the consent form.
+At your callback, validate `state` and the returned `iss` against the initiating session.
+Handle `error=access_denied`; otherwise exchange `code` immediately:
+
+```bash
+curl "$ISSUER/oauth/token" \
+  --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "grant_type=authorization_code" \
+  --data-urlencode "code=$CODE" \
+  --data-urlencode "redirect_uri=$CALLBACK_URL" \
+  --data-urlencode "code_verifier=$VERIFIER"
+```
+
+Public browser/native clients omit HTTP Basic and send `client_id` in the form body.
+Use one client authentication method per request. Token endpoints accept form encoding,
+not JSON. Browser token requests must originate from a registered browser origin and
+must not include cookies.
+
+The response contains `access_token`, `token_type: "Bearer"`, `expires_in`, and the actual
+`scope`. A `refresh_token` is returned only when the user grants `offline_access`.
+Treat tokens as opaque; use the granted scope rather than assuming all requested scopes
+were accepted. No Supabase JWT or OpenID Connect ID token is returned.
+
+```bash
+curl "$ISSUER/api/v1/users/me" -H "Authorization: Bearer $ACCESS_TOKEN"
+```
+
+## Scopes
+
+| Scope             | Access                                                                                         |
+| ----------------- | ---------------------------------------------------------------------------------------------- |
+| `profile:read`    | Account ID and profile information                                                             |
+| `lkbx:read`       | Lockbox devices, templates, sessions and state                                                 |
+| `lkbx:control`    | Start/end locks and adjust durations within existing permissions                               |
+| `lkbx:keyholders` | Assign keyholders when starting a lock; also requires `lkbx:control`                           |
+| `dtt:read`        | DTT devices, templates, history and statistics                                                 |
+| `dtt:write`       | Edit and activate DTT templates                                                                |
+| `ossm:read`       | OSSM device information; no remote control                                                     |
+| `shared:access`   | Extend granted product scopes to accounts the user can manage, including accounts linked later |
+| `offline_access`  | Receive rotating refresh tokens                                                                |
+
+Without `shared:access`, only the consenting account's resources are accessible, including
+by ID and through aliases. Scope permissions do not override account sharing, keyholder,
+self-lock or other device rules. Unknown routes and methods are denied. OAuth responses
+omit pairing codes, internal identifiers and other fields outside the external contract.
+Training statistics on profile endpoints also require `dtt:read`.
+
+## Refresh, revoke and rotate
+
+Authorization codes last five minutes and can be used once. Access tokens last ten minutes.
+Refresh tokens expire after 30 days without use and at most 180 days after initial consent.
+Each successful refresh replaces the refresh token. Serialize refreshes per connection
+and persist the replacement atomically. Reusing any prior refresh token revokes its entire
+family, including access tokens issued from that family. There is no replay grace period;
+after an ambiguous refresh outcome, the user may need to reconnect.
+
+```bash
+curl "$ISSUER/oauth/token" --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "grant_type=refresh_token" \
+  --data-urlencode "refresh_token=$REFRESH_TOKEN"
+
+curl "$ISSUER/oauth/revoke" --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "token=$REFRESH_TOKEN"
+```
+
+Revocation disconnects that grant. Unknown tokens return success without revealing whether
+they existed. Users can disconnect all grants for an app under **Settings → Connected apps**.
+API calls are limited to 60 requests per minute per app and user; respect `429` and `Retry-After`.
+
+Backend secrets are shown once. Normal rotation gives the previous secret a 24-hour overlap,
+with at most two active secrets. Emergency rotation invalidates previous secrets and user
+connections immediately. Store secrets on your backend, outside source control and logs.
+
+Webhooks, client-credentials grants, password grants, implicit grants, dynamic client
+registration and OpenID Connect are outside this version.

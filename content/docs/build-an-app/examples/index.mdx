@@ -1,0 +1,116 @@
+---
+title: "Connection examples"
+description: "Choose an OAuth example for your backend, native app, or browser client."
+---
+
+Start after [creating your application](/build-an-app/first-application). Each example
+uses the same R+D authorization-code flow with S256 PKCE and reads only the connected
+user's profile. Choose the platform you registered, not just your preferred language.
+
+| Example                                               | Languages                              | What you get                                                                                   |
+| ----------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [Backend OAuth](/build-an-app/examples/backend)       | TypeScript on Node.js 24, Python 3.11+ | Framework-independent helpers for authorization, callbacks, API calls, refresh, and revocation |
+| [Native / desktop](/build-an-app/examples/native)     | JavaScript on Node.js 24, Python 3.11+ | Runnable local demos using the system browser and an IP-loopback callback                      |
+| [Client-side browser](/build-an-app/examples/browser) | JavaScript, TypeScript                 | A runnable HTML demo with a public client, registered origin, and in-memory access token       |
+
+These examples use standard libraries and browser APIs. The backend helpers need
+your framework's authenticated session and storage adapter. The native and browser
+demos can be run after registering their callbacks and setting your own client ID.
+They are teaching examples, not an R+D SDK or a complete production application.
+
+## Watch: link and disconnect an account
+
+Silent recording of the local app with synthetic accounts. The interface is in English; captions are available in English, German, French, and Dutch.
+
+This walkthrough uses a backend app and an accepted tester. It shows consent, a real code exchange, and revocation; it does not demonstrate an API data request. The same consent and disconnect steps apply to native and browser clients.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Watch: link and disconnect an account"
+  poster="/videos/oauth/link-account.png"
+>
+  <source src="/videos/oauth/link-account.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.en.vtt"
+    srcLang="en"
+    label="English"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Your browser cannot play this video. Use the download link or transcript
+  below.
+</video>
+
+<a href="/videos/oauth/link-account.webm" download>
+  Download video (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Video transcript">
+    <p><strong>0:00</strong> An accepted tester starts in the third-party app and chooses Link your R+D account.</p>
+
+    <p><strong>0:08</strong> R+D shows the app identity and requested permissions. Review these before allowing access.</p>
+
+    <p><strong>0:14</strong> Choose Allow selected permissions. The browser returns to the app callback.</p>
+
+    <p><strong>0:19</strong> The server validates the callback and exchanges the code with PKCE. Tokens stay on the server.</p>
+
+    <p><strong>0:25</strong> To review or remove access, open R+D Settings → Connected apps.</p>
+
+    <p><strong>0:32</strong> Choose Disconnect. The app can no longer use this connection for API access.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## The exchange all platforms share
+
+1. Create fresh random `state` and a PKCE verifier for this connection attempt. Retain them in the initiating user's session.
+2. Open your configured issuer's `/oauth/authorize` with `response_type=code`, client ID, callback, scope, state, and the S256 challenge.
+3. At the callback, consume the pending transaction once. Check `state` and `iss` before handling approval or denial.
+4. Send the code, the exact callback, and the verifier to `/oauth/token` using form encoding. Backend clients also authenticate with their registered secret method.
+5. Read the granted `scope`. Send `Authorization: Bearer ...` to the API only for features the user authorized.
+
+Use one fixed issuer for each environment. Discover its endpoints through
+`/.well-known/oauth-authorization-server`; never choose a token endpoint from an
+unvalidated callback's `iss`. Staging and production registrations and tokens are
+separate. OAuth tokens are opaque and are not OpenID Connect ID tokens.
+
+## Errors to handle
+
+| Result                                                                      | App behavior                                                                                                 |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `error=access_denied` at callback                                           | Validate state and issuer, consume the attempt, and return the user to an unconnected state                  |
+| Unexpected state, issuer, duplicate callback parameters, or expired attempt | Reject the response without exchanging the code; start a new attempt                                         |
+| Token endpoint rejects the code                                             | Do not reuse it; verify callback, PKCE, environment, and the registered client-authentication method         |
+| API `401`                                                                   | Access may have expired or been revoked; refresh once if you have a valid refresh token, otherwise reconnect |
+| API `403`                                                                   | Check granted scopes and existing account/device permissions                                                 |
+| API `429`                                                                   | Wait for `Retry-After` before sending another request                                                        |
+| Refresh timeout or an ambiguous response                                    | Do not retry the old refresh token; reconnect if you cannot recover the stored replacement                   |
+
+Access tokens last ten minutes. The samples omit `offline_access`; the backend guide
+explains how to add it when needed. OAuth API traffic is limited to 60 requests per
+minute per app and user. See the [protocol reference](/dashboard/api/oauth) for the
+complete scope and token lifecycle rules.

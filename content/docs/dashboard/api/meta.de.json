@@ -1,8 +1,4 @@
 {
   "title": "API-Übersicht",
-  "pages": [
-    "introduction",
-    "authentication",
-    "shared-access"
-  ]
+  "pages": ["introduction", "authentication", "oauth", "shared-access"]
 }

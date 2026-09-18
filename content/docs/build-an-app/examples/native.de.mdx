@@ -1,0 +1,109 @@
+---
+title: "Beispiele für native und Desktop-Apps"
+description: "Testen Sie JavaScript und Python mit Systembrowser und ohne Client-Geheimnis."
+---
+
+Registrieren Sie **Native / Desktop**, Authentifizierung `none`, Scope
+`profile:read` und Rückruf `http://127.0.0.1/callback`. Geben Sie App-Kennung und
+Nachweis zur Kontrolle des Rückrufs an. Beschreiben Sie bei einem Prototyp den lokalen
+IP-Loopback-Listener und Ihre Anwendung bzw. Ihr Repository. Der tatsächliche Rückruf
+enthält einen vom Betriebssystem gewählten Port.
+
+Die Demos öffnen den Systembrowser, empfangen einen Rückruf an `127.0.0.1`, prüfen
+State, Issuer und PKCE, lesen das Profil und widerrufen die Verbindung. Sie zeigen
+keine Kontodaten und speichern keine Token auf der Festplatte. Während der Prüfung
+können Eigentümer und akzeptierte Tester zustimmen.
+
+## Demo starten
+
+Setzen Sie `RD_ISSUER` und die native `RD_CLIENT_ID`. Verwenden Sie kein Geheimnis.
+Speichern Sie die zwei Dateien Ihrer Sprache im selben Verzeichnis:
+
+<Tabs>
+<Tab title="JavaScript">
+
+Laden Sie <a href="/examples/oauth/native-node.mjs" download>native-node.mjs</a> und <a href="/examples/oauth/rd-oauth.ts" download>rd-oauth.ts</a> herunter. Node.js 24 führt das löschbare TypeScript direkt aus; Installation oder Kompilierung sind nicht nötig.
+
+```bash
+node native-node.mjs
+```
+
+Der Kern verwendet dieselbe Transaktion von Start bis Rückruf:
+
+```javascript
+import { beginLink, finishLink, readProfile, revoke } from "./rd-oauth.ts";
+
+// In the complete demo, redirectUri includes the bound loopback listener's port.
+export function startNativeConnection(issuer, clientId, redirectUri) {
+  const config = { issuer, clientId, redirectUri };
+  const started = beginLink(config, "profile:read");
+  return { config, ...started };
+}
+
+export async function completeNativeConnection(
+  config,
+  callbackUrl,
+  transaction,
+) {
+  // The listener consumes the transaction once before invoking this function.
+  const tokens = await finishLink(config, callbackUrl, transaction);
+  try {
+    await readProfile(config, tokens);
+  } finally {
+    await revoke(config, tokens.access_token);
+  }
+}
+```
+
+</Tab>
+<Tab title="Python">
+
+Laden Sie <a href="/examples/oauth/native_python.py" download>native_python.py</a> und <a href="/examples/oauth/rd_oauth.py" download>rd_oauth.py</a> herunter. Python 3.11+ genügt; unter Windows kann `py` statt `python` verwendet werden.
+
+```bash
+python native_python.py
+```
+
+Der Listener wird vor der Autorisierung gebunden:
+
+```python
+from http.server import HTTPServer
+from native_python import Callback
+from rd_oauth import begin_link
+
+def prepare_listener(issuer, client_id):
+    server = HTTPServer(("127.0.0.1", 0), Callback)
+    server.config = {
+        "issuer": issuer,
+        "client_id": client_id,
+        "redirect_uri": f"http://127.0.0.1:{server.server_port}/callback",
+    }
+    server.completed = False
+    url, server.transaction = begin_link(server.config, "profile:read")
+    return server, url
+```
+
+</Tab>
+</Tabs>
+
+Erlauben Sie die Verbindung oder testen Sie die Ablehnung. Bei Erfolg erscheint
+„Profile request succeeded.“ Das Token wird danach widerrufen. Starten Sie das Skript
+für einen neuen Versuch erneut; der Listener läuft nach zehn Minuten ab.
+
+## In eine ausgelieferte App übernehmen
+
+Verwenden Sie den Authentifizierungsbrowser und Rückrufmechanismus des Betriebssystems.
+Betten Sie die Anmeldung nicht in eine WebView ein und liefern Sie kein Backend-Geheimnis
+mit aus. PKCE bindet den Code an die initiierende App-Instanz. Siehe
+[OAuth für native Apps, RFC 8252](https://www.rfc-editor.org/rfc/rfc8252).
+
+Mobile Apps registrieren beanspruchte HTTPS-Adressen oder geprüfte Reverse-Domain-Schemata.
+Auf Apple-Plattformen verwenden Sie
+[ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession)
+mit Präsentationskontext und registriertem Rückruf. Behalten Sie State-, Issuer-,
+Verifier- und Einmaligkeitsprüfungen bei.
+
+Für dauerhafte Verbindungen benötigen Sie ausdrücklich `offline_access` und den
+geschützten Zugangsdaten-Speicher des Betriebssystems. Erneuern Sie seriell und
+speichern Sie Ersatz-Token atomar gemäß [OAuth-Regeln](/de/dashboard/api/oauth).
+Halten Sie Rückrufe und Token aus Absturzberichten und Protokollen heraus.

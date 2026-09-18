@@ -1,0 +1,46 @@
+---
+title: "Een app voor R+D bouwen"
+description: "Verbind je product met accounts, gegevens en ondersteunde apparaatacties van Research and Desire."
+---
+
+Bouw een externe toepassing die Research and Desire in je product integreert.
+Met toestemming van gebruikers kun je via de Dashboard-API hun platformgegevens
+lezen en ondersteunde acties uitvoeren. Een relatiebeheerder kan Lockbox-activiteit
+tonen; een trainingsapp kan de DTT-geschiedenis gebruiken.
+
+De gebruiker kiest **R+D-account koppelen**, meldt zich bij R+D aan en beoordeelt de
+gevraagde rechten. OAuth geeft je app beperkte toegang zonder dat gebruikers een
+persoonlijk API-token hoeven te kopiëren. Ze kunnen de koppeling intrekken in hun R+D-instellingen.
+
+## Wat kun je bouwen?
+
+| Functie                         | Gegevens of acties                                                          | Rechten                                                                     |
+| ------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Een gekoppeld account herkennen | Accountidentiteit en openbare profielvelden                                 | `profile:read`                                                              |
+| Lockbox-activiteit tonen        | Apparaten, sjablonen, sessies en huidige vergrendeling                      | `lkbx:read`                                                                 |
+| Een vergrendelsessie beheren    | Vergrendeling starten/beëindigen en duur aanpassen binnen bestaande rechten | `lkbx:control`; voeg `lkbx:keyholders` toe voor sleutelhouders bij de start |
+| Een trainingsapp maken          | DTT-apparaten, sjablonen, geschiedenis en statistieken                      | `dtt:read`; `dtt:write` om sjablonen te bewerken/activeren                  |
+| OSSM-apparaten tonen            | OSSM-apparaatinformatie                                                     | `ossm:read`                                                                 |
+
+Vraag alleen noodzakelijke rechten. De gebruiker kan een deel toestaan. Regels voor
+accountdeling, sleutelhouders, zelfvergrendeling en producten blijven gelden. De
+[API-referentie](/nl/api-reference) beschrijft endpoints; de [OAuth-referentie](/nl/dashboard/api/oauth)
+beschrijft rechten.
+
+Toegang geldt eerst alleen voor het toestemmende account. `shared:access` breidt
+productrechten uit naar accounts die de gebruiker kan beheren, ook later gekoppelde
+accounts. `offline_access` laat je app werken terwijl de gebruiker afwezig is. Beide
+vereisen afzonderlijke toestemming. Deze versie biedt geen webhooks of OSSM-bewegingsbediening
+via de cloud. Directe interfaces staan bij [OSSM BLE](/nl/ossm/software/communication/ble),
+[RADR](/nl/radr) en [DTT](/nl/dtt/specs/accessory-port).
+
+## Van idee naar eerste koppeling
+
+1. [Ontwikkelaarstoegang aanvragen](/nl/build-an-app/getting-started): beschrijf je product en gegevensgebruik.
+2. [Je eerste toepassing maken](/nl/build-an-app/first-application): kies het platform, registreer callbacks en nodig maximaal vijf testers uit.
+3. [Een voorbeeld kiezen](/nl/build-an-app/examples): backend, native app of browser in TypeScript, JavaScript of Python.
+4. [Productfuncties toevoegen](/nl/api-reference): doe API-aanvragen met de verleende rechten.
+
+Goedkeuring als ontwikkelaar laat je apps registreren. Iedere app heeft vervolgens
+eigen goedkeuring nodig voordat anderen dan de eigenaar en geaccepteerde testers
+kunnen koppelen. OAuth moet in de gebruikte omgeving zijn ingeschakeld.

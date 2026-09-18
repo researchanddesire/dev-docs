@@ -1,0 +1,116 @@
+---
+title: "Demander un accès développeur"
+description: "Demandez un compte développeur avant d’enregistrer des applications pour d’autres utilisateurs R+D."
+---
+
+L’accès développeur autorise votre propre compte R+D à enregistrer des applications
+OAuth pour d’autres utilisateurs. Un jeton personnel sert aux scripts de votre compte ;
+OAuth permet à chaque personne d’accorder ses propres permissions à votre produit.
+
+## Vidéo : demander l’accès développeur
+
+Enregistrement sans son de l’application locale avec des comptes fictifs. L’interface est en anglais ; les sous-titres sont disponibles en anglais, allemand, français et néerlandais.
+
+Le passage à l’approbation est simulé pour cette démonstration. R+D examine les vraies demandes séparément ; envoyer le formulaire n’accorde pas l’approbation.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Vidéo : demander l’accès développeur"
+  poster="/videos/oauth/apply-for-access.png"
+>
+  <source src="/videos/oauth/apply-for-access.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.fr.vtt"
+    srcLang="fr"
+    label="Français"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Votre navigateur ne peut pas lire cette vidéo. Utilisez le téléchargement ou
+  la transcription ci-dessous.
+</video>
+
+<a href="/videos/oauth/apply-for-access.webm" download>
+  Télécharger la vidéo (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Transcription de la vidéo">
+    <p><strong>0:00</strong> Connectez-vous, puis ouvrez directement /app/developers. Cette page est masquée dans la navigation du tableau de bord.</p>
+
+    <p><strong>0:04</strong> Indiquez votre nom de développeur, votre site HTTPS et votre adresse de contact.</p>
+
+    <p><strong>0:09</strong> Décrivez votre intégration et la manière dont vous utiliserez, protégerez et supprimerez les données.</p>
+
+    <p><strong>0:15</strong> Sélectionnez les produits à prendre en charge, puis envoyez votre demande.</p>
+
+    <p><strong>0:21</strong> Votre demande est en attente. R+D examine les candidatures de développeurs séparément.</p>
+
+    <p><strong>0:25</strong> Plus tard, une fois votre compte développeur approuvé par R+D, la création d’applications devient disponible.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## Ouvrir le portail développeur
+
+Connectez-vous au compte qui possédera vos applications et ouvrez directement
+`/app/developers`. Cette page est volontairement absente de la navigation du tableau de bord.
+
+| Environnement | Portail                                                                      | Émetteur                                  |
+| ------------- | ---------------------------------------------------------------------------- | ----------------------------------------- |
+| Staging       | [Portail staging](https://staging.researchanddesire.com/app/developers)      | `https://staging.researchanddesire.com`   |
+| Production    | [Portail production](https://dashboard.researchanddesire.com/app/developers) | `https://dashboard.researchanddesire.com` |
+
+Utilisez l’environnement activé par R+D pour votre intégration. Si la page n’est pas
+disponible, contactez R+D. Demandes développeur, enregistrements, données de compte,
+identifiants et jetons sont distincts entre environnements. Un test en staging
+n’autorise pas une application de production.
+
+## Préparer la demande
+
+Indiquez votre nom de développeur ou d’organisation, un site HTTPS, une adresse de
+contact, une description de l’intégration, l’utilisation des données et les produits
+visés (Lockbox, DTT et/ou OSSM). Précisez les données lues ou modifiées, les raisons,
+ainsi que leur stockage, leur conservation et leur suppression.
+
+Par exemple, un gestionnaire de relations affiche une session Lockbox et permet au
+détenteur de clé autorisé d’ajuster sa durée. Il conserve un résumé et le supprime à
+la déconnexion. Décrivez votre fonctionnement réel au lieu de reprendre cet exemple
+s’il ne correspond pas à votre produit.
+
+Envoyez la demande, puis consultez son statut et les commentaires dans le portail.
+En cas de refus, corrigez les points signalés et soumettez-la à nouveau. Ce processus
+ne garantit aucun délai de traitement.
+
+| Étape                                        | Possibilités                                                    |
+| -------------------------------------------- | --------------------------------------------------------------- |
+| Demande développeur en attente               | Consulter la demande et son statut                              |
+| Développeur approuvé                         | Créer et configurer jusqu’à cinq applications                   |
+| Première validation d’application en attente | Le propriétaire et jusqu’à cinq invités acceptés peuvent tester |
+| Application approuvée                        | D’autres utilisateurs R+D admissibles peuvent consentir         |
+
+Une invitation de test n’approuve pas votre propre compte développeur et ne donne
+aucun accès aux réglages de l’application. Suite : [Créer votre première application](/fr/build-an-app/first-application).

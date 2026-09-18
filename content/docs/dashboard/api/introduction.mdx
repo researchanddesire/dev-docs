@@ -3,11 +3,15 @@ title: "API Overview"
 description: "Access your Research and Desire data programmatically with the REST API"
 ---
 
+For a product that connects other users, follow [Build an app](/build-an-app) and the [connection examples](/build-an-app/examples). The API conventions below also apply to authorized OAuth requests.
+
 The Research and Desire API lets you access your dashboard data from external applications, scripts, and integrations. Every API request respects your account's permissions — you can only access data you're allowed to see.
 
 <Info>
-  API access is an **Ultra** feature. You need an active Ultra subscription to
-  create API tokens. [Learn more about Ultra](https://dashboard.researchanddesire.com/app/settings/subscription).
+  Creating **personal API tokens** requires an Ultra subscription. OAuth
+  developer applications have a separate approval process; existing product
+  restrictions still apply. [Learn about personal
+  tokens](/dashboard/api/authentication).
 </Info>
 
 ## Base URL
@@ -25,7 +29,7 @@ https://dashboard.researchanddesire.com/api/v1
     Create API tokens and learn how to authenticate requests.
   </Card>
 
-  <Card title="Endpoint Reference" icon="code" href="./endpoints/users">
+  <Card title="Endpoint Reference" icon="code" href="/api-reference">
     Browse all available endpoints for Users, DTT, LKBX, and OSSM.
   </Card>
 </CardGroup>

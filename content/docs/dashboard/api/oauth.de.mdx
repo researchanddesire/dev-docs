@@ -1,0 +1,125 @@
+---
+title: "Konten mit OAuth verbinden"
+description: "Integrationen registrieren, Tester einladen und Kontoberechtigungen mit OAuth 2.0 anfragen"
+---
+
+Entwickeln Sie ein Produkt für andere R+D-Nutzer? Beginnen Sie mit [Eine App entwickeln](/de/build-an-app) für Entwicklerzugang, Registrierung und Plattformbeispiele. Diese Seite dient als Protokollreferenz.
+
+OAuth ist verfügbar, wenn es für die jeweilige Umgebung aktiviert wurde. Beantrage
+Entwicklerzugang unter `/app/developers`. Die Seite ist absichtlich nicht in der Navigation
+verlinkt. Persönliche API-Token funktionieren weiterhin unabhängig davon.
+
+## App registrieren und testen
+
+Beschreibe deine Integration und die Verwendung von Nutzerdaten im Entwicklerantrag.
+Nach dessen Freigabe kannst du bis zu fünf Apps registrieren. Jede App wird separat
+geprüft. Gib Name, Website, HTTPS-Datenschutzerklärung, Support-E-Mail, Callback-URLs
+und gewünschte Berechtigungen an.
+
+Backend-Apps verwenden `client_secret_basic` oder das registrierte Verfahren
+`client_secret_post`. Browser- und native Apps verwenden `none` und dürfen kein Geheimnis
+einbetten. Alle Clients benötigen den Autorisierungscode-Flow mit **S256 PKCE**.
+Native Apps nutzen den Systembrowser und müssen ihre App-Kennung sowie einen Nachweis
+über die Kontrolle des Callbacks zur Prüfung einreichen.
+
+Registriere maximal zehn exakte Callback-URLs. HTTPS ist erforderlich, außer bei lokalem
+HTTP oder geprüften nativen Schemas mit umgekehrtem Domainnamen. Wildcards, eingebettete
+Zugangsdaten und Fragmente sind verboten. Native IP-Loopback-Callbacks dürfen ihren Port
+ändern; die tatsächlich verwendete URL wird an den Code gebunden. Browser-Apps müssen
+auch ihre exakten Ursprünge registrieren.
+
+Vor der ersten App-Freigabe kannst du **fünf weitere bestehende R+D-Konten** über die
+exakte E-Mail-Adresse oder die Benutzernamensuche einladen. Offene und angenommene
+Einladungen zählen zum Limit. Empfänger nehmen die Einladung unter `/app/developers` an
+und können anschließend ihre Kontoverbindung testen. Einladungen gewähren ausschließlich
+Testzugang, keine App-Verwaltung oder Partnerrechte. Es werden keine Einladungs-E-Mails
+versendet. Das Entfernen einer Einladung widerruft auch die App-Verbindungen dieses Kontos.
+
+Änderungen erzeugen einen neuen Prüfauftrag. Die bisher freigegebene Konfiguration bleibt
+bis zur Entscheidung aktiv. Entfernte Berechtigungen werden sofort eingeschränkt.
+Eine neue Freigabe widerruft bestehende Verbindungen und verlangt erneute Zustimmung.
+Deaktivierung oder Sperrung widerrufen Verbindungen ebenfalls; eine Wiederherstellung
+reaktiviert keine alten Token.
+
+## Verbindung herstellen
+
+Verwende den Aussteller deiner Umgebung, beispielsweise
+`https://staging.researchanddesire.com`. Die Endpunkte stehen unter
+`/.well-known/oauth-authorization-server`. Registrierungen und Token sind zwischen
+Staging und Produktion getrennt.
+
+Erzeuge für jede Verbindung einen zufälligen `state` und einen neuen PKCE-Verifier.
+Speichere beide in der auslösenden Nutzersitzung. Der Challenge-Wert ist der
+Base64url-kodierte SHA-256-Hash des Verifiers. Leite den Browser zu `/oauth/authorize`
+mit `response_type=code`, `client_id`, `redirect_uri`, `scope`, `state`,
+`code_challenge` und `code_challenge_method=S256` weiter.
+
+Der Nutzer meldet sich an und wählt Berechtigungen oder bricht ab. `shared:access` und
+`offline_access` erfordern eine gesonderte Auswahl. Prüfe am Callback `state` und `iss`
+gegen die ursprüngliche Sitzung. Behandle `error=access_denied`; andernfalls tausche
+den Code sofort aus:
+
+```bash
+curl "$ISSUER/oauth/token" --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "grant_type=authorization_code" \
+  --data-urlencode "code=$CODE" \
+  --data-urlencode "redirect_uri=$CALLBACK_URL" \
+  --data-urlencode "code_verifier=$VERIFIER"
+```
+
+Öffentliche Clients senden `client_id` im Formular und lassen HTTP Basic weg. Verwende
+genau ein Authentifizierungsverfahren. Token-Anfragen benötigen Formularkodierung,
+kein JSON. Browser-Anfragen müssen von einem registrierten Ursprung kommen und dürfen
+keine Cookies mitsenden.
+
+Die Antwort enthält `access_token`, `token_type`, `expires_in` und den tatsächlich
+gewährten `scope`. Nur bei `offline_access` wird ein `refresh_token` ausgegeben.
+Behandle Token als undurchsichtige Werte. Es gibt weder ein Supabase-JWT noch ein
+OpenID-Connect-ID-Token. Sende das Zugriffstoken als `Authorization: Bearer ...` an `/api/v1`.
+
+## Berechtigungen
+
+| Scope             | Zugriff                                                               |
+| ----------------- | --------------------------------------------------------------------- |
+| `profile:read`    | Konto-ID und Profil                                                   |
+| `lkbx:read`       | Lockbox-Geräte, Vorlagen, Sitzungen und Status                        |
+| `lkbx:control`    | Sperren starten/beenden und Dauer gemäß bestehenden Rechten ändern    |
+| `lkbx:keyholders` | Schlüsselhalter beim Start zuweisen; benötigt auch `lkbx:control`     |
+| `dtt:read`        | DTT-Geräte, Vorlagen, Verlauf und Trainingsstatistiken                |
+| `dtt:write`       | DTT-Vorlagen bearbeiten und aktivieren                                |
+| `ossm:read`       | OSSM-Geräteinformationen, keine Fernsteuerung                         |
+| `shared:access`   | Produktrechte auf verwaltete Konten erweitern, auch später verknüpfte |
+| `offline_access`  | Rotierende Aktualisierungstoken erhalten                              |
+
+Ohne `shared:access` sind nur Ressourcen des zustimmenden Kontos erreichbar, auch über
+IDs und Aliase. Bestehende Partner-, Schlüsselhalter- und Selbstsperrregeln gelten weiter.
+Unbekannte Routen und Methoden sind gesperrt. Antworten lassen Kopplungscodes und interne
+Kennungen weg. Trainingsstatistiken auf Profilendpunkten benötigen zusätzlich `dtt:read`.
+
+## Erneuern und widerrufen
+
+Codes gelten fünf Minuten und sind einmalig. Zugriffstoken gelten zehn Minuten.
+Aktualisierungstoken verfallen nach 30 Tagen ohne Nutzung, spätestens jedoch 180 Tage
+nach der ersten Zustimmung. Jeder erfolgreiche Refresh ersetzt das Aktualisierungstoken.
+Führe Refreshes pro Verbindung nacheinander aus und speichere den Ersatz atomar.
+Wiederverwendung widerruft die gesamte Token-Familie einschließlich ihrer Zugriffstoken.
+Es gibt keine Kulanzfrist; bei unklarem Ausgang kann eine neue Verbindung nötig sein.
+
+```bash
+curl "$ISSUER/oauth/token" --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "grant_type=refresh_token" \
+  --data-urlencode "refresh_token=$REFRESH_TOKEN"
+curl "$ISSUER/oauth/revoke" --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "token=$REFRESH_TOKEN"
+```
+
+Ein Widerruf beendet die betreffende Autorisierung. Unbekannte Token liefern ebenfalls
+Erfolg. Unter **Einstellungen → Verbundene Apps** lassen sich alle Autorisierungen einer
+App trennen. Das Limit beträgt 60 API-Anfragen pro Minute, App und Nutzer; beachte `429`
+und `Retry-After`.
+
+Backend-Geheimnisse werden einmal angezeigt. Normale Rotation lässt 24 Stunden Überlappung
+mit maximal zwei aktiven Geheimnissen. Die Notfallrotation widerruft alte Geheimnisse und
+Verbindungen sofort. Speichere Geheimnisse nur im Backend, niemals in Git oder Logs.
+Webhooks, Client-Credentials-, Passwort- und Implicit-Grants, dynamische Registrierung
+und OpenID Connect gehören nicht zu dieser Version.

@@ -3,11 +3,15 @@ title: "Authenticatie"
 description: "Maak en beheer API-tokens om uw verzoeken te authenticeren"
 ---
 
-Voor alle API-verzoeken is een geldig API-token vereist dat wordt doorgegeven in de `Authorization`-header. Tokens zijn JWTs die zijn ondertekend met de identiteit van uw account, zodat elke toegang tot gegevens automatisch uw accountrechten respecteert.
+Bouw je een product voor andere R+D-gebruikers? Begin bij [Een app bouwen](/nl/build-an-app) voor ontwikkelaarstoegang, registratie en platformvoorbeelden.
+
+Alle API-aanvragen vereisen een geldig token in de `Authorization`-header. Persoonlijke API-tokens zijn ondoorzichtige toegangsgegevens voor je account. Externe producten kunnen [OAuth-koppelingen](/nl/dashboard/api/oauth) gebruiken wanneer deze in hun omgeving zijn ingeschakeld.
 
 <Info>
-  Voor het maken van API-tokens is een **Ultra**-abonnement vereist. Als u dat nog niet hebt,
-  ga dan naar [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription) om te upgraden.
+  Voor het maken van API-tokens is een **Ultra**-abonnement vereist. Als u dat
+  nog niet hebt, ga dan naar
+  [Abonnement](https://dashboard.researchanddesire.com/app/settings/subscription)
+  om te upgraden.
 </Info>
 
 ## Een token maken
@@ -80,7 +84,10 @@ De instellingenpagina **API-sleutels** toont al uw actieve tokens:
 
 Klik op het prullenbakpictogram naast een token om dit in te trekken. Het intrekken gebeurt onmiddellijk: verzoeken die dit token gebruiken, krijgen meteen antwoorden met `401 Unauthorized`.
 
-<Tip>Trek tokens regelmatig in en maak ze opnieuw aan als goede beveiligingspraktijk.</Tip>
+<Tip>
+  Trek tokens regelmatig in en maak ze opnieuw aan als goede
+  beveiligingspraktijk.
+</Tip>
 
 ### Tokenlimieten
 
@@ -88,11 +95,11 @@ U kunt maximaal **5 actieve tokens** tegelijk hebben. Als u er meer nodig hebt, 
 
 ## Foutreacties
 
-| Status | Betekenis                                                      |
-| ------ | ------------------------------------------------------------ |
-| `401`  | Ontbrekend, ongeldig, verlopen of ingetrokken token                    |
-| `403`  | Het token is geldig, maar u hebt geen toestemming voor deze actie       |
-| `404`  | Bron niet gevonden (of niet toegankelijk met uw rechten) |
+| Status | Betekenis                                                         |
+| ------ | ----------------------------------------------------------------- |
+| `401`  | Ontbrekend, ongeldig, verlopen of ingetrokken token               |
+| `403`  | Het token is geldig, maar u hebt geen toestemming voor deze actie |
+| `404`  | Bron niet gevonden (of niet toegankelijk met uw rechten)          |
 
 <ResponseExample>
 ```json 401 Unauthorized

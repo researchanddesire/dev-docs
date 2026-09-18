@@ -3,11 +3,15 @@ title: "Présentation de l'API"
 description: "Accédez à vos données de Research and Desire par programmation avec l'API REST"
 ---
 
+Pour connecter les comptes d’autres personnes à votre produit, suivez [Créer une application](/fr/build-an-app) et les [exemples de connexion](/fr/build-an-app/examples). Les conventions ci-dessous s’appliquent aussi aux requêtes OAuth autorisées.
+
 L'API Research and Desire vous permet d'accéder aux données de votre tableau de bord à partir d'applications externes, de scripts et d'intégrations. Chaque requête API respecte les autorisations de votre compte : vous ne pouvez accéder qu'aux données que vous êtes autorisé à consulter.
 
 <Info>
-  L'accès à l'API est une fonctionnalité **Ultra**. Vous avez besoin d'un abonnement Ultra actif pour
-  créer des jetons API. [En savoir plus sur Ultra](https://dashboard.researchanddesire.com/app/settings/subscription).
+  Créer des **jetons API personnels** nécessite un abonnement Ultra. Les
+  demandes OAuth suivent un processus d’approbation distinct ; les restrictions
+  existantes des produits restent applicables. [En savoir plus sur les jetons
+  personnels](/fr/dashboard/api/authentication).
 </Info>
 
 ## URL de base
@@ -25,7 +29,7 @@ https://dashboard.researchanddesire.com/api/v1
     Créez des jetons API et découvrez comment authentifier les requêtes.
   </Card>
 
-  <Card title="Référence des points de terminaison" icon="code" href="./endpoints/users">
+  <Card title="Référence des points de terminaison" icon="code" href="/fr/api-reference">
     Parcourez tous les points de terminaison disponibles pour Users, DTT, LKBX et OSSM.
   </Card>
 </CardGroup>
@@ -78,10 +82,10 @@ Chaque réponse utilise la même enveloppe :
 
 Les points de terminaison de listes prennent en charge la pagination via les paramètres de requête :
 
-| Paramètre | Par défaut | Max. | Description                 |
-| --------- | ------- | --- | --------------------------- |
-| `limit`   | 50      | 100 | Nombre d'enregistrements à renvoyer |
-| `offset`  | 0       | -   | Nombre d'enregistrements à ignorer   |
+| Paramètre | Par défaut | Max. | Description                         |
+| --------- | ---------- | ---- | ----------------------------------- |
+| `limit`   | 50         | 100  | Nombre d'enregistrements à renvoyer |
+| `offset`  | 0          | -    | Nombre d'enregistrements à ignorer  |
 
 Les réponses paginées enveloppent le tableau de données avec des métadonnées de pagination :
 

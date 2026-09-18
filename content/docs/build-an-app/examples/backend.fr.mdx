@@ -1,0 +1,120 @@
+---
+title: "Exemples OAuth côté serveur"
+description: "Connectez des comptes depuis un serveur TypeScript ou Python."
+---
+
+Enregistrez **Serveur / backend** avec HTTP Basic (`client_secret_basic`). PKCE
+reste obligatoire. Téléchargez <a href="/examples/oauth/rd-oauth.ts" download>rd-oauth.ts</a> pour Node.js 24
+ou <a href="/examples/oauth/rd_oauth.py" download>rd_oauth.py</a> pour Python 3.11+. Les bibliothèques
+standard suffisent ; les fichiers incluent renouvellement et révocation.
+
+Définissez `RD_ISSUER`, `RD_CLIENT_ID`, `RD_CLIENT_SECRET` et `RD_REDIRECT_URI`
+sur le serveur. En local, fournissez `http://127.0.0.1:8080/callback` ; une application
+déployée utilise son retour HTTPS exact. Ces fonctions attendent un retour sans
+paramètres de requête préexistants.
+
+## Intégrer deux routes
+
+L’action de connexion exige votre utilisateur authentifié et la protection CSRF du
+framework. Stockez la transaction dix minutes dans sa session serveur avant la
+redirection. Sous HTTPS, utilisez un cookie Secure, HttpOnly et SameSite=Lax.
+
+Au retour, retirez atomiquement la transaction de cette même session, même en cas de
+refus. Rejetez un retour sans transaction. Associez la connexion à l’utilisateur
+authentifié, jamais à un identifiant dans les paramètres. Masquez les requêtes de
+retour dans les journaux et renvoyez `Cache-Control: no-store` et `Referrer-Policy: no-referrer`.
+
+Ces adaptateurs ne sont pas un serveur web autonome. Votre framework fournit la
+session, la redirection et le stockage chiffré des jetons :
+
+<Tabs>
+<Tab title="TypeScript">
+
+```typescript
+import { beginLink, finishLink, readProfile } from "./rd-oauth.ts";
+import type { Transaction } from "./rd-oauth.ts";
+
+function required(name: string) {
+  const value = process.env[name];
+  if (!value) throw new Error(`Set ${name}`);
+  return value;
+}
+const config = {
+  issuer: required("RD_ISSUER"),
+  clientId: required("RD_CLIENT_ID"),
+  clientSecret: required("RD_CLIENT_SECRET"),
+  redirectUri: required("RD_REDIRECT_URI"),
+};
+
+export function startConnection() {
+  // Save transaction in the initiating user's session BEFORE redirecting.
+  return beginLink(config, "profile:read");
+}
+
+export async function completeConnection(
+  callbackUrl: string,
+  consumedTransaction: Transaction,
+) {
+  const tokens = await finishLink(config, callbackUrl, consumedTransaction);
+  const profile = await readProfile(config, tokens);
+  // Persist tokens privately for the authenticated app user, never in a cookie.
+  // Redirect to a clean app URL; do not send this return value to the browser.
+  return { tokens, profile };
+}
+```
+
+</Tab>
+<Tab title="Python">
+
+```python
+import os
+from rd_oauth import begin_link, finish_link, read_profile
+
+config = {
+    "issuer": os.environ["RD_ISSUER"],
+    "client_id": os.environ["RD_CLIENT_ID"],
+    "client_secret": os.environ["RD_CLIENT_SECRET"],
+    "redirect_uri": os.environ["RD_REDIRECT_URI"],
+}
+
+def start_connection():
+    # Save transaction in the initiating user's session BEFORE redirecting.
+    return begin_link(config, "profile:read")
+
+def complete_connection(callback_url, consumed_transaction):
+    tokens = finish_link(config, callback_url, consumed_transaction)
+    profile = read_profile(config, tokens)
+    # Persist tokens privately for the authenticated app user, never in a cookie.
+    # Redirect to a clean app URL; do not serialize this result to the browser.
+    return {"tokens": tokens, "profile": profile}
+```
+
+</Tab>
+</Tabs>
+
+Les fichiers vérifient état, émetteur, expiration et paramètres dupliqués. L’échange
+utilise un formulaire et HTTP Basic, sans suivre de redirection ni réessayer
+automatiquement. La réponse contient `access_token`, `token_type`, `expires_in`
+et `scope` ; le profil utilise une enveloppe `ok`/`data`.
+
+Pour `client_secret_post`, adaptez le formulaire avec ID client et secret, puis
+supprimez HTTP Basic. Ne combinez jamais les deux méthodes et ne rendez pas public
+un backend pour éviter de gérer son secret.
+
+## Accès en l’absence de l’utilisateur
+
+Ajoutez `offline_access` à l’enregistrement et à la demande seulement si nécessaire.
+L’utilisateur doit l’accepter ; vérifiez la présence de `refresh_token`. Stockez les
+jetons chiffrés avec les scopes et l’expiration calculée depuis `expires_in`.
+
+Les deux fichiers proposent `refresh(config, token)` et `revoke(config, token)`.
+Renouvelez sous un verrou par connexion, puis remplacez atomiquement les deux jetons
+avant de libérer ce verrou. Pas de renouvellements simultanés ni de nouvelle tentative
+avec l’ancien jeton après un délai dépassé : sa réutilisation révoque toute la famille.
+Un échec de stockage ou un résultat ambigu nécessite un nouveau consentement.
+
+Pour déconnecter, révoquez un jeton conservé, supprimez les identifiants locaux et
+signalez une révocation non confirmée. L’utilisateur peut aussi ouvrir **Paramètres →
+Applications connectées**. Voir le [cycle OAuth](/fr/dashboard/api/oauth). Pour un parcours
+local complet, utilisez la [démo native](/fr/build-an-app/examples/native) avec son propre
+enregistrement natif.

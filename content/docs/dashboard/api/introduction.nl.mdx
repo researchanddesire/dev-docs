@@ -3,11 +3,15 @@ title: "API-overzicht"
 description: "Krijg met de REST API programmatisch toegang tot uw gegevens van Research and Desire"
 ---
 
+Voor een product dat accounts van anderen koppelt, volg je [Een app bouwen](/nl/build-an-app) en de [koppelvoorbeelden](/nl/build-an-app/examples). De API-afspraken hieronder gelden ook voor toegestane OAuth-aanvragen.
+
 Met de Research and Desire API heeft u toegang tot uw dashboardgegevens vanuit externe applicaties, scripts en integraties. Bij elk API-verzoek worden de rechten van uw account gerespecteerd: u heeft alleen toegang tot gegevens die u mag zien.
 
 <Info>
-  API-toegang is een **Ultra**-functie. U hebt een actief Ultra-abonnement nodig
-  om API-tokens te maken. [Meer informatie over Ultra](https://dashboard.researchanddesire.com/app/settings/subscription).
+  Het maken van **persoonlijke API-tokens** vereist een Ultra-abonnement.
+  OAuth-ontwikkelaarsaanvragen hebben een apart goedkeuringsproces; bestaande
+  productbeperkingen blijven gelden. [Meer over persoonlijke
+  tokens](/nl/dashboard/api/authentication).
 </Info>
 
 ## Basis-URL
@@ -25,7 +29,7 @@ https://dashboard.researchanddesire.com/api/v1
     Maak API-tokens en leer hoe u verzoeken kunt authenticeren.
   </Card>
 
-  <Card title="Eindpuntreferentie" icon="code" href="./endpoints/users">
+  <Card title="Eindpuntreferentie" icon="code" href="/nl/api-reference">
     Blader door alle beschikbare eindpunten voor Users, DTT, LKBX en OSSM.
   </Card>
 </CardGroup>
@@ -78,10 +82,10 @@ Bij elk antwoord wordt dezelfde envelopstructuur gebruikt:
 
 Eindpunten voor lijsten ondersteunen paginering via queryparameters:
 
-| Parameter | Standaard | Max | Beschrijving                 |
-| --------- | ------- | --- | --------------------------- |
-| `limit`   | 50      | 100 | Aantal records dat moet worden geretourneerd |
-| `offset`  | 0       | -   | Aantal records dat moet worden overgeslagen   |
+| Parameter | Standaard | Max | Beschrijving                                 |
+| --------- | --------- | --- | -------------------------------------------- |
+| `limit`   | 50        | 100 | Aantal records dat moet worden geretourneerd |
+| `offset`  | 0         | -   | Aantal records dat moet worden overgeslagen  |
 
 Gepagineerde antwoorden bevatten de data-array samen met pagineringsmetagegevens:
 
@@ -108,8 +112,9 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 ## Beperking van de verzoekfrequentie
 
 <Note>
-  De API hanteert momenteel geen strikte limieten voor het aantal verzoeken, maar houd uw
-  verzoekvolume redelijk. Overmatig gebruik kan in toekomstige releases worden beperkt.
+  De API hanteert momenteel geen strikte limieten voor het aantal verzoeken,
+  maar houd uw verzoekvolume redelijk. Overmatig gebruik kan in toekomstige
+  releases worden beperkt.
 </Note>
 
 ## Machtigingen en RLS

@@ -1,0 +1,115 @@
+---
+title: "Ontwikkelaarstoegang aanvragen"
+description: "Vraag een ontwikkelaarsaccount aan voordat je toepassingen voor andere R+D-gebruikers registreert."
+---
+
+Ontwikkelaarstoegang geeft je eigen R+D-account toestemming om OAuth-apps voor andere
+gebruikers te registreren. Een persoonlijk API-token is voor scripts voor je eigen
+account; met OAuth verleent elke gebruiker afzonderlijk rechten aan je product.
+
+## Video: ontwikkelaarstoegang aanvragen
+
+Stille opname van de lokale app met fictieve accounts. De interface is Engels; ondertitels zijn beschikbaar in het Engels, Duits, Frans en Nederlands.
+
+De overgang naar goedkeuring is voor deze demonstratie gesimuleerd. R+D beoordeelt echte aanvragen afzonderlijk; het formulier indienen geeft geen goedkeuring.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Video: ontwikkelaarstoegang aanvragen"
+  poster="/videos/oauth/apply-for-access.png"
+>
+  <source src="/videos/oauth/apply-for-access.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+    default
+  />
+  Je browser kan deze video niet afspelen. Gebruik de download of het transcript
+  hieronder.
+</video>
+
+<a href="/videos/oauth/apply-for-access.webm" download>
+  Video downloaden (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Videotranscript">
+    <p><strong>0:00</strong> Meld je aan en open /app/developers rechtstreeks. Deze pagina staat niet in de dashboardnavigatie.</p>
+
+    <p><strong>0:04</strong> Vul je ontwikkelaarsnaam, HTTPS-website en contactadres in.</p>
+
+    <p><strong>0:09</strong> Beschrijf je integratie en hoe je gebruikersgegevens gebruikt, beschermt en verwijdert.</p>
+
+    <p><strong>0:15</strong> Selecteer de producten die je wilt ondersteunen en dien je aanvraag in.</p>
+
+    <p><strong>0:21</strong> Je aanvraag is in behandeling. R+D beoordeelt ontwikkelaarsaanvragen afzonderlijk.</p>
+
+    <p><strong>0:25</strong> Later, nadat R+D je ontwikkelaarsaccount heeft goedgekeurd, kun je apps maken.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## Het ontwikkelaarsportaal openen
+
+Meld je aan bij het account dat je apps gaat bezitten en open rechtstreeks
+`/app/developers`. Deze pagina staat bewust niet in de dashboardnavigatie.
+
+| Omgeving  | Portaal                                                                    | Issuer                                    |
+| --------- | -------------------------------------------------------------------------- | ----------------------------------------- |
+| Staging   | [Stagingportaal](https://staging.researchanddesire.com/app/developers)     | `https://staging.researchanddesire.com`   |
+| Productie | [Productieportaal](https://dashboard.researchanddesire.com/app/developers) | `https://dashboard.researchanddesire.com` |
+
+Gebruik de omgeving die R+D voor je integratie heeft ingeschakeld. Neem contact op
+met R+D als de pagina niet beschikbaar is. Ontwikkelaarsaanvragen, registraties,
+accountgegevens, inloggegevens en tokens zijn per omgeving gescheiden. Testen op staging
+keurt een productie-app niet goed.
+
+## Je aanvraag voorbereiden
+
+Vul je ontwikkelaars- of organisatienaam, HTTPS-website, contactadres, beschrijving
+van de integratie, gegevensgebruik en gewenste producten (Lockbox, DTT en/of OSSM) in.
+Beschrijf welke gegevens je leest of wijzigt, waarom en hoe je ze opslaat, bewaart en verwijdert.
+
+Een voorbeeld: een relatiebeheerder toont de huidige Lockbox-sessie en laat een
+bevoegde sleutelhouder de duur aanpassen. De toepassing bewaart een samenvatting en
+verwijdert die wanneer de koppeling wordt verbroken. Beschrijf je echte werkwijze
+als die van dit voorbeeld afwijkt.
+
+Dien de aanvraag in en bekijk de status en feedback in het portaal. Bij afwijzing
+kun je de feedback verwerken en opnieuw indienen. Dit proces belooft geen vaste beoordelingstermijn.
+
+| Fase                                 | Wat je kunt doen                                                |
+| ------------------------------------ | --------------------------------------------------------------- |
+| Ontwikkelaarsaanvraag in behandeling | Aanvraag en status bekijken                                     |
+| Ontwikkelaar goedgekeurd             | Maximaal vijf apps maken en configureren                        |
+| Eerste appbeoordeling in behandeling | Eigenaar en maximaal vijf geaccepteerde testers kunnen koppelen |
+| App goedgekeurd                      | Andere geschikte R+D-gebruikers kunnen toestemming geven        |
+
+Een testuitnodiging keurt je eigen ontwikkelaarsaccount niet goed en geeft geen
+toegang tot de appinstellingen van iemand anders. Volgende stap:
+[Je eerste toepassing maken](/nl/build-an-app/first-application).

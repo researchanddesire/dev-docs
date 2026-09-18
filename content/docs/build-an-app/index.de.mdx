@@ -1,0 +1,46 @@
+---
+title: "Eine App für R+D entwickeln"
+description: "Verbinden Sie Ihr Produkt mit Konten, Daten und unterstützten Geräteaktionen von Research and Desire."
+---
+
+Entwickeln Sie eine Anwendung, die Research and Desire in Ihr Produkt einbindet.
+Mit Zustimmung der Nutzer können Sie über die Dashboard-API deren Plattformdaten
+lesen und unterstützte Aktionen ausführen. Eine Beziehungsverwaltung kann beispielsweise
+Lockbox-Aktivitäten anzeigen; eine Trainings-App kann den DTT-Verlauf auswerten.
+
+Nutzer wählen **R+D-Konto verbinden**, melden sich bei R+D an und prüfen die angefragten
+Berechtigungen. OAuth erteilt Ihrer App begrenzten Zugriff. Nutzer müssen keinen
+persönlichen API-Token kopieren und können die Verbindung in ihren R+D-Einstellungen widerrufen.
+
+## Welche Funktionen sind möglich?
+
+| Funktion                     | Daten oder Aktionen                                           | Berechtigungen                                                              |
+| ---------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Verbundenes Konto erkennen   | Kontoidentität und öffentliche Profilfelder                   | `profile:read`                                                              |
+| Lockbox-Aktivität anzeigen   | Geräte, Vorlagen, Sitzungen und aktueller Sperrstatus         | `lkbx:read`                                                                 |
+| Sperrsitzung verwalten       | Sperren beginnen/beenden und Dauer im erlaubten Rahmen ändern | `lkbx:control`; zusätzlich `lkbx:keyholders` für Schlüsselhalter beim Start |
+| Trainingsbegleiter erstellen | DTT-Geräte, Vorlagen, Verlauf und Statistiken                 | `dtt:read`; `dtt:write` zum Bearbeiten/Aktivieren von Vorlagen              |
+| OSSM-Geräte auflisten        | OSSM-Geräteinformationen                                      | `ossm:read`                                                                 |
+
+Fordern Sie nur benötigte Berechtigungen an. Nutzer können eine Teilmenge freigeben.
+Kontofreigaben, Schlüsselhalterrechte, Selbstsperren und Produktregeln bleiben gültig.
+Die [API-Referenz](/de/api-reference) beschreibt Endpunkte; die
+[OAuth-Referenz](/de/dashboard/api/oauth) erklärt Berechtigungen.
+
+Standardmäßig gilt der Zugriff nur für das zustimmende Konto. `shared:access` erweitert
+erteilte Produktrechte auf verwaltbare Konten, auch auf später verknüpfte. Mit
+`offline_access` kann Ihre App während der Abwesenheit des Nutzers arbeiten. Beide
+erfordern eine gesonderte Zustimmung. Webhooks und OSSM-Bewegungssteuerung über die Cloud
+sind in dieser Version nicht verfügbar. Direkte Geräteschnittstellen finden Sie unter
+[OSSM BLE](/de/ossm/software/communication/ble), [RADR](/de/radr) und [DTT](/de/dtt/specs/accessory-port).
+
+## Der Weg zur ersten Verbindung
+
+1. [Entwicklerzugang beantragen](/de/build-an-app/getting-started): Produkt und Datennutzung beschreiben.
+2. [Erste Anwendung erstellen](/de/build-an-app/first-application): Plattform und Rückrufadressen konfigurieren, bis zu fünf Tester einladen.
+3. [Verbindungsbeispiel wählen](/de/build-an-app/examples): Backend, native Anwendung oder Browser in TypeScript, JavaScript oder Python.
+4. [Produktfunktionen ergänzen](/de/api-reference): autorisierte API-Anfragen ausführen.
+
+Die Entwicklerfreigabe erlaubt App-Registrierungen. Jede App benötigt eine eigene
+Freigabe, bevor weitere Nutzer außer Eigentümer und akzeptierten Testern sie verbinden
+können. OAuth muss in der jeweiligen Umgebung aktiviert sein.

@@ -1,0 +1,123 @@
+---
+title: "Native and desktop examples"
+description: "Run JavaScript and Python demos that connect through the system browser without a client secret."
+---
+
+Register **Native / desktop application** with authentication `none`, scope
+`profile:read`, and callback `http://127.0.0.1/callback`. Provide a native app identifier
+and callback ownership evidence in the registration. For a desktop prototype, explain
+that it uses a local IP-loopback listener and identify your application/repository.
+The actual runtime callback includes a port selected by the operating system.
+
+These demos open the system browser, accept one callback on `127.0.0.1`, verify
+state, issuer, and PKCE, call the profile API, and revoke the demo connection. They
+display no account data and store no tokens on disk. Sign in as the app owner or an
+accepted tester while the app awaits approval.
+
+## Run the demo
+
+Set `RD_ISSUER` to your enabled environment's issuer and `RD_CLIENT_ID` to your
+**native** app ID. Do not set a client secret. Save each pair of files in the same
+directory, then run the command for your language:
+
+<Tabs>
+  <Tab title="JavaScript">
+
+Download <a href="/examples/oauth/native-node.mjs" download>native-node.mjs</a> and
+
+<a href="/examples/oauth/rd-oauth.ts" download>
+  rd-oauth.ts
+</a>
+. Node.js 24 runs the helper's erasable TypeScript directly; no package
+installation or compilation is needed.
+
+```bash
+node native-node.mjs
+```
+
+The core of the listener uses the same transaction from start to callback:
+
+```javascript
+import { beginLink, finishLink, readProfile, revoke } from "./rd-oauth.ts";
+
+// In the complete demo, redirectUri includes the bound loopback listener's port.
+export function startNativeConnection(issuer, clientId, redirectUri) {
+  const config = { issuer, clientId, redirectUri };
+  const started = beginLink(config, "profile:read");
+  return { config, ...started };
+}
+
+export async function completeNativeConnection(
+  config,
+  callbackUrl,
+  transaction,
+) {
+  // The listener consumes the transaction once before invoking this function.
+  const tokens = await finishLink(config, callbackUrl, transaction);
+  try {
+    await readProfile(config, tokens);
+  } finally {
+    await revoke(config, tokens.access_token);
+  }
+}
+```
+
+  </Tab>
+  <Tab title="Python">
+
+Download <a href="/examples/oauth/native_python.py" download>native_python.py</a> and
+
+<a href="/examples/oauth/rd_oauth.py" download>
+  rd_oauth.py
+</a>
+. Use Python 3.11 or later; only the standard library is required. On Windows,
+`py` can replace `python`.
+
+```bash
+python native_python.py
+```
+
+The complete demo creates the listener before requesting authorization:
+
+```python
+from http.server import HTTPServer
+from native_python import Callback
+from rd_oauth import begin_link
+
+def prepare_listener(issuer, client_id):
+    server = HTTPServer(("127.0.0.1", 0), Callback)
+    server.config = {
+        "issuer": issuer,
+        "client_id": client_id,
+        "redirect_uri": f"http://127.0.0.1:{server.server_port}/callback",
+    }
+    server.completed = False
+    url, server.transaction = begin_link(server.config, "profile:read")
+    return server, url
+```
+
+  </Tab>
+</Tabs>
+
+Choose **Allow** in the browser to check the success path, or deny consent to check
+failure handling. A successful run displays “Profile request succeeded.” The sample
+then has no active connection because it revokes the token. Restart it for another
+attempt; the listener times out after ten minutes.
+
+## Adapt this to a shipped native app
+
+Use the operating system's authentication browser/session and callback mechanism.
+Do not embed the R+D sign-in page in a WebView or ship a backend client secret. Native
+apps are public clients, and PKCE binds the authorization code to the app instance
+that initiated it. See [OAuth for native apps, RFC 8252](https://www.rfc-editor.org/rfc/rfc8252).
+
+For mobile callbacks, register a claimed HTTPS URL or a reviewed reverse-domain
+scheme owned by your app. On Apple platforms, use
+[ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession)
+with your presentation context and registered callback. Preserve the same state,
+issuer, verifier, and one-use transaction checks from the examples.
+
+For persistent connections, request `offline_access` explicitly and store tokens in
+the operating system's protected credential store. Serialize refreshes and atomically
+save replacements, following the [refresh rules](/dashboard/api/oauth#refresh-revoke-and-rotate).
+Keep callbacks and tokens out of crash reports and logs.

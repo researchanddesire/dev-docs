@@ -1,0 +1,46 @@
+---
+title: "Créer une application pour R+D"
+description: "Reliez votre produit aux comptes, aux données et aux actions prises en charge par Research and Desire."
+---
+
+Créez une application tierce qui intègre Research and Desire à votre produit.
+Avec le consentement des utilisateurs, l’API du tableau de bord vous permet de lire
+leurs données et d’effectuer les actions autorisées. Un gestionnaire de relations
+peut afficher l’activité Lockbox ; un compagnon d’entraînement peut lire l’historique DTT.
+
+L’utilisateur choisit **Connecter mon compte R+D**, se connecte chez R+D, puis examine
+les permissions demandées. OAuth accorde un accès limité à votre application sans
+lui demander de copier un jeton personnel. Il peut révoquer la connexion dans ses paramètres R+D.
+
+## Que pouvez-vous créer ?
+
+| Fonction                          | Données ou actions                                                               | Permissions                                                                                  |
+| --------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Identifier le compte connecté     | Identité du compte et champs publics du profil                                   | `profile:read`                                                                               |
+| Afficher l’activité Lockbox       | Appareils, modèles, sessions et état du verrouillage                             | `lkbx:read`                                                                                  |
+| Gérer une session verrouillée     | Démarrer/terminer un verrouillage et ajuster sa durée selon les droits existants | `lkbx:control` ; ajouter `lkbx:keyholders` pour attribuer les détenteurs de clé au démarrage |
+| Créer un compagnon d’entraînement | Appareils DTT, modèles, historique et statistiques                               | `dtt:read` ; `dtt:write` pour modifier/activer des modèles                                   |
+| Lister les appareils OSSM         | Informations sur les appareils OSSM                                              | `ossm:read`                                                                                  |
+
+Demandez seulement les permissions nécessaires : l’utilisateur peut en accepter une
+partie. Les règles de partage de compte, de détenteur de clé, d’auto-verrouillage et du
+produit restent applicables. Consultez la [référence API](/fr/api-reference) et les
+[permissions OAuth](/fr/dashboard/api/oauth).
+
+L’accès concerne d’abord le compte consentant. `shared:access` étend les permissions
+produit accordées aux comptes qu’il peut gérer, y compris ceux liés ultérieurement.
+`offline_access` permet de travailler en son absence. Ces deux permissions demandent
+un choix explicite. Cette version ne propose ni webhooks ni commande de mouvement OSSM
+dans le cloud. Pour les interfaces directes, consultez [OSSM BLE](/fr/ossm/software/communication/ble),
+[RADR](/fr/radr) et [DTT](/fr/dtt/specs/accessory-port).
+
+## De l’idée à la première connexion
+
+1. [Demander un accès développeur](/fr/build-an-app/getting-started) : présenter le produit et l’utilisation des données.
+2. [Créer une première application](/fr/build-an-app/first-application) : choisir une plateforme, des adresses de retour et jusqu’à cinq testeurs.
+3. [Choisir un exemple](/fr/build-an-app/examples) : serveur, application native ou navigateur en TypeScript, JavaScript ou Python.
+4. [Ajouter vos fonctionnalités](/fr/api-reference) : appeler l’API avec les permissions accordées.
+
+L’approbation du développeur permet d’enregistrer des applications. Chaque application
+doit ensuite être approuvée pour connecter d’autres personnes que son propriétaire et
+ses testeurs acceptés. OAuth doit être activé dans l’environnement utilisé.

@@ -3,6 +3,15 @@ title: "Shared Access & Keyholders"
 description: "How the API scopes data to you and your linked users, and how keyholders read a lockee's sessions"
 ---
 
+<Note>
+  The shared-account behavior on this page describes personal API tokens. OAuth
+  apps must also receive the relevant product scopes and explicit
+  `shared:access` consent. Without that consent, OAuth can access only the
+  consenting account, even when it has linked partners. Tester invitations grant
+  no shared-account or device permissions. See [OAuth
+  scopes](/dashboard/api/oauth#scopes).
+</Note>
+
 Every endpoint is scoped to the users you have access to: **yourself, plus anyone linked to your account via a partnership**. Your API token inherits the exact same permissions as your dashboard account, so you never see data you couldn't already see in the dashboard.
 
 This page explains how that scoping works across the API — especially for keyholders reading their lockee's data. For the request and response details of any individual endpoint, see its page in the reference (e.g. [Lock Sessions](/api-reference/lock-sessions/list-lock-sessions)).
@@ -15,8 +24,9 @@ Keyholders are always linked users. That means **there is no separate keyholder 
 - [Get Active Lock Session](/api-reference/lock-sessions/get-active-lock-session) accepts a `targetUserId` query parameter, so a keyholder can verify a lockee's lock is running without the lockee reporting it.
 
 <Info>
-  A lock session's `ownerId` is the user who wears the lock. When you keyhold for
-  someone, their sessions appear in your results with their `ownerId`, not yours.
+  A lock session's `ownerId` is the user who wears the lock. When you keyhold
+  for someone, their sessions appear in your results with their `ownerId`, not
+  yours.
 </Info>
 
 ## Finding a linked user's ID
@@ -27,10 +37,10 @@ Endpoints that act on another user (such as `targetUserId`) take a numeric user 
 
 The API never reveals data — or even the existence of data — outside your access. How a request is rejected depends on how it identifies the target:
 
-| Request style | Outside your access |
-| ------------- | ------------------- |
-| Fetch a session by ID (e.g. [Get Lock Session by ID](/api-reference/lock-sessions/get-lock-session-by-id)) | Returns `404` — the API deliberately does not distinguish "doesn't exist" from "not yours" |
-| Pass a `targetUserId` (e.g. [Get Active Lock Session](/api-reference/lock-sessions/get-active-lock-session)) | Returns `403` — the target is a user you don't have access to |
+| Request style                                                                                                | Outside your access                                                                        |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Fetch a session by ID (e.g. [Get Lock Session by ID](/api-reference/lock-sessions/get-lock-session-by-id))   | Returns `404` — the API deliberately does not distinguish "doesn't exist" from "not yours" |
+| Pass a `targetUserId` (e.g. [Get Active Lock Session](/api-reference/lock-sessions/get-active-lock-session)) | Returns `403` — the target is a user you don't have access to                              |
 
 <Note>
   Because a by-ID lookup returns `404` for both a missing session and one that

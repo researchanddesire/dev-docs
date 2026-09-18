@@ -1,0 +1,69 @@
+---
+title: "Build an app for R+D"
+description: "Connect your product to Research and Desire accounts, data, and supported device actions."
+---
+
+Build a third-party application that brings Research and Desire into your product.
+With a user's consent, your app can read their platform data and perform supported
+actions on their behalf through the Dashboard API. For example, a relationship
+manager can show Lockbox activity, a training companion can read DTT history, and
+a device dashboard can list connected OSSM devices.
+
+Your user chooses **Link your R+D account**, signs in to R+D, reviews the permissions,
+and returns to your app. OAuth gives your app scoped access without asking the user
+to copy a personal API token. Users can disconnect your app in their R+D settings.
+
+## What can you build?
+
+| Your feature                      | Platform access                                                      | Permissions to request                                                  |
+| --------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Recognize a connected R+D account | Account identity and public profile fields                           | `profile:read`                                                          |
+| Show Lockbox activity             | Devices, templates, sessions, and current lock state                 | `lkbx:read`                                                             |
+| Manage a lock session             | Start or end a lock and adjust durations within existing permissions | `lkbx:control`; add `lkbx:keyholders` to assign keyholders at the start |
+| Build a training companion        | DTT devices, templates, session history, and statistics              | `dtt:read`; add `dtt:write` to edit or activate templates               |
+| List OSSM devices                 | OSSM device information                                              | `ossm:read`                                                             |
+
+Request only what your feature needs. The user may approve fewer permissions than
+you request. Account sharing, keyholder permissions, self-lock restrictions, and
+other product rules still apply. The [API reference](/api-reference) defines the
+available paths and request bodies; the [OAuth reference](/dashboard/api/oauth#scopes)
+defines the permissions.
+
+Access starts with the consenting user's account. Request `shared:access` only if
+your feature needs accounts that user can manage; this also covers accounts linked
+later. Request `offline_access` only when your app needs to work while the user is
+away. Both require separate opt-in on the consent screen.
+
+Cloud OAuth currently supports the REST operations listed above. Webhooks and cloud
+OSSM motion control are not available in this version. For direct device integrations,
+see [OSSM BLE](/ossm/software/communication/ble), [RADR](/radr), and the
+[DTT accessory interface](/dtt/specs/accessory-port).
+
+## From idea to first connection
+
+<CardGroup cols={2}>
+  <Card
+    title="1. Apply for developer access"
+    href="/build-an-app/getting-started"
+  >
+    Tell us about your product and how it will use account data.
+  </Card>
+  <Card
+    title="2. Create your first application"
+    href="/build-an-app/first-application"
+  >
+    Choose a platform, register callbacks, and invite up to five testers.
+  </Card>
+  <Card title="3. Connect an account" href="/build-an-app/examples">
+    Use backend, native, and browser examples in TypeScript, JavaScript, and
+    Python.
+  </Card>
+  <Card title="4. Add your product features" href="/api-reference">
+    Make scoped API calls using the user's access token.
+  </Card>
+</CardGroup>
+
+Developer approval lets you register applications. Each application then has its
+own approval before it can connect accounts beyond its owner and accepted testers.
+OAuth must be enabled in your environment; these guides do not imply that every
+environment has launched developer access yet.

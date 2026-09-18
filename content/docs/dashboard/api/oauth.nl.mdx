@@ -1,0 +1,117 @@
+---
+title: "Accounts koppelen met OAuth"
+description: "Registreer een integratie, nodig testers uit en vraag accountmachtigingen aan met OAuth 2.0"
+---
+
+Bouw je een product voor andere R+D-gebruikers? Begin bij [Een app bouwen](/nl/build-an-app) voor ontwikkelaarstoegang, registratie en platformvoorbeelden. Deze pagina is de protocolreferentie.
+
+OAuth is beschikbaar wanneer het voor de omgeving is ingeschakeld. Vraag ontwikkelaarstoegang
+aan via `/app/developers`. Deze pagina staat bewust niet in de navigatie. Persoonlijke
+API-tokens blijven onafhankelijk werken.
+
+## Een app registreren en testen
+
+Beschrijf je integratie en hoe je gebruikersgegevens gebruikt en beschermt. Na goedkeuring
+van je ontwikkelaarsaanvraag kun je maximaal vijf apps registreren. Elke app wordt apart
+beoordeeld. Vermeld naam, website, HTTPS-privacybeleid, contactadres, callback-URL’s en scopes.
+
+Backend-apps gebruiken `client_secret_basic` of de geregistreerde methode
+`client_secret_post`. Browser- en native apps gebruiken `none` en mogen geen geheim bevatten.
+Iedere client gebruikt een autorisatiecode met **S256 PKCE**. Native apps openen de
+systeembrowser en leveren hun app-identificatie en bewijs van callback-eigendom aan.
+
+Registreer maximaal tien exacte callbacks. HTTPS is verplicht, behalve voor lokale HTTP
+of beoordeelde native schema’s met omgekeerde domeinnaam. Wildcards, inloggegevens in URL’s
+en fragmenten zijn verboden. Native IP-loopback-callbacks mogen een wisselende poort gebruiken;
+de werkelijke URL wordt aan de code gebonden. Browser-apps registreren ook hun exacte origins.
+
+Vóór de eerste appgoedkeuring kun je **vijf extra bestaande R+D-accounts** uitnodigen via
+een exact e-mailadres of zoeken op gebruikersnaam. Openstaande en geaccepteerde uitnodigingen
+tellen mee. Ontvangers accepteren onder `/app/developers` en kunnen vervolgens hun account
+koppelen om te testen. Dit geeft uitsluitend testtoegang, geen appbeheer of partnerrechten.
+Er worden geen uitnodigingsmails verstuurd. Verwijderen van een uitnodiging trekt ook de
+appverbindingen van dat account in.
+
+Wijzigingen leveren een nieuwe beoordelingsaanvraag op. De eerder goedgekeurde configuratie
+blijft actief tijdens de beoordeling. Verwijderde scopes beperken bestaande machtigingen
+meteen. Nieuwe goedkeuring trekt eerdere verbindingen in en vereist opnieuw toestemming.
+Uitschakelen of schorsen trekt verbindingen in; opnieuw inschakelen herstelt geen oude tokens.
+
+## Een verbinding opzetten
+
+Gebruik de issuer van je omgeving, bijvoorbeeld `https://staging.researchanddesire.com`.
+Ontdek endpoints via `/.well-known/oauth-authorization-server`. Registraties en tokens
+zijn gescheiden tussen staging en productie.
+
+Genereer bij iedere verbinding een willekeurige `state` en nieuwe PKCE-verifier. Bewaar
+beide in de gebruikerssessie die de verbinding start. De challenge is de Base64url-gecodeerde
+SHA-256-hash van de verifier. Stuur de browser naar `/oauth/authorize` met `response_type=code`,
+`client_id`, `redirect_uri`, `scope`, `state`, `code_challenge` en `code_challenge_method=S256`.
+
+De gebruiker meldt zich aan, kiest machtigingen of annuleert. `shared:access` en
+`offline_access` vereisen een afzonderlijke keuze. Controleer bij de callback `state` en `iss`
+tegen de oorspronkelijke sessie. Verwerk `error=access_denied`; wissel anders de code direct in:
+
+```bash
+curl "$ISSUER/oauth/token" --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "grant_type=authorization_code" \
+  --data-urlencode "code=$CODE" \
+  --data-urlencode "redirect_uri=$CALLBACK_URL" \
+  --data-urlencode "code_verifier=$VERIFIER"
+```
+
+Publieke clients laten HTTP Basic weg en sturen `client_id` in het formulier. Gebruik
+precies één authenticatiemethode. Tokenverzoeken gebruiken formuliercodering, geen JSON.
+Browserverzoeken moeten van een geregistreerde origin komen en mogen geen cookies bevatten.
+
+Het antwoord bevat `access_token`, `token_type`, `expires_in` en de daadwerkelijk toegekende
+`scope`. Alleen met `offline_access` wordt een `refresh_token` verstrekt. Behandel tokens
+als ondoorzichtige waarden. Je ontvangt geen Supabase-JWT of OpenID Connect-ID-token.
+Gebruik `Authorization: Bearer ...` voor verzoeken aan `/api/v1`.
+
+## Scopes
+
+| Scope             | Toegang                                                                       |
+| ----------------- | ----------------------------------------------------------------------------- |
+| `profile:read`    | Account-ID en profiel                                                         |
+| `lkbx:read`       | Lockbox-apparaten, sjablonen, sessies en status                               |
+| `lkbx:control`    | Vergrendelingen starten/beëindigen en duur aanpassen binnen bestaande rechten |
+| `lkbx:keyholders` | Sleutelhouders toewijzen bij de start; vereist ook `lkbx:control`             |
+| `dtt:read`        | DTT-apparaten, sjablonen, trainingsgeschiedenis en statistieken               |
+| `dtt:write`       | DTT-sjablonen bewerken en activeren                                           |
+| `ossm:read`       | OSSM-apparaatinformatie, geen afstandsbediening                               |
+| `shared:access`   | Productrechten uitbreiden naar beheerde accounts, ook later gekoppelde        |
+| `offline_access`  | Roterende vernieuwingstokens ontvangen                                        |
+
+Zonder `shared:access` zijn uitsluitend gegevens van het toestemmende account toegankelijk,
+ook via ID’s en aliassen. Bestaande regels voor delen, sleutelhouders en zelfvergrendeling
+blijven gelden. Onbekende routes en methoden worden geweigerd. Antwoorden bevatten geen
+koppelcodes of interne identificaties. Trainingsstatistieken op profielendpoints vereisen
+tevens `dtt:read`.
+
+## Vernieuwen en intrekken
+
+Autorisatiecodes zijn vijf minuten geldig en eenmalig bruikbaar. Toegangstokens gelden tien
+minuten. Vernieuwingstokens verlopen na 30 dagen zonder gebruik en uiterlijk 180 dagen na
+de eerste toestemming. Elke geslaagde vernieuwing vervangt het vernieuwingstoken. Voer ze
+per verbinding na elkaar uit en sla de vervanging atomair op. Hergebruik trekt de volledige
+tokenfamilie in, inclusief toegangstokens uit die familie. Er is geen respijtperiode;
+bij een onzekere uitkomst kan opnieuw koppelen nodig zijn.
+
+```bash
+curl "$ISSUER/oauth/token" --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "grant_type=refresh_token" \
+  --data-urlencode "refresh_token=$REFRESH_TOKEN"
+curl "$ISSUER/oauth/revoke" --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "token=$REFRESH_TOKEN"
+```
+
+Intrekken beëindigt de betreffende autorisatie. Onbekende tokens leveren ook een succesvol
+antwoord op. Gebruikers kunnen alle autorisaties voor een app verbreken onder
+**Instellingen → Gekoppelde apps**. De API staat 60 verzoeken per minuut per app en gebruiker
+toe. Respecteer `429` en `Retry-After`.
+
+Backend-geheimen worden één keer getoond. Normale rotatie geeft 24 uur overlap, met maximaal
+twee actieve geheimen. Noodrotatie trekt oude geheimen en verbindingen meteen in. Bewaar
+geheimen uitsluitend op de backend, nooit in bronbeheer of logs. Webhooks, client-credentials-,
+wachtwoord- en implicit-grants, dynamische registratie en OpenID Connect vallen buiten deze versie.

@@ -1,0 +1,223 @@
+---
+title: "Je eerste toepassing maken"
+description: "Registreer een OAuth-client, stel toestemming in en test je eerste accountkoppeling."
+---
+
+Ga na [goedkeuring als ontwikkelaar](/nl/build-an-app/getting-started) terug naar
+`/app/developers` en maak een toepassing. Begin met `profile:read` om je eigen profiel te lezen.
+
+## Video: je app registreren
+
+Stille opname van de lokale app met fictieve accounts. De interface is Engels; ondertitels zijn beschikbaar in het Engels, Duits, Frans en Nederlands.
+
+De video gebruikt `http://localhost:3105/callback` voor de lokale demoserver. De downloadbare backendhandleiding gebruikt `http://127.0.0.1:8080/callback`; registreer de exacte URL die je server aanbiedt.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Video: je app registreren"
+  poster="/videos/oauth/create-application.png"
+>
+  <source src="/videos/oauth/create-application.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+    default
+  />
+  Je browser kan deze video niet afspelen. Gebruik de download of het transcript
+  hieronder.
+</video>
+
+<a href="/videos/oauth/create-application.webm" download>
+  Video downloaden (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Videotranscript">
+    <p><strong>0:00</strong> Kies na goedkeuring als ontwikkelaar ‘Create an app’ (Een app maken).</p>
+
+    <p><strong>0:04</strong> Stel de naam en beschrijving in die gebruikers zien wanneer ze toestemming geven.</p>
+
+    <p><strong>0:09</strong> Vul je HTTPS-website, privacybeleid en supportadres in.</p>
+
+    <p><strong>0:15</strong> Dit voorbeeld gebruikt Server / backend en HTTP Basic voor clientauthenticatie.</p>
+
+    <p><strong>0:19</strong> Registreer de exacte callback van je toepassing. Deze lokale demo gebruikt poort 3105.</p>
+
+    <p><strong>0:23</strong> Vraag alleen de benodigde rechten aan. Begin met profile:read.</p>
+
+    <p><strong>0:27</strong> Dien de app in voor beoordeling. Voor goedkeuring kunnen alleen de eigenaar en geaccepteerde testers koppelen.</p>
+
+    <p><strong>0:33</strong> Kopieer je client-ID. Genereer voor een backend een geheim en bewaar het in veilige opslag op de server.</p>
+
+    <p><strong>0:40</strong> Het geheim wordt maar één keer getoond en is in deze opname afgeschermd. Browser- en native apps hebben geen geheim.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## Een platform kiezen
+
+Alle platforms gebruiken de OAuth-autorisatiecodeflow met **S256 PKCE**. Het platform
+van een registratie kan niet worden gewijzigd. Maak aparte apps voor verschillende platforms.
+
+| Platform         | Toepassing                                  | Clientauthenticatie                                            | Voorbeelden                                                  |
+| ---------------- | ------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------ |
+| Server / backend | Server ontvangt callbacks en bewaart tokens | `client_secret_basic` aanbevolen; `client_secret_post` kan ook | [TypeScript / Python](/nl/build-an-app/examples/backend)     |
+| Native / desktop | Geïnstalleerde app met systeembrowser       | `none`, geen ingebouwd geheim                                  | [JavaScript / Python](/nl/build-an-app/examples/native)      |
+| Browser          | JavaScript wisselt de code rechtstreeks uit | `none`, geen browsergeheim                                     | [JavaScript / TypeScript](/nl/build-an-app/examples/browser) |
+
+Bewaart je backend de tokens van je webinterface, kies dan backend. Clientgegevens
+zijn hier de client-ID en eventueel het geheim; de grant `client_credentials` wordt
+niet ondersteund. Toestemming van een gebruiker is altijd nodig.
+
+## Toestemming en callbacks instellen
+
+Vul een appnaam, duidelijke beschrijving, HTTPS-website, HTTPS-privacybeleid en
+supportadres in. Deze gegevens identificeren je product tijdens toestemming. Kies
+eerst `profile:read` en dien het formulier in voor goedkeuring. Raadpleeg de
+[OAuth-rechten](/nl/dashboard/api/oauth) voor verdere functies.
+
+Een callback is een route in **je eigen toepassing**, niet een OAuth-endpoint van R+D.
+
+| Platform           | Callback voor het voorbeeld          | Extra configuratie                                                                     |
+| ------------------ | ------------------------------------ | -------------------------------------------------------------------------------------- |
+| Backend            | `http://127.0.0.1:8080/callback`     | Je server moet deze route aanbieden                                                    |
+| Native desktopdemo | `http://127.0.0.1/callback`          | App-identificatie en bewijs van callbackbeheer; poort wordt tijdens uitvoering gekozen |
+| Browserdemo        | `http://127.0.0.1:8080/browser.html` | Registreer ook origin `http://127.0.0.1:8080`                                          |
+
+Een app kan maximaal tien exacte callbacks hebben. Wildcards, fragmenten en
+inloggegevens in URL’s worden geweigerd. Gebruik HTTPS, behalve voor lokale HTTP of
+beoordeelde native callbacks. Native apps kunnen geclaimde HTTPS-adressen, beoordeelde
+omgekeerde domeinschema’s of IP-loopback gebruiken. Alleen native HTTP-callbacks op
+`127.0.0.1` of `[::1]` mogen van poort veranderen; niet `localhost`, backend of browser.
+Stuur bij de code-uitwisseling de werkelijk gebruikte callback opnieuw mee.
+
+Browser-origins bevatten alleen schema, host en eventueel poort, zonder pad of
+afsluitende slash. Registreer elke callback-origin. `localhost` en `127.0.0.1`
+zijn verschillende origins.
+
+## Clientgegevens bewaren
+
+Kopieer de client-ID. Maak voor een backend een geheim in het portaal en sla het
+meteen veilig op de server op: het wordt maar één keer getoond. Native en browserapps
+hebben geen geheim. Houd staging en productie gescheiden en houd tokens, geheimen en
+callbackparameters uit broncode, logs, analyses en supportvragen.
+
+## Testers uitnodigen
+
+Stille opname van de lokale app met fictieve accounts. De interface is Engels; ondertitels zijn beschikbaar in het Engels, Duits, Frans en Nederlands.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Video: een tester uitnodigen en de uitnodiging accepteren"
+  poster="/videos/oauth/invite-tester.png"
+>
+  <source src="/videos/oauth/invite-tester.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+    default
+  />
+  Je browser kan deze video niet afspelen. Gebruik de download of het transcript
+  hieronder.
+</video>
+
+<a href="/videos/oauth/invite-tester.webm" download>
+  Video downloaden (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Videotranscript">
+    <p><strong>0:00</strong> Voor de eerste appgoedkeuring kan de eigenaar maximaal vijf extra bestaande R+D-accounts uitnodigen.</p>
+
+    <p><strong>0:04</strong> Zoek op exact e-mailadres of R+D-gebruikersnaam en selecteer het bijbehorende account.</p>
+
+    <p><strong>0:11</strong> Kies ‘Invite developer’. Openstaande en geaccepteerde uitnodigingen tellen beide mee voor de limiet van vijf accounts.</p>
+
+    <p><strong>0:16</strong> Wissel naar de uitgenodigde tester. Die meldt zich aan en opent /app/developers. Er wordt geen uitnodigingsmail verstuurd.</p>
+
+    <p><strong>0:23</strong> Accepteer de uitnodiging om tester te worden. Dit geeft geen appbeheer of goedkeuring als ontwikkelaar.</p>
+
+    <p><strong>0:29</strong> De tester kan nu het eigen account koppelen. Voor toegang blijft OAuth-toestemming nodig.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+Voor de eerste goedkeuring kan de eigenaar **vijf extra bestaande R+D-accounts**
+uitnodigen. Zoek op exact e-mailadres of R+D-gebruikersnaam, selecteer het account en
+verstuur de uitnodiging. Zowel openstaande als geaccepteerde uitnodigingen tellen mee;
+de eigenaar telt niet mee.
+
+Testers melden zich in dezelfde omgeving aan en accepteren via `/app/developers`.
+Deze versie verstuurt geen uitnodigingsmails en maakt geen account aan via de zoekactie.
+Vertel testers zelf waar ze de uitnodiging kunnen accepteren.
+
+Geaccepteerde testers kunnen hun eigen account koppelen, maar geen instellingen,
+geheimen of uitnodigingen beheren. Een uitnodiging geeft geen partner- of apparaattoegang.
+Verwijderen maakt een plek vrij en trekt de koppelingen van dat account in. Andere
+gebruikers kunnen de app pas na goedkeuring autoriseren.
+
+## Eerste koppeling en publicatie
+
+1. Gebruik het [voorbeeld voor je platform](/nl/build-an-app/examples) met je issuer en client-ID.
+2. Meld je aan als eigenaar of geaccepteerde tester en sta `profile:read` toe.
+3. Controleer `state` en `iss` en wissel de code uit met de PKCE-verifier.
+4. Roep `GET /api/v1/users/me` aan met het Bearer-token; succes bevat `ok: true` en `data`.
+5. Test weigering, ontbrekende rechten, verloop en ontkoppelen onder **Instellingen → Verbonden apps**.
+
+Activeer functies op basis van de werkelijk verleende `scope`. De eerste
+appbeoordeling moet worden goedgekeurd voor algemeen gebruik. Latere wijzigingen
+maken een nieuwe aanvraag; de goedgekeurde configuratie blijft tijdens beoordeling
+actief. Rechten verwijderen beperkt bestaande koppelingen onmiddellijk. Goedkeuring
+trekt oude koppelingen in en vereist nieuwe toestemming. Uitschakelen of schorsen
+trekt koppelingen ook in; herstellen maakt oude tokens niet opnieuw geldig. Details
+over token- en geheimrotatie staan in de [OAuth-referentie](/nl/dashboard/api/oauth).

@@ -1,0 +1,115 @@
+---
+title: "Entwicklerzugang beantragen"
+description: "Beantragen Sie ein Entwicklerkonto, bevor Sie Apps für andere R+D-Nutzer registrieren."
+---
+
+Entwicklerzugang erlaubt es Ihrem eigenen R+D-Konto, OAuth-Anwendungen für andere
+Nutzer zu registrieren. Persönliche API-Token dienen dagegen Skripten für Ihr eigenes
+Konto. Jeder OAuth-Nutzer erteilt Ihrer Anwendung eine eigene Zustimmung.
+
+## Video: Entwicklerzugang beantragen
+
+Stumme Aufnahme der lokalen App mit fiktiven Konten. Die Oberfläche ist auf Englisch; Untertitel sind auf Englisch, Deutsch, Französisch und Niederländisch verfügbar.
+
+Der Übergang zur Freigabe wird für die Demonstration simuliert. R+D prüft echte Anträge separat; das Absenden des Formulars erteilt keine Freigabe.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Video: Entwicklerzugang beantragen"
+  poster="/videos/oauth/apply-for-access.png"
+>
+  <source src="/videos/oauth/apply-for-access.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Ihr Browser kann dieses Video nicht abspielen. Nutzen Sie den Download oder
+  das Transkript unten.
+</video>
+
+<a href="/videos/oauth/apply-for-access.webm" download>
+  Video herunterladen (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Videotranskript">
+    <p><strong>0:00</strong> Melden Sie sich an und öffnen Sie /app/developers direkt. Die Seite ist in der Dashboard-Navigation verborgen.</p>
+
+    <p><strong>0:04</strong> Geben Sie Ihren Entwicklernamen, Ihre HTTPS-Website und eine Kontakt-E-Mail-Adresse an.</p>
+
+    <p><strong>0:09</strong> Beschreiben Sie Ihre Integration und wie Sie Nutzerdaten verwenden, schützen und löschen.</p>
+
+    <p><strong>0:15</strong> Wählen Sie die unterstützten Produkte und senden Sie den Antrag ab.</p>
+
+    <p><strong>0:21</strong> Ihr Antrag ist ausstehend. R+D prüft Entwickleranträge separat.</p>
+
+    <p><strong>0:25</strong> Später, nach der Freigabe Ihres Entwicklerkontos durch R+D, können Sie Apps erstellen.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## Entwicklerportal öffnen
+
+Melden Sie sich mit dem Konto an, das Ihre Apps besitzen soll, und öffnen Sie direkt
+`/app/developers`. Die Seite erscheint bewusst nicht in der Dashboard-Navigation.
+
+| Umgebung   | Portal                                                                      | Issuer                                    |
+| ---------- | --------------------------------------------------------------------------- | ----------------------------------------- |
+| Staging    | [Staging-Portal](https://staging.researchanddesire.com/app/developers)      | `https://staging.researchanddesire.com`   |
+| Produktion | [Produktionsportal](https://dashboard.researchanddesire.com/app/developers) | `https://dashboard.researchanddesire.com` |
+
+Verwenden Sie die für Ihre Integration freigeschaltete Umgebung. Ist die Seite nicht
+verfügbar, kontaktieren Sie R+D. Entwickleranträge, App-Registrierungen, Kontodaten,
+Zugangsdaten und Token sind pro Umgebung getrennt; ein Staging-Test gibt keine Produktions-App frei.
+
+## Antrag vorbereiten
+
+Geben Sie Ihren Entwickler- oder Organisationsnamen, eine HTTPS-Website, eine
+Kontaktadresse, eine Beschreibung der Integration, die Datennutzung und die gewünschten
+Produkte (Lockbox, DTT und/oder OSSM) an. Beschreiben Sie bei der Datennutzung konkret,
+was Sie lesen oder ändern, warum und wie Sie Daten speichern, aufbewahren und löschen.
+
+Ein Beispiel: Eine Beziehungsverwaltung zeigt aktuelle Lockbox-Sitzungen und lässt
+berechtigte Schlüsselhalter deren Dauer ändern. Sie speichert eine Sitzungsübersicht
+und löscht diese beim Trennen der Verbindung. Ihr Antrag muss Ihre tatsächliche
+Umsetzung beschreiben.
+
+Senden Sie den Antrag ab. Status und Rückmeldung finden Sie im Portal. Nach einer
+Ablehnung können Sie die Rückmeldung einarbeiten und erneut einreichen. Für die
+Bearbeitung wird durch diesen Ablauf keine feste Frist zugesagt.
+
+| Status                  | Verfügbare Möglichkeiten                                       |
+| ----------------------- | -------------------------------------------------------------- |
+| Entwicklerantrag offen  | Antrag und Status ansehen                                      |
+| Entwickler freigegeben  | Bis zu fünf Apps erstellen und konfigurieren                   |
+| Erste App-Prüfung offen | Eigentümer und bis zu fünf akzeptierte Tester können verbinden |
+| App freigegeben         | Weitere berechtigte R+D-Nutzer können zustimmen                |
+
+Eine Testeinladung genehmigt weder Ihr eigenes Entwicklerkonto noch den Zugriff auf
+fremde App-Einstellungen. Weiter: [Erste Anwendung erstellen](/de/build-an-app/first-application).

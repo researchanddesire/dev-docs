@@ -1,0 +1,110 @@
+---
+title: "Exemples de connexion"
+description: "Choisissez un exemple OAuth pour votre serveur, votre application native ou votre navigateur."
+---
+
+Commencez après [création de l’application](/fr/build-an-app/first-application). Tous les
+exemples utilisent le code d’autorisation avec PKCE S256 et lisent seulement le profil connecté.
+
+| Exemple                                                 | Langages                              | Contenu                                                                |
+| ------------------------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------- |
+| [OAuth côté serveur](/fr/build-an-app/examples/backend) | TypeScript / Node.js 24, Python 3.11+ | Fonctions pour consentement, retour, API, renouvellement et révocation |
+| [Native / bureau](/fr/build-an-app/examples/native)     | JavaScript / Node.js 24, Python 3.11+ | Démos exécutables avec navigateur système et bouclage IP               |
+| [Navigateur](/fr/build-an-app/examples/browser)         | JavaScript, TypeScript                | Démo HTML avec client public et jeton en mémoire                       |
+
+Les exemples utilisent des bibliothèques standard. Le backend nécessite les sessions
+et le stockage de votre framework. Les démos natives et navigateur s’exécutent après
+enregistrement et configuration. Ce sont des exemples pédagogiques, pas un SDK ni
+une application de production complète.
+
+## Vidéo : connecter et déconnecter un compte
+
+Enregistrement sans son de l’application locale avec des comptes fictifs. L’interface est en anglais ; les sous-titres sont disponibles en anglais, allemand, français et néerlandais.
+
+Cette vidéo utilise une application backend et un testeur accepté. Elle montre le consentement, un véritable échange de code et la révocation, mais pas une requête de données API. Les étapes de consentement et de déconnexion sont identiques pour les clients natifs et navigateur.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Vidéo : connecter et déconnecter un compte"
+  poster="/videos/oauth/link-account.png"
+>
+  <source src="/videos/oauth/link-account.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.fr.vtt"
+    srcLang="fr"
+    label="Français"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Votre navigateur ne peut pas lire cette vidéo. Utilisez le téléchargement ou
+  la transcription ci-dessous.
+</video>
+
+<a href="/videos/oauth/link-account.webm" download>
+  Télécharger la vidéo (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Transcription de la vidéo">
+    <p><strong>0:00</strong> Un testeur accepté ouvre l’application tierce et choisit « Link your R+D account ».</p>
+
+    <p><strong>0:08</strong> R+D affiche l’identité de l’app et les permissions demandées. Vérifiez-les avant d’autoriser l’accès.</p>
+
+    <p><strong>0:14</strong> Choisissez « Allow selected permissions ». Le navigateur revient à l’adresse de retour de l’app.</p>
+
+    <p><strong>0:19</strong> Le serveur valide le retour et échange le code avec PKCE. Les jetons restent sur le serveur.</p>
+
+    <p><strong>0:25</strong> Pour consulter ou retirer l’accès, ouvrez les paramètres R+D → Applications connectées.</p>
+
+    <p><strong>0:32</strong> Choisissez « Disconnect ». L’app ne peut plus utiliser cette connexion pour accéder à l’API.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## Échange commun
+
+1. Générez un état aléatoire et un vérificateur PKCE pour l’utilisateur à l’origine de la demande.
+2. Ouvrez `/oauth/authorize` avec ID client, retour exact, scope, état et challenge S256.
+3. Consommez la transaction une seule fois ; vérifiez `state` et `iss`, même en cas de refus.
+4. Envoyez code, retour et vérificateur à `/oauth/token` sous forme de formulaire. Le backend s’authentifie également.
+5. Vérifiez les scopes accordés, puis envoyez le jeton Bearer aux opérations autorisées.
+
+Configurez un émetteur fixe par environnement. Les métadonnées se trouvent dans
+`/.well-known/oauth-authorization-server` ; ne choisissez jamais un endpoint de
+jeton à partir d’un `iss` non validé. Les jetons sont opaques, sans ID token OpenID Connect.
+
+## Traiter les erreurs
+
+Après `access_denied`, validez l’état et l’émetteur puis restez déconnecté. Refusez
+les paramètres inattendus, dupliqués ou expirés sans échanger le code. Ne réutilisez
+pas un code rejeté ; vérifiez PKCE, retour, environnement et authentification client.
+Pour `401`, renouvelez une fois si possible ou reconnectez ; pour `403`, vérifiez
+scopes et permissions de compte/appareil ; pour `429`, respectez `Retry-After`.
+Ne renvoyez jamais l’ancien jeton de renouvellement après un résultat ambigu.
+
+Les jetons d’accès durent dix minutes. Les démos ne demandent pas `offline_access`.
+La limite est de 60 appels API par minute, application et utilisateur. Consultez
+la [référence OAuth](/fr/dashboard/api/oauth) pour le cycle de vie complet.

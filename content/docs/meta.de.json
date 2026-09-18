@@ -2,6 +2,7 @@
   "title": "Entwicklerdokumente",
   "pages": [
     "index",
+    "build-an-app",
     "quickstart",
     "dashboard",
     "api-reference",

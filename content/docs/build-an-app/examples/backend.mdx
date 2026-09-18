@@ -1,0 +1,130 @@
+---
+title: "Backend OAuth examples"
+description: "Connect accounts from a TypeScript or Python server and keep credentials on the backend."
+---
+
+Register **Server / backend** with **HTTP Basic** (`client_secret_basic`). These
+examples use PKCE as well as the client secret. Download <a href="/examples/oauth/rd-oauth.ts" download>rd-oauth.ts</a>
+for Node.js 24 or <a href="/examples/oauth/rd_oauth.py" download>rd_oauth.py</a> for Python 3.11+. They use
+standard libraries and expose authorization, code exchange, profile, refresh, and
+revocation helpers.
+
+Configure `RD_ISSUER`, `RD_CLIENT_ID`, `RD_CLIENT_SECRET`, and `RD_REDIRECT_URI` in
+your server environment. Use the issuer and secret from the same registration.
+For local development, register and serve `http://127.0.0.1:8080/callback`; use your
+own exact HTTPS callback for the deployed app. The helpers use callbacks without
+pre-existing query parameters.
+
+## Add two routes to your application
+
+Your “Link R+D” route must require your own logged-in user and use your framework's
+CSRF protection for the initiating action. Store the returned transaction in that
+user's server-side session, expire it after ten minutes, and redirect to the returned
+URL. Use a Secure, HttpOnly, SameSite=Lax session cookie on deployed HTTPS sites.
+
+In the callback route, atomically remove the pending transaction from the **same
+session** before calling the helper, even if the user denied consent. Reject a
+callback with no pending attempt. Associate the resulting connection with that
+authenticated user; never choose a user from callback query parameters. Redact
+callback queries from access logs and return `Cache-Control: no-store` and
+`Referrer-Policy: no-referrer` on the callback response.
+
+The following functions are route adapters: your framework supplies the session,
+response redirect, and encrypted token storage. They are not a standalone web server.
+
+<Tabs>
+  <Tab title="TypeScript">
+
+```typescript
+import { beginLink, finishLink, readProfile } from "./rd-oauth.ts";
+import type { Transaction } from "./rd-oauth.ts";
+
+function required(name: string) {
+  const value = process.env[name];
+  if (!value) throw new Error(`Set ${name}`);
+  return value;
+}
+const config = {
+  issuer: required("RD_ISSUER"),
+  clientId: required("RD_CLIENT_ID"),
+  clientSecret: required("RD_CLIENT_SECRET"),
+  redirectUri: required("RD_REDIRECT_URI"),
+};
+
+export function startConnection() {
+  // Save transaction in the initiating user's session BEFORE redirecting.
+  return beginLink(config, "profile:read");
+}
+
+export async function completeConnection(
+  callbackUrl: string,
+  consumedTransaction: Transaction,
+) {
+  const tokens = await finishLink(config, callbackUrl, consumedTransaction);
+  const profile = await readProfile(config, tokens);
+  // Persist tokens privately for the authenticated app user, never in a cookie.
+  // Redirect to a clean app URL; do not send this return value to the browser.
+  return { tokens, profile };
+}
+```
+
+  </Tab>
+  <Tab title="Python">
+
+```python
+import os
+from rd_oauth import begin_link, finish_link, read_profile
+
+config = {
+    "issuer": os.environ["RD_ISSUER"],
+    "client_id": os.environ["RD_CLIENT_ID"],
+    "client_secret": os.environ["RD_CLIENT_SECRET"],
+    "redirect_uri": os.environ["RD_REDIRECT_URI"],
+}
+
+def start_connection():
+    # Save transaction in the initiating user's session BEFORE redirecting.
+    return begin_link(config, "profile:read")
+
+def complete_connection(callback_url, consumed_transaction):
+    tokens = finish_link(config, callback_url, consumed_transaction)
+    profile = read_profile(config, tokens)
+    # Persist tokens privately for the authenticated app user, never in a cookie.
+    # Redirect to a clean app URL; do not serialize this result to the browser.
+    return {"tokens": tokens, "profile": profile}
+```
+
+  </Tab>
+</Tabs>
+
+The downloaded helpers generate S256 challenges, check the callback's state and issuer,
+reject duplicate parameters, and exchange codes using a form body and HTTP Basic.
+They do not follow token/API redirects or automatically retry failed exchanges.
+The token response has `access_token`, `token_type`, `expires_in`, and the granted
+`scope`; the profile API returns an `ok`/`data` envelope.
+
+If you registered `client_secret_post`, adapt the request helper to put `client_id`
+and `client_secret` in the form body and remove HTTP Basic. Do not send both methods.
+Do not change the app to public authentication just to avoid handling its secret.
+
+## Keep a connection while the user is away
+
+Add `offline_access` to the app registration and authorization request only when
+needed. The user must opt in; check whether the response actually contains a
+`refresh_token`. Store it encrypted on the backend along with the access token,
+granted scope, and an expiry calculated from `expires_in`.
+
+Both downloads expose `refresh(config, refreshToken)` (Python: `refresh(config,
+refresh_token)`) and `revoke(config, token)`. Call refresh under a **per-connection
+lock** and atomically replace both stored tokens with the response before releasing
+the lock. Never refresh the same connection concurrently or retry an old refresh token
+after a timeout. Reuse revokes the entire token family. If replacement storage fails
+or the outcome is unknown, stop using that connection and require fresh consent.
+
+For disconnect, revoke a stored token, remove your local credentials, and tell the
+user if remote revocation could not be confirmed. Users can also revoke all connections
+to your app under **Settings → Connected apps**. The [OAuth reference](/dashboard/api/oauth#refresh-revoke-and-rotate)
+covers refresh expiry, secret rotation, and reconnection.
+
+To try a complete local browser round trip before wiring a framework, use the
+[native demo](/build-an-app/examples/native) with its own **native** registration.

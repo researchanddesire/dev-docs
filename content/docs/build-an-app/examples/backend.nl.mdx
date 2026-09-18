@@ -1,0 +1,123 @@
+---
+title: "OAuth-voorbeelden voor backends"
+description: "Koppel accounts via een TypeScript- of Python-server."
+---
+
+Registreer **Server / backend** met HTTP Basic (`client_secret_basic`). PKCE blijft
+verplicht. Download <a href="/examples/oauth/rd-oauth.ts" download>rd-oauth.ts</a> voor Node.js 24 of
+
+<a href="/examples/oauth/rd_oauth.py" download>
+  rd_oauth.py
+</a>
+voor Python 3.11+. Standaardbibliotheken zijn voldoende; de bestanden bevatten
+ook vernieuwen en intrekken.
+
+Stel `RD_ISSUER`, `RD_CLIENT_ID`, `RD_CLIENT_SECRET` en `RD_REDIRECT_URI` in
+op de server. Bied lokaal `http://127.0.0.1:8080/callback` aan en gebruik in productie
+je eigen exacte HTTPS-callback. De helpers verwachten callbacks zonder bestaande queryparameters.
+
+## Twee routes integreren
+
+De koppelactie vereist je eigen aangemelde gebruiker en CSRF-bescherming van je
+framework. Bewaar de transactie tien minuten in diens serversessie voordat je
+doorstuurt. Gebruik op HTTPS een Secure-, HttpOnly- en SameSite=Lax-sessiecookie.
+
+Verwijder de openstaande transactie bij de callback atomair uit dezelfde sessie, ook
+bij weigering. Wijs callbacks zonder transactie af. Koppel het resultaat aan de
+ingelogde gebruiker, nooit aan een gebruiker uit callbackparameters. Verberg callbackqueries
+in logs en stuur `Cache-Control: no-store` en `Referrer-Policy: no-referrer`.
+
+Dit zijn routeadapters, geen zelfstandige webserver. Je framework levert de sessie,
+doorverwijzing en versleutelde tokenopslag:
+
+<Tabs>
+<Tab title="TypeScript">
+
+```typescript
+import { beginLink, finishLink, readProfile } from "./rd-oauth.ts";
+import type { Transaction } from "./rd-oauth.ts";
+
+function required(name: string) {
+  const value = process.env[name];
+  if (!value) throw new Error(`Set ${name}`);
+  return value;
+}
+const config = {
+  issuer: required("RD_ISSUER"),
+  clientId: required("RD_CLIENT_ID"),
+  clientSecret: required("RD_CLIENT_SECRET"),
+  redirectUri: required("RD_REDIRECT_URI"),
+};
+
+export function startConnection() {
+  // Save transaction in the initiating user's session BEFORE redirecting.
+  return beginLink(config, "profile:read");
+}
+
+export async function completeConnection(
+  callbackUrl: string,
+  consumedTransaction: Transaction,
+) {
+  const tokens = await finishLink(config, callbackUrl, consumedTransaction);
+  const profile = await readProfile(config, tokens);
+  // Persist tokens privately for the authenticated app user, never in a cookie.
+  // Redirect to a clean app URL; do not send this return value to the browser.
+  return { tokens, profile };
+}
+```
+
+</Tab>
+<Tab title="Python">
+
+```python
+import os
+from rd_oauth import begin_link, finish_link, read_profile
+
+config = {
+    "issuer": os.environ["RD_ISSUER"],
+    "client_id": os.environ["RD_CLIENT_ID"],
+    "client_secret": os.environ["RD_CLIENT_SECRET"],
+    "redirect_uri": os.environ["RD_REDIRECT_URI"],
+}
+
+def start_connection():
+    # Save transaction in the initiating user's session BEFORE redirecting.
+    return begin_link(config, "profile:read")
+
+def complete_connection(callback_url, consumed_transaction):
+    tokens = finish_link(config, callback_url, consumed_transaction)
+    profile = read_profile(config, tokens)
+    # Persist tokens privately for the authenticated app user, never in a cookie.
+    # Redirect to a clean app URL; do not serialize this result to the browser.
+    return {"tokens": tokens, "profile": profile}
+```
+
+</Tab>
+</Tabs>
+
+De downloads controleren state, issuer, verloop en dubbele parameters. Uitwisseling
+gebruikt een formulier en HTTP Basic, zonder redirects of automatische herhalingen.
+Het tokenantwoord bevat `access_token`, `token_type`, `expires_in` en `scope`;
+het profiel gebruikt een `ok`/`data`-envelop.
+
+Voor `client_secret_post` plaats je client-ID en geheim in het formulier en verwijder
+je HTTP Basic. Gebruik nooit beide methoden en maak een backend niet publiek om
+het beheer van een geheim te vermijden.
+
+## Toegang tijdens afwezigheid
+
+Voeg alleen indien nodig `offline_access` toe aan registratie en aanvraag. De
+gebruiker moet apart toestemmen; controleer of `refresh_token` aanwezig is. Bewaar
+tokens versleuteld met scopes en een vervaltijd berekend uit `expires_in`.
+
+Beide downloads bieden `refresh(config, token)` en `revoke(config, token)`.
+Vernieuw onder een vergrendeling per koppeling en vervang beide tokens atomair voordat
+je die vrijgeeft. Vernieuw niet gelijktijdig en herhaal een oud refresh-token niet na
+een timeout: hergebruik trekt de hele tokenfamilie in. Bij opslagfalen of onduidelijk
+resultaat is nieuwe toestemming nodig.
+
+Trek bij ontkoppelen een bewaard token in, verwijder lokale clientgegevens en meld
+het als intrekken niet is bevestigd. De gebruiker kan ook **Instellingen → Verbonden
+apps** gebruiken. Zie de [OAuth-levensduur](/nl/dashboard/api/oauth). Voor een volledige
+lokale ronde gebruik je de [native demo](/nl/build-an-app/examples/native) met een eigen
+native registratie.
