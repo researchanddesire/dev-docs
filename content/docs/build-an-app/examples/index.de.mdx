@@ -1,0 +1,109 @@
+---
+title: "Verbindungsbeispiele"
+description: "Wählen Sie OAuth-Beispiele für Backend, native Anwendungen oder Browser."
+---
+
+Beginnen Sie nach dem [Erstellen der App](/de/build-an-app/first-application). Alle Beispiele
+verwenden Autorisierungscode mit S256 PKCE und lesen nur das Profil des verbundenen Nutzers.
+
+| Beispiel                                             | Sprachen                              | Inhalt                                                                                      |
+| ---------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------- |
+| [Backend-OAuth](/de/build-an-app/examples/backend)   | TypeScript / Node.js 24, Python 3.11+ | Framework-unabhängige Hilfsfunktionen für Zustimmung, Rückruf, API, Erneuerung und Widerruf |
+| [Native / Desktop](/de/build-an-app/examples/native) | JavaScript / Node.js 24, Python 3.11+ | Ausführbare Demos mit Systembrowser und IP-Loopback                                         |
+| [Browser](/de/build-an-app/examples/browser)         | JavaScript, TypeScript                | HTML-Demo mit öffentlichem Client und Token nur im Arbeitsspeicher                          |
+
+Die Beispiele verwenden Standardbibliotheken. Backend-Beispiele benötigen die Sitzung
+und Speicherung Ihres Frameworks. Native und Browser-Demos laufen nach Registrierung
+und Konfiguration. Sie sind Lernbeispiele, kein SDK oder vollständiges Produktionssystem.
+
+## Video: Konto verbinden und trennen
+
+Stumme Aufnahme der lokalen App mit fiktiven Konten. Die Oberfläche ist auf Englisch; Untertitel sind auf Englisch, Deutsch, Französisch und Niederländisch verfügbar.
+
+Diese Aufnahme verwendet eine Backend-App und einen akzeptierten Tester. Sie zeigt Zustimmung, einen echten Codeaustausch und Widerruf, jedoch keinen API-Datenabruf. Zustimmung und Trennung funktionieren bei nativen und Browser-Clients genauso.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Video: Konto verbinden und trennen"
+  poster="/videos/oauth/link-account.png"
+>
+  <source src="/videos/oauth/link-account.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/link-account.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Ihr Browser kann dieses Video nicht abspielen. Nutzen Sie den Download oder
+  das Transkript unten.
+</video>
+
+<a href="/videos/oauth/link-account.webm" download>
+  Video herunterladen (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Videotranskript">
+    <p><strong>0:00</strong> Ein akzeptierter Tester startet in der Drittanbieter-App und wählt „Link your R+D account“.</p>
+
+    <p><strong>0:08</strong> R+D zeigt die App und die angeforderten Rechte. Prüfen Sie diese vor der Zustimmung.</p>
+
+    <p><strong>0:14</strong> Wählen Sie „Allow selected permissions“. Der Browser kehrt zur Rückrufadresse der App zurück.</p>
+
+    <p><strong>0:19</strong> Der Server prüft den Rückruf und tauscht den Code mit PKCE aus. Die Token bleiben auf dem Server.</p>
+
+    <p><strong>0:25</strong> Öffnen Sie zum Prüfen oder Entfernen des Zugriffs R+D-Einstellungen → Verbundene Apps.</p>
+
+    <p><strong>0:32</strong> Wählen Sie „Disconnect“. Die App kann diese Verbindung nicht mehr für API-Zugriffe verwenden.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## Gemeinsamer Ablauf
+
+1. Erzeugen Sie zufälligen State und PKCE-Verifier und speichern Sie sie für den initiierenden Nutzer.
+2. Öffnen Sie `/oauth/authorize` mit Client-ID, genauem Rückruf, Scope, State und S256-Challenge.
+3. Verbrauchen Sie die Transaktion einmalig und prüfen Sie `state` und `iss`, auch bei Ablehnung.
+4. Senden Sie Code, Rückruf und Verifier formularcodiert an `/oauth/token`. Backends authentifizieren sich zusätzlich.
+5. Lesen Sie die erteilten Scopes und senden Sie das Bearer-Token bei erlaubten API-Anfragen.
+
+Verwenden Sie einen fest konfigurierten Issuer pro Umgebung. Metadaten stehen unter
+`/.well-known/oauth-authorization-server`; wählen Sie nie einen Token-Endpunkt aus
+einem ungeprüften `iss`. Token sind undurchsichtig, keine OpenID-Connect-ID-Token.
+
+## Fehler behandeln
+
+Bei `access_denied` nach State-/Issuer-Prüfung unverbunden bleiben. Ungültige,
+doppelte oder abgelaufene Rückrufparameter ohne Codeaustausch ablehnen. Einen
+abgewiesenen Code nicht wiederverwenden; PKCE, Rückruf, Umgebung und Authentifizierung prüfen.
+Bei API-`401` gegebenenfalls einmal sicher erneuern oder neu verbinden; bei `403`
+Scopes und Geräterecht prüfen; bei `429` auf `Retry-After` warten. Nach unklarem
+Refresh-Ergebnis niemals das alte Refresh-Token erneut senden.
+
+Access-Token gelten zehn Minuten. Die Demos fordern kein `offline_access` an.
+Das Limit beträgt 60 API-Anfragen pro Minute, App und Nutzer. Weitere Regeln:
+[OAuth-Referenz](/de/dashboard/api/oauth).

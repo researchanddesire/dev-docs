@@ -1,0 +1,123 @@
+---
+title: "OAuth-Beispiele für Backends"
+description: "Verbinden Sie Konten über einen TypeScript- oder Python-Server."
+---
+
+Registrieren Sie **Server / Backend** mit HTTP Basic (`client_secret_basic`). PKCE
+ist zusätzlich erforderlich. Laden Sie <a href="/examples/oauth/rd-oauth.ts" download>rd-oauth.ts</a> für
+Node.js 24 oder <a href="/examples/oauth/rd_oauth.py" download>rd_oauth.py</a> für Python 3.11+ herunter.
+Die Standardbibliothek genügt; beide Dateien enthalten Erneuerung und Widerruf.
+
+Setzen Sie `RD_ISSUER`, `RD_CLIENT_ID`, `RD_CLIENT_SECRET` und `RD_REDIRECT_URI`
+auf dem Server. Verwenden Sie lokal `http://127.0.0.1:8080/callback` und in der
+bereitgestellten App Ihren genauen HTTPS-Rückruf. Die Hilfsfunktionen erwarten
+Rückrufe ohne bereits vorhandene Abfrageparameter.
+
+## Zwei Routen integrieren
+
+Die Verbindungsaktion muss Ihren angemeldeten Nutzer und den CSRF-Schutz Ihres
+Frameworks voraussetzen. Speichern Sie die Transaktion vor der Weiterleitung zehn
+Minuten in dessen Serversitzung. Unter HTTPS verwenden Sie ein Secure-, HttpOnly-
+und SameSite=Lax-Sitzungscookie.
+
+Entfernen Sie beim Rückruf die ausstehende Transaktion atomar aus derselben Sitzung,
+auch bei Ablehnung. Fehlt sie, weisen Sie den Rückruf ab. Ordnen Sie die Verbindung
+dem angemeldeten Nutzer zu, niemals einem Nutzer aus Rückrufparametern. Schwärzen
+Sie Rückrufabfragen in Protokollen und senden Sie `Cache-Control: no-store` sowie
+`Referrer-Policy: no-referrer`.
+
+Dies sind Routenadapter, kein Webserver. Ihr Framework stellt Sitzung, Weiterleitung
+und verschlüsselte Token-Speicherung bereit:
+
+<Tabs>
+<Tab title="TypeScript">
+
+```typescript
+import { beginLink, finishLink, readProfile } from "./rd-oauth.ts";
+import type { Transaction } from "./rd-oauth.ts";
+
+function required(name: string) {
+  const value = process.env[name];
+  if (!value) throw new Error(`Set ${name}`);
+  return value;
+}
+const config = {
+  issuer: required("RD_ISSUER"),
+  clientId: required("RD_CLIENT_ID"),
+  clientSecret: required("RD_CLIENT_SECRET"),
+  redirectUri: required("RD_REDIRECT_URI"),
+};
+
+export function startConnection() {
+  // Save transaction in the initiating user's session BEFORE redirecting.
+  return beginLink(config, "profile:read");
+}
+
+export async function completeConnection(
+  callbackUrl: string,
+  consumedTransaction: Transaction,
+) {
+  const tokens = await finishLink(config, callbackUrl, consumedTransaction);
+  const profile = await readProfile(config, tokens);
+  // Persist tokens privately for the authenticated app user, never in a cookie.
+  // Redirect to a clean app URL; do not send this return value to the browser.
+  return { tokens, profile };
+}
+```
+
+</Tab>
+<Tab title="Python">
+
+```python
+import os
+from rd_oauth import begin_link, finish_link, read_profile
+
+config = {
+    "issuer": os.environ["RD_ISSUER"],
+    "client_id": os.environ["RD_CLIENT_ID"],
+    "client_secret": os.environ["RD_CLIENT_SECRET"],
+    "redirect_uri": os.environ["RD_REDIRECT_URI"],
+}
+
+def start_connection():
+    # Save transaction in the initiating user's session BEFORE redirecting.
+    return begin_link(config, "profile:read")
+
+def complete_connection(callback_url, consumed_transaction):
+    tokens = finish_link(config, callback_url, consumed_transaction)
+    profile = read_profile(config, tokens)
+    # Persist tokens privately for the authenticated app user, never in a cookie.
+    # Redirect to a clean app URL; do not serialize this result to the browser.
+    return {"tokens": tokens, "profile": profile}
+```
+
+</Tab>
+</Tabs>
+
+Die Downloads prüfen State, Issuer, Ablauf und doppelte Parameter. Der Codeaustausch
+verwendet ein Formular mit HTTP Basic. Weiterleitungen und automatische Wiederholungen
+sind deaktiviert. Tokenantworten enthalten `access_token`, `token_type`, `expires_in`
+und `scope`; Profilantworten verwenden `ok` und `data`.
+
+Bei registriertem `client_secret_post` müssen Client-ID und Geheimnis stattdessen
+im Formular stehen und HTTP Basic entfallen. Verwenden Sie nie beide Methoden und
+stellen Sie ein Backend nicht auf öffentliche Authentifizierung um.
+
+## Zugriff während der Abwesenheit
+
+Ergänzen Sie nur bei Bedarf `offline_access` in Registrierung und Anfrage. Nutzer
+müssen separat zustimmen; prüfen Sie, ob ein `refresh_token` zurückkommt. Speichern
+Sie Token verschlüsselt zusammen mit Scopes und einer aus `expires_in` berechneten Ablaufzeit.
+
+Beide Downloads bieten `refresh(config, token)` und `revoke(config, token)`.
+Erneuern Sie unter einer Sperre pro Verbindung und ersetzen Sie beide gespeicherten
+Token atomar, bevor die Sperre freigegeben wird. Gleichzeitiges Erneuern und erneutes
+Senden eines alten Tokens nach Zeitüberschreitung sind unzulässig: Wiederverwendung
+widerruft die ganze Familie. Nach Speicherfehlern oder unklarem Ergebnis ist eine
+neue Zustimmung erforderlich.
+
+Beim Trennen widerrufen Sie einen gespeicherten Token, löschen lokale Zugangsdaten
+und informieren den Nutzer, falls der Widerruf nicht bestätigt wurde. Alternativ
+nutzt er **Einstellungen → Verbundene Apps**. Siehe [OAuth-Lebenszyklus](/de/dashboard/api/oauth).
+Für einen kompletten lokalen Ablauf nutzen Sie die [native Demo](/de/build-an-app/examples/native)
+mit einer eigenen nativen Registrierung.

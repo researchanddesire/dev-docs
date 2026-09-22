@@ -1,0 +1,108 @@
+---
+title: "Voorbeelden voor native en desktop"
+description: "Test JavaScript en Python met de systeembrowser en zonder clientgeheim."
+---
+
+Registreer **Native / desktop**, authenticatie `none`, scope `profile:read` en
+callback `http://127.0.0.1/callback`. Geef je app-identificatie en bewijs van
+callbackbeheer op. Beschrijf bij een prototype de lokale IP-loopbacklistener en
+identificeer je app of repository. De werkelijke callback bevat een poort die het systeem kiest.
+
+De demo’s openen de systeembrowser, ontvangen één callback op `127.0.0.1`, controleren
+state, issuer en PKCE, lezen het profiel en trekken de koppeling in. Ze tonen geen
+accountgegevens en bewaren geen tokens op schijf. Gebruik tijdens beoordeling de
+eigenaar of een geaccepteerde tester.
+
+## De demo uitvoeren
+
+Stel `RD_ISSUER` en de native `RD_CLIENT_ID` in, zonder geheim. Sla de twee
+bestanden voor je taal in dezelfde map op:
+
+<Tabs>
+<Tab title="JavaScript">
+
+Download <a href="/examples/oauth/native-node.mjs" download>native-node.mjs</a> en <a href="/examples/oauth/rd-oauth.ts" download>rd-oauth.ts</a>. Node.js 24 voert verwijderbare TypeScript rechtstreeks uit; installatie of compilatie is niet nodig.
+
+```bash
+node native-node.mjs
+```
+
+Dezelfde transactie verbindt start en callback:
+
+```javascript
+import { beginLink, finishLink, readProfile, revoke } from "./rd-oauth.ts";
+
+// In the complete demo, redirectUri includes the bound loopback listener's port.
+export function startNativeConnection(issuer, clientId, redirectUri) {
+  const config = { issuer, clientId, redirectUri };
+  const started = beginLink(config, "profile:read");
+  return { config, ...started };
+}
+
+export async function completeNativeConnection(
+  config,
+  callbackUrl,
+  transaction,
+) {
+  // The listener consumes the transaction once before invoking this function.
+  const tokens = await finishLink(config, callbackUrl, transaction);
+  try {
+    await readProfile(config, tokens);
+  } finally {
+    await revoke(config, tokens.access_token);
+  }
+}
+```
+
+</Tab>
+<Tab title="Python">
+
+Download <a href="/examples/oauth/native_python.py" download>native_python.py</a> en <a href="/examples/oauth/rd_oauth.py" download>rd_oauth.py</a>. Python 3.11+ is voldoende; op Windows kan `py` `python` vervangen.
+
+```bash
+python native_python.py
+```
+
+De listener wordt vóór de autorisatie gebonden:
+
+```python
+from http.server import HTTPServer
+from native_python import Callback
+from rd_oauth import begin_link
+
+def prepare_listener(issuer, client_id):
+    server = HTTPServer(("127.0.0.1", 0), Callback)
+    server.config = {
+        "issuer": issuer,
+        "client_id": client_id,
+        "redirect_uri": f"http://127.0.0.1:{server.server_port}/callback",
+    }
+    server.completed = False
+    url, server.transaction = begin_link(server.config, "profile:read")
+    return server, url
+```
+
+</Tab>
+</Tabs>
+
+Sta de koppeling toe of test weigering. Bij succes verschijnt “Profile request
+succeeded.” Het token wordt daarna ingetrokken. Start het script opnieuw voor een
+nieuwe poging; de listener verloopt na tien minuten.
+
+## Aanpassen voor een uitgebrachte app
+
+Gebruik de authenticatiebrowser en het callbackmechanisme van het besturingssysteem.
+Plaats aanmelden niet in een WebView en lever geen backendgeheim mee. PKCE bindt de
+code aan de appinstantie die begon. Zie
+[OAuth voor native apps, RFC 8252](https://www.rfc-editor.org/rfc/rfc8252).
+
+Registreer op mobiel geclaimde HTTPS-adressen of beoordeelde omgekeerde domeinschema’s.
+Gebruik op Apple-platforms
+[ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession)
+met presentatiecontext en geregistreerde callback. Behoud controles voor state,
+issuer, verifier en eenmalig transactiegebruik.
+
+Vraag voor blijvende koppelingen expliciet `offline_access` en bewaar tokens in de
+beveiligde opslag van het systeem. Vernieuw achtereenvolgens en sla vervangingen
+atomair op volgens de [OAuth-regels](/nl/dashboard/api/oauth). Houd callbacks en tokens
+uit crashrapporten en logs.

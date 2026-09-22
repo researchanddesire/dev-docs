@@ -1,0 +1,226 @@
+---
+title: "Créer votre première application"
+description: "Enregistrez un client OAuth, configurez son écran de consentement et testez la connexion."
+---
+
+Après [approbation du développeur](/fr/build-an-app/getting-started), revenez à
+`/app/developers` et créez une application. Commencez par lire votre propre profil
+avec `profile:read`.
+
+## Vidéo : enregistrer votre application
+
+Enregistrement sans son de l’application locale avec des comptes fictifs. L’interface est en anglais ; les sous-titres sont disponibles en anglais, allemand, français et néerlandais.
+
+La vidéo utilise `http://localhost:3105/callback` pour son serveur local. Le guide backend téléchargeable utilise `http://127.0.0.1:8080/callback` ; enregistrez l’URL exacte fournie par votre serveur.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Vidéo : enregistrer votre application"
+  poster="/videos/oauth/create-application.png"
+>
+  <source src="/videos/oauth/create-application.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.fr.vtt"
+    srcLang="fr"
+    label="Français"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Votre navigateur ne peut pas lire cette vidéo. Utilisez le téléchargement ou
+  la transcription ci-dessous.
+</video>
+
+<a href="/videos/oauth/create-application.webm" download>
+  Télécharger la vidéo (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Transcription de la vidéo">
+    <p><strong>0:00</strong> Une fois l’accès développeur approuvé, choisissez « Create an app » (Créer une application).</p>
+
+    <p><strong>0:04</strong> Définissez le nom et la description que les utilisateurs verront lors du consentement.</p>
+
+    <p><strong>0:09</strong> Indiquez votre site HTTPS, votre politique de confidentialité et votre adresse d’assistance.</p>
+
+    <p><strong>0:15</strong> Cet exemple utilise Serveur / backend et l’authentification du client par HTTP Basic.</p>
+
+    <p><strong>0:19</strong> Enregistrez l’adresse de retour exacte de votre application. Cette démonstration locale utilise le port 3105.</p>
+
+    <p><strong>0:23</strong> Demandez uniquement les permissions nécessaires. Commencez par profile:read.</p>
+
+    <p><strong>0:27</strong> Soumettez l’app pour examen. Avant approbation, seuls le propriétaire et les testeurs acceptés peuvent se connecter.</p>
+
+    <p><strong>0:33</strong> Copiez l’ID client. Pour un backend, générez un secret et conservez-le dans le stockage sécurisé du serveur.</p>
+
+    <p><strong>0:40</strong> Le secret n’est affiché qu’une fois et reste masqué dans cette vidéo. Les apps natives et navigateur n’ont pas de secret.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## Choisir une plateforme
+
+Toutes les plateformes utilisent le code d’autorisation OAuth avec **PKCE S256**.
+La plateforme d’un enregistrement ne peut pas être modifiée ; créez des applications
+distinctes pour des plateformes différentes.
+
+| Plateforme        | Utilisation                                        | Authentification du client                                        | Exemples                                                     |
+| ----------------- | -------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------ |
+| Serveur / backend | Le serveur reçoit le retour et conserve les jetons | `client_secret_basic` conseillé ; `client_secret_post` disponible | [TypeScript / Python](/fr/build-an-app/examples/backend)     |
+| Native / bureau   | Application installée avec navigateur système      | `none`, aucun secret embarqué                                     | [JavaScript / Python](/fr/build-an-app/examples/native)      |
+| Navigateur        | JavaScript échange directement le code             | `none`, aucun secret côté navigateur                              | [JavaScript / TypeScript](/fr/build-an-app/examples/browser) |
+
+Si un serveur conserve les jetons de votre interface web, choisissez backend.
+Les identifiants désignent ici l’ID client et éventuellement son secret ; le grant
+`client_credentials` n’est pas proposé. Le consentement d’un utilisateur reste obligatoire.
+
+## Configurer le consentement et les retours
+
+Fournissez un nom, une description claire, un site HTTPS, une politique de
+confidentialité HTTPS et une adresse d’assistance. Ces informations identifient votre
+produit pendant le consentement. Sélectionnez d’abord `profile:read`, puis soumettez
+le formulaire pour approbation. Consultez les [permissions OAuth](/fr/dashboard/api/oauth).
+
+Une adresse de retour est une route de **votre application**, pas un endpoint OAuth de R+D.
+
+| Plateforme               | Adresse enregistrée pour l’exemple   | Configuration supplémentaire                                                          |
+| ------------------------ | ------------------------------------ | ------------------------------------------------------------------------------------- |
+| Backend                  | `http://127.0.0.1:8080/callback`     | Votre serveur doit fournir cette route                                                |
+| Démonstration native     | `http://127.0.0.1/callback`          | Identifiant d’application et preuve de contrôle du retour ; port choisi à l’exécution |
+| Démonstration navigateur | `http://127.0.0.1:8080/browser.html` | Enregistrer aussi l’origine `http://127.0.0.1:8080`                                   |
+
+Une app accepte jusqu’à dix retours exacts. Jokers, fragments et identifiants dans
+l’URL sont refusés. HTTPS est requis sauf pour HTTP local et les retours natifs
+validés. Les apps natives acceptent HTTPS revendiqué, un schéma de domaine inversé
+validé ou le bouclage IP. Seuls les retours HTTP natifs sur `127.0.0.1` ou `[::1]`
+peuvent changer de port : pas `localhost`, ni les clients backend ou navigateur.
+Renvoyez l’adresse réellement utilisée lors de l’échange du code.
+
+Une origine navigateur contient seulement le schéma, l’hôte et le port éventuel,
+sans chemin ni barre finale. Enregistrez chaque origine de retour. `localhost`
+et `127.0.0.1` sont des origines différentes.
+
+## Conserver les identifiants
+
+Copiez l’ID client. Pour un backend, créez un secret dans le portail et conservez-le
+immédiatement dans le stockage sécurisé du serveur : il n’est affiché qu’une fois.
+Les clients natifs et navigateur n’ont pas de secret. Séparez staging et production.
+N’incluez jamais jetons, secrets ou paramètres de retour dans le code source, les
+journaux, les outils d’analyse ou les demandes d’assistance.
+
+## Inviter des testeurs
+
+Enregistrement sans son de l’application locale avec des comptes fictifs. L’interface est en anglais ; les sous-titres sont disponibles en anglais, allemand, français et néerlandais.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Vidéo : inviter un testeur et accepter l’invitation"
+  poster="/videos/oauth/invite-tester.png"
+>
+  <source src="/videos/oauth/invite-tester.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.fr.vtt"
+    srcLang="fr"
+    label="Français"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Votre navigateur ne peut pas lire cette vidéo. Utilisez le téléchargement ou
+  la transcription ci-dessous.
+</video>
+
+<a href="/videos/oauth/invite-tester.webm" download>
+  Télécharger la vidéo (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Transcription de la vidéo">
+    <p><strong>0:00</strong> Avant la première approbation, le propriétaire peut inviter jusqu’à cinq comptes R+D existants supplémentaires.</p>
+
+    <p><strong>0:04</strong> Cherchez l’adresse e-mail exacte ou le nom d’utilisateur R+D, puis sélectionnez le compte correspondant.</p>
+
+    <p><strong>0:11</strong> Choisissez « Invite developer ». Les invitations en attente et acceptées comptent dans la limite de cinq comptes.</p>
+
+    <p><strong>0:16</strong> Passage au compte du testeur invité : il se connecte et ouvre /app/developers. Aucun e-mail d’invitation n’est envoyé.</p>
+
+    <p><strong>0:23</strong> Acceptez l’invitation pour devenir testeur. Cela n’accorde ni gestion de l’app ni approbation comme développeur.</p>
+
+    <p><strong>0:29</strong> Le testeur peut maintenant connecter son propre compte. Le consentement OAuth reste nécessaire pour l’accès.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+Avant la première approbation, le propriétaire peut inviter **cinq comptes R+D
+existants supplémentaires**. Cherchez l’adresse e-mail exacte ou le nom d’utilisateur,
+sélectionnez le compte et envoyez l’invitation. Les invitations en attente et acceptées
+comptent toutes ; le propriétaire ne compte pas.
+
+Les testeurs se connectent au même environnement et acceptent dans `/app/developers`.
+Cette version n’envoie pas d’e-mails d’invitation et la recherche ne crée aucun
+compte. Indiquez vous-même aux testeurs où accepter leur invitation.
+
+Les invités acceptés peuvent connecter leur propre compte, sans gérer les réglages,
+secrets ou invitations de l’app. L’invitation ne donne aucun accès partenaire ou
+appareil. La supprimer libère une place et révoque les connexions de ce compte.
+Les autres utilisateurs ne peuvent pas autoriser l’app avant son approbation.
+
+## Première connexion et publication
+
+1. Exécutez l’[exemple de votre plateforme](/fr/build-an-app/examples) avec votre émetteur et votre ID client.
+2. Connectez-vous comme propriétaire ou testeur accepté et autorisez `profile:read`.
+3. Vérifiez `state` et `iss`, puis échangez le code avec le vérificateur PKCE.
+4. Appelez `GET /api/v1/users/me` avec le jeton Bearer ; le succès contient `ok: true` et `data`.
+5. Testez le refus, une permission manquante, l’expiration et la déconnexion dans **Paramètres → Applications connectées**.
+
+Activez les fonctionnalités selon le `scope` effectivement accordé. L’application
+doit être approuvée avant son ouverture générale. Les modifications suivantes créent
+une nouvelle demande ; la configuration approuvée reste active pendant l’examen.
+Retirer des permissions limite immédiatement les connexions. Une approbation révoque
+les anciennes connexions et impose un nouveau consentement. Désactiver ou suspendre
+l’app révoque aussi les connexions ; la restaurer ne réactive pas les jetons. Consultez
+la [référence OAuth](/fr/dashboard/api/oauth) pour la rotation des secrets et des jetons.

@@ -1,0 +1,130 @@
+---
+title: "Apply for developer access"
+description: "Request a developer account before creating applications for other R+D users."
+---
+
+Developer access is the permission to register OAuth applications for other users.
+It is attached to your own R+D account and is separate from a personal API token.
+A personal token connects scripts to your own account; an OAuth application lets
+each user grant your product its own permissions.
+
+## Watch: apply for developer access
+
+Silent recording of the local app with synthetic accounts. The interface is in English; captions are available in English, German, French, and Dutch.
+
+The approval transition is simulated for the demonstration. R+D reviews real requests separately; submitting a form does not grant approval.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Watch: apply for developer access"
+  poster="/videos/oauth/apply-for-access.png"
+>
+  <source src="/videos/oauth/apply-for-access.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.en.vtt"
+    srcLang="en"
+    label="English"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/apply-for-access.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Your browser cannot play this video. Use the download link or transcript
+  below.
+</video>
+
+<a href="/videos/oauth/apply-for-access.webm" download>
+  Download video (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Video transcript">
+    <p><strong>0:00</strong> Sign in, then open /app/developers directly. This page is hidden from dashboard navigation.</p>
+
+    <p><strong>0:04</strong> Enter your developer name, HTTPS website, and contact email.</p>
+
+    <p><strong>0:09</strong> Explain your integration and how you will use, protect, and delete user data.</p>
+
+    <p><strong>0:15</strong> Select the products you plan to support, then submit your request.</p>
+
+    <p><strong>0:21</strong> Your request is pending. R+D reviews developer applications separately.</p>
+
+    <p><strong>0:25</strong> Later, after R+D approves your developer account, app creation becomes available.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## Open the developer portal
+
+Sign in to the R+D account that will own your applications. Open `/app/developers`
+directly in the correct environment; the page is intentionally hidden from the
+dashboard navigation.
+
+| Environment | Developer portal                                                                      | Issuer used in your app                   |
+| ----------- | ------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Staging     | [Staging developer portal](https://staging.researchanddesire.com/app/developers)      | `https://staging.researchanddesire.com`   |
+| Production  | [Production developer portal](https://dashboard.researchanddesire.com/app/developers) | `https://dashboard.researchanddesire.com` |
+
+Use the environment R+D has enabled for your integration. If the page is unavailable,
+contact R+D to arrange developer access. Staging and production have separate developer
+applications, app registrations, account data, credentials, and tokens. Testing on
+staging does not authorize a production app.
+
+## Prepare your application
+
+The form asks for:
+
+| Field                   | What to provide                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------- |
+| Name                    | Your developer or organization name                                              |
+| Website                 | An HTTPS website describing your product                                         |
+| Contact email           | An address where R+D can reach you about the integration                         |
+| Integration description | What you are building and which user actions you will support                    |
+| Data use                | What you will read or change, why, and how you will store, retain, and delete it |
+| Products                | The Lockbox, DTT, and/or OSSM products you want to integrate                     |
+
+For example: “Our relationship manager shows the user's current Lockbox session and
+lets an authorized keyholder adjust its duration. We store the connection and session
+summary, and delete them when the user disconnects.” Describe your actual handling
+rather than copying this example if it does not match your product.
+
+Submit the form and return to the portal to see its review status and feedback.
+You can create applications after your developer account is approved. If the request
+is rejected, address the feedback and resubmit through the same page. No review
+turnaround time is guaranteed by this flow.
+
+## Developer approval and app approval
+
+| Stage                     | What becomes available                                      |
+| ------------------------- | ----------------------------------------------------------- |
+| Developer request pending | View your request and its status                            |
+| Developer approved        | Create and configure up to five apps                        |
+| First app review pending  | The owner and up to five accepted invitees can test linking |
+| App approved              | Other eligible R+D users can consent to that app            |
+
+An invitation to test someone else's app does not approve your own developer account
+or give you access to their app settings. See [testing your first app](/build-an-app/first-application#invite-testers)
+for how invitations work.
+
+Next: [Create your first application](/build-an-app/first-application).

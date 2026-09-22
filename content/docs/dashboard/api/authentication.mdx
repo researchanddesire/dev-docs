@@ -3,11 +3,15 @@ title: "Authentication"
 description: "Create and manage API tokens to authenticate your requests"
 ---
 
-All API requests require a valid API token passed in the `Authorization` header. Tokens are JWTs signed with your account's identity, so all data access respects your account permissions automatically.
+Building a product for other R+D users? Start with [Build an app](/build-an-app) for developer access, registration, and platform-specific examples.
+
+All API requests require a valid token passed in the `Authorization` header. Personal API tokens are opaque credentials associated with your account. Third-party products can use [OAuth account connections](/dashboard/api/oauth) when enabled for their environment.
 
 <Info>
   Creating API tokens requires an **Ultra** subscription. If you don't have one
-  yet, visit [Subscription](https://dashboard.researchanddesire.com/app/settings/subscription) to upgrade.
+  yet, visit
+  [Subscription](https://dashboard.researchanddesire.com/app/settings/subscription)
+  to upgrade.
 </Info>
 
 ## Creating a Token

@@ -1,0 +1,226 @@
+---
+title: "Erste Anwendung erstellen"
+description: "Registrieren Sie einen OAuth-Client, konfigurieren Sie die Zustimmung und testen Sie die erste Verbindung."
+---
+
+Öffnen Sie nach der [Entwicklerfreigabe](/de/build-an-app/getting-started) erneut
+`/app/developers`. Erstellen Sie eine App und beginnen Sie mit `profile:read`,
+um Ihr eigenes Profil zu lesen.
+
+## Video: App registrieren
+
+Stumme Aufnahme der lokalen App mit fiktiven Konten. Die Oberfläche ist auf Englisch; Untertitel sind auf Englisch, Deutsch, Französisch und Niederländisch verfügbar.
+
+Das Video verwendet `http://localhost:3105/callback` für seinen lokalen Demoserver. Die herunterladbare Backend-Anleitung nutzt `http://127.0.0.1:8080/callback`; registrieren Sie die genaue URL Ihres Servers.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Video: App registrieren"
+  poster="/videos/oauth/create-application.png"
+>
+  <source src="/videos/oauth/create-application.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Ihr Browser kann dieses Video nicht abspielen. Nutzen Sie den Download oder
+  das Transkript unten.
+</video>
+
+<a href="/videos/oauth/create-application.webm" download>
+  Video herunterladen (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Videotranskript">
+    <p><strong>0:00</strong> Wählen Sie nach der Entwicklerfreigabe „Create an app“ (App erstellen).</p>
+
+    <p><strong>0:04</strong> Legen Sie den Namen und die Beschreibung fest, die Nutzer bei der Zustimmung sehen.</p>
+
+    <p><strong>0:09</strong> Geben Sie HTTPS-Website, Datenschutzrichtlinie und Support-E-Mail-Adresse an.</p>
+
+    <p><strong>0:15</strong> Dieses Beispiel verwendet Server / Backend und HTTP Basic zur Client-Authentifizierung.</p>
+
+    <p><strong>0:19</strong> Registrieren Sie die genaue Rückrufadresse Ihrer Anwendung. Diese lokale Demo verwendet Port 3105.</p>
+
+    <p><strong>0:23</strong> Fordern Sie nur benötigte Rechte an. Beginnen Sie mit profile:read.</p>
+
+    <p><strong>0:27</strong> Senden Sie die App zur Prüfung. Vor der Freigabe können nur Eigentümer und akzeptierte Tester verbinden.</p>
+
+    <p><strong>0:33</strong> Kopieren Sie die Client-ID. Erzeugen Sie beim Backend ein Geheimnis und speichern Sie es sicher auf dem Server.</p>
+
+    <p><strong>0:40</strong> Das Geheimnis wird nur einmal angezeigt und ist in der Aufnahme verdeckt. Browser- und native Apps haben kein Geheimnis.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## Plattform wählen
+
+Alle Plattformen verwenden den OAuth-Autorisierungscode-Ablauf mit **S256 PKCE**.
+Eine Registrierung hat genau eine unveränderliche Plattform. Verwenden Sie für
+verschiedene Plattformen getrennte Apps.
+
+| Plattform        | Einsatz                                      | Client-Authentifizierung                                         | Beispiele                                                    |
+| ---------------- | -------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------ |
+| Server / Backend | Server empfängt Rückrufe und speichert Token | `client_secret_basic` empfohlen; alternativ `client_secret_post` | [TypeScript / Python](/de/build-an-app/examples/backend)     |
+| Native / Desktop | Installierte App mit Systembrowser           | `none`, kein eingebettetes Geheimnis                             | [JavaScript / Python](/de/build-an-app/examples/native)      |
+| Browser          | JavaScript tauscht den Code direkt aus       | `none`, kein Browser-Geheimnis                                   | [JavaScript / TypeScript](/de/build-an-app/examples/browser) |
+
+Hält Ihr Backend die Token einer Weboberfläche, wählen Sie Backend. Zugangsdaten
+bedeuten hier Client-ID und gegebenenfalls Geheimnis; der Grant `client_credentials`
+wird nicht unterstützt. Eine Nutzerzustimmung ist immer erforderlich.
+
+## Zustimmung und Rückrufadressen konfigurieren
+
+Geben Sie App-Namen, Beschreibung, HTTPS-Website, HTTPS-Datenschutzrichtlinie und
+Support-E-Mail an. Diese Angaben identifizieren Ihre App bei der Zustimmung.
+Wählen Sie zunächst `profile:read` und senden Sie das Formular zur Prüfung ab.
+Weitere Rechte sind in der [OAuth-Referenz](/de/dashboard/api/oauth) erklärt.
+
+Eine Rückrufadresse gehört zu **Ihrer Anwendung**, nicht zu einem R+D-OAuth-Endpunkt.
+
+| Plattform           | Rückrufadresse für das Beispiel      | Zusätzliche Angaben                                                                         |
+| ------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Backend             | `http://127.0.0.1:8080/callback`     | Ihre Anwendung muss diese Route bereitstellen                                               |
+| Native Desktop-Demo | `http://127.0.0.1/callback`          | App-Kennung und Nachweis zur Kontrolle des Rückrufs; Laufzeit-Port wird automatisch gewählt |
+| Browser-Demo        | `http://127.0.0.1:8080/browser.html` | Auch den Ursprung `http://127.0.0.1:8080` registrieren                                      |
+
+Bis zu zehn genaue Rückrufe sind möglich. Platzhalter, Fragmente und Zugangsdaten in
+URLs sind verboten. Verwenden Sie HTTPS, außer bei lokalem HTTP oder geprüften nativen
+Rückrufen. Native Apps unterstützen beanspruchte HTTPS-Adressen, geprüfte Reverse-Domain-Schemata
+und IP-Loopback. Nur bei nativen HTTP-Rückrufen an `127.0.0.1` oder `[::1]` darf
+sich der Port ändern; nicht bei `localhost`, Backend oder Browser. Beim Codeaustausch
+muss dieselbe tatsächliche Rückrufadresse gesendet werden.
+
+Browser-Ursprünge enthalten Schema, Host und optional Port, aber keinen Pfad oder
+abschließenden Schrägstrich. Registrieren Sie jeden Rückrufursprung. `localhost`
+und `127.0.0.1` sind unterschiedliche Ursprünge.
+
+## Zugangsdaten speichern
+
+Kopieren Sie die Client-ID. Erzeugen Sie bei einem Backend im Portal ein Geheimnis
+und speichern Sie es sofort sicher auf dem Server; es wird nur einmal angezeigt.
+Native Apps und Browser erhalten kein Geheimnis. Trennen Sie Produktions- und
+Staging-Konfiguration und halten Sie Token, Geheimnisse und Rückrufparameter aus
+Quellcode, Protokollen, Analysen und Support-Anfragen heraus.
+
+## Tester einladen
+
+Stumme Aufnahme der lokalen App mit fiktiven Konten. Die Oberfläche ist auf Englisch; Untertitel sind auf Englisch, Deutsch, Französisch und Niederländisch verfügbar.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Video: Tester einladen und Einladung annehmen"
+  poster="/videos/oauth/invite-tester.png"
+>
+  <source src="/videos/oauth/invite-tester.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.en.vtt"
+    srcLang="en"
+    label="English"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Ihr Browser kann dieses Video nicht abspielen. Nutzen Sie den Download oder
+  das Transkript unten.
+</video>
+
+<a href="/videos/oauth/invite-tester.webm" download>
+  Video herunterladen (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Videotranskript">
+    <p><strong>0:00</strong> Vor der ersten App-Freigabe kann der Eigentümer bis zu fünf zusätzliche bestehende R+D-Konten einladen.</p>
+
+    <p><strong>0:04</strong> Suchen Sie nach genauer E-Mail-Adresse oder R+D-Nutzernamen und wählen Sie das passende Konto.</p>
+
+    <p><strong>0:11</strong> Wählen Sie „Invite developer“. Offene und akzeptierte Einladungen zählen zum Limit von fünf Konten.</p>
+
+    <p><strong>0:16</strong> Wechsel zum eingeladenen Tester: Er meldet sich an und öffnet /app/developers. Eine Einladungs-E-Mail wird nicht versendet.</p>
+
+    <p><strong>0:23</strong> Akzeptieren Sie die Einladung zum Testen. Dies gewährt weder App-Verwaltung noch eine Entwicklerfreigabe.</p>
+
+    <p><strong>0:29</strong> Der Tester kann nun sein eigenes Konto verbinden. Für den Zugriff ist weiterhin eine OAuth-Zustimmung erforderlich.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+Vor der ersten App-Freigabe kann der Eigentümer **fünf zusätzliche bestehende
+R+D-Konten** einladen. Suchen Sie nach genauer E-Mail-Adresse oder R+D-Nutzernamen,
+wählen Sie das Konto aus und senden Sie die Einladung. Offene und akzeptierte
+Einladungen zählen; der Eigentümer zählt nicht.
+
+Tester melden sich in derselben Umgebung an und akzeptieren unter `/app/developers`.
+Diese Version versendet keine Einladungs-E-Mails und legt durch die E-Mail-Suche
+keine neuen Konten an. Informieren Sie die Tester selbst über den Portalbesuch.
+
+Akzeptierte Tester dürfen ihr eigenes Konto verbinden, aber keine App-Einstellungen,
+Geheimnisse oder Einladungen verwalten. Die Einladung gewährt keinen Partner- oder
+Gerätezugriff. Entfernen einer Einladung gibt den Platz frei und widerruft die
+App-Verbindungen dieses Kontos. Andere Nutzer können vor der Freigabe nicht verbinden.
+
+## Erste Verbindung und Veröffentlichung
+
+1. Führen Sie das [Beispiel Ihrer Plattform](/de/build-an-app/examples) mit Issuer und Client-ID aus.
+2. Melden Sie sich als Eigentümer oder akzeptierter Tester an und erlauben Sie `profile:read`.
+3. Prüfen Sie `state` und `iss`; tauschen Sie den Code mit dem PKCE-Verifier aus.
+4. Rufen Sie `GET /api/v1/users/me` mit dem Bearer-Token auf; Erfolg enthält `ok: true` und `data`.
+5. Testen Sie Ablehnung, fehlende Rechte, Ablauf und Trennung unter **Einstellungen → Verbundene Apps**.
+
+Aktivieren Sie Funktionen anhand des tatsächlich erteilten `scope`. Vor allgemeiner
+Nutzung muss die erste App-Prüfung genehmigt werden. Spätere Änderungen erzeugen eine
+neue Prüfung; die genehmigte Konfiguration bleibt währenddessen aktiv. Entfernte
+Rechte beschränken Verbindungen sofort. Eine Genehmigung widerruft alte Verbindungen
+und erfordert erneute Zustimmung. Deaktivierung oder Sperrung widerruft ebenfalls
+Verbindungen; Wiederherstellung lässt alte Token nicht wieder aufleben. Details zu
+Token- und Geheimnisrotation stehen in der [OAuth-Referenz](/de/dashboard/api/oauth).

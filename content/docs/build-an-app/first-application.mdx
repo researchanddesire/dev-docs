@@ -1,0 +1,244 @@
+---
+title: "Create your first application"
+description: "Register an OAuth client, configure its consent screen, and test your first account connection."
+---
+
+After [developer approval](/build-an-app/getting-started), return to `/app/developers`
+and create an application. Start with a small feature: connect your own account and
+read your profile with `profile:read`.
+
+## Watch: register your app
+
+Silent recording of the local app with synthetic accounts. The interface is in English; captions are available in English, German, French, and Dutch.
+
+The video uses `http://localhost:3105/callback` for its local demo server. The downloadable backend guide uses `http://127.0.0.1:8080/callback`; register the exact URL your server actually serves.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Watch: register your app"
+  poster="/videos/oauth/create-application.png"
+>
+  <source src="/videos/oauth/create-application.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.en.vtt"
+    srcLang="en"
+    label="English"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/create-application.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Your browser cannot play this video. Use the download link or transcript
+  below.
+</video>
+
+<a href="/videos/oauth/create-application.webm" download>
+  Download video (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Video transcript">
+    <p><strong>0:00</strong> With developer access approved, choose Create an app.</p>
+
+    <p><strong>0:04</strong> Set the name and description users will see during consent.</p>
+
+    <p><strong>0:09</strong> Provide your HTTPS website, privacy policy, and support email.</p>
+
+    <p><strong>0:15</strong> This example uses Server / backend and HTTP Basic client authentication.</p>
+
+    <p><strong>0:19</strong> Register the exact callback served by your application. This local demo uses port 3105.</p>
+
+    <p><strong>0:23</strong> Request only the permissions you need. Start with profile:read.</p>
+
+    <p><strong>0:27</strong> Submit the app for review. Before approval, only its owner and accepted testers can connect.</p>
+
+    <p><strong>0:33</strong> Copy your client ID. For a backend, generate a secret and save it in server-side secret storage.</p>
+
+    <p><strong>0:40</strong> The secret is shown only once and is hidden in this recording. Browser and native apps have no secret.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+## Choose where your app runs
+
+All three platforms use the **OAuth authorization-code flow with S256 PKCE**.
+The platform determines where credentials can be stored and how users return to your app.
+Create separate registrations for different platforms; a registration's platform
+cannot be changed after creation.
+
+| Platform in the portal       | Choose it when                                              | Client authentication                                                     | Example                                                   |
+| ---------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Server / backend             | Your server receives callbacks and stores tokens            | `client_secret_basic` recommended; `client_secret_post` is also supported | [TypeScript / Python](/build-an-app/examples/backend)     |
+| Native / desktop application | An installed application receives a system-browser callback | `none`; no embedded secret                                                | [JavaScript / Python](/build-an-app/examples/native)      |
+| Browser application          | JavaScript in the user's browser exchanges the code         | `none`; no browser secret                                                 | [JavaScript / TypeScript](/build-an-app/examples/browser) |
+
+If your web UI uses a backend to hold tokens, register the backend platform. Do not
+put its secret into a frontend bundle. “Client credentials” here means your app's ID
+and, for backends, secret; the `client_credentials` grant is not supported. A user's
+authorization is always required.
+
+## Configure the consent screen
+
+Provide the app name, a clear description, an HTTPS website, an HTTPS privacy policy,
+and a support email. These details identify your product to users during consent.
+Use URLs and an email you control, with a privacy policy that explains the permissions
+you request and your handling of user data.
+
+Select `profile:read` for the first connection. Add product scopes as you implement
+features, using the [scope reference](/dashboard/api/oauth#scopes). Saving the form
+with **Submit for approval** creates the app and its review submission.
+
+## Register callback URLs
+
+A callback is a route **in your application**, where R+D returns the user after
+consent. It is not the R+D `/oauth/authorize` or `/oauth/token` endpoint.
+The following local URLs match the downloadable examples:
+
+| Platform            | Registered callback                  | Additional configuration                                                                            |
+| ------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| Backend             | `http://127.0.0.1:8080/callback`     | Your framework must serve this route; use an exact HTTPS URL outside local development              |
+| Native desktop demo | `http://127.0.0.1/callback`          | Provide an app identifier and callback ownership evidence; the demo selects a local port at runtime |
+| Browser demo        | `http://127.0.0.1:8080/browser.html` | Register browser origin `http://127.0.0.1:8080` too                                                 |
+
+An app supports up to ten exact callbacks. Wildcards, fragments, and embedded URL
+credentials are rejected. HTTPS is required except for local HTTP and reviewed
+native callbacks. Native apps can use claimed HTTPS URLs, reviewed reverse-domain
+schemes, or IP-loopback callbacks. The runtime-port exception applies only to native
+HTTP callbacks on `127.0.0.1` or `[::1]`, not `localhost` or browser/backend callbacks.
+Send the exact runtime callback again during the code exchange.
+
+Browser origins contain only the scheme, host, and optional port—no path or trailing
+slash. Every browser callback origin must be registered. `localhost` and `127.0.0.1`
+are different origins; choose one consistently.
+
+## Save your credentials
+
+Copy the client ID from your app. For a backend, create a client secret in the portal
+and save it immediately in your server's secret store; it is shown only once.
+Browser and native applications receive no secret. Keep staging and production
+configuration separate. Do not include tokens or secrets in source control, analytics,
+support tickets, or callback/request logs.
+
+## Invite testers
+
+Silent recording of the local app with synthetic accounts. The interface is in English; captions are available in English, German, French, and Dutch.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  width={1280}
+  height={900}
+  className="my-4 w-full rounded-lg border [&::cue]:text-sm sm:[&::cue]:text-base"
+  aria-label="Watch: invite and accept a tester"
+  poster="/videos/oauth/invite-tester.png"
+>
+  <source src="/videos/oauth/invite-tester.webm" type="video/webm" />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.en.vtt"
+    srcLang="en"
+    label="English"
+    default
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.de.vtt"
+    srcLang="de"
+    label="Deutsch"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.fr.vtt"
+    srcLang="fr"
+    label="Français"
+  />
+  <track
+    kind="captions"
+    src="/videos/oauth/invite-tester.nl.vtt"
+    srcLang="nl"
+    label="Nederlands"
+  />
+  Your browser cannot play this video. Use the download link or transcript
+  below.
+</video>
+
+<a href="/videos/oauth/invite-tester.webm" download>
+  Download video (WebM)
+</a>
+
+<AccordionGroup>
+  <Accordion title="Video transcript">
+    <p><strong>0:00</strong> Before first approval, an app owner can invite up to five additional existing R+D accounts.</p>
+
+    <p><strong>0:04</strong> Search by exact email or R+D username, then select the matching account.</p>
+
+    <p><strong>0:11</strong> Choose Invite developer. Pending and accepted invitations both count toward the five-account limit.</p>
+
+    <p><strong>0:16</strong> Switch to the invited tester. They sign in and open /app/developers; no invitation email is sent.</p>
+
+    <p><strong>0:23</strong> Accept the invitation to become a tester. This does not grant app management or developer approval.</p>
+
+    <p><strong>0:29</strong> The tester can now link their own account. OAuth consent is still required for access.</p>
+
+  </Accordion>
+</AccordionGroup>
+
+Before the app's first approval, its owner can invite **up to five additional existing
+R+D accounts**. Search by exact email address or R+D username, select the matching
+account, and send the invitation. Pending and accepted invitations both count toward
+the five-account limit; the owner does not count.
+
+Ask each tester to sign in and open `/app/developers` in the same environment to accept.
+This version shows invitations in the portal and does **not** deliver invitation
+emails. An email search does not create an account for someone who has not registered.
+
+Accepted invitees can connect their own accounts for testing. They cannot edit your
+app, see its secret, invite other testers, or gain partner/device access from the
+invitation itself. Removing an invitation frees its slot and revokes that account's
+connections to your app. Before approval, other users cannot authorize the app.
+
+## Make your first connection
+
+1. Follow the [example for your platform](/build-an-app/examples) with your issuer and client ID.
+2. Start linking from your app, then sign in as the owner or an accepted tester.
+3. Approve `profile:read` on the consent screen.
+4. Validate the returned `state` and `iss`, then exchange the code with its PKCE verifier.
+5. Call `GET /api/v1/users/me` with the returned bearer token. A successful API response has `ok: true` and a `data` field.
+6. Test cancellation, a missing permission, token expiry, and disconnecting under **Settings → Connected apps**.
+
+The user may grant a subset of requested scopes. Enable features from the token
+response's `scope`, and show a reconnect action if the user revokes access.
+
+## Release and later changes
+
+The initial app review must be approved before general users can connect. Saving
+later changes creates a new review submission; the current approved configuration
+stays active during review. Removing permissions restricts existing connections
+immediately. Approval revokes previous connections so users can consent to the new
+configuration. Plan for that reconnect step when changing callbacks or permissions.
+
+Disabling or suspending an app revokes its connections. Restoring it requires fresh
+consent. See the [OAuth reference](/dashboard/api/oauth#refresh-revoke-and-rotate) for
+secret rotation, refresh-token rotation, and revocation behavior.

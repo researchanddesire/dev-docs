@@ -1,0 +1,108 @@
+---
+title: "Exemples natifs et de bureau"
+description: "Testez JavaScript et Python avec le navigateur système et sans secret client."
+---
+
+Enregistrez **Native / bureau**, authentification `none`, scope `profile:read`
+et retour `http://127.0.0.1/callback`. Fournissez l’identifiant d’application et
+la preuve de contrôle du retour. Pour un prototype, décrivez l’écoute locale IP
+et identifiez votre application ou dépôt. Le retour réel inclut un port choisi par le système.
+
+Les démos ouvrent le navigateur système, reçoivent un retour sur `127.0.0.1`,
+vérifient état, émetteur et PKCE, lisent le profil, puis révoquent la connexion. Elles
+n’affichent aucune donnée de compte et n’enregistrent aucun jeton sur disque. Durant
+l’examen, utilisez le propriétaire ou un testeur accepté.
+
+## Exécuter la démo
+
+Définissez `RD_ISSUER` et l’ID client natif `RD_CLIENT_ID`, sans secret.
+Enregistrez les deux fichiers du langage choisi dans le même dossier :
+
+<Tabs>
+<Tab title="JavaScript">
+
+Téléchargez <a href="/examples/oauth/native-node.mjs" download>native-node.mjs</a> et <a href="/examples/oauth/rd-oauth.ts" download>rd-oauth.ts</a>. Node.js 24 exécute directement le TypeScript effaçable ; aucune installation ni compilation n’est nécessaire.
+
+```bash
+node native-node.mjs
+```
+
+La même transaction relie le départ au retour :
+
+```javascript
+import { beginLink, finishLink, readProfile, revoke } from "./rd-oauth.ts";
+
+// In the complete demo, redirectUri includes the bound loopback listener's port.
+export function startNativeConnection(issuer, clientId, redirectUri) {
+  const config = { issuer, clientId, redirectUri };
+  const started = beginLink(config, "profile:read");
+  return { config, ...started };
+}
+
+export async function completeNativeConnection(
+  config,
+  callbackUrl,
+  transaction,
+) {
+  // The listener consumes the transaction once before invoking this function.
+  const tokens = await finishLink(config, callbackUrl, transaction);
+  try {
+    await readProfile(config, tokens);
+  } finally {
+    await revoke(config, tokens.access_token);
+  }
+}
+```
+
+</Tab>
+<Tab title="Python">
+
+Téléchargez <a href="/examples/oauth/native_python.py" download>native_python.py</a> et <a href="/examples/oauth/rd_oauth.py" download>rd_oauth.py</a>. Python 3.11+ suffit ; sous Windows, `py` peut remplacer `python`.
+
+```bash
+python native_python.py
+```
+
+L’écoute locale démarre avant l’autorisation :
+
+```python
+from http.server import HTTPServer
+from native_python import Callback
+from rd_oauth import begin_link
+
+def prepare_listener(issuer, client_id):
+    server = HTTPServer(("127.0.0.1", 0), Callback)
+    server.config = {
+        "issuer": issuer,
+        "client_id": client_id,
+        "redirect_uri": f"http://127.0.0.1:{server.server_port}/callback",
+    }
+    server.completed = False
+    url, server.transaction = begin_link(server.config, "profile:read")
+    return server, url
+```
+
+</Tab>
+</Tabs>
+
+Acceptez la connexion ou testez le refus. Le succès affiche « Profile request
+succeeded. » Le jeton est ensuite révoqué. Relancez le script pour un nouvel essai ;
+l’écoute expire après dix minutes.
+
+## Adapter à une application distribuée
+
+Utilisez le navigateur d’authentification et les mécanismes de retour du système.
+N’intégrez pas la connexion dans une WebView et n’embarquez pas de secret backend.
+PKCE lie le code à l’instance qui a lancé la demande. Voir
+[OAuth pour applications natives, RFC 8252](https://www.rfc-editor.org/rfc/rfc8252).
+
+Sur mobile, enregistrez une adresse HTTPS revendiquée ou un schéma de domaine inversé
+validé. Sur les plateformes Apple, utilisez
+[ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession)
+avec contexte de présentation et retour enregistré. Conservez les vérifications
+d’état, d’émetteur, de vérificateur et de transaction à usage unique.
+
+Pour une connexion persistante, demandez explicitement `offline_access` et utilisez
+le stockage protégé des identifiants du système. Sérialisez les renouvellements et
+sauvegardez atomiquement les remplacements selon les [règles OAuth](/fr/dashboard/api/oauth).
+Gardez retours et jetons hors des rapports de plantage et des journaux.

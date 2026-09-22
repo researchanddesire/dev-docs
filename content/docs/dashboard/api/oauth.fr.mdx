@@ -1,0 +1,127 @@
+---
+title: "Connecter des comptes avec OAuth"
+description: "Enregistrer une intégration, inviter des testeurs et demander des autorisations avec OAuth 2.0"
+---
+
+Vous créez un produit pour d’autres utilisateurs R+D ? Commencez par [Créer une application](/fr/build-an-app) pour l’accès développeur, l’enregistrement et les exemples par plateforme. Cette page sert de référence du protocole.
+
+OAuth est disponible lorsqu’il est activé pour votre environnement. Demandez un accès
+développeur sur `/app/developers`. Cette page est volontairement absente de la navigation.
+Les jetons d’API personnels continuent à fonctionner indépendamment.
+
+## Enregistrer et tester une application
+
+Décrivez votre intégration et l’utilisation des données dans votre demande développeur.
+Après approbation, vous pouvez enregistrer jusqu’à cinq applications. Chacune fait l’objet
+d’une vérification distincte. Indiquez son nom, son site, sa politique de confidentialité
+HTTPS, son adresse de contact, ses URL de rappel et les autorisations demandées.
+
+Les applications serveur utilisent `client_secret_basic` ou la méthode enregistrée
+`client_secret_post`. Les applications web et natives utilisent `none` et ne doivent pas
+embarquer de secret. Tous les clients utilisent un code d’autorisation avec **S256 PKCE**.
+Les applications natives ouvrent le navigateur système et fournissent leur identifiant
+ainsi qu’une preuve de propriété du rappel pour vérification.
+
+Enregistrez au maximum dix URL de rappel exactes. HTTPS est obligatoire, sauf pour HTTP
+local ou un schéma natif vérifié utilisant un nom de domaine inversé. Les jokers, identifiants
+dans l’URL et fragments sont interdits. Les rappels natifs sur IP de bouclage peuvent changer
+de port ; l’URL réellement utilisée est liée au code. Les clients web enregistrent aussi
+leurs origines exactes.
+
+Avant la première approbation, invitez **cinq autres comptes R+D existants** par adresse
+e-mail exacte ou recherche de nom d’utilisateur. Les invitations en attente et acceptées
+comptent dans cette limite. Les destinataires acceptent sur `/app/developers`, puis peuvent
+tester la connexion de leur compte. Cela accorde uniquement un accès de test, sans gestion
+de l’application ni droits de partenariat. Aucun e-mail d’invitation n’est envoyé. Retirer
+une invitation révoque également les connexions de ce compte à l’application.
+
+Les modifications créent une nouvelle demande de vérification. La configuration approuvée
+reste active pendant cet examen. Retirer des autorisations restreint immédiatement les
+accès existants. Une nouvelle approbation révoque les anciennes connexions et exige un
+nouveau consentement. Désactiver ou suspendre une application révoque ses connexions ;
+la réactiver ne restaure aucun ancien jeton.
+
+## Établir la connexion
+
+Utilisez l’émetteur de votre environnement, par exemple
+`https://staging.researchanddesire.com`. Découvrez ses points d’accès avec
+`/.well-known/oauth-authorization-server`. Les enregistrements et jetons sont distincts
+entre staging et production.
+
+Pour chaque connexion, générez un `state` aléatoire et un nouveau vérificateur PKCE.
+Conservez-les dans la session utilisateur à l’origine de la demande. Le challenge est
+le hachage SHA-256 du vérificateur encodé en Base64url. Redirigez le navigateur vers
+`/oauth/authorize` avec `response_type=code`, `client_id`, `redirect_uri`, `scope`, `state`,
+`code_challenge` et `code_challenge_method=S256`.
+
+L’utilisateur se connecte, choisit ses autorisations ou annule. `shared:access` et
+`offline_access` nécessitent une sélection distincte. Au rappel, vérifiez `state` et `iss`
+par rapport à la session initiale. Traitez `error=access_denied` ; sinon, échangez le code
+immédiatement :
+
+```bash
+curl "$ISSUER/oauth/token" --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "grant_type=authorization_code" \
+  --data-urlencode "code=$CODE" \
+  --data-urlencode "redirect_uri=$CALLBACK_URL" \
+  --data-urlencode "code_verifier=$VERIFIER"
+```
+
+Les clients publics omettent HTTP Basic et envoient `client_id` dans le formulaire.
+Utilisez exactement une méthode d’authentification. Les requêtes de jetons utilisent
+l’encodage de formulaire, pas JSON. Depuis un navigateur, elles doivent provenir d’une
+origine enregistrée et ne contenir aucun cookie.
+
+La réponse contient `access_token`, `token_type`, `expires_in` et le `scope` réellement
+accordé. Un `refresh_token` n’est fourni qu’avec `offline_access`. Traitez les jetons
+comme des valeurs opaques. Aucun JWT Supabase ni jeton d’identité OpenID Connect n’est
+renvoyé. Utilisez `Authorization: Bearer ...` pour les requêtes à `/api/v1`.
+
+## Autorisations
+
+| Scope             | Accès                                                                                |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| `profile:read`    | Identifiant de compte et profil                                                      |
+| `lkbx:read`       | Appareils Lockbox, modèles, sessions et états                                        |
+| `lkbx:control`    | Démarrer/terminer des verrouillages et ajuster leur durée selon les droits existants |
+| `lkbx:keyholders` | Attribuer des détenteurs de clés au démarrage ; exige aussi `lkbx:control`           |
+| `dtt:read`        | Appareils DTT, modèles, historique et statistiques d’entraînement                    |
+| `dtt:write`       | Modifier et activer des modèles DTT                                                  |
+| `ossm:read`       | Informations des appareils OSSM, sans commande à distance                            |
+| `shared:access`   | Étendre les droits produit aux comptes gérés, y compris ceux liés ultérieurement     |
+| `offline_access`  | Recevoir des jetons de renouvellement rotatifs                                       |
+
+Sans `shared:access`, seules les ressources du compte consentant sont accessibles, y compris
+par identifiant ou alias. Les règles existantes de partage, de détention de clés et
+d’auto-verrouillage s’appliquent toujours. Les routes et méthodes inconnues sont refusées.
+Les réponses excluent les codes d’appairage et identifiants internes. Les statistiques
+d’entraînement sur les points d’accès de profil exigent également `dtt:read`.
+
+## Renouveler et révoquer
+
+Les codes sont valables cinq minutes et utilisables une seule fois. Les jetons d’accès
+durent dix minutes. Les jetons de renouvellement expirent après 30 jours sans utilisation,
+au plus tard 180 jours après le consentement initial. Chaque renouvellement réussi remplace
+le jeton de renouvellement. Effectuez-les séquentiellement par connexion et enregistrez le
+remplaçant de manière atomique. Toute réutilisation révoque la famille entière, y compris
+ses jetons d’accès. Aucun délai de grâce n’est prévu ; une issue incertaine peut exiger
+une nouvelle connexion.
+
+```bash
+curl "$ISSUER/oauth/token" --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "grant_type=refresh_token" \
+  --data-urlencode "refresh_token=$REFRESH_TOKEN"
+curl "$ISSUER/oauth/revoke" --user "$CLIENT_ID:$CLIENT_SECRET" \
+  --data-urlencode "token=$REFRESH_TOKEN"
+```
+
+La révocation termine l’autorisation concernée. Les jetons inconnus produisent aussi une
+réponse de succès. Les utilisateurs peuvent révoquer toutes les autorisations d’une
+application dans **Paramètres → Applications connectées**. La limite est de 60 requêtes
+par minute, application et utilisateur ; respectez `429` et `Retry-After`.
+
+Les secrets serveur sont affichés une seule fois. La rotation normale permet 24 heures
+de chevauchement et au maximum deux secrets actifs. La rotation d’urgence révoque
+immédiatement les anciens secrets et connexions. Conservez les secrets sur le serveur,
+jamais dans Git ou les journaux. Les webhooks, les flux client credentials, mot de passe
+et implicite, l’enregistrement dynamique et OpenID Connect sont exclus de cette version.

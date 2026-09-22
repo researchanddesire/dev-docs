@@ -3,11 +3,15 @@ title: "API-Übersicht"
 description: "Greifen Sie mit der REST-API programmgesteuert auf Ihre Daten von Research and Desire zu"
 ---
 
+Für ein Produkt mit Konten anderer Nutzer folgen Sie [Eine App entwickeln](/de/build-an-app) und den [Verbindungsbeispielen](/de/build-an-app/examples). Die folgenden API-Konventionen gelten auch für autorisierte OAuth-Anfragen.
+
 Mit der Research and Desire API können Sie über externe Anwendungen, Skripte und Integrationen auf Ihre Dashboard-Daten zugreifen. Jede API-Anfrage berücksichtigt die Berechtigungen Ihres Kontos – Sie können nur auf Daten zugreifen, die Sie sehen dürfen.
 
 <Info>
-  Der API-Zugriff ist eine **Ultra**-Funktion. Sie benötigen ein aktives Ultra-Abonnement,
-  um API-Token zu erstellen. [Erfahren Sie mehr über Ultra](https://dashboard.researchanddesire.com/app/settings/subscription).
+  Das Erstellen **persönlicher API-Token** erfordert ein Ultra-Abonnement.
+  OAuth-Entwickleranträge haben einen eigenen Freigabeprozess; bestehende
+  Produktbeschränkungen bleiben gültig. [Informationen zu persönlichen
+  Token](/de/dashboard/api/authentication).
 </Info>
 
 ## Basis-URL
@@ -25,7 +29,7 @@ https://dashboard.researchanddesire.com/api/v1
     Erstellen Sie API-Tokens und erfahren Sie, wie Sie Anfragen authentifizieren.
   </Card>
 
-  <Card title="Endpunktreferenz" icon="code" href="./endpoints/users">
+  <Card title="Endpunktreferenz" icon="code" href="/de/api-reference">
     Durchsuchen Sie alle verfügbaren Endpunkte für Users, DTT, LKBX und OSSM.
   </Card>
 </CardGroup>
@@ -78,10 +82,10 @@ Jede Antwort verwendet denselben Wrapper:
 
 Listen-Endpunkte unterstützen die Paginierung über Abfrageparameter:
 
-| Parameter | Standard | Max | Beschreibung                 |
-| --------- | ------- | --- | --------------------------- |
-| `limit`   | 50      | 100 | Anzahl der zurückzugebenden Datensätze |
-| `offset`  | 0       | -   | Anzahl der zu überspringenden Datensätze   |
+| Parameter | Standard | Max | Beschreibung                             |
+| --------- | -------- | --- | ---------------------------------------- |
+| `limit`   | 50       | 100 | Anzahl der zurückzugebenden Datensätze   |
+| `offset`  | 0        | -   | Anzahl der zu überspringenden Datensätze |
 
 Gepaginierte Antworten enthalten das Datenarray zusammen mit Paginierungsmetadaten:
 
@@ -108,9 +112,9 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 ## Ratenbegrenzung
 
 <Note>
-  Die API erzwingt derzeit keine strengen Ratenbegrenzungen, aber gehen Sie bitte
-  verantwortungsvoll mit Ihrem Anfragevolumen um. Übermäßige Nutzung kann in
-  zukünftigen Versionen zu einer Drosselung führen.
+  Die API erzwingt derzeit keine strengen Ratenbegrenzungen, aber gehen Sie
+  bitte verantwortungsvoll mit Ihrem Anfragevolumen um. Übermäßige Nutzung kann
+  in zukünftigen Versionen zu einer Drosselung führen.
 </Note>
 
 ## Berechtigungen und RLS

@@ -1,0 +1,112 @@
+---
+title: "Client-side browser examples"
+description: "Run a JavaScript or TypeScript browser app with PKCE, a registered origin, and no client secret."
+---
+
+Register **Browser application**, authentication `none`, and scope `profile:read`.
+For this demo, register callback `http://127.0.0.1:8080/browser.html` and browser
+origin `http://127.0.0.1:8080`. The origin has no trailing slash or path. Browser
+applications never receive or embed a client secret.
+
+## Run JavaScript or TypeScript
+
+Download <a href="/examples/oauth/browser.html" download>browser.html</a> and either the JavaScript file
+or the TypeScript source below. Save them in a new directory containing only the demo
+files. Set `issuer` and `clientId` at the top of the script to your enabled environment
+and **browser** app registration. Keep `redirectUri` equal to the registered callback.
+
+<Tabs>
+  <Tab title="JavaScript">
+
+Download <a href="/examples/oauth/browser.js" download>browser.js</a>. The HTML already loads this file.
+It needs no build step or JavaScript dependencies.
+
+  </Tab>
+  <Tab title="TypeScript">
+
+Download <a href="/examples/oauth/browser.ts" download>browser.ts</a>. It implements the same flow with
+typed transactions and token responses. Use your existing TypeScript compiler, or
+install one locally in the demo directory and compile to `browser.js`:
+
+```bash
+pnpm add --save-dev typescript
+pnpm exec tsc browser.ts --target ES2022 --module ES2022 --lib "ES2022,DOM,DOM.Iterable" --strict
+```
+
+The browser loads the resulting JavaScript file, not the TypeScript source.
+
+  </Tab>
+</Tabs>
+
+Serve the demo directory on the registered loopback address (Python 3):
+
+```bash
+python -m http.server 8080 --bind 127.0.0.1
+```
+
+Open `http://127.0.0.1:8080/browser.html` and choose **Link your R+D account**.
+After consent, choose **Check profile access**, then **Disconnect**. Test denial as
+well. Use a directory with no credentials: the local static server serves its contents.
+Do not use `file://`, another port, or `localhost` with this registration. For a
+deployed app, register its exact HTTPS callback and origin and update the script.
+
+## How the browser exchange works
+
+The script uses Web Crypto to generate random state and a new S256 PKCE challenge.
+It stores only the short-lived transaction in `sessionStorage` before navigation.
+At the callback it removes that transaction, clears the code from the URL, rejects
+unexpected state or issuer and duplicate parameters, and then exchanges the code.
+
+Both language versions use this form-encoded public-client request:
+
+```javascript
+export async function exchangeCode(
+  issuer,
+  clientId,
+  redirectUri,
+  code,
+  verifier,
+) {
+  // Invoke only after consuming and validating the initiating transaction.
+  const response = await fetch(new URL("/oauth/token", issuer), {
+    method: "POST",
+    credentials: "omit",
+    redirect: "error",
+    body: new URLSearchParams({
+      grant_type: "authorization_code",
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      code,
+      code_verifier: verifier,
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok)
+    throw new Error(`Token request failed (${response.status})`);
+  return response.json();
+}
+```
+
+The token and revocation endpoints allow only registered browser origins. Leave
+`credentials: "omit"` in place; do not attach dashboard cookies, HTTP Basic, or a
+client secret. API calls use the returned bearer token in the `Authorization` header.
+The demo checks granted scopes before enabling its profile action.
+
+## Token lifetime and browser storage
+
+The demo keeps its access token in memory and requests no refresh token. Reloading
+the page loses that token; reconnect to continue. Access expires after ten minutes,
+and an API `401` requires reconnecting. A browser reload is not server revocation:
+use **Disconnect** before reloading, or revoke the app in R+D's **Settings → Connected
+apps** afterward.
+
+Do not move bearer tokens into URLs, `localStorage`, or the PKCE transaction. For
+persistent access in a web product, consider the [backend pattern](/build-an-app/examples/backend)
+so your server holds tokens. Any browser-based persistence must account for script
+access to credentials and R+D's strict refresh rotation rules.
+
+Keep callback pages free of third-party scripts and analytics that could capture the
+code. The example HTML sets a no-referrer policy. Web Crypto requires a secure
+context; use HTTPS outside loopback development. See
+[Web Crypto digest](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)
+and the [OAuth security recommendations](https://www.rfc-editor.org/rfc/rfc9700).
