@@ -163,7 +163,7 @@ stateMachine->process_event(ButtonPress{});
 stateMachine->process_event(Done{});
 ```
 
-La machine à états est initialisée au démarrage dans [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp) et exposée comme pointeur global.
+La machine à états est initialisée au démarrage dans [`state.cpp`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/state.cpp) et exposée comme pointeur global.
 
 <Tip>
 Les événements sont définis comme des structures vides. Le type lui-même a une signification : aucune charge utile de données n’est nécessaire.
@@ -185,7 +185,7 @@ Les gardes sont des contrôles conditionnels qui déterminent si une transition 
 
 ### Mise en œuvre des Guards
 
-Les Guards sont définis comme des lambdas `constexpr` dans l'espace de noms [`guards`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h). Ils appellent des fonctions d'implémentation déclarées en amont pour garder l'en-tête léger :
+Les Guards sont définis comme des lambdas `constexpr` dans l'espace de noms [`guards`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/guards.h). Ils appellent des fonctions d'implémentation déclarées en amont pour garder l'en-tête léger :
 
 ```cpp
 // In guards.h - forward declaration
@@ -261,7 +261,7 @@ Les actions sont des fonctions exécutées lors des transitions d'état. Elles p
 
 ### Mise en œuvre des actions
 
-Les actions sont définies comme des lambdas `constexpr` dans l'espace de noms [`actions`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h). Comme les Guards, elles délèguent à des fonctions d'implémentation déclarées en amont :
+Les actions sont définies comme des lambdas `constexpr` dans l'espace de noms [`actions`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/actions.h). Comme les Guards, elles délèguent à des fonctions d'implémentation déclarées en amont :
 
 ```cpp
 // In actions.h - forward declarations
@@ -313,7 +313,7 @@ Cela utilise un mutex récursif pour protéger les transitions d'état et permet
 - Gestionnaires de commandes BLE
 - Tâches en arrière-plan
 
-La machine à états est initialisée dans [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp) :
+La machine à états est initialisée dans [`state.cpp`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/state.cpp) :
 
 ```cpp
 // Global state machine instance
@@ -343,7 +343,7 @@ Cela génère des informations de transition via la journalisation ESP-IDF, ce q
 
 La machine à états suit une **architecture modulaire découplée** :
 
-- **Définition de la machine à états** ([`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h)) contient uniquement la table de transition
+- **Définition de la machine à états** ([`machine.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/machine.h)) contient uniquement la table de transition
 - **Les actions et les Guards** sont des lambdas `constexpr` qui délèguent aux fonctions d'implémentation
 - **Les modules de fonctionnalités** (comme `pages::`, `simple_penetration::`, `stroke_engine::`) contiennent la logique réelle
 - **Les structures d'état globales** gèrent l'état de l'application au lieu des membres de la classe

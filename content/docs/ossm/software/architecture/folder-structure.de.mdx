@@ -8,13 +8,13 @@ description: "Verstehen der Organisation des OSSM-Firmware-Quellcodes"
 Die OSSM-Firmware folgt einer modularen, featurebasierten Architektur. Jedes Feature befindet sich in einem eigenen Namespace-Ordner, wodurch die Codebasis einfacher zu navigieren und zu verwalten ist.
 
 <Info>
-Durchsuchen Sie den Quellcode auf GitHub: [Software/src/](https://github.com/KinkyMakers/OSSM-hardware/tree/main/Software/src)
+Durchsuchen Sie den Quellcode auf GitHub: [software/firmware/src/](https://github.com/researchanddesire/OSSM/tree/main/software/firmware/src)
 </Info>
 
 ## Überblick
 
 <Tree>
-  <Tree.Folder name="Software" defaultOpen>
+  <Tree.Folder name="software/firmware" defaultOpen>
     <Tree.Folder name="include">
       <Tree.Folder name="boost">
         <Tree.File name="sml.hpp" />
@@ -95,9 +95,9 @@ Aus Gründen der Übersichtlichkeit und Testbarkeit sind die Zustandsmaschinenko
 
 | Datei | Zweck |
 |------|---------|
-| [`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h) | Übergangstabellendefinition mit Boost.SML |
-| [`actions.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h) / `actions.cpp` | Zustandsübergangsaktionen (Anzeigeaktualisierungen, Motorsteuerung) |
-| [`guards.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h) / `guards.cpp` | Bedingte Prüfungen für Übergänge |
+| [`machine.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/machine.h) | Übergangstabellendefinition mit Boost.SML |
+| [`actions.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/actions.h) / `actions.cpp` | Zustandsübergangsaktionen (Anzeigeaktualisierungen, Motorsteuerung) |
+| [`guards.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/guards.h) / `guards.cpp` | Bedingte Prüfungen für Übergänge |
 | `state.h` / `state.cpp` | Initialisierung der Zustandsmaschine und globale Instanz |
 
 **Zustandsstrukturen** verwalten verschiedene Aspekte der Anwendung:

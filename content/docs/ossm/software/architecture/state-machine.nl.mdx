@@ -163,7 +163,7 @@ stateMachine->process_event(ButtonPress{});
 stateMachine->process_event(Done{});
 ```
 
-De toestandsmachine wordt bij het opstarten geïnitialiseerd in [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp) en als globale pointer beschikbaar gesteld.
+De toestandsmachine wordt bij het opstarten geïnitialiseerd in [`state.cpp`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/state.cpp) en als globale pointer beschikbaar gesteld.
 
 <Tip>
 Gebeurtenissen worden gedefinieerd als lege structuren. Het type zelf draagt de betekenis: er is geen gegevenspayload nodig.
@@ -185,7 +185,7 @@ Guards zijn voorwaardelijke controles die bepalen of een overgang moet plaatsvin
 
 ### Implementatie van Guards
 
-Guards worden gedefinieerd als `constexpr`-lambdas in de naamruimte [`guards`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h). Ze roepen vooruit gedeclareerde implementatiefuncties aan om de header licht te houden:
+Guards worden gedefinieerd als `constexpr`-lambdas in de naamruimte [`guards`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/guards.h). Ze roepen vooruit gedeclareerde implementatiefuncties aan om de header licht te houden:
 
 ```cpp
 // In guards.h - forward declaration
@@ -261,7 +261,7 @@ Acties zijn functies die tijdens toestandsovergangen worden uitgevoerd. Ze veroo
 
 ### Actie-implementatie
 
-Acties worden gedefinieerd als `constexpr`-lambdas in de naamruimte [`actions`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h). Net als Guards delegeren ze naar vooruit gedeclareerde implementatiefuncties:
+Acties worden gedefinieerd als `constexpr`-lambdas in de naamruimte [`actions`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/actions.h). Net als Guards delegeren ze naar vooruit gedeclareerde implementatiefuncties:
 
 ```cpp
 // In actions.h - forward declarations
@@ -313,7 +313,7 @@ Hierbij wordt een recursieve mutex gebruikt om toestandsovergangen te beschermen
 - BLE-opdrachthandlers
 - Achtergrondtaken
 
-De toestandsmachine wordt geïnitialiseerd in [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp):
+De toestandsmachine wordt geïnitialiseerd in [`state.cpp`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/state.cpp):
 
 ```cpp
 // Global state machine instance
@@ -343,7 +343,7 @@ Dit geeft transitie-informatie door via ESP-IDF-logging, waardoor het gedrag van
 
 De toestandsmachine volgt een **ontkoppelde modulaire architectuur**:
 
-- **Definitie van de toestandsmachine** ([`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h)) bevat alleen de overgangstabel
+- **Definitie van de toestandsmachine** ([`machine.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/machine.h)) bevat alleen de overgangstabel
 - **Acties en Guards** zijn `constexpr`-lambda's die delegeren aan implementatiefuncties
 - **Functiemodules** (zoals `pages::`, `simple_penetration::`, `stroke_engine::`) bevatten de daadwerkelijke logica
 - **Globale toestandsstructuren** beheren de applicatietoestand in plaats van klasseleden

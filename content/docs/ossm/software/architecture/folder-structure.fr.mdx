@@ -8,13 +8,13 @@ description: "Comprendre l'organisation du code source du micrologiciel OSSM"
 Le micrologiciel OSSM suit une architecture modulaire basée sur les fonctionnalités. Chaque fonctionnalité réside dans son propre dossier d'espace de noms, ce qui facilite la navigation et la maintenance de la base de code.
 
 <Info>
-Parcourez le code source sur GitHub : [Software/src/](https://github.com/KinkyMakers/OSSM-hardware/tree/main/Software/src)
+Parcourez le code source sur GitHub : [software/firmware/src/](https://github.com/researchanddesire/OSSM/tree/main/software/firmware/src)
 </Info>
 
 ## Aperçu
 
 <Tree>
-  <Tree.Folder name="Software" defaultOpen>
+  <Tree.Folder name="software/firmware" defaultOpen>
     <Tree.Folder name="include">
       <Tree.Folder name="boost">
         <Tree.File name="sml.hpp" />
@@ -95,9 +95,9 @@ Les composants de la machine à états sont séparés pour plus de clarté et de
 
 | Fichier | But |
 |------|---------|
-| [`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h) | Définition de la table de transition à l'aide de Boost.SML |
-| [`actions.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h) / `actions.cpp` | Actions de transition d'état (mises à jour de l'affichage, contrôle du moteur) |
-| [`guards.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h) / `guards.cpp` | Vérifications conditionnelles pour les transitions |
+| [`machine.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/machine.h) | Définition de la table de transition à l'aide de Boost.SML |
+| [`actions.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/actions.h) / `actions.cpp` | Actions de transition d'état (mises à jour de l'affichage, contrôle du moteur) |
+| [`guards.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/guards.h) / `guards.cpp` | Vérifications conditionnelles pour les transitions |
 | `state.h` / `state.cpp` | Initialisation de la machine à états et instance globale |
 
 Les **structures d'état** gèrent différents aspects de l'application :

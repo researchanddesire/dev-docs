@@ -163,7 +163,7 @@ stateMachine->process_event(ButtonPress{});
 stateMachine->process_event(Done{});
 ```
 
-The state machine is initialized at startup in [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp) and exposed as a global pointer.
+The state machine is initialized at startup in [`state.cpp`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/state.cpp) and exposed as a global pointer.
 
 <Tip>
 Events are defined as empty structs. The type itself carries the meaning - no data payload is needed.
@@ -185,7 +185,7 @@ Guards are conditional checks that determine whether a transition should occur. 
 
 ### Guard Implementation
 
-Guards are defined as `constexpr` lambdas in the [`guards`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h) namespace. They call forward-declared implementation functions to keep the header lightweight:
+Guards are defined as `constexpr` lambdas in the [`guards`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/guards.h) namespace. They call forward-declared implementation functions to keep the header lightweight:
 
 ```cpp
 // In guards.h - forward declaration
@@ -261,7 +261,7 @@ Actions are functions executed during state transitions. They perform side effec
 
 ### Action Implementation
 
-Actions are defined as `constexpr` lambdas in the [`actions`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h) namespace. Like guards, they delegate to forward-declared implementation functions:
+Actions are defined as `constexpr` lambdas in the [`actions`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/actions.h) namespace. Like guards, they delegate to forward-declared implementation functions:
 
 ```cpp
 // In actions.h - forward declarations
@@ -313,7 +313,7 @@ This uses a recursive mutex to protect state transitions, allowing safe event di
 - BLE command handlers
 - Background tasks
 
-The state machine is initialized in [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp):
+The state machine is initialized in [`state.cpp`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/state.cpp):
 
 ```cpp
 // Global state machine instance
@@ -343,7 +343,7 @@ This outputs transition information via ESP-IDF logging, making it easy to trace
 
 The state machine follows a **decoupled modular architecture**:
 
-- **State machine definition** ([`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h)) contains only the transition table
+- **State machine definition** ([`machine.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/machine.h)) contains only the transition table
 - **Actions and guards** are `constexpr` lambdas that delegate to implementation functions
 - **Feature modules** (like `pages::`, `simple_penetration::`, `stroke_engine::`) contain the actual logic
 - **Global state structs** manage application state instead of class members

@@ -8,13 +8,13 @@ description: "Inzicht in de broncodeorganisatie van de OSSM-firmware"
 De OSSM-firmware volgt een modulaire, op functies gebaseerde architectuur. Elke functie bevindt zich in een eigen naamruimtemap, waardoor de codebase gemakkelijker te navigeren en te onderhouden is.
 
 <Info>
-Blader door de broncode op GitHub: [Software/src/](https://github.com/KinkyMakers/OSSM-hardware/tree/main/Software/src)
+Blader door de broncode op GitHub: [software/firmware/src/](https://github.com/researchanddesire/OSSM/tree/main/software/firmware/src)
 </Info>
 
 ## Overzicht
 
 <Tree>
-  <Tree.Folder name="Software" defaultOpen>
+  <Tree.Folder name="software/firmware" defaultOpen>
     <Tree.Folder name="include">
       <Tree.Folder name="boost">
         <Tree.File name="sml.hpp" />
@@ -95,9 +95,9 @@ De componenten van de toestandsmachine zijn gescheiden voor duidelijkheid en tes
 
 | Bestand | Doel |
 |------|---------|
-| [`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h) | Overgangstabeldefinitie met behulp van Boost.SML |
-| [`actions.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h) / `actions.cpp` | Toestandsovergangsacties (display-updates, motorbesturing) |
-| [`guards.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h) / `guards.cpp` | Voorwaardelijke controles op overgangen |
+| [`machine.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/machine.h) | Overgangstabeldefinitie met behulp van Boost.SML |
+| [`actions.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/actions.h) / `actions.cpp` | Toestandsovergangsacties (display-updates, motorbesturing) |
+| [`guards.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/guards.h) / `guards.cpp` | Voorwaardelijke controles op overgangen |
 | `state.h` / `state.cpp` | Initialisatie van de toestandsmachine en globale instantie |
 
 **Toestandsstructuren** beheren verschillende aspecten van de applicatie:

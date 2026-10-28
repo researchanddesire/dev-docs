@@ -163,7 +163,7 @@ stateMachine->process_event(ButtonPress{});
 stateMachine->process_event(Done{});
 ```
 
-Die Zustandsmaschine wird beim Start in [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp) initialisiert und als globaler Zeiger bereitgestellt.
+Die Zustandsmaschine wird beim Start in [`state.cpp`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/state.cpp) initialisiert und als globaler Zeiger bereitgestellt.
 
 <Tip>
 Ereignisse werden als leere Strukturen definiert. Der Typ selbst trägt die Bedeutung – es sind keine Nutzdaten erforderlich.
@@ -185,7 +185,7 @@ Guards sind bedingte Prüfungen, die bestimmen, ob ein Übergang stattfinden sol
 
 ### Implementierung von Guards
 
-Guards werden als `constexpr`-Lambdas im [`guards`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h)-Namespace definiert. Sie rufen vorwärts deklarierte Implementierungsfunktionen auf, um den Header schlank zu halten:
+Guards werden als `constexpr`-Lambdas im [`guards`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/guards.h)-Namespace definiert. Sie rufen vorwärts deklarierte Implementierungsfunktionen auf, um den Header schlank zu halten:
 
 ```cpp
 // In guards.h - forward declaration
@@ -261,7 +261,7 @@ Aktionen sind Funktionen, die bei Zustandsübergängen ausgeführt werden. Sie f
 
 ### Implementierung von Aktionen
 
-Aktionen werden als `constexpr`-Lambdas im [`actions`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h)-Namespace definiert. Wie Guards delegieren sie an vorwärts deklarierte Implementierungsfunktionen:
+Aktionen werden als `constexpr`-Lambdas im [`actions`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/actions.h)-Namespace definiert. Wie Guards delegieren sie an vorwärts deklarierte Implementierungsfunktionen:
 
 ```cpp
 // In actions.h - forward declarations
@@ -313,7 +313,7 @@ Dabei wird ein rekursiver Mutex verwendet, um Zustandsübergänge zu schützen u
 - BLE-Befehlshandler
 - Hintergrundaufgaben
 
-Die Zustandsmaschine wird in [`state.cpp`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/state.cpp) initialisiert:
+Die Zustandsmaschine wird in [`state.cpp`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/state.cpp) initialisiert:
 
 ```cpp
 // Global state machine instance
@@ -343,7 +343,7 @@ Dadurch werden Übergangsinformationen über die ESP-IDF-Protokollierung ausgege
 
 Die Zustandsmaschine folgt einer **entkoppelten modularen Architektur**:
 
-- **Zustandsmaschinendefinition** ([`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h)) enthält nur die Übergangstabelle
+- **Zustandsmaschinendefinition** ([`machine.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/machine.h)) enthält nur die Übergangstabelle
 - **Aktionen und Guards** sind `constexpr`-Lambdas, die an Implementierungsfunktionen delegieren
 - **Funktionsmodule** (wie `pages::`, `simple_penetration::`, `stroke_engine::`) enthalten die eigentliche Logik
 - **Globale Zustandsstrukturen** verwalten den Anwendungsstatus anstelle von Klassenmitgliedern

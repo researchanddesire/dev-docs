@@ -8,13 +8,13 @@ description: "Understanding the OSSM firmware source code organization"
 The OSSM firmware follows a modular, feature-based architecture. Each feature lives in its own namespace folder, making the codebase easier to navigate and maintain.
 
 <Info>
-Browse the source code on GitHub: [Software/src/](https://github.com/KinkyMakers/OSSM-hardware/tree/main/Software/src)
+Browse the source code on GitHub: [software/firmware/src/](https://github.com/researchanddesire/OSSM/tree/main/software/firmware/src)
 </Info>
 
 ## Overview
 
 <Tree>
-  <Tree.Folder name="Software" defaultOpen>
+  <Tree.Folder name="software/firmware" defaultOpen>
     <Tree.Folder name="include">
       <Tree.Folder name="boost">
         <Tree.File name="sml.hpp" />
@@ -95,9 +95,9 @@ The state machine components are separated for clarity and testability.
 
 | File | Purpose |
 |------|---------|
-| [`machine.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/machine.h) | Transition table definition using Boost.SML |
-| [`actions.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/actions.h) / `actions.cpp` | State transition actions (display updates, motor control) |
-| [`guards.h`](https://github.com/KinkyMakers/OSSM-hardware/blob/main/Software/src/ossm/state/guards.h) / `guards.cpp` | Conditional checks for transitions |
+| [`machine.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/machine.h) | Transition table definition using Boost.SML |
+| [`actions.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/actions.h) / `actions.cpp` | State transition actions (display updates, motor control) |
+| [`guards.h`](https://github.com/researchanddesire/OSSM/blob/main/software/firmware/src/ossm/state/guards.h) / `guards.cpp` | Conditional checks for transitions |
 | `state.h` / `state.cpp` | State machine initialization and global instance |
 
 **State structs** manage different aspects of the application:
