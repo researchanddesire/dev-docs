@@ -35,7 +35,7 @@ Suchen Sie regelmäßig nach Firmware-Updates, um auf neue Funktionen und Gerät
 
 Der vollständige Firmware-Quellcode ist auf GitHub verfügbar:
 
-<Card title="RADR Firmware" icon="code" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Software">
+<Card title="RADR Firmware" icon="code" href="https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR/tree/main/software/firmware">
 Durchsuchen Sie den Quellcode und die Dokumentation.
 </Card>
 
@@ -77,13 +77,13 @@ Durchsuchen Sie den Quellcode und die Dokumentation.
 <Steps>
 <Step title="Klonen Sie das Repository">
 ```bash
-git clone https://github.com/researchanddesire/radr-wireless-remote.git
-cd radr-wireless-remote/Software
+git clone https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR.git
+cd Open-Source-Wireless-Remote_RADR/software/firmware
 ```
 </Step>
 
 <Step title="In VS Code öffnen">
-Öffnen Sie den Ordner `Software` in VS Code. PlatformIO erkennt die Projektkonfiguration automatisch.
+Öffnen Sie den Ordner `software/firmware` in VS Code. PlatformIO erkennt die Projektkonfiguration automatisch.
 </Step>
 
 <Step title="Kompilieren Sie die Firmware">
@@ -132,10 +132,13 @@ Die dynamische Registrierung (`registry.json`) kann über Firmware-Updates aktua
 
 ## Konfigurationsdateien
 
+Die Pfade sind relativ zu `software/firmware/`.
+
 | Datei | Zweck |
 |------|---------|
 | `platformio.ini` | Build-Konfiguration und Abhängigkeiten |
-| `src/config.h` | Definitionen und Konstanten der Hardware-Pins |
+| `src/pins.h` | Definitionen der Hardware-Pins |
+| `src/constants.h` | Firmware-Konstanten |
 | `data/registry.json` | Buttplug.io-Geräte-UUID-Zuordnungen |
 
 ## Technische Referenz
@@ -152,7 +155,7 @@ Details zum Bluetooth-Protokoll und zur Gerätekommunikation.
 
 ## Mitwirken
 
-Lesen Sie die [Beitragsrichtlinien](https://github.com/researchanddesire/radr-wireless-remote/blob/main/CONTRIBUTING.md), bevor Sie eine Änderung am `main`-Zweig einreichen.
+Lesen Sie die [Beitragsrichtlinien](https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR/blob/main/CONTRIBUTING.md), bevor Sie eine Änderung am `main`-Zweig einreichen.
 
 ### Codestil
 
@@ -163,4 +166,4 @@ Lesen Sie die [Beitragsrichtlinien](https://github.com/researchanddesire/radr-wi
 
 ## Lizenz
 
-Die RADR-Firmware wird unter der **CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S v2)** veröffentlicht. Weitere Informationen finden Sie in der [Lizenzdatei](https://github.com/researchanddesire/radr-wireless-remote/blob/main/LICENSE).
+Die RADR-Firmware wird unter der **CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S v2)** veröffentlicht. Weitere Informationen finden Sie in der [Lizenzdatei](https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR/blob/main/LICENSE).

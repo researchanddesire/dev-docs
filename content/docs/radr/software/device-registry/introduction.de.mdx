@@ -5,6 +5,8 @@ description: "Wie RADR Geräteinstanzen aus BLE-Dienst-UUIDs erkennt und erstell
 
 Die Geräteregistrierung ist das Kernsystem, das die UUIDs der Bluetooth-Low-Energy-(BLE-)Dienste den Gerätefabriken zuordnet. Wenn RADR nach Geräten sucht, verwendet es Dienst-UUIDs, um zu bestimmen, welche Factory die Geräteinstanz erstellen soll.
 
+Quell- und Datenpfade auf dieser Seite sind relativ zum PlatformIO-Projekt in `software/firmware/`.
+
 ## Architekturübersicht
 
 RADR verwendet ein zweistufiges Registrierungssystem:
@@ -227,7 +229,7 @@ Kompilieren und flashen Sie die aktualisierte Firmware.
 Wenn Sie lokal entwickeln, verwenden Sie die Funktion „Upload Filesystem“ von PlatformIO, um das Verzeichnis `data/` auf LittleFS zu flashen:
 
 1. Ändern Sie `data/registry.json` oder fügen Sie Spezifikationsdateien zu `data/protocols/` hinzu
-2. Klicken Sie in VS Code mit PlatformIO auf **Upload Filesystem** (oder führen Sie `pio run --target uploadfs` aus).
+2. Klicken Sie in VS Code mit PlatformIO auf **Upload Filesystem** (oder führen Sie `pio run -d software/firmware --target uploadfs` aus).
 3. Das Gerät verwendet beim nächsten Start die aktualisierte Registrierung
 
 <Warning>

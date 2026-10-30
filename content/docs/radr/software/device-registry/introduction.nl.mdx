@@ -5,6 +5,8 @@ description: "Hoe RADR apparaatinstanties ontdekt en maakt op basis van BLE-serv
 
 Het apparaatregister is het kernsysteem dat de UUID's van Bluetooth Low Energy (BLE)-services koppelt aan apparaatfabrieken. Wanneer RADR naar apparaten scant, gebruikt het service-UUID's om te bepalen welke fabriek de apparaatinstantie moet maken.
 
+Bron- en gegevenspaden op deze pagina zijn relatief ten opzichte van het PlatformIO-project in `software/firmware/`.
+
 ## Architectuuroverzicht
 
 RADR maakt gebruik van een registersysteem met twee niveaus:
@@ -227,7 +229,7 @@ Bouw de bijgewerkte firmware en flash deze.
 Wanneer u lokaal ontwikkelt, gebruikt u de functie "Upload Filesystem" van PlatformIO om de map `data/` naar LittleFS te flashen:
 
 1. Wijzig `data/registry.json` of voeg spec-bestanden toe aan `data/protocols/`
-2. Klik in VS Code met PlatformIO op **Upload Filesystem** (of voer `pio run --target uploadfs` uit)
+2. Klik in VS Code met PlatformIO op **Upload Filesystem** (of voer `pio run -d software/firmware --target uploadfs` uit)
 3. Het apparaat gebruikt het bijgewerkte register wanneer het de volgende keer opstart
 
 <Warning>

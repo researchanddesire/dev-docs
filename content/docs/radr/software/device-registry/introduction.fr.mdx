@@ -5,6 +5,8 @@ description: "Comment RADR découvre et crée des instances de périphérique à
 
 Le registre des appareils est le système principal qui associe les UUID de service Bluetooth Low Energy (BLE) aux fabriques d’appareils. Lorsque RADR recherche des appareils, il utilise les UUID de service pour déterminer quelle fabrique doit créer l’instance de périphérique.
 
+Les chemins des sources et des données sur cette page sont relatifs au projet PlatformIO dans `software/firmware/`.
+
 ## Présentation de l'architecture
 
 RADR utilise un système de registre à deux niveaux :
@@ -227,7 +229,7 @@ Compilez et flashez le micrologiciel mis à jour.
 Lors du développement local, utilisez la fonctionnalité « Upload Filesystem » de PlatformIO pour flasher le répertoire `data/` sur LittleFS :
 
 1. Modifiez `data/registry.json` ou ajoutez des fichiers de spécifications à `data/protocols/`
-2. Dans VS Code avec PlatformIO, cliquez sur **Upload Filesystem** (ou exécutez `pio run --target uploadfs`)
+2. Dans VS Code avec PlatformIO, cliquez sur **Upload Filesystem** (ou exécutez `pio run -d software/firmware --target uploadfs`)
 3. L'appareil utilisera le registre mis à jour au prochain démarrage
 
 <Warning>

@@ -5,6 +5,8 @@ description: "Technical documentation for the RADR over-the-air update architect
 
 This document describes the over-the-air (OTA) update system used by the Research And Desire wireless Remote (RADR), including the update chain, state machine flow, and what components get updated.
 
+Source and data paths on this page are relative to the PlatformIO project in `software/firmware/`.
+
 ## Overview
 
 RADR uses a two-part OTA update system:
@@ -38,7 +40,7 @@ flowchart TB
 
 ### Update Server
 
-Updates are served from Supabase Storage. The server URL is defined in `platformio.ini`:
+Updates are served from Supabase Storage. The server URL is defined in `software/firmware/platformio.ini`:
 
 ```ini
 UPDATE_SERVER_URL="https://acjajruwevyyatztbkdf.supabase.co/storage/v1/object/public/radr-firmware"
@@ -212,7 +214,7 @@ This sets both `isSoftwareUpdateAvailable` and `isFilesystemUpdateAvailable` to 
 When developing locally, use PlatformIO's "Upload Filesystem" feature:
 
 ```bash
-pio run --target uploadfs
+pio run -d software/firmware --target uploadfs
 ```
 
 This uploads the contents of the `data/` directory to the LittleFS partition.

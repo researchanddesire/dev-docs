@@ -35,7 +35,7 @@ Vérifiez régulièrement les mises à jour du micrologiciel pour accéder aux n
 
 Le code source complet du micrologiciel est disponible sur GitHub :
 
-<Card title="RADR Firmware" icon="code" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Software">
+<Card title="RADR Firmware" icon="code" href="https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR/tree/main/software/firmware">
 Parcourez le code source et la documentation.
 </Card>
 
@@ -77,13 +77,13 @@ Parcourez le code source et la documentation.
 <Steps>
 <Step title="Cloner le dépôt">
 ```bash
-git clone https://github.com/researchanddesire/radr-wireless-remote.git
-cd radr-wireless-remote/Software
+git clone https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR.git
+cd Open-Source-Wireless-Remote_RADR/software/firmware
 ```
 </Step>
 
 <Step title="Ouvrir dans VS Code">
-Ouvrez le dossier `Software` dans VS Code. PlatformIO détectera automatiquement la configuration du projet.
+Ouvrez le dossier `software/firmware` dans VS Code. PlatformIO détectera automatiquement la configuration du projet.
 </Step>
 
 <Step title="Compiler le micrologiciel">
@@ -132,10 +132,13 @@ Le registre dynamique (`registry.json`) peut être mis à jour via des mises à 
 
 ## Fichiers de configuration
 
+Les chemins sont relatifs à `software/firmware/`.
+
 | Fichier | Objectif |
 |------|---------|
 | `platformio.ini` | Configuration de build et dépendances |
-| `src/config.h` | Définitions et constantes des broches matérielles |
+| `src/pins.h` | Définitions des broches matérielles |
+| `src/constants.h` | Constantes du micrologiciel |
 | `data/registry.json` | Mappages des UUID des appareils Buttplug.io |
 
 ## Référence technique
@@ -152,7 +155,7 @@ Détails du protocole Bluetooth et communication de l'appareil.
 
 ## Contribuer
 
-Lisez les [directives de contribution](https://github.com/researchanddesire/radr-wireless-remote/blob/main/CONTRIBUTING.md) avant de soumettre une modification sur la branche `main`.
+Lisez les [directives de contribution](https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR/blob/main/CONTRIBUTING.md) avant de soumettre une modification sur la branche `main`.
 
 ### Style de code
 
@@ -163,4 +166,4 @@ Lisez les [directives de contribution](https://github.com/researchanddesire/radr
 
 ## Licence
 
-Le micrologiciel RADR est publié sous la **CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S v2)**. Consultez la [licence](https://github.com/researchanddesire/radr-wireless-remote/blob/main/LICENSE) du dépôt pour plus de détails.
+Le micrologiciel RADR est publié sous la **CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S v2)**. Consultez la [licence](https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR/blob/main/LICENSE) du dépôt pour plus de détails.

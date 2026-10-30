@@ -35,7 +35,7 @@ Controleer regelmatig op firmware-updates om toegang te krijgen tot nieuwe funct
 
 De volledige firmwarebroncode is beschikbaar op GitHub:
 
-<Card title="RADR Firmware" icon="code" href="https://github.com/researchanddesire/radr-wireless-remote/tree/main/Software">
+<Card title="RADR Firmware" icon="code" href="https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR/tree/main/software/firmware">
 Blader door de broncode en documentatie.
 </Card>
 
@@ -77,13 +77,13 @@ Blader door de broncode en documentatie.
 <Steps>
 <Step title="Kloon de repository">
 ```bash
-git clone https://github.com/researchanddesire/radr-wireless-remote.git
-cd radr-wireless-remote/Software
+git clone https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR.git
+cd Open-Source-Wireless-Remote_RADR/software/firmware
 ```
 </Step>
 
 <Step title="Openen in VS Code">
-Open de map `Software` in VS Code. PlatformIO detecteert automatisch de projectconfiguratie.
+Open de map `software/firmware` in VS Code. PlatformIO detecteert automatisch de projectconfiguratie.
 </Step>
 
 <Step title="Bouw de firmware">
@@ -132,10 +132,13 @@ Het dynamische register (`registry.json`) kan via firmware-updates worden bijgew
 
 ## Configuratiebestanden
 
+De paden zijn relatief ten opzichte van `software/firmware/`.
+
 | Bestand | Doel |
 |------|---------|
 | `platformio.ini` | Buildconfiguratie en afhankelijkheden |
-| `src/config.h` | Hardware-pindefinities en constanten |
+| `src/pins.h` | Hardware-pindefinities |
+| `src/constants.h` | Firmwareconstanten |
 | `data/registry.json` | Buttplug.io-apparaat-UUID-toewijzingen |
 
 ## Technische referentie
@@ -152,7 +155,7 @@ Bluetooth-protocoldetails en apparaatcommunicatie.
 
 ## Bijdragen
 
-Lees de [richtlijnen voor bijdragen](https://github.com/researchanddesire/radr-wireless-remote/blob/main/CONTRIBUTING.md) voordat u een wijziging indient voor de `main`-tak.
+Lees de [richtlijnen voor bijdragen](https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR/blob/main/CONTRIBUTING.md) voordat u een wijziging indient voor de `main`-tak.
 
 ### Codestijl
 
@@ -163,4 +166,4 @@ Lees de [richtlijnen voor bijdragen](https://github.com/researchanddesire/radr-w
 
 ## Licentie
 
-De RADR-firmware wordt uitgebracht onder de **CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S v2)**. Zie de [licentie](https://github.com/researchanddesire/radr-wireless-remote/blob/main/LICENSE) in de repository voor meer informatie.
+De RADR-firmware wordt uitgebracht onder de **CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S v2)**. Zie de [licentie](https://github.com/researchanddesire/Open-Source-Wireless-Remote_RADR/blob/main/LICENSE) in de repository voor meer informatie.

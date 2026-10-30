@@ -5,6 +5,8 @@ description: "Documentation technique pour l'architecture des mises à jour OTA 
 
 Ce document décrit le système de mise à jour par liaison radio (OTA) utilisé par la télécommande sans fil Research And Desire Wireless Remote (RADR), y compris la chaîne de mise à jour, le flux de la machine à états et les composants mis à jour.
 
+Les chemins des sources et des données sur cette page sont relatifs au projet PlatformIO dans `software/firmware/`.
+
 ## Aperçu
 
 RADR utilise un système de mise à jour OTA en deux parties :
@@ -38,7 +40,7 @@ flowchart TB
 
 ### Serveur de mise à jour
 
-Les mises à jour sont fournies par Supabase Storage. L'URL du serveur est définie dans `platformio.ini` :
+Les mises à jour sont fournies par Supabase Storage. L'URL du serveur est définie dans `software/firmware/platformio.ini` :
 
 ```ini
 UPDATE_SERVER_URL="https://acjajruwevyyatztbkdf.supabase.co/storage/v1/object/public/radr-firmware"
@@ -212,7 +214,7 @@ Cela définit `isSoftwareUpdateAvailable` et `isFilesystemUpdateAvailable` sur `
 Lors du développement local, utilisez la fonctionnalité « Upload Filesystem » de PlatformIO :
 
 ```bash
-pio run --target uploadfs
+pio run -d software/firmware --target uploadfs
 ```
 
 Cela téléverse le contenu du répertoire `data/` sur la partition LittleFS.
