@@ -20,8 +20,12 @@ Only the schema is locked — `.github/workflows/scripts/bom.schema.json` is ven
 Use this exact header, in this order:
 
 ```
-#,Part Name,Category,Description,Qty,UOM,Manufacturer,MFG PN,Vendor,Vendor PN,Source,Notes
+#,Part Name,Category,Description,Qty,UOM,Manufacturer,MFG PN,Vendor,Vendor PN,Design Source,Purchase Source,Notes
 ```
+
+## Migration from the 12-column header
+
+Existing BOMs using `Source` remain supported by OHAI during migration. Move repository/design paths to `Design Source` and vendor/product URLs to `Purchase Source`; do not infer a missing link. Update validators before migrating a product CSV. Old BOMs retain their original header and row values when imported.
 
 ## Columns
 
@@ -39,7 +43,8 @@ The schema tracks both the canonical **field name** (machine identifier) and the
 | `mfg_part_number`    | `MFG PN`      | string  | no       |                                                                       |
 | `vendor`             | `Vendor`      | string  | no       |                                                                       |
 | `vendor_part_number` | `Vendor PN`   | string  | no       |                                                                       |
-| `source`             | `Source`      | string  | no       | Repo source if it exists, else a vendor/source URL, else `–` (see below) |
+| `design_source`      | `Design Source` | string | no      | CAD, PCB or cable design path/URL, else `–` |
+| `purchase_source`    | `Purchase Source` | string | no    | Vendor or webstore product URL, else `–` |
 | `notes`              | `Notes`       | string  | no       |                                                                       |
 
 ## Conventions
@@ -47,7 +52,9 @@ The schema tracks both the canonical **field name** (machine identifier) and the
 - **No blank cells.** An empty value is written as an en-dash `–` (U+2013), never left blank. The schema treats `–` as the "no value" marker.
 - **`qty` is a number.** Integers for discrete parts; fractions are fine for measured UOMs (e.g. `412.5` mm of belt). Lint only checks it parses as a number — it does **not** cross-check `qty` against `UOM`.
 - **`UOM` is free text.** No closed vocabulary; use sensible units. Kept loose on purpose.
-- **`source`** prefers the in-repo GitHub source that defines or produces the part (its `cad/`, `pcb/`, or `cables/` artifact) when one exists; otherwise a vendor/product URL is acceptable; otherwise `–`.
+- **`Design Source`** links to the CAD, PCB or cable source that defines the part. Prefer an in-repo relative path; use `–` when no design source is known.
+- **`Purchase Source`** links to the vendor or webstore product page. Keep it alongside the design source when both exist. A kit URL is appropriate for parts sold in a kit.
+- Mark optional parts explicitly in `Notes`, including the build variant they apply to. Keep their quantity in `Qty`.
 
 ## Part category codes
 

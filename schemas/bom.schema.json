@@ -78,10 +78,16 @@
       "description": "Vendor / distributor part number."
     },
     {
-      "name": "source",
-      "title": "Source",
+      "name": "design_source",
+      "title": "Design Source",
       "type": "string",
-      "description": "Source link for the part. Prefer the in-repo GitHub source that defines/produces it (cad/, pcb/, cables/) when it exists; otherwise a vendor/product URL is acceptable; otherwise the empty marker."
+      "description": "Repository CAD, PCB or cable design path or URL. Use the empty marker when no design source is known."
+    },
+    {
+      "name": "purchase_source",
+      "title": "Purchase Source",
+      "type": "string",
+      "description": "Vendor or webstore product URL for the part or its kit, otherwise the empty marker."
     },
     {
       "name": "notes",
