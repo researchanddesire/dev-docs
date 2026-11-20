@@ -1,0 +1,112 @@
+---
+title: "BOM-Standard"
+description: "Spaltenvertrag, Teilekategorie-Codes und Konventionen für jede Stückliste der Research-and-Desire-Hardware."
+---
+
+Diese Seite ist die zentrale Referenz für Stücklisten (Bills of Materials, BOMs) in allen Hardware-Repositorys von Research and Desire. Jede `hardware/bom.csv` in [OSSM](https://github.com/researchanddesire/OSSM), [LKBX](https://github.com/researchanddesire/lkbx), [DTT](https://github.com/researchanddesire/dtt) und [RADR](https://github.com/researchanddesire/radr) folgt diesem Vertrag, damit Stücklisten für Mitwirkende, Werkzeuge und CI einheitlich und maschinenlesbar bleiben.
+
+**Kanonische Quelle:** Diese Seite (Fließtext) und [`schemas/bom.schema.json`](https://github.com/researchanddesire/dev-docs/blob/main/schemas/bom.schema.json) (maschinenlesbar) liegen in [`researchanddesire/dev-docs`](https://github.com/researchanddesire/dev-docs). Produkt-Repositorys übernehmen das Schema schreibgeschützt und setzen es mit der Prüfung `bom-lint` durch. Spalten Sie den Standard nicht pro Repository ab, sondern ändern Sie ihn in `dev-docs`.
+
+## Datei
+
+- **Speicherort:** `hardware/bom.csv` in jedem Produkt-Repository. `bom-lint` prüft jede `hardware/**/bom.csv`.
+- **Format:** CSV mit einer Zeile pro Position; die feste Kopfzeile unten steht in der ersten Zeile.
+
+## Eine Stückliste bearbeiten
+
+Jede Person darf `hardware/bom.csv` direkt bearbeiten und einen Pull Request öffnen. Es gibt keine zusätzliche Freigabe: **Solange `bom-lint` erfolgreich ist, ist die Änderung in Ordnung.** Die Datei `bom.csv` enthält von Menschen gepflegte Daten und ist kein generiertes Artefakt.
+
+Nur das Schema ist gesperrt. `.github/workflows/scripts/bom.schema.json` wird schreibgeschützt aus `dev-docs` übernommen, bearbeiten Sie es daher nicht von Hand. Änderungen am Standard selbst erfolgen in `dev-docs`.
+
+## Kopfzeile
+
+Verwenden Sie genau diese Kopfzeile in dieser Reihenfolge:
+
+```text
+#,Part Name,Category,Description,Qty,UOM,Manufacturer,MFG PN,Vendor,Vendor PN,Design Source,Purchase Source,Notes
+```
+
+## Umstellung von der 12-spaltigen Kopfzeile
+
+Stücklisten, die noch die 12-spaltige Kopfzeile mit einer einzelnen Spalte `Source` verwenden, werden während der Umstellung weiterhin von [R+D Assembly](https://ohai.researchanddesire.com) unterstützt. Verschieben Sie Repository- und Konstruktionspfade nach `Design Source` und Händler- oder Produkt-URLs nach `Purchase Source`; ergänzen Sie fehlende Links nicht durch Vermutungen. Aktualisieren Sie die Validatoren, bevor Sie eine Produkt-CSV umstellen. Ältere Stücklisten behalten beim Import ihre ursprüngliche Kopfzeile und ihre Zeilenwerte.
+
+## Spalten
+
+Das Schema erfasst sowohl den kanonischen **Feldnamen** (maschinelle Kennung) als auch die **Kopfzeile**, als die er angezeigt wird:
+
+| Feldname             | Kopfzeile         | Typ     | Pflicht | Hinweise                                                              |
+| -------------------- | ----------------- | ------- | ------- | --------------------------------------------------------------------- |
+| `line_item`          | `#`               | integer | ja      | Fortlaufende Positionsnummer                                          |
+| `part_name`          | `Part Name`       | string  | ja      |                                                                       |
+| `category`           | `Category`        | string  | ja      | Einer der [Kategorie-Codes](#teilekategorie-codes) (geschlossene Liste) |
+| `description`        | `Description`     | string  | nein    |                                                                       |
+| `qty`                | `Qty`             | number  | ja      | UOM gibt die Einheit an; Brüche bei gemessenen Einheiten erlaubt      |
+| `unit_of_measure`    | `UOM`             | string  | nein    | Freitext (zum Beispiel `each`, `mm`, `ml`, `g`)                       |
+| `manufacturer`       | `Manufacturer`    | string  | nein    |                                                                       |
+| `mfg_part_number`    | `MFG PN`          | string  | nein    |                                                                       |
+| `vendor`             | `Vendor`          | string  | nein    |                                                                       |
+| `vendor_part_number` | `Vendor PN`       | string  | nein    |                                                                       |
+| `design_source`      | `Design Source`   | string  | nein    | Pfad oder URL der CAD-, Leiterplatten- oder Kabelkonstruktion, sonst `–` |
+| `purchase_source`    | `Purchase Source` | string  | nein    | Produkt-URL des Händlers oder Webshops, sonst `–`                     |
+| `notes`              | `Notes`           | string  | nein    |                                                                       |
+
+## Konventionen
+
+- **Keine leeren Zellen.** Schreiben Sie einen leeren Wert als Halbgeviertstrich `–` (U+2013) und lassen Sie die Zelle nie leer. Das Schema behandelt `–` als Markierung für „kein Wert“.
+- **`Qty` ist eine Zahl.** Verwenden Sie ganze Zahlen für einzelne Teile; Brüche sind bei gemessenen Einheiten in Ordnung (zum Beispiel `412.5` mm Riemen). Lint prüft nur, ob sich der Wert als Zahl lesen lässt. Es gleicht `Qty` **nicht** mit `UOM` ab.
+- **`UOM` ist Freitext.** Es gibt kein festes Vokabular; verwenden Sie sinnvolle Einheiten. Das ist bewusst locker gehalten.
+- **`Design Source`** verweist auf die CAD-, Leiterplatten- oder Kabelquelle, die das Teil definiert. Bevorzugen Sie einen relativen Pfad im Repository; verwenden Sie `–`, wenn keine Konstruktionsquelle bekannt ist.
+- **`Purchase Source`** verweist auf die Produktseite des Händlers oder Webshops. Führen Sie sie zusätzlich zur Konstruktionsquelle, wenn beide vorhanden sind. Für Teile, die in einem Bausatz verkauft werden, ist eine Bausatz-URL angemessen.
+- Kennzeichnen Sie optionale Teile ausdrücklich in `Notes`, einschließlich der Bauvariante, für die sie gelten. Behalten Sie ihre Menge in `Qty`.
+
+## Teilekategorie-Codes
+
+`Category` muss einer dieser Codes sein; die Liste ist geschlossen. Codes werden großgeschrieben. Erweitern Sie die Liste nur, indem Sie diese Liste und das Schema in `dev-docs` bearbeiten; fügen Sie niemals spontan Codes in einem Produkt-Repository hinzu.
+
+| Code | Teilekategorie                                 |
+| ---- | ---------------------------------------------- |
+| ADH  | Klebstoff                                      |
+| ASM  | Baugruppe                                      |
+| BTP  | Riemen und Riemenscheibe                       |
+| BTY  | Akku                                           |
+| CAP  | Kondensator                                    |
+| CBL  | Kabel                                          |
+| CHA  | Kabelbaum                                      |
+| CON  | Steckverbinder                                 |
+| CSM  | Bearbeitetes Metall                            |
+| EXT  | Aluminium-Strangpressprofil                    |
+| FBO  | Gefertigt, Sonstiges                           |
+| FDM  | Im FDM-Verfahren gedruckte Teile               |
+| FIL  | FDM-Filament                                   |
+| FST  | Befestigungselement                            |
+| FUS  | Sicherung                                      |
+| IC   | Integrierte Schaltung                          |
+| IND  | Induktivität                                   |
+| INS  | Isolierung                                     |
+| LNM  | Linearbewegung                                 |
+| LUB  | Schmiermittel                                  |
+| MCM  | Bearbeiteter Kunststoff                        |
+| MTR  | Motor                                          |
+| OSC  | Oszillator                                     |
+| PCA  | Bestückte Leiterplatte                         |
+| PCB  | Leiterplatte                                   |
+| PCP  | Leiterplattennutzen                            |
+| PKG  | Verpackung                                     |
+| PNU  | Pneumatik                                      |
+| PPG  | Papierwaren                                    |
+| PSU  | Netzteil                                       |
+| PWT  | Kraftübertragung                               |
+| RES  | Widerstand                                     |
+| SKU  | Lagerartikel (SKU)                             |
+| SLA  | Im SLA-Verfahren gedruckte Teile               |
+| SOP  | Standardarbeitsanweisung                       |
+| SPR  | Feder                                          |
+| SWI  | Schalter                                       |
+
+## Wie der Standard jedes Repository erreicht
+
+- **Menschen** lesen diese Seite unter `dev.researchanddesire.com/meta/bom-standard`. Die `CONTRIBUTING.md` und die Hardware-Vorlagen für Pull Requests und Issues jedes Produkt-Repositorys verlinken hierher.
+- **Editor-Regeln** in den Repositorys, die das Schema übernehmen, enthalten den Spaltenvertrag und die Kategorie-Codes direkt und verweisen hierher zurück.
+- **CI** prüft `bom.csv` mit `bom-lint` gegen das übernommene `bom.schema.json`. Ein geplanter Workflow in jedem dieser Repositorys öffnet einen Pull Request, wenn sich das kanonische Schema ändert.
+
+Fließtext und Schema werden einmal hier geschrieben und per CI verteilt: dieselbe Regel „einmal schreiben, Kopien nie von Hand bearbeiten“, die auch für die Entwicklerdokumentation gilt.

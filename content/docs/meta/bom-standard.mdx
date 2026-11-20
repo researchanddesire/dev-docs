@@ -1,0 +1,112 @@
+---
+title: "BOM standard"
+description: "Column contract, part category codes, and conventions for every Research and Desire hardware bill of materials."
+---
+
+This page is the single reference for bills of materials (BOMs) across all Research and Desire hardware repositories. Every `hardware/bom.csv` in [OSSM](https://github.com/researchanddesire/OSSM), [LKBX](https://github.com/researchanddesire/lkbx), [DTT](https://github.com/researchanddesire/dtt), and [RADR](https://github.com/researchanddesire/radr) follows this contract, so BOMs stay consistent and machine-readable for contributors, tooling, and CI.
+
+**Canonical source:** this page (prose) and [`schemas/bom.schema.json`](https://github.com/researchanddesire/dev-docs/blob/main/schemas/bom.schema.json) (machine-readable) live in [`researchanddesire/dev-docs`](https://github.com/researchanddesire/dev-docs). Product repositories vendor the schema read-only and enforce it with the `bom-lint` check. Do not fork the standard per repository; change it in `dev-docs`.
+
+## File
+
+- **Location:** `hardware/bom.csv` in each product repository. `bom-lint` checks every `hardware/**/bom.csv`.
+- **Format:** CSV, one row per line item, with the fixed header row below as the first line.
+
+## Editing a BOM
+
+Anyone is welcome to edit `hardware/bom.csv` directly and open a pull request. There is no extra gatekeeping: **as long as `bom-lint` passes, the change is good.** The `bom.csv` file is human-owned data, not a generated artifact.
+
+Only the schema is locked. `.github/workflows/scripts/bom.schema.json` is vendored read-only from `dev-docs`, so do not hand-edit it. Changes to the standard itself happen in `dev-docs`.
+
+## Header row
+
+Use this exact header, in this order:
+
+```text
+#,Part Name,Category,Description,Qty,UOM,Manufacturer,MFG PN,Vendor,Vendor PN,Design Source,Purchase Source,Notes
+```
+
+## Migration from the 12-column header
+
+BOMs that still use the 12-column header with a single `Source` column remain supported by [R+D Assembly](https://ohai.researchanddesire.com) during migration. Move repository and design paths to `Design Source` and vendor or product URLs to `Purchase Source`; do not infer a missing link. Update the validators before migrating a product CSV. Older BOMs keep their original header and row values when imported.
+
+## Columns
+
+The schema tracks both the canonical **field name** (machine identifier) and the **header** it renders as:
+
+| Field name           | Header            | Type    | Required | Notes                                                          |
+| -------------------- | ----------------- | ------- | -------- | -------------------------------------------------------------- |
+| `line_item`          | `#`               | integer | yes      | Sequential line number                                         |
+| `part_name`          | `Part Name`       | string  | yes      |                                                                |
+| `category`           | `Category`        | string  | yes      | One of the [category codes](#part-category-codes) (closed set) |
+| `description`        | `Description`     | string  | no       |                                                                |
+| `qty`                | `Qty`             | number  | yes      | UOM carries the unit; fractions allowed for measured UOMs      |
+| `unit_of_measure`    | `UOM`             | string  | no       | Free text (for example `each`, `mm`, `ml`, `g`)                |
+| `manufacturer`       | `Manufacturer`    | string  | no       |                                                                |
+| `mfg_part_number`    | `MFG PN`          | string  | no       |                                                                |
+| `vendor`             | `Vendor`          | string  | no       |                                                                |
+| `vendor_part_number` | `Vendor PN`       | string  | no       |                                                                |
+| `design_source`      | `Design Source`   | string  | no       | CAD, PCB, or cable design path or URL, else `–`                |
+| `purchase_source`    | `Purchase Source` | string  | no       | Vendor or webstore product URL, else `–`                       |
+| `notes`              | `Notes`           | string  | no       |                                                                |
+
+## Conventions
+
+- **No blank cells.** Write an empty value as an en dash `–` (U+2013), never leave it blank. The schema treats `–` as the "no value" marker.
+- **`Qty` is a number.** Use integers for discrete parts; fractions are fine for measured UOMs (for example `412.5` mm of belt). Lint only checks that it parses as a number. It does **not** cross-check `Qty` against `UOM`.
+- **`UOM` is free text.** There is no closed vocabulary; use sensible units. It is kept loose on purpose.
+- **`Design Source`** links to the CAD, PCB, or cable source that defines the part. Prefer an in-repository relative path; use `–` when no design source is known.
+- **`Purchase Source`** links to the vendor or webstore product page. Keep it alongside the design source when both exist. A kit URL is appropriate for parts sold in a kit.
+- Mark optional parts explicitly in `Notes`, including the build variant they apply to. Keep their quantity in `Qty`.
+
+## Part category codes
+
+`Category` must be one of these codes, a closed vocabulary. Codes are uppercase. Extend the set only by editing this list and the schema in `dev-docs`; never add codes ad hoc in a product repository.
+
+| Code | Part category                           |
+| ---- | --------------------------------------- |
+| ADH  | Adhesive                                |
+| ASM  | Assembly                                |
+| BTP  | Belt and Pulley                         |
+| BTY  | Battery                                 |
+| CAP  | Capacitor                               |
+| CBL  | Cable                                   |
+| CHA  | Cable Harness Assembly                  |
+| CON  | Connector                               |
+| CSM  | Machined Metal                          |
+| EXT  | Extruded Aluminum                       |
+| FBO  | Fabricated, Other                       |
+| FDM  | Fused Deposition Modeling Printed Parts |
+| FIL  | FDM Filament                            |
+| FST  | Fastener                                |
+| FUS  | Fuse                                    |
+| IC   | Integrated Circuit                      |
+| IND  | Inductor                                |
+| INS  | Insulation                              |
+| LNM  | Linear Motion                           |
+| LUB  | Lubricant                               |
+| MCM  | Machined Plastic                        |
+| MTR  | Motor                                   |
+| OSC  | Oscillator                              |
+| PCA  | Printed Circuit Board Assembly          |
+| PCB  | Printed Circuit Board                   |
+| PCP  | Printed Circuit Board Panel             |
+| PKG  | Packaging                               |
+| PNU  | Pneumatic                               |
+| PPG  | Paper Goods                             |
+| PSU  | Power Supply Unit                       |
+| PWT  | Power Transmission                      |
+| RES  | Resistor                                |
+| SKU  | Stock Keeping Unit                      |
+| SLA  | Stereolithography Printed Parts         |
+| SOP  | Standard Operating Procedure            |
+| SPR  | Spring                                  |
+| SWI  | Switch                                  |
+
+## How this reaches every repository
+
+- **People** read this page at `dev.researchanddesire.com/meta/bom-standard`. Each product repository's `CONTRIBUTING.md` and hardware pull request and issue templates link here.
+- **Editor rules** in the repositories that vendor the schema carry the column contract and category codes inline and point back here.
+- **CI** validates `bom.csv` against the vendored `bom.schema.json` with `bom-lint`. A scheduled workflow in each of those repositories opens a pull request when the canonical schema changes.
+
+The prose and schema are written once here and fanned out by CI: the same "write once, never hand-edit copies" rule used for the developer docs.

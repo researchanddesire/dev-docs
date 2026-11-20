@@ -1,0 +1,112 @@
+---
+title: "BOM-standaard"
+description: "Kolomcontract, categoriecodes voor onderdelen en conventies voor elke stuklijst van Research and Desire-hardware."
+---
+
+Deze pagina is de enige referentie voor stuklijsten (bills of materials, BOM's) in alle hardwarerepository's van Research and Desire. Elke `hardware/bom.csv` in [OSSM](https://github.com/researchanddesire/OSSM), [LKBX](https://github.com/researchanddesire/lkbx), [DTT](https://github.com/researchanddesire/dtt) en [RADR](https://github.com/researchanddesire/radr) volgt dit contract, zodat stuklijsten consistent en machineleesbaar blijven voor bijdragers, tooling en CI.
+
+**Canonieke bron:** deze pagina (tekst) en [`schemas/bom.schema.json`](https://github.com/researchanddesire/dev-docs/blob/main/schemas/bom.schema.json) (machineleesbaar) staan in [`researchanddesire/dev-docs`](https://github.com/researchanddesire/dev-docs). Productrepository's nemen het schema alleen-lezen over en dwingen het af met de controle `bom-lint`. Maak geen eigen variant van de standaard per repository; wijzig hem in `dev-docs`.
+
+## Bestand
+
+- **Locatie:** `hardware/bom.csv` in elke productrepository. `bom-lint` controleert elke `hardware/**/bom.csv`.
+- **Indeling:** CSV, één rij per regelitem, met de vaste kopregel hieronder als eerste regel.
+
+## Een stuklijst bewerken
+
+Iedereen mag `hardware/bom.csv` rechtstreeks bewerken en een pull request openen. Er is geen extra goedkeuringsstap: **zolang `bom-lint` slaagt, is de wijziging goed.** Het bestand `bom.csv` bevat door mensen beheerde gegevens en is geen gegenereerd artefact.
+
+Alleen het schema staat vast. `.github/workflows/scripts/bom.schema.json` wordt alleen-lezen overgenomen uit `dev-docs`, dus bewerk het niet met de hand. Wijzigingen aan de standaard zelf gebeuren in `dev-docs`.
+
+## Kopregel
+
+Gebruik precies deze kopregel, in deze volgorde:
+
+```text
+#,Part Name,Category,Description,Qty,UOM,Manufacturer,MFG PN,Vendor,Vendor PN,Design Source,Purchase Source,Notes
+```
+
+## Overstappen van de kopregel met 12 kolommen
+
+Stuklijsten die nog de kopregel met 12 kolommen en één kolom `Source` gebruiken, blijven tijdens de overstap ondersteund door [R+D Assembly](https://ohai.researchanddesire.com). Verplaats repository- en ontwerppaden naar `Design Source` en URL's van leveranciers of producten naar `Purchase Source`; vul een ontbrekende link niet op basis van een vermoeden in. Werk eerst de validators bij voordat je een product-CSV omzet. Oudere stuklijsten behouden bij het importeren hun oorspronkelijke kopregel en rijwaarden.
+
+## Kolommen
+
+Het schema legt zowel de canonieke **veldnaam** (machine-ID) vast als de **kop** waarmee die wordt weergegeven:
+
+| Veldnaam             | Kop               | Type    | Verplicht | Opmerkingen                                                           |
+| -------------------- | ----------------- | ------- | --------- | --------------------------------------------------------------------- |
+| `line_item`          | `#`               | integer | ja        | Doorlopend regelnummer                                                |
+| `part_name`          | `Part Name`       | string  | ja        |                                                                       |
+| `category`           | `Category`        | string  | ja        | Een van de [categoriecodes](#categoriecodes-voor-onderdelen) (gesloten lijst) |
+| `description`        | `Description`     | string  | nee       |                                                                       |
+| `qty`                | `Qty`             | number  | ja        | UOM bepaalt de eenheid; breuken toegestaan bij gemeten eenheden       |
+| `unit_of_measure`    | `UOM`             | string  | nee       | Vrije tekst (bijvoorbeeld `each`, `mm`, `ml`, `g`)                    |
+| `manufacturer`       | `Manufacturer`    | string  | nee       |                                                                       |
+| `mfg_part_number`    | `MFG PN`          | string  | nee       |                                                                       |
+| `vendor`             | `Vendor`          | string  | nee       |                                                                       |
+| `vendor_part_number` | `Vendor PN`       | string  | nee       |                                                                       |
+| `design_source`      | `Design Source`   | string  | nee       | Pad of URL van het CAD-, printplaat- of kabelontwerp, anders `–`      |
+| `purchase_source`    | `Purchase Source` | string  | nee       | Product-URL van de leverancier of webwinkel, anders `–`               |
+| `notes`              | `Notes`           | string  | nee       |                                                                       |
+
+## Conventies
+
+- **Geen lege cellen.** Schrijf een lege waarde als en-streepje `–` (U+2013) en laat een cel nooit leeg. Het schema behandelt `–` als markering voor "geen waarde".
+- **`Qty` is een getal.** Gebruik gehele getallen voor losse onderdelen; breuken zijn prima bij gemeten eenheden (bijvoorbeeld `412.5` mm riem). Lint controleert alleen of de waarde als getal te lezen is. Het vergelijkt `Qty` **niet** met `UOM`.
+- **`UOM` is vrije tekst.** Er is geen vaste woordenlijst; gebruik logische eenheden. Dit is bewust ruim gehouden.
+- **`Design Source`** verwijst naar de CAD-, printplaat- of kabelbron die het onderdeel definieert. Gebruik bij voorkeur een relatief pad binnen de repository; gebruik `–` als er geen ontwerpbron bekend is.
+- **`Purchase Source`** verwijst naar de productpagina van de leverancier of webwinkel. Houd deze naast de ontwerpbron aan als beide bestaan. Voor onderdelen die in een kit worden verkocht, is een kit-URL geschikt.
+- Markeer optionele onderdelen expliciet in `Notes`, inclusief de bouwvariant waarvoor ze gelden. Houd hun aantal in `Qty`.
+
+## Categoriecodes voor onderdelen
+
+`Category` moet een van deze codes zijn; de lijst is gesloten. Codes zijn in hoofdletters. Breid de lijst alleen uit door deze lijst en het schema in `dev-docs` te bewerken; voeg nooit zomaar codes toe in een productrepository.
+
+| Code | Onderdeelcategorie                         |
+| ---- | ------------------------------------------ |
+| ADH  | Lijm                                       |
+| ASM  | Samenstelling                              |
+| BTP  | Riem en poelie                             |
+| BTY  | Accu                                       |
+| CAP  | Condensator                                |
+| CBL  | Kabel                                      |
+| CHA  | Kabelboom                                  |
+| CON  | Connector                                  |
+| CSM  | Bewerkt metaal                             |
+| EXT  | Geëxtrudeerd aluminium                     |
+| FBO  | Gefabriceerd, overig                       |
+| FDM  | Met FDM geprinte onderdelen                |
+| FIL  | FDM-filament                               |
+| FST  | Bevestigingsmiddel                         |
+| FUS  | Zekering                                   |
+| IC   | Geïntegreerde schakeling                   |
+| IND  | Spoel                                      |
+| INS  | Isolatie                                   |
+| LNM  | Lineaire beweging                          |
+| LUB  | Smeermiddel                                |
+| MCM  | Bewerkt kunststof                          |
+| MTR  | Motor                                      |
+| OSC  | Oscillator                                 |
+| PCA  | Bestukte printplaat                        |
+| PCB  | Printplaat                                 |
+| PCP  | Printplaatpaneel                           |
+| PKG  | Verpakking                                 |
+| PNU  | Pneumatiek                                 |
+| PPG  | Papierwaren                                |
+| PSU  | Voeding                                    |
+| PWT  | Krachtoverbrenging                         |
+| RES  | Weerstand                                  |
+| SKU  | Voorraadartikel (SKU)                      |
+| SLA  | Met SLA geprinte onderdelen                |
+| SOP  | Standaardwerkinstructie                    |
+| SPR  | Veer                                       |
+| SWI  | Schakelaar                                 |
+
+## Hoe de standaard elke repository bereikt
+
+- **Mensen** lezen deze pagina op `dev.researchanddesire.com/meta/bom-standard`. De `CONTRIBUTING.md` en de hardwaresjablonen voor pull requests en issues van elke productrepository verwijzen hiernaartoe.
+- **Editorregels** in de repository's die het schema overnemen, bevatten het kolomcontract en de categoriecodes zelf en verwijzen terug naar deze pagina.
+- **CI** valideert `bom.csv` met `bom-lint` tegen het overgenomen `bom.schema.json`. Een geplande workflow in elk van die repository's opent een pull request wanneer het canonieke schema verandert.
+
+De tekst en het schema worden hier één keer geschreven en via CI verspreid: dezelfde regel "één keer schrijven, kopieën nooit met de hand bewerken" die ook voor de ontwikkelaarsdocumentatie geldt.
