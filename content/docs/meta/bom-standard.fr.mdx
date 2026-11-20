@@ -1,0 +1,112 @@
+---
+title: "Norme BOM"
+description: "Contrat de colonnes, codes de catégorie de pièces et conventions pour chaque nomenclature du matériel Research and Desire."
+---
+
+Cette page est la référence unique pour les nomenclatures (bills of materials, BOM) de tous les dépôts matériels de Research and Desire. Chaque `hardware/bom.csv` dans [OSSM](https://github.com/researchanddesire/OSSM), [LKBX](https://github.com/researchanddesire/lkbx), [DTT](https://github.com/researchanddesire/dtt) et [RADR](https://github.com/researchanddesire/radr) suit ce contrat, afin que les nomenclatures restent cohérentes et lisibles par machine pour les contributeurs, les outils et la CI.
+
+**Source canonique :** cette page (texte) et [`schemas/bom.schema.json`](https://github.com/researchanddesire/dev-docs/blob/main/schemas/bom.schema.json) (lisible par machine) se trouvent dans [`researchanddesire/dev-docs`](https://github.com/researchanddesire/dev-docs). Les dépôts produits intègrent le schéma en lecture seule et l'appliquent avec la vérification `bom-lint`. Ne créez pas de variante de la norme par dépôt ; modifiez-la dans `dev-docs`.
+
+## Fichier
+
+- **Emplacement :** `hardware/bom.csv` dans chaque dépôt produit. `bom-lint` vérifie chaque `hardware/**/bom.csv`.
+- **Format :** CSV, une ligne par article, avec la ligne d'en-tête fixe ci-dessous en première ligne.
+
+## Modifier une nomenclature
+
+Tout le monde peut modifier `hardware/bom.csv` directement et ouvrir une pull request. Il n'y a pas de validation supplémentaire : **tant que `bom-lint` réussit, la modification est bonne.** Le fichier `bom.csv` contient des données gérées par des personnes ; ce n'est pas un artefact généré.
+
+Seul le schéma est verrouillé. `.github/workflows/scripts/bom.schema.json` est intégré en lecture seule depuis `dev-docs` : ne le modifiez donc pas à la main. Les modifications de la norme elle-même se font dans `dev-docs`.
+
+## Ligne d'en-tête
+
+Utilisez exactement cet en-tête, dans cet ordre :
+
+```text
+#,Part Name,Category,Description,Qty,UOM,Manufacturer,MFG PN,Vendor,Vendor PN,Design Source,Purchase Source,Notes
+```
+
+## Migration depuis l'en-tête à 12 colonnes
+
+Les nomenclatures qui utilisent encore l'en-tête à 12 colonnes avec une seule colonne `Source` restent prises en charge par [R+D Assembly](https://ohai.researchanddesire.com) pendant la migration. Déplacez les chemins de dépôt et de conception vers `Design Source`, et les URL de fournisseurs ou de produits vers `Purchase Source` ; ne devinez pas un lien manquant. Mettez à jour les validateurs avant de migrer le CSV d'un produit. Les anciennes nomenclatures conservent leur en-tête et leurs valeurs de ligne d'origine lors de l'import.
+
+## Colonnes
+
+Le schéma enregistre à la fois le **nom de champ** canonique (identifiant machine) et l'**en-tête** sous lequel il s'affiche :
+
+| Nom de champ         | En-tête           | Type    | Obligatoire | Remarques                                                              |
+| -------------------- | ----------------- | ------- | ----------- | ---------------------------------------------------------------------- |
+| `line_item`          | `#`               | integer | oui         | Numéro de ligne séquentiel                                             |
+| `part_name`          | `Part Name`       | string  | oui         |                                                                        |
+| `category`           | `Category`        | string  | oui         | L'un des [codes de catégorie](#codes-de-catégorie-de-pièces) (liste fermée) |
+| `description`        | `Description`     | string  | non         |                                                                        |
+| `qty`                | `Qty`             | number  | oui         | UOM porte l'unité ; fractions autorisées pour les unités mesurées      |
+| `unit_of_measure`    | `UOM`             | string  | non         | Texte libre (par exemple `each`, `mm`, `ml`, `g`)                      |
+| `manufacturer`       | `Manufacturer`    | string  | non         |                                                                        |
+| `mfg_part_number`    | `MFG PN`          | string  | non         |                                                                        |
+| `vendor`             | `Vendor`          | string  | non         |                                                                        |
+| `vendor_part_number` | `Vendor PN`       | string  | non         |                                                                        |
+| `design_source`      | `Design Source`   | string  | non         | Chemin ou URL de la conception CAO, du circuit imprimé ou du câble, sinon `–` |
+| `purchase_source`    | `Purchase Source` | string  | non         | URL du produit chez le fournisseur ou la boutique en ligne, sinon `–`  |
+| `notes`              | `Notes`           | string  | non         |                                                                        |
+
+## Conventions
+
+- **Aucune cellule vide.** Écrivez une valeur vide sous forme de tiret demi-cadratin `–` (U+2013) et ne laissez jamais une cellule vide. Le schéma traite `–` comme le marqueur « aucune valeur ».
+- **`Qty` est un nombre.** Utilisez des entiers pour les pièces unitaires ; les fractions conviennent aux unités mesurées (par exemple `412.5` mm de courroie). Le lint vérifie seulement que la valeur se lit comme un nombre. Il ne compare **pas** `Qty` à `UOM`.
+- **`UOM` est un texte libre.** Il n'y a pas de vocabulaire fermé ; utilisez des unités sensées. C'est volontairement souple.
+- **`Design Source`** renvoie à la source CAO, de circuit imprimé ou de câble qui définit la pièce. Préférez un chemin relatif dans le dépôt ; utilisez `–` lorsqu'aucune source de conception n'est connue.
+- **`Purchase Source`** renvoie à la page produit du fournisseur ou de la boutique en ligne. Conservez-la à côté de la source de conception lorsque les deux existent. Une URL de kit convient aux pièces vendues en kit.
+- Signalez explicitement les pièces optionnelles dans `Notes`, en précisant la variante de montage concernée. Conservez leur quantité dans `Qty`.
+
+## Codes de catégorie de pièces
+
+`Category` doit être l'un de ces codes ; la liste est fermée. Les codes sont en majuscules. N'étendez la liste qu'en modifiant cette liste et le schéma dans `dev-docs` ; n'ajoutez jamais de code au cas par cas dans un dépôt produit.
+
+| Code | Catégorie de pièce                          |
+| ---- | ------------------------------------------- |
+| ADH  | Adhésif                                     |
+| ASM  | Assemblage                                  |
+| BTP  | Courroie et poulie                          |
+| BTY  | Batterie                                    |
+| CAP  | Condensateur                                |
+| CBL  | Câble                                       |
+| CHA  | Faisceau de câbles                          |
+| CON  | Connecteur                                  |
+| CSM  | Métal usiné                                 |
+| EXT  | Aluminium extrudé                           |
+| FBO  | Fabriqué, autre                             |
+| FDM  | Pièces imprimées par dépôt de fil fondu (FDM) |
+| FIL  | Filament FDM                                |
+| FST  | Fixation                                    |
+| FUS  | Fusible                                     |
+| IC   | Circuit intégré                             |
+| IND  | Inductance                                  |
+| INS  | Isolation                                   |
+| LNM  | Mouvement linéaire                          |
+| LUB  | Lubrifiant                                  |
+| MCM  | Plastique usiné                             |
+| MTR  | Moteur                                      |
+| OSC  | Oscillateur                                 |
+| PCA  | Circuit imprimé assemblé                    |
+| PCB  | Circuit imprimé                             |
+| PCP  | Panneau de circuits imprimés                |
+| PKG  | Emballage                                   |
+| PNU  | Pneumatique                                 |
+| PPG  | Articles en papier                          |
+| PSU  | Bloc d'alimentation                         |
+| PWT  | Transmission de puissance                   |
+| RES  | Résistance                                  |
+| SKU  | Unité de gestion des stocks (SKU)           |
+| SLA  | Pièces imprimées par stéréolithographie     |
+| SOP  | Procédure opératoire standard               |
+| SPR  | Ressort                                     |
+| SWI  | Interrupteur                                |
+
+## Comment la norme atteint chaque dépôt
+
+- **Les personnes** lisent cette page à l'adresse `dev.researchanddesire.com/meta/bom-standard`. Le `CONTRIBUTING.md` et les modèles matériels de pull request et d'issue de chaque dépôt produit renvoient ici.
+- **Les règles d'éditeur** des dépôts qui intègrent le schéma reprennent directement le contrat de colonnes et les codes de catégorie, et renvoient à cette page.
+- **La CI** valide `bom.csv` avec `bom-lint` par rapport au `bom.schema.json` intégré. Un workflow planifié dans chacun de ces dépôts ouvre une pull request lorsque le schéma canonique change.
+
+Le texte et le schéma sont rédigés une seule fois ici et diffusés par la CI : la même règle « écrire une fois, ne jamais modifier les copies à la main » que pour la documentation développeur.
